@@ -1,0 +1,37 @@
+# --- Unity ---
+# 忽略 Unity 自動生成的目錄，避免多台電腦間產生不必要的同步衝突
+Library/
+Logs/
+Temp/
+obj/
+build/
+Assets/Plugins/*/Editor/
+
+# Unity 錯誤日誌
+*.log
+
+# Visual Studio / Rider 的 IDE 設定檔（不同電腦設定可能不同）
+.vscode/
+.idea/
+*.sln
+*.csproj
+*.userprefs
+
+# --- Aseprite ---
+# 忽略 Aseprite 的備份檔案
+*.aseprite-backups/
+
+# --- Audacity ---
+# 忽略 Audacity 的暫存檔
+*.aup3-wal
+*.autosave
+
+# --- 通用忽略 ---
+# 版本控制無需跟蹤的二進制檔案
+*.exe
+*.dll
+*.pdb
+*.obj
+*.pyc
+.DS_Store
+Thumbs.db

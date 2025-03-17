@@ -7,10 +7,18 @@ public class Player : MonoBehaviour, IDamageable, IAttackable
 {
     #region 公開變數
     public int playerID;
+
+    // 基礎冷卻時間（不變動，從 SkillData 來)
     public float skillSlot1CooldownTime;
     public float skillSlot2CooldownTime;
     public float skillSlot3CooldownTime;
     public float skillSlot4CooldownTime;
+
+    // 實際倒數的冷卻時間
+    private float skillSlot1CurrentCooldownTime = 0;
+    private float skillSlot2CurrentCooldownTime = 0;
+    private float skillSlot3CurrentCooldownTime = 0;
+    private float skillSlot4CurrentCooldownTime = 0;
 
     public GameObject skillSlot1DetectPrefab;
     public GameObject skillSlot2DetectPrefab;
@@ -43,9 +51,11 @@ public class Player : MonoBehaviour, IDamageable, IAttackable
 
     private void Update() {
         behaviorTree.Tick(); // 執行行為樹
-
+        UpdateCooldowns();   // 每幀更新技能冷卻時間
     }
     #endregion
+
+
 
     #region SetBehaviorTree()
     private void SetBehaviorTree() {
@@ -61,60 +71,67 @@ public class Player : MonoBehaviour, IDamageable, IAttackable
     }
     #endregion
 
-    #region CanUseSkillSlot(int skillSlot)          bool 
+    #region CanUseSkill(int skillSlot)
     public bool CanUseSkill(int skillSlot) {
         switch (skillSlot)
         {
-            case 1: return CanUseSkillSlot1();
-            case 2: return CanUseSkillSlot2();
-            case 3: return CanUseSkillSlot3();
-            case 4: return CanUseSkillSlot4();
+            case 1: return CanUseSkillSlot(skillSlot1DetectPrefab, skillSlot1CurrentCooldownTime);
+            case 2: return CanUseSkillSlot(skillSlot2DetectPrefab, skillSlot2CurrentCooldownTime);
+            case 3: return CanUseSkillSlot(skillSlot3DetectPrefab, skillSlot3CurrentCooldownTime);
+            case 4: return CanUseSkillSlot(skillSlot4DetectPrefab, skillSlot4CurrentCooldownTime);
             default: return false;
         }
     }
 
-    public bool CanUseSkillSlot1() {
-        if (skillSlot1DetectPrefab == null) return false;
-        TargetDetector detector = skillSlot1DetectPrefab.GetComponent<TargetDetector>();
-        return detector != null && detector.hasTarget && skillSlot1CooldownTime <= 0;
-    }
-    public bool CanUseSkillSlot2() {
-        if (skillSlot2DetectPrefab == null) return false;
-        TargetDetector detector = skillSlot1DetectPrefab.GetComponent<TargetDetector>();
-        return detector != null && detector.hasTarget && skillSlot1CooldownTime <= 0;
-    }
-    public bool CanUseSkillSlot3() {
-        if (skillSlot3DetectPrefab == null) return false;
-        TargetDetector detector = skillSlot1DetectPrefab.GetComponent<TargetDetector>();
-        return detector != null && detector.hasTarget && skillSlot1CooldownTime <= 0;
-    }
-    public bool CanUseSkillSlot4() {
-        if (skillSlot4DetectPrefab == null) return false;
-        TargetDetector detector = skillSlot1DetectPrefab.GetComponent<TargetDetector>();
-        return detector != null && detector.hasTarget && skillSlot1CooldownTime <= 0;
+    private bool CanUseSkillSlot(GameObject detectPrefab, float cooldown) {
+        if (detectPrefab == null) return false;
+        TargetDetector detector = detectPrefab.GetComponent<TargetDetector>();
+        return detector != null && detector.hasTarget && cooldown <= 0;
     }
     #endregion
-    #region UseSkillSlot(int skillSlot)             void
+    #region UseSkill(int skillSlot)
     public void UseSkill(int skillSlot) {
         switch (skillSlot)
         {
-            case 1: UseSkillSlot1(); break;
-            case 2: UseSkillSlot2(); break;
-            case 3: UseSkillSlot3(); break;
-            case 4: UseSkillSlot4(); break;
+            case 1: UseSkillSlot(0, skillSlot1DetectPrefab, ref skillSlot1CurrentCooldownTime, skillSlot1CooldownTime); break;
+            case 2: UseSkillSlot(1, skillSlot2DetectPrefab, ref skillSlot2CurrentCooldownTime, skillSlot2CooldownTime); break;
+            case 3: UseSkillSlot(2, skillSlot3DetectPrefab, ref skillSlot3CurrentCooldownTime, skillSlot3CooldownTime); break;
+            case 4: UseSkillSlot(3, skillSlot4DetectPrefab, ref skillSlot4CurrentCooldownTime, skillSlot4CooldownTime); break;
         }
     }
 
-    public void UseSkillSlot1() { skillSlot1CooldownTime = playerStats.GetSkillAtSkillSlot(0).cooldownTime; Attack(); }
-    public void UseSkillSlot2() { skillSlot2CooldownTime = playerStats.GetSkillAtSkillSlot(1).cooldownTime; Attack(); }
-    public void UseSkillSlot3() { skillSlot3CooldownTime = playerStats.GetSkillAtSkillSlot(2).cooldownTime; Attack(); }
-    public void UseSkillSlot4() { skillSlot4CooldownTime = playerStats.GetSkillAtSkillSlot(3).cooldownTime; Attack(); }
+    private void UseSkillSlot(int slotIndex, GameObject detectPrefab, ref float currentCooldown, float baseCooldown) {
+        if (playerStats == null) return;
+        var skillData = playerStats.GetSkillAtSkillSlot(slotIndex);
+        if (skillData == null) return;
+
+        // 🔹 **立即開始冷卻計時**
+        currentCooldown = baseCooldown;
+
+        Attack(slotIndex, detectPrefab, skillData.skillPrefab);
+    }
+    #endregion
+    #region 冷卻時間倒數
+    private void UpdateCooldowns() {
+        // 🔹 **讓冷卻時間減少**
+        skillSlot1CurrentCooldownTime = Mathf.Max(0, skillSlot1CurrentCooldownTime - Time.deltaTime);
+        skillSlot2CurrentCooldownTime = Mathf.Max(0, skillSlot2CurrentCooldownTime - Time.deltaTime);
+        skillSlot3CurrentCooldownTime = Mathf.Max(0, skillSlot3CurrentCooldownTime - Time.deltaTime);
+        skillSlot4CurrentCooldownTime = Mathf.Max(0, skillSlot4CurrentCooldownTime - Time.deltaTime);
+    }
     #endregion
 
     #region 公開Attack()方法
-    public void Attack() {
+    private void Attack(int slotIndex, GameObject detectPrefab, GameObject skillPrefab) {
         animator.Play(Animator.StringToHash("Attack"));
-        //behaviorTree.canChangeAnim = false;
+        if (skillSpawner != null && detectPrefab != null)
+        {
+            TargetDetector detector = detectPrefab.GetComponent<TargetDetector>();
+            if (detector != null && detector.targetTransform != null)
+            {
+                skillSpawner.SpawnAttack(skillPrefab, detector.targetTransform);
+            }
+        }
     }
     #endregion
     #region 公開Move()方法

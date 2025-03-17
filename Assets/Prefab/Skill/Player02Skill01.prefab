@@ -168,3 +168,26 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a4dfaaf66ef49214aae722a3f87c09a6, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  moveType: 0
+  skillDamage: 1
+  destroyDelay: 1
+  moveSpeed: 1
+  targetLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  skillOffset: {x: 0, y: 0}
+  knockbackForce: 0
+  scaleFactor: {x: 1, y: 1}
+  moveCount: 0
+  resetDestroyDelay: 0
+  chaseNextTargetCount: 0
+  splitPrefab: {fileID: 0}
+  multiHitCount: 0
+  dotDamage: 0
+  dotDuration: 0
+  attackReduction: 0
+  attackReductionDuration: 0
+  speedReduction: 0
+  speedReductionDuration: 0
+  canRotate: 1
+  mirrorFlipOnLeftSide: 1

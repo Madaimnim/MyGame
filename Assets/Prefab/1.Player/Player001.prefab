@@ -122,7 +122,7 @@ BoxCollider2D:
   m_Enabled: 1
   m_Density: 1
   m_Material: {fileID: 0}
-  m_IsTrigger: 0
+  m_IsTrigger: 1
   m_UsedByEffector: 0
   m_UsedByComposite: 0
   m_Offset: {x: -0.01133728, y: 0.569464}
@@ -172,6 +172,14 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   playerID: 1
+  skillSlot1CooldownTime: 0
+  skillSlot2CooldownTime: 0
+  skillSlot3CooldownTime: 0
+  skillSlot4CooldownTime: 0
+  skillSlot1DetectPrefab: {fileID: 0}
+  skillSlot2DetectPrefab: {fileID: 0}
+  skillSlot3DetectPrefab: {fileID: 0}
+  skillSlot4DetectPrefab: {fileID: 0}
   playerStats:
     playerID: 0
     playerName: 
@@ -192,7 +200,6 @@ MonoBehaviour:
   behaviorTree: {fileID: 1901394458928384578}
   skillSpawner: {fileID: 1901394458928384579}
   shadowController: {fileID: 0}
-  stopMoveDragPower: 0
 --- !u!114 &1901394458928384579
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -219,21 +226,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 032d1b645f3c07b49bfd6d8a7615c927, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  isDead: 0
-  isHurt: 0
-  canMove: 1
-  isMoving: 0
-  canStartMove: 0
-  isInAttack01Range: 0
-  isInAttack02Range: 0
-  isInAttack03Range: 0
-  isInAttack04Range: 0
-  isAttack01CoolDown: 1
-  isAttack02CoolDown: 1
-  isAttack03CoolDown: 1
-  isAttack04CoolDown: 1
-  isCooldownComplete: 1
-  canChangeAnim: 1
 --- !u!114 &1901394458928384607
 MonoBehaviour:
   m_ObjectHideFlags: 0

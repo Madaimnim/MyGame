@@ -82,7 +82,7 @@ SpriteRenderer:
   m_FlipX: 0
   m_FlipY: 0
   m_DrawMode: 0
-  m_Size: {x: 2.25, y: 2.25}
+  m_Size: {x: 1.3125, y: 1.625}
   m_AdaptiveModeThreshold: 0.5
   m_SpriteTileMode: 0
   m_WasSpriteAssigned: 1
@@ -119,15 +119,15 @@ PolygonCollider2D:
   m_Enabled: 1
   m_Density: 1
   m_Material: {fileID: 0}
-  m_IsTrigger: 0
+  m_IsTrigger: 1
   m_UsedByEffector: 0
   m_UsedByComposite: 0
   m_Offset: {x: 0, y: 0}
   m_SpriteTilingProperty:
     border: {x: 0, y: 0, z: 0, w: 0}
-    pivot: {x: 0.5, y: 0}
-    oldSize: {x: 2.25, y: 2.25}
-    newSize: {x: 2.25, y: 2.25}
+    pivot: {x: 0.5, y: 0.5}
+    oldSize: {x: 1.3125, y: 1.625}
+    newSize: {x: 1.3125, y: 1.625}
     adaptiveTilingThreshold: 0.5
     drawMode: 0
     adaptiveTiling: 0
@@ -181,14 +181,14 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a4dfaaf66ef49214aae722a3f87c09a6, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  moveType: 3
+  moveType: 4
   skillDamage: 1
   destroyDelay: 0.5
   moveSpeed: 0
   targetLayers:
     serializedVersion: 2
     m_Bits: 256
-  skillOffset: {x: 1, y: 0}
+  skillOffset: {x: 0, y: 0}
   knockbackForce: 1
   scaleFactor: {x: 1, y: 1}
   moveCount: 0
@@ -202,3 +202,5 @@ MonoBehaviour:
   attackReductionDuration: 0
   speedReduction: 0
   speedReductionDuration: 0
+  canRotate: 1
+  mirrorFlipOnLeftSide: 1

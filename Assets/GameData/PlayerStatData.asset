@@ -56,7 +56,7 @@ MonoBehaviour:
     - skillID: 1
       skillName: "\u5C04\u64CA"
       currentLevel: 1
-      cooldownTime: 0
+      cooldownTime: 1
       skillPrefab: {fileID: 7327708947082931564, guid: ebc3332d416aec74cb1e857b78e74da3, type: 3}
       targetDetectPrefab: {fileID: 1240820100763929428, guid: 97300d7895f13084783945f8167006d2, type: 3}
     - skillID: 3

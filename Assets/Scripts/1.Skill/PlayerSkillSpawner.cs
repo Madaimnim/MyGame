@@ -14,40 +14,23 @@ public class PlayerSkillSpawner : MonoBehaviour
     #endregion
 
     #region AnimationEvent方法()
-    public void SpawnAttack() {
-        int skillSlotIndex = 0;
-
-        int currentSkillID = player.playerStats.equippedSkillIDList[skillSlotIndex];
-        if (!player.playerStats.skillPoolDtny.TryGetValue(currentSkillID, out var currentSkill))
+    public void SpawnAttack(GameObject skillPrefab, Transform targetTransform) {
+        if (skillPrefab == null || targetTransform == null)
         {
-            Debug.LogError($"❌ AttackSpawner: 找不到技能 ID {currentSkillID}！");
-            return;
-        }
-        if (currentSkill.skillPrefab == null)
-        {
-            Debug.LogWarning("❌ AttackSpawner: skillPrefab 未設定！");
+            Debug.LogError("❌ SpawnAttack: SkillPrefab 或 TargetTransform 為空！");
             return;
         }
 
-        //目標方向
-        Vector2 directionVector = targetTransform != null
-            ? (Vector2)(targetTransform.position - transform.position).normalized
-            : Vector2.right; // 默認向右
-
-        //旋轉角度
+        // 計算方向
+        Vector2 directionVector = (Vector2)(targetTransform.position - transform.position).normalized;
         float rotateAngle = Mathf.Atan2(directionVector.y, directionVector.x) * Mathf.Rad2Deg;
 
-        currentSkillPrefab = Instantiate(currentSkill.skillPrefab, transform.position, Quaternion.Euler(0, 0, rotateAngle));
+        // 生成技能
+        GameObject currentSkillPrefab = Instantiate(skillPrefab, transform.position, Quaternion.identity);
         currentSkillPrefab.SetActive(false);               // 避免異常行為，先關閉
 
-        //默認移動方向(1,0)
-        SetSkillObjectProperties(
-            currentSkillPrefab, 
-            new Vector2(1, 0), 
-            player.playerStats.attackPower, 
-            targetTransform, 
-            rotateAngle);
-
+        // 設置技能屬性
+        SetSkillObjectProperties(currentSkillPrefab, directionVector, player.playerStats.attackPower, targetTransform, rotateAngle);
         currentSkillPrefab.SetActive(true); // 啟用
     }
     #endregion

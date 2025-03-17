@@ -20,7 +20,6 @@ public class GameWall : MonoBehaviour, IDamageable
     private Animator animator;
     private Rigidbody2D rb;
     private SpriteRenderer spriteRenderer;
-    private int takeDamage;
     private int currentHp;
     #endregion
 
@@ -41,15 +40,23 @@ public class GameWall : MonoBehaviour, IDamageable
         
     #region TakeDamage()方法，
 
-    public void TakeDamage(int damage,float knockedForece) {
-        takeDamage = damage;
-        currentHp -= takeDamage;
+    public void TakeDamage(
+        int damage,
+        float knockbackForce,
+
+        float dotDuration,
+        float dotDamage,
+
+        float attackReduction,
+        float attackReductionDuration,
+
+        float speedReduction,
+        float speedReductionDuration) {
+
+        currentHp -= damage;
         currentHp = Mathf.Clamp(currentHp, 0, maxHp);
-        Debug.Log($"敵人 {gameWallID} 受傷！當前血量: {currentHp}");
-
         ValueChanged?.Invoke(currentHp, maxHp);//觸發事件，通知 UI 更新血量
-
-        ShowDamageText(takeDamage);//顯示damage數字TEXT
+        ShowDamageText(damage);//顯示damage數字TEXT
     }
     #endregion
 
@@ -62,7 +69,6 @@ public class GameWall : MonoBehaviour, IDamageable
         }
         Vector3 spawnPosition = transform.position + new Vector3(0, 1f, 0); // ✅ 讓數字浮動在敵人上方
 
-        //Instantiate 傷害TEXT預製體
         GameObject damageTextObj = Instantiate(damageTextPrefab, spawnPosition, Quaternion.identity, transform);
         damageTextObj.GetComponent<DamageTextController>().Setup(damage);
     }

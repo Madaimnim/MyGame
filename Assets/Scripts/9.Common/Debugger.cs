@@ -23,18 +23,6 @@ public class Debugger : MonoBehaviour
 
         string debugInfo = $"BlackBoard Debug Info\n"
                          + $"----------------------\n"
-                         + $"isDead: {behaviorTree.isDead}\n"                                 //isDead
-                         + $"isHurt: {behaviorTree.isHurt}\n\n"                               //isHurt
-
-                         + $"canMove: {behaviorTree.canMove}\n"                               //canMove
-                         + $"isMoving: {behaviorTree.isMoving} \n"                            //isMoving
-                         + $"canStartMove: {behaviorTree.canStartMove}\n\n"                   //canStartMove
-
-                         + $"canAttack: {behaviorTree.isInAttack01Range}\n"                     //isInAttackRange
-                         + $"canAttack: {behaviorTree.isInAttack02Range}\n"                     //isInAttackRange
-                         + $"canAttack: {behaviorTree.isInAttack03Range}\n"                     //isInAttackRange
-                         + $"canAttack: {behaviorTree.isInAttack04Range}\n"                     //isInAttackRange
-                         + $"isCooldownComplete: {behaviorTree.isCooldownComplete}\n\n"         //isCooldownComplete
 
                          ;
 

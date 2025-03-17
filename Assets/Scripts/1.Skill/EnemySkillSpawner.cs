@@ -5,12 +5,11 @@ public class EnemySkillSpawner : MonoBehaviour
 {
     #region 公開變數
     public Enemy enemy;
-    public float InstantiatOffsetX = 0.0f;
-    public float InstantiatOffsetY = 0.0f;
+    public Transform targetTransform;
     #endregion
 
     #region 私有變數
-    private GameObject currentAttackObject;
+    private GameObject currentSkillPrefab;
     #endregion
 
     #region AnimationEvent方法()
@@ -18,61 +17,55 @@ public class EnemySkillSpawner : MonoBehaviour
         int skillSlotIndex = 0;
 
         int currentSkillID = enemy.enemyStats.equippedSkillIDList[skillSlotIndex];
-
-        //  修正為 Dictionary 讀取技能
         if (!enemy.enemyStats.skillPoolDtny.TryGetValue(currentSkillID, out var currentSkill))
         {
             Debug.LogError($"❌ AttackSpawner: 找不到技能 ID {currentSkillID}！");
             return;
         }
-
-        //  確保當前等級數據存在
-        if (!currentSkill.skillLevelsDataDtny.TryGetValue(currentSkill.currentLevel, out var skillLevelData))
+        if (currentSkill.GetSkillLevelData(1).skillPrefab == null)
         {
-            Debug.LogError($"❌ AttackSpawner: 技能 {currentSkill.skillName} 缺少等級 {currentSkill.currentLevel} 的數據！");
+            Debug.LogWarning("❌ AttackSpawner: skillPrefab 未設定！");
             return;
         }
 
-        //  確保技能有攻擊 Prefab
-        if (skillLevelData.attackPrefab == null)
-        {
-            Debug.LogWarning("❌ AttackSpawner: attackPrefab 未設定！");
-            return;
-        }
+        //目標方向
+        Vector2 directionVector = targetTransform != null
+            ? (Vector2)(targetTransform.position - transform.position).normalized
+            : Vector2.right; // 默認向右
 
-        //  計算生成位置
-        Vector2 spawnPosition = new Vector2(transform.position.x + InstantiatOffsetX, transform.position.y + InstantiatOffsetY);
+        //旋轉角度
+        float rotateAngle = Mathf.Atan2(directionVector.y, directionVector.x) * Mathf.Rad2Deg;
 
-        //  生成攻擊物件
-        currentAttackObject = Instantiate(skillLevelData.attackPrefab, spawnPosition, Quaternion.identity);
-        currentAttackObject.SetActive(false); // 避免異常行為，先關閉
+        currentSkillPrefab = Instantiate(currentSkill.GetSkillLevelData(1).skillPrefab, transform.position, Quaternion.Euler(0, 0, rotateAngle));
+        currentSkillPrefab.SetActive(false);               // 避免異常行為，先關閉
 
-        //  設定攻擊物件屬性
-        SetSkillObject(currentAttackObject, new Vector2(1, 0), skillLevelData);
+        //默認移動方向(1,0)
+        SetSkillObjectProperties(
+            currentSkillPrefab,
+            new Vector2(1, 0),
+            enemy.enemyStats.attackPower,
+            targetTransform,
+            rotateAngle);
 
-        currentAttackObject.SetActive(true); // 啟用
+        currentSkillPrefab.SetActive(true); // 啟用
     }
     #endregion
 
     #region 設定技能屬性
-    private void SetSkillObject(GameObject attackObject, Vector2 moveDirection, EnemyStateManager.EnemyStats.SkillLevelData skillData) {
-        SkillObject skillScript = attackObject.GetComponent<SkillObject>();
-
-        if (skillScript != null)
+    private void SetSkillObjectProperties(GameObject currentSkillPrefab, Vector2 moveDirection, int baseAttack, Transform targetTransform, float rotateAngle) {
+        SkillObject skillObject = currentSkillPrefab.GetComponent<SkillObject>();
+        if (skillObject != null)
         {
-
-            skillScript.SetSkillProperties(
+            skillObject.SetSkillProperties(
                 moveDirection,
-                skillData.moveSpeed,
-                skillData.knockForce,
-                skillData.destroySelfDelay,
-                skillData.attackPower,
-                skillData.targetLayers
+                baseAttack,
+                targetTransform,
+                rotateAngle
             );
         }
         else
         {
-            Debug.LogError("❌ AttackSpawner: 無法找到 Enemy001Skill001 腳本！");
+            Debug.LogError("❌ AttackSpawner: 無法找到 enemy001Skill001 腳本！");
         }
     }
     #endregion

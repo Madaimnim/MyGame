@@ -5,7 +5,7 @@ using Unity.VisualScripting.Antlr3.Runtime.Misc;
 using UnityEngine;
 
 
-public class Enemy : MonoBehaviour, IDamageable
+public class Enemy : MonoBehaviour, IDamageable, IAttackable
 {
     #region 公開變數
     public int enemyID;// 敵人 ID，由Inspector設定
@@ -51,25 +51,40 @@ public class Enemy : MonoBehaviour, IDamageable
     }
     #endregion
 
+    public bool CanUseSkill(int skillSlot) {
+        // Enemy 版本的技能冷卻與目標檢測
+        return true;/* 檢查 Enemy 的技能槽條件 */;
+    }
+
+    public void UseSkill(int skillSlot) {
+        // Enemy 版本的施放技能邏輯
+    }
+
     #region 公開TakeDamage()方法
-    public void TakeDamage(int takeDamage, float knockedForce) {
-        currentHealth -= takeDamage;
+    public void TakeDamage(
+        int damage,
+        float knockbackForce,
+
+        float dotDuration,
+        float dotDamage,
+
+        float attackReduction,
+        float attackReductionDuration,
+
+        float speedReduction,
+        float speedReductionDuration) {
+        
+        currentHealth -= damage;
         currentHealth = Mathf.Clamp(currentHealth, 0, enemyStats.maxHealth);
         Event_HpChanged?.Invoke(currentHealth, enemyStats.maxHealth);//觸發事件，通知 UI 更新血量
 
-        StartCoroutine(Knockback(knockedForce));
+        StartCoroutine(Knockback(knockbackForce));
         StartCoroutine(FlashWhite(0.1f));//執行閃白協程，替換材質
-        ShowDamageText(takeDamage);//顯示damage數字TEXT
+        ShowDamageText(damage);//顯示damage數字TEXT
+
     }
     #endregion
 
-
-    #region 公開StartCooldown()方法
-    public void StartCooldown() {
-        lastActionTime = Time.time;
-        behaviorTree.isCooldownComplete = false; // 進入冷卻狀態
-    }
-    #endregion
 
     #region 私有ShowDamageText(int damage)
     private void ShowDamageText(int damage) {

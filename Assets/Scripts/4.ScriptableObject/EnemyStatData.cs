@@ -52,8 +52,8 @@ public class EnemyStatData : ScriptableObject
             public int attackPower;
             public LayerMask targetLayers;
 
-            public GameObject attackPrefab;
-            public GameObject attackDetectPrefab;
+            public GameObject skillPrefab;
+            public GameObject targetDetectPrefab;
         }
     }
     #endregion

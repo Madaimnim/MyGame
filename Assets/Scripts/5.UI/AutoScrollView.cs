@@ -13,26 +13,42 @@ public class AutoScrollView : MonoBehaviour
     [Header("是否循环滚动")]
     public bool loopScroll = false; // 是否循环滚动
 
-    private void Update() {
+    private bool isInitialized = false;
+
+    private void Start() {
+        // 强制确保 `Content` 一开始在顶部
         if (scrollRect != null)
         {
-            // 计算新的滚动位置
+            scrollRect.verticalNormalizedPosition = 1f;
+        }
+    }
+
+    private void LateUpdate() {
+        // 确保 `ScrollRect` 在所有 Unity 内部计算后仍然保持在顶部
+        if (!isInitialized && scrollRect != null)
+        {
+            scrollRect.verticalNormalizedPosition = 1f;
+            isInitialized = true;
+        }
+    }
+
+    private void Update() {
+        if (scrollRect != null && isInitialized)
+        {
             float newPosition = scrollRect.verticalNormalizedPosition - (scrollSpeed * Time.deltaTime);
 
-            // 限制滚动范围
             if (newPosition <= 0f)
             {
                 if (loopScroll)
                 {
-                    newPosition = 1f; // 回到顶部，循环滚动
+                    newPosition = Mathf.Lerp(scrollRect.verticalNormalizedPosition, 1f, Time.deltaTime * 2f);
                 }
                 else
                 {
-                    newPosition = 0f; // 停止滚动
+                    newPosition = 0f;
                 }
             }
 
-            // 设置滚动位置
             scrollRect.verticalNormalizedPosition = newPosition;
         }
     }

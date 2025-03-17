@@ -14,9 +14,8 @@ GameObject:
   - component: {fileID: 1901394458928384581}
   - component: {fileID: 1901394458928384605}
   - component: {fileID: 1901394458928384577}
-  - component: {fileID: 1901394458928384606}
-  - component: {fileID: 1901394458928384578}
   - component: {fileID: 1901394458928384579}
+  - component: {fileID: 1901394458928384578}
   - component: {fileID: 1901394458928384607}
   m_Layer: 6
   m_Name: Player001
@@ -183,12 +182,10 @@ MonoBehaviour:
     currentEXP: 0
     moveStrategyType: 0
     currentHealth: 0
-    spriteIcon: {fileID: 0}
     playerPrefab: {fileID: 0}
     damageTextPrefab: {fileID: 0}
     unlockedSkillIDList: 
     equippedSkillIDList: 
-  playerAI: {fileID: 1901394458928384606}
   animator: {fileID: 1901394458928384586}
   rb: {fileID: 1901394458928384605}
   spriteRenderer: {fileID: 1901394458928384584}
@@ -196,7 +193,7 @@ MonoBehaviour:
   skillSpawner: {fileID: 1901394458928384579}
   shadowController: {fileID: 0}
   stopMoveDragPower: 0
---- !u!114 &1901394458928384606
+--- !u!114 &1901394458928384579
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -205,11 +202,11 @@ MonoBehaviour:
   m_GameObject: {fileID: 1901394458928384591}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 64c99779ff971a248803bb31d4a639e1, type: 3}
+  m_Script: {fileID: 11500000, guid: f4a89de8cd0cba14284a0bd2b3bdd134, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   player: {fileID: 1901394458928384577}
-  behaviorTree: {fileID: 1901394458928384578}
+  targetTransform: {fileID: 0}
 --- !u!114 &1901394458928384578
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -237,21 +234,6 @@ MonoBehaviour:
   isAttack04CoolDown: 1
   isCooldownComplete: 1
   canChangeAnim: 1
---- !u!114 &1901394458928384579
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1901394458928384591}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: f4a89de8cd0cba14284a0bd2b3bdd134, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  player: {fileID: 1901394458928384577}
-  InstantiatOffsetX: 0.5
-  InstantiatOffsetY: 0
 --- !u!114 &1901394458928384607
 MonoBehaviour:
   m_ObjectHideFlags: 0

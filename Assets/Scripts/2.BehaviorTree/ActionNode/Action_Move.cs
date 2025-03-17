@@ -2,14 +2,11 @@ using UnityEngine;
 
 public class Action_Move : Node
 {
-    private BehaviorTree behaviorTree;
-    public Action_Move(BehaviorTree behaviorTree) {
-        this.behaviorTree = behaviorTree;
+    public Action_Move() {
     }
     public override NodeState Evaluate() {
-        if (behaviorTree.canMove && behaviorTree.canChangeAnim) 
+        if (true) 
         { 
-            behaviorTree.MoveInvoke();
             return NodeState.SUCCESS;
         }
         return NodeState.FAILURE;

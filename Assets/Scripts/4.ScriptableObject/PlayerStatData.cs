@@ -21,7 +21,6 @@ public class PlayerStatData : ScriptableObject
         public float moveSpeed;
         public MoveStrategyType moveStrategyType;
 
-        public Sprite spriteIcon;
         public GameObject playerPrefab;
         public GameObject damageTextPrefab;
 
@@ -36,24 +35,10 @@ public class PlayerStatData : ScriptableObject
             public int skillID;
             public string skillName;
             public int currentLevel = 1;
-            public List<SkillLevelData> skillLevelsDataList = new List<SkillLevelData>();
-        }
-
-        // ✅ **技能等級數據類**
-        [System.Serializable]
-        public class SkillLevelData
-        {
-            public int level;
             public float cooldownTime;
 
-            public float moveSpeed;
-            public float knockForce;
-            public float destroySelfDelay;
-            public int attackPower;
-            public LayerMask targetLayers;
-
-            public GameObject attackPrefab;
-            public GameObject attackDetectPrefab;
+            public GameObject skillPrefab;
+            public GameObject targetDetectPrefab;
         }
     }
     #endregion

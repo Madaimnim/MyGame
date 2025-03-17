@@ -61,10 +61,11 @@ public class GameStateManager : MonoBehaviour
     private void HandlePreparation() {
         PlayerStateManager.Instance.UnlockAndSpawnPlayer(1);
         PlayerStateManager.Instance.UnlockAndSpawnPlayer(2);
+        PlayerStateManager.Instance.DeactivateAllPlayer();
 
         GameSceneManager.Instance.LoadScenePreparation();
         GameSceneManager.Instance.GameStartButton.gameObject.SetActive(false);
-        PlayerStateManager.Instance.DeactivateAllPlayer();
+
 
         UIInputController.Instance.isInputEnabled = true;
     }

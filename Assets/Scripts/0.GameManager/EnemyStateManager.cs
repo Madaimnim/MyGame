@@ -185,8 +185,8 @@ public class EnemyStateManager : MonoBehaviour
             public int attackPower;
             public LayerMask targetLayers;
 
-            public GameObject attackPrefab;
-            public GameObject attackDetectPrefab;
+            public GameObject skillPrefab;
+            public GameObject targetDetectPrefab;
 
             public SkillLevelData(EnemyStatData.EnemyStats.SkillLevelData original) {
                 level = original.level;
@@ -198,8 +198,8 @@ public class EnemyStateManager : MonoBehaviour
                 attackPower = original.attackPower;
                 targetLayers = original.targetLayers;
 
-                attackPrefab = original.attackPrefab;
-                attackDetectPrefab = original.attackDetectPrefab;
+                skillPrefab = original.skillPrefab;
+                targetDetectPrefab = original.targetDetectPrefab;
             }
         }
     }

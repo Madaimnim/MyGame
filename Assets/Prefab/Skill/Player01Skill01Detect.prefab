@@ -9,7 +9,6 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 3457001140423233959}
-  - component: {fileID: 3457001140423233978}
   - component: {fileID: 725033123542246013}
   - component: {fileID: 5163130874402246039}
   m_Layer: 10
@@ -34,27 +33,6 @@ Transform:
   m_Father: {fileID: 0}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!50 &3457001140423233978
-Rigidbody2D:
-  serializedVersion: 4
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 3457001140423233958}
-  m_BodyType: 0
-  m_Simulated: 1
-  m_UseFullKinematicContacts: 0
-  m_UseAutoMass: 0
-  m_Mass: 1
-  m_LinearDrag: 0
-  m_AngularDrag: 0.05
-  m_GravityScale: 0
-  m_Material: {fileID: 0}
-  m_Interpolate: 0
-  m_SleepingMode: 1
-  m_CollisionDetection: 0
-  m_Constraints: 7
 --- !u!58 &725033123542246013
 CircleCollider2D:
   m_ObjectHideFlags: 0
@@ -83,6 +61,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 5cbc3229a1c3d1143a0d4d0217fdb220, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  targetPriorityType: 0
   targetLayers:
     serializedVersion: 2
     m_Bits: 256
+  hasTarget: 0
+  targetTransform: {fileID: 0}

@@ -13,13 +13,15 @@ public class Enemy : MonoBehaviour, IDamageable, IAttackable
     public Rigidbody2D rb;
     public SpriteRenderer spriteRenderer;
     public BehaviorTree behaviorTree;
-    public EnemySkillSpawner skillSpawner;
+    //public EnemySkillSpawner skillSpawner;
+    public AudioClip deathSFX;
     public EnemyStateManager.EnemyStats enemyStats { get; private set; }
 
     public Action<int, int> Event_HpChanged;
     #endregion
     #region 私有變數
     private float lastActionTime;
+    private bool isDead = false;
     private int currentHealth;
     #endregion
 
@@ -27,14 +29,16 @@ public class Enemy : MonoBehaviour, IDamageable, IAttackable
     private void Awake() {
         lastActionTime = -Mathf.Infinity;
     }
-    private void OnEnable() { }
-    private void OnDisable() { }
+    private void OnEnable() {}
+    private void OnDisable() {}
+
     private IEnumerator Start() {
         if (enemyStats == null)
         {
             yield return StartCoroutine(GameManager.Instance.WaitForDataReady());
             SetEnemyData();
             currentHealth = enemyStats.maxHealth;
+            LevelManager.Instance.RegisterEnemy();
         }
 
         Event_HpChanged?.Invoke(currentHealth, enemyStats.maxHealth);// 觸發事件，通知 UI 初始血量
@@ -64,6 +68,7 @@ public class Enemy : MonoBehaviour, IDamageable, IAttackable
     public void TakeDamage(
         int damage,
         float knockbackForce,
+        Vector2 knockbackDirection,
 
         float dotDuration,
         float dotDamage,
@@ -73,18 +78,34 @@ public class Enemy : MonoBehaviour, IDamageable, IAttackable
 
         float speedReduction,
         float speedReductionDuration) {
-        
+
+
+        if (isDead) return; //  已經死了就不要再處理
+
         currentHealth -= damage;
         currentHealth = Mathf.Clamp(currentHealth, 0, enemyStats.maxHealth);
         Event_HpChanged?.Invoke(currentHealth, enemyStats.maxHealth);//觸發事件，通知 UI 更新血量
 
-        StartCoroutine(Knockback(knockbackForce));
+        StartCoroutine(Knockback(knockbackForce, knockbackDirection));
         StartCoroutine(FlashWhite(0.1f));//執行閃白協程，替換材質
         ShowDamageText(damage);//顯示damage數字TEXT
 
+        if(currentHealth<=0)
+        {
+            Die();
+        }
     }
     #endregion
 
+    #region Die()方法
+    private void Die (){
+        isDead = true;
+        LevelManager.Instance.EnemyDefeated();
+        PopupManager.Instance.ShowExpPopup(enemyStats.exp, transform.position);
+        AudioManager.Instance.PlaySFX(deathSFX,0.5f);
+        Destroy(gameObject, 0.5f);
+    }
+    #endregion
 
     #region 私有ShowDamageText(int damage)
     private void ShowDamageText(int damage) {
@@ -103,7 +124,6 @@ public class Enemy : MonoBehaviour, IDamageable, IAttackable
     private void SetEnemyData() {
         enemyStats = EnemyStateManager.Instance.enemyStatesDtny[enemyID];
         spriteRenderer.material = GameManager.Instance.normalMaterial;
-        Debug.Log($"成功設置enemyState，Name為{enemyStats.enemyName}");
     }
     #endregion
 
@@ -118,12 +138,12 @@ public class Enemy : MonoBehaviour, IDamageable, IAttackable
     }
     #endregion
 
-    #region 私有協程： ApplyKnockback(float force)，受擊閃白效果
-    private IEnumerator Knockback(float force) {
+    #region 私有協程： ApplyKnockback(float force,knockbackDirection)
+    private IEnumerator Knockback(float force,Vector2 knockbackDirection) {
         if (rb != null)
         {
             rb.velocity = Vector2.zero; // ✅ 先清除當前速度，避免擊退力疊加
-            rb.AddForce(new Vector2(1, 0) * force, ForceMode2D.Impulse); // ✅ 添加瞬間衝擊力
+            rb.AddForce( force* knockbackDirection, ForceMode2D.Impulse); // ✅ 添加瞬間衝擊力
             yield return new WaitForSeconds(0.2f);
             rb.velocity = Vector2.zero;
         }

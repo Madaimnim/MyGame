@@ -3,17 +3,12 @@ using System.Collections.Generic;
 
 public class PlayerSkillSpawner : MonoBehaviour
 {
-    #region 公開變數
-    public Player player;
-    //Todo
-    public Transform targetTransform;
-    #endregion
+    private Player player;
 
-    #region 私有變數
-    private GameObject currentSkillPrefab;
-    #endregion
+    private void Awake() {
+        player = GetComponent<Player>();
+    }
 
-    #region AnimationEvent方法()
     public void SpawnAttack(GameObject skillPrefab, Transform targetTransform) {
         if (skillPrefab == null || targetTransform == null)
         {
@@ -33,15 +28,15 @@ public class PlayerSkillSpawner : MonoBehaviour
         SetSkillObjectProperties(currentSkillPrefab, directionVector, player.playerStats.attackPower, targetTransform, rotateAngle);
         currentSkillPrefab.SetActive(true); // 啟用
     }
-    #endregion
+
 
     #region 設定技能屬性
-    private void SetSkillObjectProperties(GameObject currentSkillPrefab, Vector2 moveDirection,int baseAttack,Transform targetTransform, float rotateAngle) {
+    private void SetSkillObjectProperties(GameObject currentSkillPrefab, Vector2 directionVector, int baseAttack,Transform targetTransform, float rotateAngle) {
         SkillObject skillObject = currentSkillPrefab.GetComponent<SkillObject>();
         if (skillObject != null)
         {
             skillObject.SetSkillProperties(
-                moveDirection,
+                directionVector,
                 baseAttack,
                 targetTransform,
                 rotateAngle

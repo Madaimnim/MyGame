@@ -1,5 +1,5 @@
 fileFormatVersion: 2
-guid: e604711ffde0b914b8d99f48ba3c3cc0
+guid: a977582f41d9ddd439be066722a4e3f7
 TextureImporter:
   internalIDToNameTable: []
   externalObjects: {}
@@ -129,7 +129,7 @@ TextureImporter:
     serializedVersion: 2
     sprites:
     - serializedVersion: 2
-      name: Player001-Sheet_0
+      name: Player02-Sheet_0
       rect:
         serializedVersion: 2
         x: 0
@@ -143,14 +143,14 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: 0
       bones: []
-      spriteID: 46742fa6295e13549b7ff07d33b3a711
-      internalID: 1018089144
+      spriteID: a3ca046ba6adb7e428b397f8792281a3
+      internalID: 1701480549
       vertices: []
       indices: 
       edges: []
       weights: []
     - serializedVersion: 2
-      name: Player001-Sheet_1
+      name: Player02-Sheet_1
       rect:
         serializedVersion: 2
         x: 36
@@ -164,14 +164,14 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: 0
       bones: []
-      spriteID: 9b04084063e42e64ea6965e9d52f0bdc
-      internalID: -1570895848
+      spriteID: 7bfb01a8cda55b84582556beb52bd069
+      internalID: 112593421
       vertices: []
       indices: 
       edges: []
       weights: []
     - serializedVersion: 2
-      name: Player001-Sheet_2
+      name: Player02-Sheet_2
       rect:
         serializedVersion: 2
         x: 72
@@ -185,14 +185,14 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: 0
       bones: []
-      spriteID: 10fcfe9e6236e3743b03dcc48ff46e19
-      internalID: 1518869012
+      spriteID: 2adf22f448f45a041ab0978f35205863
+      internalID: 61915784
       vertices: []
       indices: 
       edges: []
       weights: []
     - serializedVersion: 2
-      name: Player001-Sheet_3
+      name: Player02-Sheet_3
       rect:
         serializedVersion: 2
         x: 108
@@ -206,14 +206,14 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: 0
       bones: []
-      spriteID: 2287dd5b276c78c4c83c0afacf948979
-      internalID: -1501727576
+      spriteID: 62297a9f1a1a90740a59d554309c3885
+      internalID: 1869137220
       vertices: []
       indices: 
       edges: []
       weights: []
     - serializedVersion: 2
-      name: Player001-Sheet_4
+      name: Player02-Sheet_4
       rect:
         serializedVersion: 2
         x: 144
@@ -227,8 +227,71 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: 0
       bones: []
-      spriteID: 148d444ab5e36e743b3581203efda7d7
-      internalID: 1954880810
+      spriteID: 019006e30440056468567aa261a96605
+      internalID: 1189892808
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Player02-Sheet_5
+      rect:
+        serializedVersion: 2
+        x: 180
+        y: 0
+        width: 36
+        height: 36
+      alignment: 7
+      pivot: {x: 0.5, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: cef59eddb51f8a0428247323d7173026
+      internalID: 863544792
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Player02-Sheet_6
+      rect:
+        serializedVersion: 2
+        x: 216
+        y: 0
+        width: 36
+        height: 36
+      alignment: 7
+      pivot: {x: 0.5, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 90fd90c3ee1b1154482fdb0e4ab0af90
+      internalID: -2019542341
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Player02-Sheet_7
+      rect:
+        serializedVersion: 2
+        x: 252
+        y: 0
+        width: 36
+        height: 36
+      alignment: 7
+      pivot: {x: 0.5, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 01832e70ff0a3be4a9722fc26eebf381
+      internalID: 1941770307
       vertices: []
       indices: 
       edges: []
@@ -244,11 +307,14 @@ TextureImporter:
     weights: []
     secondaryTextures: []
     nameFileIdTable:
-      Player001-Sheet_0: 1018089144
-      Player001-Sheet_1: -1570895848
-      Player001-Sheet_2: 1518869012
-      Player001-Sheet_3: -1501727576
-      Player001-Sheet_4: 1954880810
+      Player02-Sheet_0: 1701480549
+      Player02-Sheet_1: 112593421
+      Player02-Sheet_2: 61915784
+      Player02-Sheet_3: 1869137220
+      Player02-Sheet_4: 1189892808
+      Player02-Sheet_5: 863544792
+      Player02-Sheet_6: -2019542341
+      Player02-Sheet_7: 1941770307
   spritePackingTag: 
   pSDRemoveMatte: 0
   pSDShowRemoveMatteOption: 0

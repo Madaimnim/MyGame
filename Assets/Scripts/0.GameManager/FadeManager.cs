@@ -31,6 +31,7 @@ public class FadeManager : MonoBehaviour
     }
     #endregion
 
+    //變全黑
     #region 公開協程FadeOut()
     public IEnumerator FadeOut() 
     {
@@ -45,6 +46,7 @@ public class FadeManager : MonoBehaviour
         }
     }
     #endregion
+    //變全透明
     #region  公開協程FadeIn()
     public IEnumerator FadeIn() {
         Color color = fadeImage.color;
@@ -56,6 +58,16 @@ public class FadeManager : MonoBehaviour
             fadeImage.color = color;
             yield return null;
         }
+    }
+    #endregion
+    //變透明(呼叫給予透明度)
+    #region 公開方法：直接設置透明度
+    public void FadeSetAlpha(float targetAlpha) {
+        if (fadeImage == null) return;
+
+        Color color = fadeImage.color;
+        color.a = targetAlpha;
+        fadeImage.color = color;
     }
     #endregion
 }

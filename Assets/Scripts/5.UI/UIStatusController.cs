@@ -2,24 +2,35 @@
 using TMPro;
 using UnityEngine.UI;
 using System.Collections.Generic;
+using System.Collections;
 
 public class UIStatusController : MonoBehaviour
 {
+    public Button ChangNextPlayerDisplayerButton;
+    public Button ChangLastPlayerDisplayerButton;
     public TextMeshProUGUI[] statusTextsArray; // 角色基本狀態顯示（前 6 個）
     private PlayerStateManager.PlayerStats currentPlayer;
 
+
     private void OnEnable() {
         EventBus.Listen<UICurrentPlayerChangEvent>(OnUICurrentPlayerChanged);
-        if (UIManager.Instance == null)
-            return;
-
-        PlayerStateManager.Instance.playerStatesDtny.TryGetValue(UIManager.Instance.currentPlayerId, out currentPlayer);
-        SetActiveUIPlayer(UIManager.Instance.currentPlayerId);
-        RefreshPlayerStatusText();
+        StartCoroutine(WaitAndInit());
     }
 
     private void OnDisable() {
         EventBus.StopListen<UICurrentPlayerChangEvent>(OnUICurrentPlayerChanged);
+        ChangNextPlayerDisplayerButton.onClick.RemoveListener(ChangNextPlayerDisplay);
+        ChangLastPlayerDisplayerButton.onClick.RemoveListener(ChangLastPlayerDisplay);
+    }
+
+
+    private IEnumerator WaitAndInit() {      
+        yield return new WaitUntil(() => UIManager.Instance != null && PlayerStateManager.Instance != null);
+        ChangNextPlayerDisplayerButton.onClick.AddListener(ChangNextPlayerDisplay);
+        ChangLastPlayerDisplayerButton.onClick.AddListener(ChangLastPlayerDisplay);
+        PlayerStateManager.Instance.playerStatesDtny.TryGetValue(UIManager.Instance.currentPlayerId, out currentPlayer);
+        SetActiveUIPlayer(UIManager.Instance.currentPlayerId);
+        RefreshPlayerStatusText();
     }
 
 
@@ -53,8 +64,16 @@ public class UIStatusController : MonoBehaviour
             kvp.Value.SetActive(isActive);
             Animator animator = kvp.Value.GetComponent<Animator>();
             if (isActive) // 如果是當前選擇的角色，播放動畫
-                animator.Play(Animator.StringToHash("Attack")); // 播放指定動畫
+                animator.Play(Animator.StringToHash("Attack01")); // 播放指定動畫
         }
     }
     #endregion
+
+    void ChangNextPlayerDisplay() {
+        UIManager.Instance.ChangCurrentPlayerID(1);
+    }
+
+    void ChangLastPlayerDisplay() {
+        UIManager.Instance.ChangCurrentPlayerID(-1);
+    }
 }

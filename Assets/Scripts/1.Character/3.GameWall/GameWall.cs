@@ -43,6 +43,7 @@ public class GameWall : MonoBehaviour, IDamageable
     public void TakeDamage(
         int damage,
         float knockbackForce,
+        Vector2 knockbackDirection,
 
         float dotDuration,
         float dotDamage,

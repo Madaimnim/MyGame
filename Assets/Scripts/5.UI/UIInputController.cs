@@ -6,13 +6,12 @@ public class UIInputController : MonoBehaviour
     public static UIInputController Instance { get; private set; }
     [Header("#Esc鍵、I鍵開關的對象--------------------------------------------------------------------")]
 
-    public bool isInputEnabled = false;
+    public bool isUIInputEnabled = false;
 
     private void Awake() {
         if (Instance == null)
         {
             Instance = this;
-            DontDestroyOnLoad(gameObject);
         }
         else
         {
@@ -21,7 +20,7 @@ public class UIInputController : MonoBehaviour
     }
 
     private void Update() {
-        if (!isInputEnabled) return;
+        if (!isUIInputEnabled) return;
 
         if (Input.GetKeyDown(KeyCode.I) || Input.GetKeyDown(KeyCode.Escape))
         {

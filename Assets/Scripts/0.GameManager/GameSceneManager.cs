@@ -39,23 +39,35 @@ public class GameSceneManager: MonoBehaviour
         yield return StartCoroutine(GameManager.Instance.WaitForDataReady());
         GameStartButton.gameObject.SetActive(true);
     }
-
+    //讀取起始場景
     #region 公開方法 LoadSceneGameStart()
     public void LoadSceneGameStart() {
         StartCoroutine(LoadScene(gameStartScene));
     }
     #endregion
+
+    //讀取戰鬥場景
     #region 公開方法 LoadSceneBattle()
     public void LoadSceneBattle() {
         StartCoroutine(LoadScene(battleScene));
     }
     #endregion
+
+    //讀取準備場景
     #region 公開方法 LoadScenePreparation()
     public void LoadScenePreparation() {
         StartCoroutine(LoadScene(preparationScene));
     }
     #endregion
 
+    //讀取指定場景
+    #region 公開方法 LoadSceneForSceneName()
+    public void LoadSceneForSceneName(string sceneName) {
+        StartCoroutine(LoadScene(sceneName));
+    }
+    #endregion
+
+    //LoadScene協程
     #region 私有協程LoadScene(string sceneName)
     //順序加載場景
     private IEnumerator LoadScene(string sceneName) {

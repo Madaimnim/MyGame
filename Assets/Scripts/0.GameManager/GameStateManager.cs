@@ -34,14 +34,13 @@ public class GameStateManager : MonoBehaviour
     #endregion
 
     #region 設定狀態
-    public void SetState(GameState newState) {
+    public void SetState(GameState newState, string sceneName = null) {
         if (currentState == newState) return; // 避免重複設置相同狀態
-
-        Debug.Log($"[GameStateManager] 狀態變更: {currentState} -> {newState}");
+        //Debug.Log($"[GameStateManager] 狀態變更: {currentState} -> {newState}");
 
         //先離開當前狀態，再進入下個狀態
         ExitState(currentState);
-        EnterState(newState);
+        EnterState(newState,sceneName);
         currentState = newState;
     }
     #endregion
@@ -51,7 +50,7 @@ public class GameStateManager : MonoBehaviour
     private void HandleGameStart() {
         GameSceneManager.Instance.LoadSceneGameStart();
         GameSceneManager.Instance.GameStartButton.gameObject.SetActive(true);   
-        UIInputController.Instance.isInputEnabled = false;
+        UIInputController.Instance.isUIInputEnabled = false;
     }
     private void ExitGameStart() {
         GameSceneManager.Instance.GameStartButton.interactable=false;
@@ -67,20 +66,22 @@ public class GameStateManager : MonoBehaviour
         GameSceneManager.Instance.GameStartButton.gameObject.SetActive(false);
 
 
-        UIInputController.Instance.isInputEnabled = true;
+        UIInputController.Instance.isUIInputEnabled = true;
     }
     private void ExitPreparation() {
-        UIInputController.Instance.isInputEnabled = false;
+        UIInputController.Instance.isUIInputEnabled = false;
         UIManager.Instance.CloseAllUIPanels();
     }
 
     //進出戰鬥
-    private void HandleBattle() {
-        GameSceneManager.Instance.LoadSceneBattle();
-
+    private void HandleBattle(string sceneName) {
+        GameSceneManager.Instance.LoadSceneForSceneName(sceneName);
+        PlayerInputController.Instance.InitailPlayerList();
+        PlayerInputController.Instance.isBattleInputEnabled = true;
     }
     private void ExitBattle() {
-
+        PlayerInputController.Instance.isBattleInputEnabled = false;
+        PopupManager.Instance.PopupPrefab_StageClear.SetActive(false);
     }
 
     //進出戰鬥暫停
@@ -106,7 +107,7 @@ public class GameStateManager : MonoBehaviour
     #endregion
 
     #region 狀態處理邏輯
-    private void EnterState(GameState state) {
+    private void EnterState(GameState state,string sceneName) {
         switch (state)
         {
             case GameState.GameStart:
@@ -118,7 +119,7 @@ public class GameStateManager : MonoBehaviour
                 break;
 
             case GameState.Battle:
-                HandleBattle();
+                HandleBattle(sceneName);
                 break;
 
             case GameState.BattlePause:

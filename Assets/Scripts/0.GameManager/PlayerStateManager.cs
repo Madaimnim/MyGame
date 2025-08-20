@@ -45,7 +45,7 @@ public class PlayerStateManager : MonoBehaviour
         if (!unlockedPlayerIDsHashSet.Contains(playerID))
         {
             unlockedPlayerIDsHashSet.Add(playerID);
-            Debug.Log($"角色 {playerID} 解鎖成功！");
+            Debug.Log($"角色 {playerID} 解鎖");
         }
 
         GameObject playerObject = SpawnPlayer(playerID, new Vector3(0, 0,0), Quaternion.identity, playerParent);
@@ -54,11 +54,11 @@ public class PlayerStateManager : MonoBehaviour
         UIManager.Instance.activeUIPlayersDtny[playerID] = playerUIObject;
 
         playerStatesDtny[playerID].UnlockSkill(1);                           //解鎖技能1
-        playerStatesDtny[playerID].UnlockSkill(2);
-        playerStatesDtny[playerID].UnlockSkill(3);
+        playerStatesDtny[playerID].UnlockSkill(2);                           //解鎖技能2
         playerStatesDtny[playerID].SetSkillAtSlot(0, 1);            //裝備技能1在技能槽1(index=0)
     }
 
+    //生成腳色
     private GameObject SpawnPlayer(int playerID, Vector3 position, Quaternion rotation, GameObject parentObject) {
         if (!playerStatesDtny.TryGetValue(playerID, out var playerStats) || playerStats.playerPrefab == null)
         {
@@ -68,12 +68,10 @@ public class PlayerStateManager : MonoBehaviour
 
         // 生成角色、初始localPosition為(0,0,0)，並隱藏
         GameObject playerPrefab = Instantiate(playerStats.playerPrefab, position, rotation, parentObject.transform);
-        
-        playerPrefab.transform.localPosition = new Vector3(0,0,0);
         playerPrefab.SetActive(false);
 
-        // 確保角色能讀取自身的 PlayerStats
-        Player player = playerPrefab.GetComponent<Player>();
+        playerPrefab.transform.localPosition = new Vector3(0,0,0);
+        Player player = playerPrefab.GetComponent<Player>();        // 確保角色能讀取自身的 PlayerStats
         if (player != null)
         {
             player.Initialize(playerStats);
@@ -128,13 +126,13 @@ public class PlayerStateManager : MonoBehaviour
         public int maxHealth;
         public int attackPower;
         public float moveSpeed;
-        public int currentEXP;
-        public MoveStrategyType moveStrategyType;
-
-        public int currentHealth;
-
+        public PlayerStatData.PlayerStats.PlayerType playerType;
         public GameObject playerPrefab;
         public GameObject damageTextPrefab;
+
+        public int currentEXP;
+        public int currentHealth;
+
 
         public Dictionary<int, SkillData> skillPoolDtny = new Dictionary<int, SkillData>(); // 
         public List<int> unlockedSkillIDList = new List<int>();
@@ -142,14 +140,14 @@ public class PlayerStateManager : MonoBehaviour
         #endregion
         #region 深拷貝
         public PlayerStats(PlayerStatData.PlayerStats original) {
-            Debug.Log($"[PlayerStats] 創建 {original.playerID} 的 PlayerStats");
+            //Debug.Log($"[PlayerStats] 創建 {original.playerID} 的 PlayerStats");
             playerID = original.playerID;
             playerName = original.playerName;
             level = original.level;
             maxHealth = original.maxHealth;
             attackPower = original.attackPower;
             moveSpeed = original.moveSpeed;
-            moveStrategyType = original.moveStrategyType;
+            playerType = original.playerType;
 
             playerPrefab = original.playerPrefab;
             damageTextPrefab = original.damageTextPrefab;
@@ -160,17 +158,6 @@ public class PlayerStateManager : MonoBehaviour
             foreach (var skill in original.skillPoolList)
             {
                 skillPoolDtny[skill.skillID] = new SkillData(skill);
-
-                if (skill.skillID == 1)  // 只檢查 SkillID = 1
-                {
-                    Debug.Log($"[PlayerStats] 正在初始化技能 {skill.skillID}");
-                    if (skill.targetDetectPrefab == null)
-                    {
-                        Debug.LogWarning($"⚠ [EquipTargetDetectPrefab] 技能 ID {skill.skillID} 的 targetDetectPrefab 為 null，請確認角色 {playerID} 是否正確設定！");
-                        return ;
-                    }
-                }
-
             }
 
             unlockedSkillIDList = new List<int>(original.unlockedSkillIDList);

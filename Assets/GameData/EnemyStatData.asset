@@ -19,6 +19,7 @@ MonoBehaviour:
     maxHealth: 10
     attackPower: 1
     moveSpeed: 1
+    exp: 7
     moveStrategyType: 0
     spriteIcon: {fileID: 0}
     enemyPrefab: {fileID: 6620357324717576252, guid: aa87e46c63625174d84e532f142c761b, type: 3}

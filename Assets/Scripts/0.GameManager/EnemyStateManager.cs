@@ -81,7 +81,7 @@ public class EnemyStateManager : MonoBehaviour
         public int maxHealth;
         public int attackPower;
         public float moveSpeed;
-        public int currentEXP;
+        public float exp;
         public MoveStrategyType moveStrategyType;
 
         public int currentHealth;
@@ -131,6 +131,7 @@ public class EnemyStateManager : MonoBehaviour
             maxHealth = original.maxHealth;
             attackPower = original.attackPower;
             moveSpeed = original.moveSpeed;
+            exp = original.exp;
             moveStrategyType = original.moveStrategyType;
 
             spriteIcon = original.spriteIcon;

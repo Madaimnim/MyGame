@@ -1,33 +1,53 @@
 ﻿using UnityEngine;
 using System;
 using System.Collections.Generic;
+using System.Collections;
 
 public class SkillObject : MonoBehaviour
 {
     #region 私有變數
     private Vector2 moveDirection;                                      //移動方向
+    private Vector2 initialDirection;
     private float baseAttackPower = 0f;                                 //基礎攻擊力
-    private Transform targetTransform;                                  //目標
     private float rotateAngle = 0f;                                     //旋轉角度
+    private Transform targetTransform;                                  //目標
+    private Coroutine destroyCoroutine;                                 //自我破壞協程
 
-
-    private Dictionary<SkillMoveType, Action> skillMoveTypeDtny;         // 移動方法字典
-
+    private Dictionary<SkillMoveType, Action> skillMoveTypeDtny;        //移動方法字典
+    private Dictionary<OnHitType, Action> onHitTypeDtny;                //移動方法字典
     private Animator ani;
+    private SpriteRenderer spriteRenderer;
     private HashSet<IDamageable> hitTargetsHash = new HashSet<IDamageable>();
     #endregion
 
-    #region 可設置變數!
+    #region 可設置變數：
 
-    #region **旋轉設定**
-    [Header("**旋轉設定**")]
-    public bool canRotate = true;   // 🔹 是否允許旋轉
+    #region 攻擊動畫類型
+    [Header("攻擊動畫")]
+    public AttackAnimationType attackAnimationType;                     //腳色攻擊動畫類型
+    public float attackSpawnDelayTime = 0f;                             //技能生成延遲
+    public enum AttackAnimationType
+    {
+        [InspectorName("攻擊01")] Attack01,
+        [InspectorName("攻擊02")] Attack02,
+        [InspectorName("其他01")] Other01,
+        [InspectorName("其他02")] Other02
+    }
     #endregion
-
+    #region 旋轉變數
+    [Header("**生成圖片設定**")]
+    public bool canRotate = true;                                       //是否允許旋轉
+    public Transform rotatePivot;                                       //旋轉基準點
+    public Transform spawnPivot;                                        //生成時對準的基準點
+    #endregion
+    #region 基本變數
     [Header("基本參數")]
     public SkillMoveType moveType;                                      //移動方法
+    public OnHitType onHitType;
     public float skillDamage = 0f;                                      //技能傷害(百分比)
+    public float attackRecoveryTime = 0f;                               //攻擊動畫後硬直時間
     public float destroyDelay = 0f;                                     //自毀時間
+    public float onHitDestroyDelay = 0f;                                //碰撞自毀時間
     public float moveSpeed = 0f;                                        //移動速度
     public LayerMask targetLayers;                                      //目標layer
     public Vector2 skillOffset = Vector2.zero;                          //生成的偏移量
@@ -50,14 +70,18 @@ public class SkillObject : MonoBehaviour
     public float speedReductionDuration = 0f;                           //降速持續時間
     #endregion
 
+    #endregion
+
     #region 生命週期
     private void Awake() {
+        spriteRenderer=GetComponent<SpriteRenderer>();
         ani = GetComponent<Animator>();
         InitialSkillMoveTypeDtny();
+        InitialOnHitTypeDtny();
     }
     private void Start() {
-        AdjustSkillPositionAndRotation(); // 🔹 調整技能生成位置與方向
-        Destroy(gameObject, destroyDelay);
+        AdjustSkillPositionAndRotation();                               //調整技能生成位置與方向
+        StartDestroyTimer(destroyDelay);                          //自毀時間初始設置  
     }
 
     private void Update() {
@@ -83,29 +107,42 @@ public class SkillObject : MonoBehaviour
             { SkillMoveType.SpawnAtTarget, SpawnAtTarget }
         };
     }
+    public enum OnHitType
+    {
+        [InspectorName("沒反應")] Nothing,                      //沒反應
+        [InspectorName("命中消失")] Disappear,                  //命中即消失
+        [InspectorName("命中後停留爆炸")] Explode,              //命中後停留爆炸
+    }
+    private void InitialOnHitTypeDtny() {
+        onHitTypeDtny = new Dictionary<OnHitType,Action> {
+            { OnHitType.Nothing, OnHitNothing},
+            { OnHitType.Disappear, OnHitDisappear},
+            { OnHitType.Explode, OnHitExplode}
+        };
+    }
     #endregion
 
     #region 調整生成位置與方向
     private void AdjustSkillPositionAndRotation() {
-        bool isTargetOnLeft = targetTransform != null && targetTransform.position.x < transform.position.x;
+        
+        if (targetTransform == null)
+        {
+            Debug.LogWarning("SkillObject 沒有可用的 targetTransform，跳過位置與旋轉調整。");
+            return;
+        }
 
-        // 鏡像處理
+        bool isTargetOnLeft = targetTransform != null && targetTransform.position.x < transform.position.x;
+        // 鏡像處理localScale
         transform.localScale = new Vector3(isTargetOnLeft ? -Mathf.Abs(transform.localScale.x) : Mathf.Abs(transform.localScale.x),
                                            transform.localScale.y,
                                            transform.localScale.z);
 
-        // 偏移位置
-        Vector2 adjustedOffset = skillOffset;
-        if (isTargetOnLeft) adjustedOffset.x *= -1; // 左右翻转 Offset
-        if (targetTransform != null)
-        {
-            transform.position = (Vector2)transform.position + adjustedOffset;
-        }
+        // 處理Offset位置
+        transform.position = (Vector2)transform.position + new Vector2(isTargetOnLeft ? -skillOffset.x : skillOffset.x, skillOffset.y);
 
         // 應用旋轉
         if (canRotate)
             ApplyRotation(isTargetOnLeft);
-
 
         switch (moveType)
         {
@@ -113,23 +150,30 @@ public class SkillObject : MonoBehaviour
             case SkillMoveType.Station:
                 break;
             #endregion
+
             #region SkillMoveType.Homing
             case SkillMoveType.Toward:
                 moveDirection = (targetTransform != null) ? (targetTransform.position - transform.position).normalized : Vector2.right;
                 break;
             #endregion
+
             #region SkillMoveType.Toward
             case SkillMoveType.Straight:
                 moveDirection = isTargetOnLeft ? Vector2.left : Vector2.right;
                 break;
             #endregion
+
             #region SkillMoveType.Straight
             case SkillMoveType.Homing:
                 break; // 追踪类技能在 Update 里处理移动
             #endregion
+
             #region SkillMoveType.SpawnAtTarget
             case SkillMoveType.SpawnAtTarget:
-                transform.position = (Vector2)targetTransform.position + adjustedOffset;
+                transform.position = 
+                    (Vector2)targetTransform.position 
+                    +new Vector2(isTargetOnLeft ? -skillOffset.x : skillOffset.x, skillOffset.y) 
+                    - ((Vector2)spawnPivot.position - (Vector2)transform.position);
                 break;
             #endregion
             #region Default
@@ -141,7 +185,7 @@ public class SkillObject : MonoBehaviour
     }
     #endregion
 
-    #region 移動方式
+    #region SkillMoveType方法
     #region StationMove()
     private void StationMove() {
         // 原地不動
@@ -175,43 +219,48 @@ public class SkillObject : MonoBehaviour
     }
     #endregion
     #endregion
+    #region OnHitType方法
+    #region OnHitNothing方法
+    private void OnHitNothing() {
+    }
+    #endregion
 
-    #region 應用旋轉
-    private void ApplyRotation(bool isTargetOnLeft) {
-        SpriteRenderer spriteRenderer = GetComponent<SpriteRenderer>();
-        if (spriteRenderer == null)
-        {
-            Debug.LogWarning("⚠️ SkillObject 缺少 SpriteRenderer，無法正確旋轉！");
-            return;
-        }
+    #region OnHitDisappear()
+    private void OnHitDisappear() {
+        StartDestroyTimer(onHitDestroyDelay);                       //命中後重設自毀計時
+    }
+    #endregion
 
-        // 旋轉基於 `SpriteRenderer.bounds.center`（確保以 Sprite 中心旋轉）
-        Vector2 spriteCenter = spriteRenderer.bounds.center;
-        Vector2 pivot = spriteCenter; // 以 `Sprite` 的中心点作为旋转轴心
-
-        // **调整角度**
-        float adjustedAngle = rotateAngle; // 默认右侧角度
-        if (isTargetOnLeft)
-        {
-            //左半邊(90° ~ 270°) 需要转换为 (rotateAngle - 180°)
-            if (rotateAngle > 90f && rotateAngle <= 270f)
-            {
-                adjustedAngle = rotateAngle - 180;
-            }
- 
-        }
-
-        // **围绕 Sprite 中心旋转**
-        transform.RotateAround(pivot, Vector3.forward, adjustedAngle);
+    #region OnHitExplode()
+    private void OnHitExplode() {
+        StartDestroyTimer(onHitDestroyDelay);                       //命中後重設自毀計時
     }
     #endregion
 
 
+    #endregion
 
 
-    #region SetSkillProperties(Vector2 moveDirection, float baseAttackPower, Transform targetTransform, float rotateAngle)
-    public void SetSkillProperties(Vector2 moveDirection, float baseAttackPower, Transform targetTransform, float rotateAngle) {
-        this.moveDirection = moveDirection.normalized;
+    #region 應用旋轉
+    private void ApplyRotation(bool isTargetOnLeft) {
+        // 调整角度
+        float adjustedAngle = rotateAngle; // 默认右侧角度
+        if (isTargetOnLeft)
+        {
+            //左半邊(90-180、-90-180) 需要转换为 (rotateAngle - 180°)
+            if (rotateAngle > 90f || rotateAngle < -90f)
+            {
+                adjustedAngle = rotateAngle - 180;
+            }
+        }
+        // 围绕 Sprite 中心旋转
+        transform.RotateAround(rotatePivot.position, Vector3.forward, adjustedAngle);
+    }
+    #endregion
+    #region SetSkillProperties(Vector2 directionVector, float baseAttackPower, Transform targetTransform, float rotateAngle)
+    public void SetSkillProperties(Vector2 directionVector, float baseAttackPower, Transform targetTransform, float rotateAngle) {
+        initialDirection = directionVector.normalized;
+        moveDirection = directionVector.normalized;
         this.baseAttackPower = baseAttackPower;
         this.targetTransform = targetTransform;
         this.rotateAngle = rotateAngle;
@@ -231,15 +280,28 @@ public class SkillObject : MonoBehaviour
                 hitTargetsHash.Add(damageable);
                 damageable.TakeDamage(
                     finalDamage, 
-                    knockbackForce, 
+                    knockbackForce,
+                    initialDirection,
                     dotDuration,
                     dotDamage, 
                     attackReduction,
                     attackReductionDuration, 
                     speedReduction, 
                     speedReductionDuration);
+                onHitTypeDtny[onHitType]?.Invoke();                                              //觸發OnHitTypeDtny裡的對應方法。
             }
         }
     }
     #endregion
+
+    public void StartDestroyTimer(float delay) {
+        if (destroyCoroutine != null)
+            StopCoroutine(destroyCoroutine);
+        destroyCoroutine = StartCoroutine(DestroyAfterDelay(delay));
+    }
+
+    private IEnumerator DestroyAfterDelay(float delay) {
+        yield return new WaitForSeconds(delay);
+        Destroy(gameObject);
+    }
 }

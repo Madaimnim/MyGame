@@ -19,7 +19,6 @@ public class GamePauseManager : MonoBehaviour
         }
         else
         {
-            Debug.LogWarning("⚠️ 嘗試創建第二個 GamePauseManager，將其刪除");
             Destroy(gameObject);
         }
     }

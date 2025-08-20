@@ -15,27 +15,9 @@ public class UISkillController : MonoBehaviour
     private PlayerStateManager.PlayerStats currentPlayer;
     private Vector2 originSkillSelectionPanelPosition;
 
-    private void OnEnable() {
-        if (UIManager.Instance == null)
-        {
-            Debug.LogWarning($"[UISkillController] 啟用，但 UIManager 為空");
-            return;
-        }
-
-        PlayerStateManager.Instance.playerStatesDtny.TryGetValue(UIManager.Instance.currentPlayerId, out currentPlayer);
-        Debug.Log($"[UISkillController] 獲取當前角色：{currentPlayer?.playerName}");
-
+    private void OnEnable() { 
         EventBus.Listen<UICurrentPlayerChangEvent>(OnCurrentPlayerChanged);
-
-        originSkillSelectionPanelPosition = skillSelectionPanel.transform.position;
-        skillSelectionPanel.SetActive(false);
-
-        for (int i = 0; i < slotSkillButtons.Length; i++)
-        {
-            int slotIndex = i;
-            slotSkillButtons[i].onClick.AddListener(() => ShowAvailableSkills(slotIndex));
-        }
-        RefreshSkillSlotButtonText();
+        StartCoroutine(WaitAndInit());
     }
 
     private void OnDisable() {
@@ -45,6 +27,20 @@ public class UISkillController : MonoBehaviour
             slotSkillButtons[i].onClick.RemoveAllListeners();
         }
     }
+
+    private IEnumerator WaitAndInit() {
+        yield return new WaitUntil(() => UIManager.Instance != null && PlayerStateManager.Instance != null);
+        PlayerStateManager.Instance.playerStatesDtny.TryGetValue(UIManager.Instance.currentPlayerId, out currentPlayer);
+        originSkillSelectionPanelPosition = skillSelectionPanel.transform.position;
+        skillSelectionPanel.SetActive(false);
+        for (int i = 0; i < slotSkillButtons.Length; i++)
+        {
+            int slotIndex = i;
+            slotSkillButtons[i].onClick.AddListener(() => ShowAvailableSkills(slotIndex));
+        }
+        RefreshSkillSlotButtonText();
+    }
+
 
     #region 當「當前腳色變更」事件觸發時，更新本地currentPlayer，並刷新技能槽4個Text
     private void OnCurrentPlayerChanged(UICurrentPlayerChangEvent eventData) {

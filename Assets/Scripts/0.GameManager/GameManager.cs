@@ -66,7 +66,6 @@ public class GameManager : MonoBehaviour
         {
             yield return null; // 等待下一幀
         }
-        Debug.Log("完成全部資料加載");
     }
 
 }

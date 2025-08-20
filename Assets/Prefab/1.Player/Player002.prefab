@@ -14,8 +14,10 @@ GameObject:
   - component: {fileID: 1901394458928384581}
   - component: {fileID: 1901394458928384605}
   - component: {fileID: 1901394458928384577}
-  - component: {fileID: 1901394458928384578}
+  - component: {fileID: 5081692193626905293}
+  - component: {fileID: -784742385834960563}
   - component: {fileID: 1901394458928384579}
+  - component: {fileID: 1901394458928384578}
   - component: {fileID: 1901394458928384607}
   m_Layer: 6
   m_Name: Player002
@@ -33,9 +35,10 @@ Transform:
   m_GameObject: {fileID: 1901394458928384591}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: -5.43, y: -0.18, z: 0}
-  m_LocalScale: {x: 0.5, y: 0.5, z: 1}
+  m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
-  m_Children: []
+  m_Children:
+  - {fileID: 9191419462193891982}
   m_Father: {fileID: 0}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
@@ -80,7 +83,7 @@ SpriteRenderer:
   m_SortingLayerID: -760997319
   m_SortingLayer: 2
   m_SortingOrder: 10
-  m_Sprite: {fileID: 21300000, guid: dd106f33d4256a04e8261802b3508a2a, type: 3}
+  m_Sprite: {fileID: 1701480549, guid: a977582f41d9ddd439be066722a4e3f7, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_FlipX: 0
   m_FlipY: 0
@@ -101,7 +104,7 @@ Animator:
   m_GameObject: {fileID: 1901394458928384591}
   m_Enabled: 1
   m_Avatar: {fileID: 0}
-  m_Controller: {fileID: 9100000, guid: 378b546b10e49d647b0ac37cb5572db7, type: 2}
+  m_Controller: {fileID: 9100000, guid: d5da4456c57feb442ae6e98663768650, type: 2}
   m_CullingMode: 0
   m_UpdateMode: 0
   m_ApplyRootMotion: 0
@@ -125,11 +128,11 @@ BoxCollider2D:
   m_IsTrigger: 1
   m_UsedByEffector: 0
   m_UsedByComposite: 0
-  m_Offset: {x: 0, y: -0.28683513}
+  m_Offset: {x: 0, y: 0.58}
   m_SpriteTilingProperty:
     border: {x: 0, y: 0, z: 0, w: 0}
-    pivot: {x: 0.5, y: 0.5}
-    oldSize: {x: 2, y: 2.3125}
+    pivot: {x: 0.5, y: 0}
+    oldSize: {x: 2.25, y: 2.25}
     newSize: {x: 1, y: 1.5}
     adaptiveTilingThreshold: 0.5
     drawMode: 0
@@ -172,6 +175,15 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   playerID: 2
+  selectIndicatorPoint: {fileID: 5535622795397535964}
+  skillSlot1CooldownTime: 0
+  skillSlot2CooldownTime: 0
+  skillSlot3CooldownTime: 0
+  skillSlot4CooldownTime: 0
+  skillSlot1DetectPrefab: {fileID: 0}
+  skillSlot2DetectPrefab: {fileID: 0}
+  skillSlot3DetectPrefab: {fileID: 0}
+  skillSlot4DetectPrefab: {fileID: 0}
   playerStats:
     playerID: 0
     playerName: 
@@ -179,21 +191,19 @@ MonoBehaviour:
     maxHealth: 0
     attackPower: 0
     moveSpeed: 0
-    currentEXP: 0
-    moveStrategyType: 0
-    currentHealth: 0
+    playerType: 0
     playerPrefab: {fileID: 0}
     damageTextPrefab: {fileID: 0}
+    currentEXP: 0
+    currentHealth: 0
     unlockedSkillIDList: 
     equippedSkillIDList: 
   animator: {fileID: 1901394458928384586}
   rb: {fileID: 1901394458928384605}
   spriteRenderer: {fileID: 1901394458928384584}
-  behaviorTree: {fileID: 1901394458928384578}
   skillSpawner: {fileID: 1901394458928384579}
   shadowController: {fileID: 0}
-  stopMoveDragPower: 0
---- !u!114 &1901394458928384578
+--- !u!114 &5081692193626905293
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -202,24 +212,23 @@ MonoBehaviour:
   m_GameObject: {fileID: 1901394458928384591}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 032d1b645f3c07b49bfd6d8a7615c927, type: 3}
+  m_Script: {fileID: 11500000, guid: ca6e799b3c7d1444988ab4e6bf81d381, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  isDead: 0
-  isHurt: 0
-  canMove: 1
-  isMoving: 0
-  canStartMove: 0
-  isInAttack01Range: 0
-  isInAttack02Range: 0
-  isInAttack03Range: 0
-  isInAttack04Range: 0
-  isAttack01CoolDown: 1
-  isAttack02CoolDown: 1
-  isAttack03CoolDown: 1
-  isAttack04CoolDown: 1
-  isCooldownComplete: 1
-  canChangeAnim: 1
+--- !u!114 &-784742385834960563
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1901394458928384591}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 6d76b8fe7f980b1488409a5def55f567, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  meleeMovementBounds: {fileID: 0}
+  rangedMovementBounds: {fileID: 0}
 --- !u!114 &1901394458928384579
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -232,8 +241,18 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f4a89de8cd0cba14284a0bd2b3bdd134, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  player: {fileID: 1901394458928384577}
-  targetTransform: {fileID: 0}
+--- !u!114 &1901394458928384578
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1901394458928384591}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 032d1b645f3c07b49bfd6d8a7615c927, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!114 &1901394458928384607
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -247,3 +266,34 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   spriteRenderer: {fileID: 1901394458928384584}
+--- !u!1 &5535622795397535964
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 9191419462193891982}
+  m_Layer: 6
+  m_Name: SelectIndicatorPoint
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &9191419462193891982
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5535622795397535964}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0.07, y: 1.18, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 1901394458928384585}
+  m_RootOrder: 0
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}

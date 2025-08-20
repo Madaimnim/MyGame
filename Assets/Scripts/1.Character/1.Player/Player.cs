@@ -7,6 +7,7 @@ public class Player : MonoBehaviour, IDamageable, IAttackable
 {
     #region 公開變數
     public int playerID;
+    public GameObject selectIndicatorPoint;
 
     // 基礎冷卻時間（不變動，從 SkillData 來)
     public float skillSlot1CooldownTime;
@@ -29,9 +30,12 @@ public class Player : MonoBehaviour, IDamageable, IAttackable
     public Animator animator;
     public Rigidbody2D rb;
     public SpriteRenderer spriteRenderer;
-    public BehaviorTree behaviorTree;
     public PlayerSkillSpawner skillSpawner;
     public ShadowController shadowController;
+
+
+    private bool onAttackRecovery = false;
+    private bool isPlayingActionAnimation = false;
 
     public event Action<int, int> Event_HpChanged; // (當前血量, 最大血量)
     #endregion
@@ -40,47 +44,28 @@ public class Player : MonoBehaviour, IDamageable, IAttackable
     private void Awake() {
     }
 
-    private IEnumerator Start() {
-        SetBehaviorTree();
-        //if (playerStats == null)
-        //{
-            yield return StartCoroutine(GameManager.Instance.WaitForDataReady());
-        //    playerStats = PlayerStateManager.Instance.playerStatesDtny[playerID];
-        //}       //設定初始化playerStats
+    private void Start() {
     }
 
     private void Update() {
-        behaviorTree.Tick(); // 執行行為樹
         UpdateCooldowns();   // 每幀更新技能冷卻時間
-    }
-    #endregion
-
-
-
-    #region SetBehaviorTree()
-    private void SetBehaviorTree() {
-        behaviorTree.SetRoot(new Selector(new List<Node> // Selector 來處理優先級
-        {
-        new Action_Attack(this, 4),
-        new Action_Attack(this, 3),
-        new Action_Attack(this, 2),
-        new Action_Attack(this, 1),
-        new Action_Move(),
-        new Action_Idle()
-        })); ;
     }
     #endregion
 
     #region CanUseSkill(int skillSlot)
     public bool CanUseSkill(int skillSlot) {
+        bool canUse = false;
+
         switch (skillSlot)
         {
-            case 1: return CanUseSkillSlot(skillSlot1DetectPrefab, skillSlot1CurrentCooldownTime);
-            case 2: return CanUseSkillSlot(skillSlot2DetectPrefab, skillSlot2CurrentCooldownTime);
-            case 3: return CanUseSkillSlot(skillSlot3DetectPrefab, skillSlot3CurrentCooldownTime);
-            case 4: return CanUseSkillSlot(skillSlot4DetectPrefab, skillSlot4CurrentCooldownTime);
-            default: return false;
+            case 1: canUse = CanUseSkillSlot(skillSlot1DetectPrefab, skillSlot1CurrentCooldownTime); break;
+            case 2: canUse = CanUseSkillSlot(skillSlot2DetectPrefab, skillSlot2CurrentCooldownTime); break;
+            case 3: canUse = CanUseSkillSlot(skillSlot3DetectPrefab, skillSlot3CurrentCooldownTime); break;
+            case 4: canUse = CanUseSkillSlot(skillSlot4DetectPrefab, skillSlot4CurrentCooldownTime); break;
         }
+
+   
+        return canUse;
     }
 
     private bool CanUseSkillSlot(GameObject detectPrefab, float cooldown) {
@@ -89,8 +74,15 @@ public class Player : MonoBehaviour, IDamageable, IAttackable
         return detector != null && detector.hasTarget && cooldown <= 0;
     }
     #endregion
-    #region UseSkill(int skillSlot)
+
+    #region 技能施放
     public void UseSkill(int skillSlot) {
+        if (onAttackRecovery)
+        {
+            Debug.Log($"Debug: UseSkill({skillSlot}) 被阻止，因為攻擊硬直中");
+            return;
+        }
+
         switch (skillSlot)
         {
             case 1: UseSkillSlot(0, skillSlot1DetectPrefab, ref skillSlot1CurrentCooldownTime, skillSlot1CooldownTime); break;
@@ -105,25 +97,82 @@ public class Player : MonoBehaviour, IDamageable, IAttackable
         var skillData = playerStats.GetSkillAtSkillSlot(slotIndex);
         if (skillData == null) return;
 
-        // 🔹 **立即開始冷卻計時**
         currentCooldown = baseCooldown;
-
         Attack(slotIndex, detectPrefab, skillData.skillPrefab);
     }
     #endregion
+
     #region 冷卻時間倒數
     private void UpdateCooldowns() {
-        // 🔹 **讓冷卻時間減少**
         skillSlot1CurrentCooldownTime = Mathf.Max(0, skillSlot1CurrentCooldownTime - Time.deltaTime);
         skillSlot2CurrentCooldownTime = Mathf.Max(0, skillSlot2CurrentCooldownTime - Time.deltaTime);
         skillSlot3CurrentCooldownTime = Mathf.Max(0, skillSlot3CurrentCooldownTime - Time.deltaTime);
         skillSlot4CurrentCooldownTime = Mathf.Max(0, skillSlot4CurrentCooldownTime - Time.deltaTime);
+
+        
     }
     #endregion
 
     #region 公開Attack()方法
     private void Attack(int slotIndex, GameObject detectPrefab, GameObject skillPrefab) {
-        animator.Play(Animator.StringToHash("Attack"));
+        if (onAttackRecovery || isPlayingActionAnimation)
+        {
+            Debug.Log($"🚫 Debug: Attack() 被阻止，因為 onAttackRecovery={onAttackRecovery}, isPlayingActionAnimation={isPlayingActionAnimation}");
+            return;
+        }
+
+        SkillObject skillObject = skillPrefab.GetComponent<SkillObject>();        
+        if (skillObject == null) return;
+        TargetDetector targetDetector= detectPrefab.GetComponent<TargetDetector>();
+        if (targetDetector == null) return;
+        if (targetDetector.targetTransform == null)
+        {
+            Debug.LogWarning("Attack()中止：targetTransform 已被 Destroy 或不存在");
+            return;
+        }
+
+        // 翻轉角色朝向
+        bool isTargetOnLeft = targetDetector.targetTransform.position.x < transform.position.x;
+        transform.localScale = new Vector3(isTargetOnLeft ? -Mathf.Abs(transform.localScale.x) : Mathf.Abs(transform.localScale.x),
+                                     transform.localScale.y,
+                                     transform.localScale.z);
+        isPlayingActionAnimation = true;
+        onAttackRecovery = true;
+        string attackAnimationName = GetAttackAnimationName(skillObject.attackAnimationType);
+
+
+        animator.Play(Animator.StringToHash(attackAnimationName));
+        StartCoroutine(WaitAndStartAnimationLock( skillObject.attackRecoveryTime));
+        StartCoroutine(PlayAnimationAndSpawnSkillAfterDelay(skillObject.attackSpawnDelayTime, skillPrefab, detectPrefab));
+    }
+    #region GetAttackAnimationName(SkillObject.AttackAnimationType type)
+
+    private string GetAttackAnimationName(SkillObject.AttackAnimationType type) {
+        switch (type)
+        {
+            case SkillObject.AttackAnimationType.Attack01: return "Attack01";
+            case SkillObject.AttackAnimationType.Attack02: return "Attack02";
+            case SkillObject.AttackAnimationType.Other01: return "Other01";
+            case SkillObject.AttackAnimationType.Other02: return "Other02";
+            default: return "Attack01";
+        }
+    }
+    #endregion
+    private IEnumerator WaitAndStartAnimationLock(float attackRecoveryTime) {
+        yield return null; // 等待一幀，確保動畫已切換
+        float animationDurationTime = GetCurrentAnimationLength();
+
+
+        yield return new WaitForSeconds(animationDurationTime);
+        isPlayingActionAnimation = false;
+
+        yield return new WaitForSeconds(attackRecoveryTime);
+        onAttackRecovery = false;
+    }
+
+    #region 延遲生成技能
+    private IEnumerator PlayAnimationAndSpawnSkillAfterDelay(float delayTime, GameObject skillPrefab, GameObject detectPrefab) {
+        yield return new WaitForSeconds(delayTime);
         if (skillSpawner != null && detectPrefab != null)
         {
             TargetDetector detector = detectPrefab.GetComponent<TargetDetector>();
@@ -134,16 +183,20 @@ public class Player : MonoBehaviour, IDamageable, IAttackable
         }
     }
     #endregion
-    #region 公開Move()方法
-    public void Move() {
-        
+
+    private float GetCurrentAnimationLength() {
+        AnimatorStateInfo stateInfo = animator.GetCurrentAnimatorStateInfo(0); // 🔹 獲取當前動畫狀態
+        return stateInfo.length; // 直接返回動畫時長
     }
+
     #endregion
 
+    //受傷
     #region 公開方法 TakeDamage()
     public void TakeDamage(
         int damage,
         float knockbackForce,
+        Vector2 knockbackDirection,
 
         float dotDuration,
         float dotDamage,
@@ -162,6 +215,7 @@ public class Player : MonoBehaviour, IDamageable, IAttackable
         ShowDamageText(damage); // 顯示傷害數字
     }
     #endregion
+    //顯示傷害數字
     #region 顯示傷害數字
     private void ShowDamageText(int damage) {
         //Todo if (playerState == null || playerState.damageTextPrefab == null)
@@ -175,6 +229,7 @@ public class Player : MonoBehaviour, IDamageable, IAttackable
         //damageTextObj.GetComponent<DamageTextController>().Setup(damage);
     }
     #endregion
+    //受傷特效
     #region 閃白受擊
     private IEnumerator FlashWhite(float duration) {
         if (spriteRenderer != null )

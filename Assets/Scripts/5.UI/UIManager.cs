@@ -13,11 +13,10 @@ public class UIManager : MonoBehaviour
     public GameObject equipmentUIPanel;
     public GameObject skillsUIPanel;
     public GameObject formationUIPanel;
-
-    public UISkillController uiSkillController;
     public Dictionary<int, GameObject> activeUIPlayersDtny = new Dictionary<int, GameObject>();
     public Stack<GameObject> activeUIPanelsStack = new Stack<GameObject>(); // 儲存開啟中的 UI 面板
 
+    private UISkillController uiSkillController;
     #region 角色管理
     public int currentPlayerId = 1;   // 貫穿整個 UI 的核心變數
     #endregion
@@ -32,6 +31,7 @@ public class UIManager : MonoBehaviour
         {
             Destroy(gameObject);
         }
+        uiSkillController = GetComponentInChildren<UISkillController>();
     }
 
     private void OnEnable() {

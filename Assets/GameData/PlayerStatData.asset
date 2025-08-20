@@ -19,20 +19,20 @@ MonoBehaviour:
     maxHealth: 10
     attackPower: 1
     moveSpeed: 1
-    moveStrategyType: 0
+    playerType: 0
     playerPrefab: {fileID: 1901394458928384591, guid: c1a9c12d802fc0446a22a42d0c13403e, type: 3}
     damageTextPrefab: {fileID: 1607938802007343288, guid: 0d86880a858ce654c8236cd3c5a778c5, type: 3}
     skillPoolList:
     - skillID: 1
       skillName: "\u65AC\u64CA"
       currentLevel: 1
-      cooldownTime: 1
+      cooldownTime: 0.5
       skillPrefab: {fileID: 1868301516382297822, guid: bee82ac91c521d24b938786f51b7c88d, type: 3}
       targetDetectPrefab: {fileID: 3457001140423233958, guid: 84b845aceaf3a27428687d6c246943ec, type: 3}
     - skillID: 2
       skillName: "\u91CD\u64CA"
       currentLevel: 1
-      cooldownTime: 3
+      cooldownTime: 2
       skillPrefab: {fileID: 7327708947082931564, guid: ebc3332d416aec74cb1e857b78e74da3, type: 3}
       targetDetectPrefab: {fileID: 1240820100763929428, guid: 97300d7895f13084783945f8167006d2, type: 3}
     - skillID: 3
@@ -48,8 +48,8 @@ MonoBehaviour:
     level: 1
     maxHealth: 5
     attackPower: 1
-    moveSpeed: 3
-    moveStrategyType: 0
+    moveSpeed: 2
+    playerType: 1
     playerPrefab: {fileID: 1901394458928384591, guid: 0d87d99a51500fd418339ea0f269bb01, type: 3}
     damageTextPrefab: {fileID: 1607938802007343288, guid: 0d86880a858ce654c8236cd3c5a778c5, type: 3}
     skillPoolList:
@@ -57,8 +57,8 @@ MonoBehaviour:
       skillName: "\u5C04\u64CA"
       currentLevel: 1
       cooldownTime: 1
-      skillPrefab: {fileID: 7327708947082931564, guid: ebc3332d416aec74cb1e857b78e74da3, type: 3}
-      targetDetectPrefab: {fileID: 1240820100763929428, guid: 97300d7895f13084783945f8167006d2, type: 3}
+      skillPrefab: {fileID: 1868301516382297822, guid: e9482e1a632b9db42abfad2b78ec208a, type: 3}
+      targetDetectPrefab: {fileID: 2003774139042550798, guid: 95167d54ba66b37429c084cc1d1c6065, type: 3}
     - skillID: 3
       skillName: "\u591A\u91CD\u5C04\u64CA"
       currentLevel: 1
@@ -79,7 +79,7 @@ MonoBehaviour:
     maxHealth: 700
     attackPower: 200
     moveSpeed: 1
-    moveStrategyType: 0
+    playerType: 0
     playerPrefab: {fileID: 1901394458928384591, guid: fac17571dfa75c24d91b7b378396d20e, type: 3}
     damageTextPrefab: {fileID: 0}
     skillPoolList:
@@ -115,7 +115,7 @@ MonoBehaviour:
     maxHealth: 1000
     attackPower: 300
     moveSpeed: 10
-    moveStrategyType: 0
+    playerType: 0
     playerPrefab: {fileID: 1901394458928384591, guid: 0d87d99a51500fd418339ea0f269bb01, type: 3}
     damageTextPrefab: {fileID: 0}
     skillPoolList:
@@ -151,7 +151,7 @@ MonoBehaviour:
     maxHealth: 5000
     attackPower: 1000
     moveSpeed: 10
-    moveStrategyType: 0
+    playerType: 0
     playerPrefab: {fileID: 1901394458928384591, guid: 0d87d99a51500fd418339ea0f269bb01, type: 3}
     damageTextPrefab: {fileID: 0}
     skillPoolList:

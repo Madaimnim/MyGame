@@ -19,6 +19,7 @@ public class EnemyStatData : ScriptableObject
         public int maxHealth;
         public int attackPower;
         public float moveSpeed;
+        public float exp;
         public MoveStrategyType moveStrategyType;
 
         public Sprite spriteIcon;

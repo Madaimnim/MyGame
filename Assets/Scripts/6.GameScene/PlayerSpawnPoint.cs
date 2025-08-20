@@ -1,12 +1,14 @@
-﻿using UnityEngine;
+﻿using System.Collections;
+using System.Collections.Generic;
+using UnityEngine;
 
 public class PlayerSpawnPoint : MonoBehaviour
 {
-    private void OnEnable() {
+    private IEnumerator Start() {
+        yield return StartCoroutine(GameManager.Instance.WaitForDataReady());
         if (PlayerStateManager.Instance != null)
         {
             PlayerStateManager.Instance.stageSpawnPosition = gameObject.transform.position;
-            Debug.Log($"生成點座標為{ gameObject.transform.position}");
             PlayerStateManager.Instance.ActivateAllPlayer();
         }
         else

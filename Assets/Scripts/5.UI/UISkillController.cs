@@ -12,7 +12,7 @@ public class UISkillController : MonoBehaviour
     public GameObject skillSelectionPanel;  // 技能選擇面板
     public GameObject skillSelectionButtonPrefab;  // 技能選擇按鈕的預製體
 
-    private PlayerStateManager.PlayerStats currentPlayer;
+    private PlayerStateManager.PlayerStatsRuntime currentPlayer;
     private Vector2 originSkillSelectionPanelPosition;
 
     private void OnEnable() { 
@@ -68,7 +68,7 @@ public class UISkillController : MonoBehaviour
 
     #region 顯示可選技能列表
     private void ShowAvailableSkills(int slotIndex) {
-        List<PlayerStateManager.PlayerStats.SkillData> availableSkills = new List<PlayerStateManager.PlayerStats.SkillData>();
+        List<PlayerStateManager.PlayerStatsRuntime.SkillData> availableSkills = new List<PlayerStateManager.PlayerStatsRuntime.SkillData>();
 
         skillSelectionPanel.transform.position = originSkillSelectionPanelPosition;
 

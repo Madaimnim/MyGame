@@ -21,6 +21,7 @@ public class UIManager : MonoBehaviour
     public int currentPlayerId = 1;   // 貫穿整個 UI 的核心變數
     #endregion
 
+    //生命週期
     #region 生命週期
     private void Awake() {
         if (Instance == null)
@@ -42,13 +43,17 @@ public class UIManager : MonoBehaviour
         yield return StartCoroutine(GameManager.Instance.WaitForDataReady());
         UpdateUICrrentIndexAndPlayer(); // ✅ 初始化 UI
     }
+    #endregion
 
     //供Button訂閱傳入「string 動畫名稱」，執行當前角色的動畫撥放
+    #region PlayUIAttackAnimation(string animationName)
     public void PlayUIAttackAnimation(string animationName) {
         activeUIPlayersDtny[currentPlayerId].GetComponent<Animator>().Play(Animator.StringToHash(animationName));
     }
+    #endregion
 
-
+    //開起UI方法
+    #region OpenUIPanel(GameObject panel)
     public void OpenUIPanel(GameObject panel) {
         if (panel == null)
         {
@@ -64,6 +69,21 @@ public class UIManager : MonoBehaviour
         activeUIPanelsStack.Push(panel);
         panel.SetActive(true);
     }
+    #endregion
+
+    //開啟UI菜單
+    #region
+    public void OpenUIMene() {
+        OpenUIPanel(menuUIPanel);
+    }
+    #endregion
+
+    //開啟UI狀態
+    #region
+    public void OpenUIStatus() {
+        OpenUIPanel(statusUIPanel);
+    }
+    #endregion
 
     public void CloseTopUIPanel() {
         if (activeUIPanelsStack.Count == 0)
@@ -85,7 +105,9 @@ public class UIManager : MonoBehaviour
         //formationUIPanel.SetActive(false);
         activeUIPanelsStack.Clear();
     }
-    #endregion
+
+    //更新UI裡的腳色ID
+    #region UpdateUICrrentIndexAndPlayer()
     public void UpdateUICrrentIndexAndPlayer() {
         var unlockedPlayerIDs = PlayerStateManager.Instance.unlockedPlayerIDsHashSet;
 
@@ -96,12 +118,14 @@ public class UIManager : MonoBehaviour
 
         // 確保 currentIndex 在合理範圍
         currentPlayerId = Mathf.Clamp(currentPlayerId, 0, unlockedPlayerIDs.Count);
-        PlayerStateManager.PlayerStats newPlayer = PlayerStateManager.Instance.playerStatesDtny[currentPlayerId];
+        PlayerStateManager.PlayerStatsRuntime newPlayer = PlayerStateManager.Instance.playerStatesDtny[currentPlayerId];
 
         EventBus.Trigger(new UICurrentPlayerChangEvent(PlayerStateManager.Instance.playerStatesDtny[currentPlayerId]));
     }
+    #endregion
 
-    #region 提供外部方法變更currentIndex
+    //提供外部方法變更currentIndex
+    #region ChangCurrentPlayerID(int AddNumber)
     public void ChangCurrentPlayerID(int AddNumber) {
         var unlockedPlayerIDs = PlayerStateManager.Instance.unlockedPlayerIDsHashSet;
 
@@ -125,5 +149,8 @@ public class UIManager : MonoBehaviour
 
     #endregion
 
+    //打開Menu
+    #region
 
+    #endregion
 }

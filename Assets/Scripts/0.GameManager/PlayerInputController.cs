@@ -10,10 +10,12 @@ public class PlayerInputController : MonoBehaviour
 
     public bool isBattleInputEnabled = false;
 
-    private Dictionary<int, GameObject> playersDtny = new Dictionary<int, GameObject>(); // 直接從 PlayerStateManager 取得
-    private List<int> playerIDsList = new List<int>(); // 存放目前可用的角色 ID
+    private Dictionary<int, GameObject> deployedPlayersDtny = new Dictionary<int, GameObject>(); // 直接從 PlayerStateManager 取得
+    private List<int> deployedPlayerIDsList = new List<int>(); // 存放目前可用的角色 ID
     private int currentPlayerIndex = -1;  // 當前選擇的角色索引
 
+    //生命週期
+    #region 
     private void Awake() {
         if (Instance == null)
         {
@@ -33,31 +35,38 @@ public class PlayerInputController : MonoBehaviour
         if (!isBattleInputEnabled) return;
         HandleMovement(); // ✅ 正確用 FixedUpdate 處理剛體移動
     }
+    #endregion
 
+    //初始化角色清單，並預選第一個角色
+    #region InitailPlayerList()
     public void InitailPlayerList() {
         UpdatePlayerList(); // 初始化角色列表
-        if (playerIDsList.Count > 0)
+        if (deployedPlayerIDsList.Count > 0)
         {
             SelectPlayer(0);  // 預設選擇第一個角色
-            Debug.Log($"PlayerInputController已初始化當前角色控制為{playersDtny[1].name}");
+            Debug.Log($"PlayerInputController已初始化當前角色控制為{deployedPlayersDtny[1].name}");
         }
     }
+    #endregion
 
-    // 🔹 動態更新玩家列表
+    // 更新玩家列表
+    #region UpdatePlayerList()
     private void UpdatePlayerList() {
-        playersDtny = PlayerStateManager.Instance.activePlayersDtny; // 直接引用 Dictionary
-        playerIDsList = new List<int>(playersDtny.Keys); // 取得所有可用的角色 ID
+        deployedPlayersDtny = PlayerStateManager.Instance.deployedPlayersDtny; // 直接引用 Dictionary
+        deployedPlayerIDsList = new List<int>(deployedPlayersDtny.Keys); // 取得所有可用的角色 ID
 
-        if (playerIDsList.Count == 0)
+        if (deployedPlayerIDsList.Count == 0)
         {
-            Debug.LogWarning("⚠ 目前沒有可控制的角色！");
+            Debug.LogWarning("目前沒有可控制的角色！");
         }
     }
+    #endregion
 
-    // 🔹 處理角色切換
+    // 處理角色切換
+    #region  HandlePlayerSwitch()
     private void HandlePlayerSwitch() {
         // 數字鍵 1-9 切換角色（根據當前角色數量自適應）
-        for (int i = 0; i < playerIDsList.Count && i < 9; i++)
+        for (int i = 0; i < deployedPlayerIDsList.Count && i < 9; i++)
         {
             if (Input.GetKeyDown(KeyCode.Alpha1 + i))
             {
@@ -74,11 +83,11 @@ public class PlayerInputController : MonoBehaviour
                 Collider2D hit = Physics2D.OverlapPoint(Camera.main.ScreenToWorldPoint(Input.mousePosition));
                 if (hit != null)
                 {
-                    foreach (var kvp in playersDtny)
+                    foreach (var kvp in deployedPlayersDtny)
                     {
                         if (hit.gameObject == kvp.Value)
                         {
-                            int index = playerIDsList.IndexOf(kvp.Key);
+                            int index = deployedPlayerIDsList.IndexOf(kvp.Key);
                             if (index != -1)
                             {
                                 SelectPlayer(index);
@@ -90,10 +99,12 @@ public class PlayerInputController : MonoBehaviour
             }
         }
     }
+    #endregion
 
-    // 🔹 選擇角色
+    // 選擇角色
+    #region SelectPlayer(int index)
     private void SelectPlayer(int index) {
-        if (index < 0 || index >= playerIDsList.Count) return;
+        if (index < 0 || index >= deployedPlayerIDsList.Count) return;
 
         if (currentPlayerIndex != index) // 只有當角色變更時才更新
         {
@@ -101,16 +112,18 @@ public class PlayerInputController : MonoBehaviour
             UpdateSelectionIndicator();
         }
     }
+    #endregion
 
-    // 🔹 更新選框的位置
+    // 更新選框的位置
+    #region UpdateSelectionIndicator()
     private void UpdateSelectionIndicator() {
-        if (!playersDtny.ContainsKey(playerIDsList[currentPlayerIndex]))
+        if (!deployedPlayersDtny.ContainsKey(deployedPlayerIDsList[currentPlayerIndex]))
         {
-            Debug.LogWarning("⚠ 玩家 ID 不存在於 playersDtny！");
+            Debug.LogWarning("⚠ 玩家 ID 不存在於 deployedPlayersDtny！");
             return;
         }
-        int playerID = playerIDsList[currentPlayerIndex];
-        Player player = PlayerStateManager.Instance.GetPlayerObject(playerID).GetComponent<Player>();
+        int playerID = deployedPlayerIDsList[currentPlayerIndex];
+        Player player = PlayerStateManager.Instance.GetDeployedPlayerObject(playerID).GetComponent<Player>();
 
         if (player == null)
         {
@@ -134,20 +147,33 @@ public class PlayerInputController : MonoBehaviour
         currentSelectionIndicator.transform.SetParent(indicatorPoint);
         currentSelectionIndicator.transform.localPosition = Vector3.zero;
     }
+    #endregion
 
-
-    // 🔹 控制當前角色移動
+    //  控制當前角色移動
+    #region HandleMovement()
     private void HandleMovement() {
-        if (playerIDsList.Count == 0) return; // 確保場上有角色
+        if (deployedPlayerIDsList.Count == 0) return; // 確保場上有角色
 
         float moveX = Input.GetAxisRaw("Horizontal");
         float moveY = Input.GetAxisRaw("Vertical");
 
         Vector2 moveDirection = new Vector2(moveX, moveY).normalized;
 
-        if (playersDtny.ContainsKey(playerIDsList[currentPlayerIndex]))
+        int currentId = deployedPlayerIDsList[currentPlayerIndex];
+        if (deployedPlayersDtny.ContainsKey(deployedPlayerIDsList[currentPlayerIndex]))
         {
-            playersDtny[playerIDsList[currentPlayerIndex]].GetComponent<PlayerMove>().Move(moveDirection);
+            var currentPlayerObject = deployedPlayersDtny[currentId];
+            currentPlayerObject.GetComponent<PlayerMove>().Move(moveDirection);
+
+            if (Mathf.Abs(moveX) > 0.01f)
+            {
+                Transform t = currentPlayerObject.transform;
+                Vector3 s = t.localScale;
+                float mag = Mathf.Abs(s.x);                  // 保留原本的絕對大小
+                s.x = (moveX < 0f) ? -mag : mag;             // 左負右正
+                t.localScale = s;
+            }
         }
     }
+    #endregion
 }

@@ -207,10 +207,9 @@ public class SkillObject : MonoBehaviour
     #endregion
     #region TowardMove()
     private void TowardMove() {
-        if (targetTransform != null)
-        {
+
             transform.position += (Vector3)(moveDirection * moveSpeed * Time.deltaTime);
-        }
+
     }
     #endregion
     #region SpawnAtTarget()
@@ -278,16 +277,7 @@ public class SkillObject : MonoBehaviour
                 int finalDamage = Mathf.CeilToInt(baseAttackPower * skillDamage/100f);
 
                 hitTargetsHash.Add(damageable);
-                damageable.TakeDamage(
-                    finalDamage, 
-                    knockbackForce,
-                    initialDirection,
-                    dotDuration,
-                    dotDamage, 
-                    attackReduction,
-                    attackReductionDuration, 
-                    speedReduction, 
-                    speedReductionDuration);
+                damageable.TakeDamage( finalDamage,knockbackForce, initialDirection);
                 onHitTypeDtny[onHitType]?.Invoke();                                              //觸發OnHitTypeDtny裡的對應方法。
             }
         }

@@ -1,8 +1,10 @@
 using UnityEngine;
+using System.Collections;
 using System;
 using System.Collections.Generic;
 using UnityEngine.UI;
 using TMPro;
+
 
 public class GameStateManager : MonoBehaviour
 {
@@ -54,37 +56,61 @@ public class GameStateManager : MonoBehaviour
     }
     private void ExitGameStart() {
         GameSceneManager.Instance.GameStartButton.interactable=false;
+        PlayerStateManager.Instance.UnlockAndSpawnPlayer(1);
+        PlayerStateManager.Instance.playerStatesDtny[1].UnlockSkill(2);
+        PlayerStateManager.Instance.playerStatesDtny[1].UnlockSkill(3);
+        PlayerStateManager.Instance.SetupDefaultSkills(1);
+        //PlayerStateManager.Instance.UnlockAndSpawnPlayer(2);
+        //PlayerStateManager.Instance.SetupDefaultSkills(2);
     }
 
-    //進出準備
+    //進出準備場景
+    #region Handle、ExitPreparation()
     private void HandlePreparation() {
-        PlayerStateManager.Instance.UnlockAndSpawnPlayer(1);
-        PlayerStateManager.Instance.UnlockAndSpawnPlayer(2);
         PlayerStateManager.Instance.DeactivateAllPlayer();
-
         GameSceneManager.Instance.LoadScenePreparation();
         GameSceneManager.Instance.GameStartButton.gameObject.SetActive(false);
-
-
         UIInputController.Instance.isUIInputEnabled = true;
+        TextPopupManager.Instance.TextPrefab_StageClear.transform.localPosition = Vector3.zero;
+        TextPopupManager.Instance.TextPrefab_StageDefeat.transform.localPosition = Vector3.zero;
     }
     private void ExitPreparation() {
         UIInputController.Instance.isUIInputEnabled = false;
         UIManager.Instance.CloseAllUIPanels();
     }
+    #endregion
 
-    //進出戰鬥
+    //進出戰鬥場景
+    #region Handle、ExitBattle(string sceneName)
     private void HandleBattle(string sceneName) {
-        GameSceneManager.Instance.LoadSceneForSceneName(sceneName);
+        StartCoroutine(HandleBattle_Co(sceneName));
+    }
+    
+    private IEnumerator HandleBattle_Co(string sceneName) {
+        // 等待場景載入完成（含淡出/加載/淡入流程）
+        yield return GameSceneManager.Instance.LoadSceneForSceneName_Co(sceneName);
+        //再等一幀
+        yield return null;
+
+        //新場景就緒後再啟用玩家
+        PlayerStateManager.Instance.ActivateAllPlayer();
+
+        // 再初始化輸入與清單
         PlayerInputController.Instance.InitailPlayerList();
         PlayerInputController.Instance.isBattleInputEnabled = true;
     }
+
+
     private void ExitBattle() {
         PlayerInputController.Instance.isBattleInputEnabled = false;
-        PopupManager.Instance.PopupPrefab_StageClear.SetActive(false);
+        TextPopupManager.Instance.TextPrefab_StageClear.SetActive(false);
+        TextPopupManager.Instance.TextPrefab_StageDefeat.SetActive(false);
     }
+    #endregion
+
 
     //進出戰鬥暫停
+
     private void HandleBattlePause() {
         Time.timeScale = 0f;
     }
@@ -106,7 +132,8 @@ public class GameStateManager : MonoBehaviour
     }
     #endregion
 
-    #region 狀態處理邏輯
+    //狀態進出Case選項
+    #region EnterState(GameState state,string sceneName)
     private void EnterState(GameState state,string sceneName) {
         switch (state)
         {
@@ -162,6 +189,14 @@ public class GameStateManager : MonoBehaviour
                 ExitEndGame();
                 break;
         }
+    }
+    #endregion
+
+    //進入準備階段方法(外部呼叫用)
+
+    #region
+    public void EnterPrepareState() {
+        SetState(GameState.Preparation,"Preparation");
     }
     #endregion
 }

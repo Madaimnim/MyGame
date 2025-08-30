@@ -24,9 +24,11 @@ public class UIInputController : MonoBehaviour
 
         if (Input.GetKeyDown(KeyCode.I) || Input.GetKeyDown(KeyCode.Escape))
         {
+            Debug.Log("按下了I鍵或Ese鍵");
             if (!UIManager.Instance.menuUIPanel.activeSelf)
             {
-                UIManager.Instance.OpenUIPanel(UIManager.Instance.menuUIPanel); // ✅ 改成 OpenUIPanel
+                Debug.Log("執行開啟菜單");
+                UIManager.Instance.OpenUIPanel(UIManager.Instance.menuUIPanel); // OpenUIPanel
             }
             else
             {

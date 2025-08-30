@@ -9,7 +9,7 @@ public class UIStatusController : MonoBehaviour
     public Button ChangNextPlayerDisplayerButton;
     public Button ChangLastPlayerDisplayerButton;
     public TextMeshProUGUI[] statusTextsArray; // 角色基本狀態顯示（前 6 個）
-    private PlayerStateManager.PlayerStats currentPlayer;
+    private PlayerStateManager.PlayerStatsRuntime currentPlayer;
 
 
     private void OnEnable() {

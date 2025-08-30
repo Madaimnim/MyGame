@@ -6,16 +6,23 @@ public class PlayerStatData : ScriptableObject
 {
     #region 定義
     [Header("所有玩家數據列表")]
-    public List<PlayerStats> playerStatsList = new List<PlayerStats>();
+    public List<PlayerStatsTemplate> playerStatsList = new List<PlayerStatsTemplate>();
     #endregion
 
     #region 內含類PlayerStats
     [System.Serializable]
-    public class PlayerStats
+    public class PlayerStatsTemplate
     {
         public int playerID;
         public string playerName;
-        public int level;
+        public int level=1;
+        public int currentEXP=0;
+        public int[] expTable = new int[]{
+        13, 18, 25, 34, 45, 58, 73, 90, 109, 130, // 1~10
+        153, 178, 205, 234, 265, 298, 333, 370, 409, 450, // 11~20
+        493, 538, 585, 634, 685, 738, 793, 850, 909, 970  // 21~30
+        };
+ 
         public int maxHealth;
         public int attackPower;
         public float moveSpeed;

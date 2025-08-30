@@ -8,14 +8,15 @@ using System.Collections.Generic;
 
 public class EnemyAI : MonoBehaviour, IAttackable
 {
-    #region 公開變數
+    //變數
+    #region 變數
     public Enemy enemy;
     public SpriteRenderer spriteRenderer;
     public Animator animator;
     public Rigidbody2D rb;
     public MoveStrategyBase moveStrategy; // 存儲移動策略
     public SkillStrategyBase skillStrategy; // 存儲技能策略
-    public EnemySkillSpawner skillSpawner;
+    public List<EnemySkillSlot> enemySkillSlotList;
     public BehaviorTree behaviorTree;
     public ShadowController shadowController;
     public float stopMoveDragPower;
@@ -30,35 +31,25 @@ public class EnemyAI : MonoBehaviour, IAttackable
     public GameObject skillSlot3DetectPrefab;
     public GameObject skillSlot4DetectPrefab;
 
-    #endregion
-    #region 私有變數
 
 
     #endregion
-
+    
+    //生命週期
     #region Awake()方法
-    private void Awake() {
-    }
-    #endregion
+    private void Awake() {}
 
-    #region Start()方法
     void Start() {
         SetMoveStrategy(); 
         SetBehaviorTree(); // 設定行為樹
     }
-    #endregion
-    
-    #region FixUpdata
-    private void FixedUpdate() {
 
-    }
-    #endregion
-    #region Update
     void Update() {
         behaviorTree.Tick(); // 執行行為樹
     }
     #endregion
 
+    //設置行為樹
     #region 私有SetBehaviorTree()方法
     private void SetBehaviorTree() {
         behaviorTree.SetRoot(new Selector(new List<Node> // Selector 來處理優先級
@@ -90,6 +81,7 @@ public class EnemyAI : MonoBehaviour, IAttackable
         TargetDetector detector = skillSlot1DetectPrefab.GetComponent<TargetDetector>();
         return detector != null && detector.hasTarget && skillSlot1CooldownTime <= 0;
     }
+
     public bool CanUseSkillSlot2() {
         if (skillSlot2DetectPrefab == null) return false;
         TargetDetector detector = skillSlot1DetectPrefab.GetComponent<TargetDetector>();
@@ -106,6 +98,7 @@ public class EnemyAI : MonoBehaviour, IAttackable
         return detector != null && detector.hasTarget && skillSlot1CooldownTime <= 0;
     }
     #endregion
+
     #region UseSkillSlot(int skillSlot)             void
     public void UseSkill(int skillSlot) {
         switch (skillSlot)
@@ -149,13 +142,6 @@ public class EnemyAI : MonoBehaviour, IAttackable
     }
     #endregion
 
-    #region 公有Attack()方法
-    public void Attack() {
-        animator.Play(Animator.StringToHash("Attack"));
-        //behaviorTree.canChangeAnim = false;
-    }
-
-    #endregion
     #region 公有Move方法()
     public void Move() {
         if (moveStrategy != null)

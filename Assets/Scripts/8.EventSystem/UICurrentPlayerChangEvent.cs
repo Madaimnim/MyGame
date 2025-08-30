@@ -3,9 +3,9 @@ using UnityEngine;
 
 public class UICurrentPlayerChangEvent
 {
-    public PlayerStateManager.PlayerStats currentPlayer  { get; private set; }
+    public PlayerStateManager.PlayerStatsRuntime currentPlayer  { get; private set; }
 
-    public UICurrentPlayerChangEvent(PlayerStateManager.PlayerStats currentPlayer) {
+    public UICurrentPlayerChangEvent(PlayerStateManager.PlayerStatsRuntime currentPlayer) {
         this.currentPlayer = currentPlayer;
     }
 }

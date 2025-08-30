@@ -60,28 +60,37 @@ public class GameSceneManager: MonoBehaviour
     }
     #endregion
 
-    //讀取指定場景
+    //讀取指定場景(不等待版本)
     #region 公開方法 LoadSceneForSceneName()
     public void LoadSceneForSceneName(string sceneName) {
         StartCoroutine(LoadScene(sceneName));
     }
     #endregion
 
+    //讀取指定場景(等待版本)
+    #region 公開協程 LoadSceneForSceneName_Co()
+    public IEnumerator LoadSceneForSceneName_Co(string sceneName) {
+        yield return LoadScene(sceneName);
+    }
+    #endregion
+
     //LoadScene協程
     #region 私有協程LoadScene(string sceneName)
-    //順序加載場景
     private IEnumerator LoadScene(string sceneName) {
+        GamePauseManager.Instance.ResumeGame(); // 先恢復
+        GameStartButton.gameObject.SetActive(false);
+
         //避免加載相同場景
         if (sceneName == currentSceneName)
         {
-            Debug.LogWarning($"⚠️ 嘗試加載相同場景 ({sceneName})，加載取消。");
+            Debug.LogWarning($" 嘗試加載相同場景 ({sceneName})，加載取消。");
             yield break;
         }
 
         // 確保不會並行加載
         if (isLoadingScene)
         {
-            Debug.LogWarning($"⚠️ 場景加載中，請勿重複加載 ({sceneName})");
+            Debug.LogWarning($" 場景加載中，請勿重複加載 ({sceneName})");
             yield break;
         }
         isLoadingScene = true;
@@ -89,7 +98,7 @@ public class GameSceneManager: MonoBehaviour
         // 確保 GameManager 的資料已加載完畢
         if (!GameManager.Instance.IsAllDataLoaded)
         {
-            Debug.LogError("❌ 資料未完成加載，等待中...");
+            Debug.LogError("GameManager.Instance.IsAllDataLoaded，資料未完成加載，等待中...");
             yield return new WaitUntil(() => GameManager.Instance.IsAllDataLoaded);
         }
 

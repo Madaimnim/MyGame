@@ -19,6 +19,7 @@ GameObject:
   - component: {fileID: 1901394458928384579}
   - component: {fileID: 1901394458928384578}
   - component: {fileID: 1901394458928384607}
+  - component: {fileID: 363619117296785542}
   m_Layer: 6
   m_Name: Player001
   m_TagString: Untagged
@@ -160,7 +161,7 @@ Rigidbody2D:
   m_Material: {fileID: 0}
   m_Interpolate: 0
   m_SleepingMode: 1
-  m_CollisionDetection: 0
+  m_CollisionDetection: 1
   m_Constraints: 4
 --- !u!114 &1901394458928384577
 MonoBehaviour:
@@ -184,20 +185,6 @@ MonoBehaviour:
   skillSlot2DetectPrefab: {fileID: 0}
   skillSlot3DetectPrefab: {fileID: 0}
   skillSlot4DetectPrefab: {fileID: 0}
-  playerStats:
-    playerID: 0
-    playerName: 
-    level: 0
-    maxHealth: 0
-    attackPower: 0
-    moveSpeed: 0
-    playerType: 0
-    playerPrefab: {fileID: 0}
-    damageTextPrefab: {fileID: 0}
-    currentEXP: 0
-    currentHealth: 0
-    unlockedSkillIDList: 
-    equippedSkillIDList: 
   animator: {fileID: 1901394458928384586}
   rb: {fileID: 1901394458928384605}
   spriteRenderer: {fileID: 1901394458928384584}
@@ -266,6 +253,19 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   spriteRenderer: {fileID: 1901394458928384584}
+--- !u!114 &363619117296785542
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1901394458928384591}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 2817ac25a3675ef479dfbb007dafe992, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  player: {fileID: 1901394458928384577}
 --- !u!1 &3680016166740253231
 GameObject:
   m_ObjectHideFlags: 0

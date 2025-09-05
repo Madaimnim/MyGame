@@ -22,6 +22,8 @@ public class GameSceneManager: MonoBehaviour
     private bool isLoadingScene = false;
     #endregion
 
+    //生命週期
+    #region
     private void Awake() {
         if (Instance == null)
         {
@@ -39,6 +41,8 @@ public class GameSceneManager: MonoBehaviour
         yield return StartCoroutine(GameManager.Instance.WaitForDataReady());
         GameStartButton.gameObject.SetActive(true);
     }
+    #endregion
+
     //讀取起始場景
     #region 公開方法 LoadSceneGameStart()
     public void LoadSceneGameStart() {

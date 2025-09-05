@@ -44,7 +44,6 @@ public class SkillObject : MonoBehaviour
     [Header("基本參數")]
     public SkillMoveType moveType;                                      //移動方法
     public OnHitType onHitType;
-    public float skillDamage = 0f;                                      //技能傷害(百分比)
     public float attackRecoveryTime = 0f;                               //攻擊動畫後硬直時間
     public float destroyDelay = 0f;                                     //自毀時間
     public float onHitDestroyDelay = 0f;                                //碰撞自毀時間
@@ -256,6 +255,7 @@ public class SkillObject : MonoBehaviour
         transform.RotateAround(rotatePivot.position, Vector3.forward, adjustedAngle);
     }
     #endregion
+
     #region SetSkillProperties(Vector2 directionVector, float baseAttackPower, Transform targetTransform, float rotateAngle)
     public void SetSkillProperties(Vector2 directionVector, float baseAttackPower, Transform targetTransform, float rotateAngle) {
         initialDirection = directionVector.normalized;
@@ -274,10 +274,17 @@ public class SkillObject : MonoBehaviour
             IDamageable damageable = collision.GetComponent<IDamageable>();
             if (damageable != null && !hitTargetsHash.Contains(damageable))
             {
-                int finalDamage = Mathf.CeilToInt(baseAttackPower * skillDamage/100f);
+                int finalDamage = Mathf.CeilToInt(baseAttackPower );
 
                 hitTargetsHash.Add(damageable);
-                damageable.TakeDamage( finalDamage,knockbackForce, initialDirection);
+                DamageInfo info = new DamageInfo()
+                {
+                    damage = finalDamage,
+                    knockbackForce = knockbackForce,
+                    knockbackDirection = initialDirection
+                };
+
+                damageable.TakeDamage( info);
                 onHitTypeDtny[onHitType]?.Invoke();                                              //觸發OnHitTypeDtny裡的對應方法。
             }
         }

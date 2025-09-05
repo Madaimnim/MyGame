@@ -6,15 +6,19 @@ using TMPro;
 
 public class UISkillController : MonoBehaviour
 {
+    [Header("狀態欄")]
     public Button[] slotSkillButtons;  // 技能槽4個按鈕
     public TextMeshProUGUI[] slotSkillNames;  // 技能槽技能名稱的 Text
-
     public GameObject skillSelectionPanel;  // 技能選擇面板
     public GameObject skillSelectionButtonPrefab;  // 技能選擇按鈕的預製體
 
     private PlayerStateManager.PlayerStatsRuntime currentPlayer;
     private Vector2 originSkillSelectionPanelPosition;
 
+
+
+    //生命週期
+    #region 生命週期
     private void OnEnable() { 
         EventBus.Listen<UICurrentPlayerChangEvent>(OnCurrentPlayerChanged);
         StartCoroutine(WaitAndInit());
@@ -27,6 +31,8 @@ public class UISkillController : MonoBehaviour
             slotSkillButtons[i].onClick.RemoveAllListeners();
         }
     }
+    #endregion
+
 
     private IEnumerator WaitAndInit() {
         yield return new WaitUntil(() => UIManager.Instance != null && PlayerStateManager.Instance != null);

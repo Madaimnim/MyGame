@@ -85,6 +85,13 @@ public class UIManager : MonoBehaviour
     }
     #endregion
 
+
+    //開啟UI技能
+    #region
+    public void OpenUISkillUsage() {
+        OpenUIPanel(skillsUIPanel);
+    }
+    #endregion
     public void CloseTopUIPanel() {
         if (activeUIPanelsStack.Count == 0)
         {
@@ -101,7 +108,7 @@ public class UIManager : MonoBehaviour
         statusUIPanel.SetActive(false);
         //jobUIPanel.SetActive(false);
         //equipmentUIPanel.SetActive(false);
-        //skillsUIPanel.SetActive(false);
+        skillsUIPanel.SetActive(false);
         //formationUIPanel.SetActive(false);
         activeUIPanelsStack.Clear();
     }

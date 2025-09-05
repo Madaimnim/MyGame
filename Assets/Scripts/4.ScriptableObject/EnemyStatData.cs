@@ -33,7 +33,7 @@ public class EnemyStatData : ScriptableObject
             public int skillID;
             public string skillName;
 
-            [Min(0f)] public float cooldownTime;
+            [Min(0f)] public float cooldown;
             [Min(0f)] public float knockbackForce;
             [Min(0f)] public int attackPower;
         

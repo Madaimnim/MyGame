@@ -18,29 +18,38 @@ MonoBehaviour:
     level: 1
     currentEXP: 0
     expTable: 0d0000001200000019000000220000002d0000003a000000490000005a0000006d0000008200000099000000b2000000cd000000ea000000090100002a0100004d0100007201000099010000c2010000ed0100001a020000490200007a020000ad020000e202000019030000520300008d030000ca030000
-    maxHealth: 1
+    maxHealth: 50
     attackPower: 1
-    moveSpeed: 2
+    moveSpeed: 3
     playerType: 0
     playerPrefab: {fileID: 1901394458928384591, guid: c1a9c12d802fc0446a22a42d0c13403e, type: 3}
     damageTextPrefab: {fileID: 1607938802007343288, guid: 0d86880a858ce654c8236cd3c5a778c5, type: 3}
     skillPoolList:
     - skillID: 1
-      skillName: "\u65AC\u64CA"
+      skillName: "\u528D\u65AC"
       currentLevel: 1
-      cooldownTime: 0.5
+      attack: 1
+      cooldown: 3
+      skillUsageCount: 0
+      nextSkillLevelCount: 10
       skillPrefab: {fileID: 1868301516382297822, guid: bee82ac91c521d24b938786f51b7c88d, type: 3}
       targetDetectPrefab: {fileID: 3457001140423233958, guid: 84b845aceaf3a27428687d6c246943ec, type: 3}
     - skillID: 2
       skillName: "\u91CD\u64CA"
       currentLevel: 1
-      cooldownTime: 2
+      attack: 1
+      cooldown: 0
+      skillUsageCount: 0
+      nextSkillLevelCount: 10
       skillPrefab: {fileID: 7327708947082931564, guid: ebc3332d416aec74cb1e857b78e74da3, type: 3}
       targetDetectPrefab: {fileID: 1240820100763929428, guid: 97300d7895f13084783945f8167006d2, type: 3}
     - skillID: 3
-      skillName: "\u53CD\u64CA\u65AC"
+      skillName: "\u65CB\u98A8\u65AC"
       currentLevel: 1
-      cooldownTime: 3
+      attack: 1
+      cooldown: 0
+      skillUsageCount: 0
+      nextSkillLevelCount: 10
       skillPrefab: {fileID: 7327708947082931564, guid: ebc3332d416aec74cb1e857b78e74da3, type: 3}
       targetDetectPrefab: {fileID: 1240820100763929428, guid: 97300d7895f13084783945f8167006d2, type: 3}
     unlockedSkillIDList: 
@@ -60,19 +69,28 @@ MonoBehaviour:
     - skillID: 1
       skillName: "\u5C04\u64CA"
       currentLevel: 1
-      cooldownTime: 1
+      attack: 1
+      cooldown: 0
+      skillUsageCount: 0
+      nextSkillLevelCount: 100
       skillPrefab: {fileID: 1868301516382297822, guid: e9482e1a632b9db42abfad2b78ec208a, type: 3}
       targetDetectPrefab: {fileID: 2003774139042550798, guid: 95167d54ba66b37429c084cc1d1c6065, type: 3}
     - skillID: 3
       skillName: "\u591A\u91CD\u5C04\u64CA"
       currentLevel: 1
-      cooldownTime: 0
+      attack: 1
+      cooldown: 0
+      skillUsageCount: 0
+      nextSkillLevelCount: 100
       skillPrefab: {fileID: 0}
       targetDetectPrefab: {fileID: 0}
     - skillID: 0
       skillName: 
       currentLevel: 1
-      cooldownTime: 0
+      attack: 1
+      cooldown: 0
+      skillUsageCount: 0
+      nextSkillLevelCount: 100
       skillPrefab: {fileID: 0}
       targetDetectPrefab: {fileID: 0}
     unlockedSkillIDList: 
@@ -92,25 +110,37 @@ MonoBehaviour:
     - skillID: 0
       skillName: 
       currentLevel: 1
-      cooldownTime: 0
+      attack: 1
+      cooldown: 0
+      skillUsageCount: 0
+      nextSkillLevelCount: 100
       skillPrefab: {fileID: 0}
       targetDetectPrefab: {fileID: 0}
     - skillID: 0
       skillName: 
       currentLevel: 1
-      cooldownTime: 0
+      attack: 1
+      cooldown: 0
+      skillUsageCount: 0
+      nextSkillLevelCount: 100
       skillPrefab: {fileID: 0}
       targetDetectPrefab: {fileID: 0}
     - skillID: 0
       skillName: 
       currentLevel: 1
-      cooldownTime: 0
+      attack: 1
+      cooldown: 0
+      skillUsageCount: 0
+      nextSkillLevelCount: 100
       skillPrefab: {fileID: 0}
       targetDetectPrefab: {fileID: 0}
     - skillID: 0
       skillName: 
       currentLevel: 1
-      cooldownTime: 0
+      attack: 1
+      cooldown: 0
+      skillUsageCount: 0
+      nextSkillLevelCount: 100
       skillPrefab: {fileID: 0}
       targetDetectPrefab: {fileID: 0}
     unlockedSkillIDList: 01000000
@@ -130,25 +160,37 @@ MonoBehaviour:
     - skillID: 0
       skillName: 
       currentLevel: 1
-      cooldownTime: 0
+      attack: 1
+      cooldown: 0
+      skillUsageCount: 0
+      nextSkillLevelCount: 100
       skillPrefab: {fileID: 0}
       targetDetectPrefab: {fileID: 0}
     - skillID: 0
       skillName: 
       currentLevel: 1
-      cooldownTime: 0
+      attack: 1
+      cooldown: 0
+      skillUsageCount: 0
+      nextSkillLevelCount: 100
       skillPrefab: {fileID: 0}
       targetDetectPrefab: {fileID: 0}
     - skillID: 0
       skillName: 
       currentLevel: 1
-      cooldownTime: 0
+      attack: 1
+      cooldown: 0
+      skillUsageCount: 0
+      nextSkillLevelCount: 100
       skillPrefab: {fileID: 0}
       targetDetectPrefab: {fileID: 0}
     - skillID: 0
       skillName: 
       currentLevel: 1
-      cooldownTime: 0
+      attack: 1
+      cooldown: 0
+      skillUsageCount: 0
+      nextSkillLevelCount: 100
       skillPrefab: {fileID: 0}
       targetDetectPrefab: {fileID: 0}
     unlockedSkillIDList: 
@@ -168,25 +210,37 @@ MonoBehaviour:
     - skillID: 0
       skillName: 
       currentLevel: 1
-      cooldownTime: 0
+      attack: 1
+      cooldown: 0
+      skillUsageCount: 0
+      nextSkillLevelCount: 100
       skillPrefab: {fileID: 0}
       targetDetectPrefab: {fileID: 0}
     - skillID: 0
       skillName: 
       currentLevel: 1
-      cooldownTime: 0
+      attack: 1
+      cooldown: 0
+      skillUsageCount: 0
+      nextSkillLevelCount: 100
       skillPrefab: {fileID: 0}
       targetDetectPrefab: {fileID: 0}
     - skillID: 0
       skillName: 
       currentLevel: 1
-      cooldownTime: 0
+      attack: 1
+      cooldown: 0
+      skillUsageCount: 0
+      nextSkillLevelCount: 100
       skillPrefab: {fileID: 0}
       targetDetectPrefab: {fileID: 0}
     - skillID: 0
       skillName: 
       currentLevel: 1
-      cooldownTime: 0
+      attack: 1
+      cooldown: 0
+      skillUsageCount: 0
+      nextSkillLevelCount: 100
       skillPrefab: {fileID: 0}
       targetDetectPrefab: {fileID: 0}
     unlockedSkillIDList: 

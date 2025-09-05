@@ -1,7 +1,7 @@
 using UnityEngine;
 using System.Collections.Generic;
 
-public class PlayerAIController : MonoBehaviour
+public class PlayerAIController : MonoBehaviour,IMoveable
 {
     private BehaviorTree behaviorTree;
     private Player player;
@@ -28,6 +28,10 @@ public class PlayerAIController : MonoBehaviour
         behaviorTreeUpdateCooldown -= Time.deltaTime;
     }
 
+    public void Move() { 
+    
+    }
+
     private void SetBehaviorTree() {
         behaviorTree.SetRoot(new Selector(new List<Node>
         {
@@ -35,7 +39,7 @@ public class PlayerAIController : MonoBehaviour
             new Action_Attack(player, 3),
             new Action_Attack(player, 2),
             new Action_Attack(player, 1),
-            new Action_Move(),
+            //new Action_Move(this),
             new Action_Idle()
         }));
     }

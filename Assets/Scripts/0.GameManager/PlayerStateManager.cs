@@ -64,42 +64,32 @@ public class PlayerStateManager : MonoBehaviour
         {
             unlockedPlayerIDsHashSet.Add(playerID);
 
-
             // 解鎖當下：生成唯一戰鬥用實體 +UI 預覽實體
             if (!playerStatesDtny.TryGetValue(playerID, out var stats) || stats.playerPrefab == null)
             {
                 Debug.LogError($"[UnlockPlayer] 無法解鎖玩家 {playerID}：缺 stats 或 prefab 為 null");
                 return;
             }
-            //生成battle角色物件
-            GameObject battlePlayerObject = GetSpawnPlayer(playerID, Vector3.zero, Quaternion.identity, playerParent);
-            //生成UI角色物件
-            GameObject uiPlayerObject = GetSpawnPlayer(playerID, Vector3.zero, Quaternion.identity, playerPreviewParent);
-            if (uiPlayerObject != null) UIManager.Instance.activeUIPlayersDtny[playerID] = uiPlayerObject;
 
-            //將battle腳色物件，存入上陣deployed字典
-            MarkAsDeployed(playerID, battlePlayerObject) ;
-            unlockedPlayersDtny[playerID] = new UnlockedPlayerData { battlePlayerObject = battlePlayerObject, uiPlayerObject = uiPlayerObject, stats = stats };
-            Debug.Log($"角色 {playerID}{playerStatesDtny[playerID].playerName} 解鎖");
-        }
-        else
-        {
-            // 已解鎖則不重複生成
+            SpawnPlayerAndUIPlayer(playerID,stats);
         }
     }
     #endregion
 
-    //指定、反指定角色為deployed角色
-    #region MarkAsDeployed(int playerID, GameObject battlePlayerObject)
-    public void MarkAsDeployed(int playerID, GameObject battlePlayerObject) {
-        if (!battlePlayerObject) return;
-        deployedPlayersDtny[playerID] = battlePlayerObject;
+    private void SpawnPlayerAndUIPlayer(int playerID,PlayerStatsRuntime stats) {
+        //生成battle角色物件
+        GameObject battlePlayerObject = GetSpawnPlayer(playerID, Vector3.zero, Quaternion.identity, playerParent);
+        //生成UI角色物件
+        GameObject uiPlayerObject = GetSpawnPlayer(playerID, Vector3.zero, Quaternion.identity, playerPreviewParent);
+        if (uiPlayerObject != null) UIManager.Instance.activeUIPlayersDtny[playerID] = uiPlayerObject;
+
+        //將battle腳色物件，存入上陣deployed字典
+        if (battlePlayerObject)
+            deployedPlayersDtny[playerID] = battlePlayerObject;
+        unlockedPlayersDtny[playerID] = new UnlockedPlayerData { battlePlayerObject = battlePlayerObject, uiPlayerObject = uiPlayerObject, stats = stats };
+        Debug.Log($"角色 {playerID}{playerStatesDtny[playerID].playerName} 解鎖");
     }
 
-    public void UnmarkDeployed(int playerID) {
-        deployedPlayersDtny.Remove(playerID);
-    }
-    #endregion
 
     //解鎖技能&裝備技能槽技能(int playerID)，預設解鎖1、2技能
     #region SetupDefaultSkills(int playerID)
@@ -140,23 +130,75 @@ public class PlayerStateManager : MonoBehaviour
 
     //激活所有腳色，並放置到關卡的出生點上
     #region ActivateALLPlayer()方法
+    //public void ActivateAllPlayer() {
+    //    //位移量
+    //    float offsetY = -1;
+    //    Vector3 spawnPos = stageSpawnPosition;
+    //    foreach (var kv in deployedPlayersDtny)
+    //    {
+    //        var currentPlayerObject = kv.Value;
+    //        if (!currentPlayerObject) continue;
+    //        currentPlayerObject.SetActive(true);
+    //        currentPlayerObject.transform.position = spawnPos;
+    //
+    //        //Debug.Log($"{ currentPlayerObject.name}被放置到{spawnPos}");
+    //
+    //        spawnPos = new Vector3(spawnPos.x, spawnPos.y + offsetY, spawnPos.z);
+    //        //Debug.Log($"出生點位置更新{spawnPos}");
+    //    }
+    //}
+
     public void ActivateAllPlayer() {
-        //位移量
         float offsetY = -1;
         Vector3 spawnPos = stageSpawnPosition;
+
         foreach (var kv in deployedPlayersDtny)
         {
             var currentPlayerObject = kv.Value;
             if (!currentPlayerObject) continue;
-            currentPlayerObject.SetActive(true);
-            currentPlayerObject.transform.position = spawnPos;
 
-            //Debug.Log($"{ currentPlayerObject.name}被放置到{spawnPos}");
+            currentPlayerObject.SetActive(true);
+            StartCoroutine(SpawnWithDrop(currentPlayerObject, spawnPos));
 
             spawnPos = new Vector3(spawnPos.x, spawnPos.y + offsetY, spawnPos.z);
-            //Debug.Log($"出生點位置更新{spawnPos}");
         }
     }
+
+    private IEnumerator SpawnWithDrop(GameObject player, Vector3 groundPos) {
+        // 從上方開始 (比地面高一點，例如 +3)
+        Vector3 startPos = groundPos + new Vector3(0, 10f, 0);
+        player.transform.position = startPos;
+
+        float t = 0;
+        float duration = 0.5f; // 下落時間
+
+        // 下落 (ease in)
+        while (t < 1)
+        {
+            t += Time.deltaTime / duration;
+            player.transform.position = Vector3.Lerp(startPos, groundPos, t * t);
+            yield return null;
+        }
+
+        // 彈一下 (往上小抬起再回來)
+        Vector3 bouncePos = groundPos + new Vector3(0, 0.3f, 0);
+        t = 0;
+        while (t < 1)
+        {
+            t += Time.deltaTime / 0.2f; // 彈跳快一點
+            player.transform.position = Vector3.Lerp(groundPos, bouncePos, Mathf.Sin(t * Mathf.PI));
+            yield return null;
+        }
+
+        // 最後確保回到地面
+        player.transform.position = groundPos;
+    }
+
+
+
+
+
+
     #endregion
 
     //反激活角色，並重置位置到原點
@@ -170,6 +212,8 @@ public class PlayerStateManager : MonoBehaviour
         }
     }
     #endregion
+
+
 
     // =================================================== RUNTIME 狀態類 ==========================================================
     
@@ -233,8 +277,12 @@ public class PlayerStateManager : MonoBehaviour
             #region 變數
             public int skillID;
             public string skillName;
-            public int currentLevel = 1;
-            public float cooldownTime;
+            public int currentLevel;
+            public int attack ;
+            public float cooldown;
+            public int skillUsageCount;
+            public int nextSkillLevelCount;
+
             public GameObject skillPrefab;
             public GameObject targetDetectPrefab;
             #endregion
@@ -245,7 +293,11 @@ public class PlayerStateManager : MonoBehaviour
                 skillID = original.skillID;
                 skillName = original.skillName;
                 currentLevel = original.currentLevel;
-                cooldownTime = original.cooldownTime;
+                attack = original.attack;
+                cooldown = original.cooldown;
+                skillUsageCount = original.skillUsageCount;
+                nextSkillLevelCount = original.nextSkillLevelCount;
+
                 skillPrefab = original.skillPrefab;
                 targetDetectPrefab = original.targetDetectPrefab;
             }
@@ -377,10 +429,10 @@ public class PlayerStateManager : MonoBehaviour
             if (player == null) return;
             switch (slotIndex)
             {
-                case 0: if (player.skillSlot1DetectPrefab) Destroy(player.skillSlot1DetectPrefab); player.skillSlot1DetectPrefab = null; break;
-                case 1: if (player.skillSlot2DetectPrefab) Destroy(player.skillSlot2DetectPrefab); player.skillSlot2DetectPrefab = null; break;
-                case 2: if (player.skillSlot3DetectPrefab) Destroy(player.skillSlot3DetectPrefab); player.skillSlot3DetectPrefab = null; break;
-                case 3: if (player.skillSlot4DetectPrefab) Destroy(player.skillSlot4DetectPrefab); player.skillSlot4DetectPrefab = null; break;
+                case 0: if (player.skillSlots[0].detectPrefab) Destroy(player.skillSlots[0].detectPrefab); player.skillSlots[0].detectPrefab = null; break;
+                case 1: if (player.skillSlots[1].detectPrefab) Destroy(player.skillSlots[1].detectPrefab); player.skillSlots[1].detectPrefab = null; break;
+                case 2: if (player.skillSlots[2].detectPrefab) Destroy(player.skillSlots[2].detectPrefab); player.skillSlots[2].detectPrefab = null; break;
+                case 3: if (player.skillSlots[3].detectPrefab) Destroy(player.skillSlots[3].detectPrefab); player.skillSlots[3].detectPrefab = null; break;
                 default: Debug.LogError($"[RemoveSkillDetector] 無效的技能槽索引: {slotIndex}"); break;
             }
         }
@@ -397,10 +449,10 @@ public class PlayerStateManager : MonoBehaviour
 
             switch (slotIndex)
             {
-                case 0: player.skillSlot1DetectPrefab = detectorObject; break;
-                case 1: player.skillSlot2DetectPrefab = detectorObject; break;
-                case 2: player.skillSlot3DetectPrefab = detectorObject; break;
-                case 3: player.skillSlot4DetectPrefab = detectorObject; break;
+                case 0: player.skillSlots[0].detectPrefab = detectorObject; break;
+                case 1: player.skillSlots[1].detectPrefab = detectorObject; break;
+                case 2: player.skillSlots[2].detectPrefab = detectorObject; break;
+                case 3: player.skillSlots[3].detectPrefab = detectorObject; break;
                 default: Debug.LogError($"[SetPlayerSkillSlotDetectPrefab] 無效的技能槽索引: {slotIndex}"); break;
             }
         }
@@ -428,10 +480,10 @@ public class PlayerStateManager : MonoBehaviour
         private void SetPlayerSkillSlotCooldownTime(Player player, int slotIndex, SkillData newSkill) {
             switch (slotIndex)
             {
-                case 0: player.skillSlot1CooldownTime = newSkill.cooldownTime; break;
-                case 1: player.skillSlot2CooldownTime = newSkill.cooldownTime; break;
-                case 2: player.skillSlot3CooldownTime = newSkill.cooldownTime; break;
-                case 3: player.skillSlot4CooldownTime = newSkill.cooldownTime; break;
+                case 0: player.skillSlots[0].cooldown = newSkill.cooldown; break;
+                case 1: player.skillSlots[1].cooldown = newSkill.cooldown; break;
+                case 2: player.skillSlots[2].cooldown = newSkill.cooldown; break;
+                case 3: player.skillSlots[3].cooldown = newSkill.cooldown; break;
                 default: Debug.LogError($"[SetSkillDetector] 無效的技能槽索引: {slotIndex}"); break;
             }
         }

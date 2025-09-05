@@ -60,6 +60,7 @@ public class GameStateManager : MonoBehaviour
         PlayerStateManager.Instance.playerStatesDtny[1].UnlockSkill(2);
         PlayerStateManager.Instance.playerStatesDtny[1].UnlockSkill(3);
         PlayerStateManager.Instance.SetupDefaultSkills(1);
+
         //PlayerStateManager.Instance.UnlockAndSpawnPlayer(2);
         //PlayerStateManager.Instance.SetupDefaultSkills(2);
     }
@@ -94,9 +95,15 @@ public class GameStateManager : MonoBehaviour
 
         //新場景就緒後再啟用玩家
         PlayerStateManager.Instance.ActivateAllPlayer();
-
         // 再初始化輸入與清單
         PlayerInputController.Instance.InitailPlayerList();
+        
+        yield return new WaitForSeconds(0.5f);
+
+        DialogueManager.Instance.StartDialogue();
+
+        yield return new WaitUntil(() => DialogueManager.Instance.isDialogueRunning == false);
+
         PlayerInputController.Instance.isBattleInputEnabled = true;
     }
 

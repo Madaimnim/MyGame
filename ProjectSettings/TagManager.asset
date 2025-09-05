@@ -12,14 +12,14 @@ TagManager:
   - Water
   - UI
   - Player
-  - Block
+  - Object
   - Enemy
   - GameWall
   - PlayerAttack
   - EnemyAttack
   - Bound
   - PlayerPreview
-  - 
+  - PlayerMove
   - 
   - 
   - 

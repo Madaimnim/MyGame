@@ -40,11 +40,11 @@ public class GameWall : MonoBehaviour, IDamageable
         
     #region TakeDamage()方法，
 
-    public void TakeDamage(int damage,float knockbackForce,Vector2 knockbackDirection) {
-        currentHp -= damage;
+    public void TakeDamage(DamageInfo info) {
+        currentHp -= info.damage;
         currentHp = Mathf.Clamp(currentHp, 0, maxHp);
         ValueChanged?.Invoke(currentHp, maxHp);//觸發事件，通知 UI 更新血量
-        ShowDamageText(damage);//顯示damage數字TEXT
+        ShowDamageText(info.damage);//顯示damage數字TEXT
     }
     #endregion
 

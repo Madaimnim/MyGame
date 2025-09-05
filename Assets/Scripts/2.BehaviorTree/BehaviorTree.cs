@@ -18,5 +18,17 @@ public class BehaviorTree:MonoBehaviour
         rootNode?.Evaluate();
     }
     #endregion
+}
 
+public abstract class Node
+{
+    protected NodeState state;  // 儲存節點狀態
+    public abstract NodeState Evaluate();
+}
+
+public enum NodeState
+{
+    SUCCESS,   // 成功
+    FAILURE,   // 失敗
+    RUNNING    // 持續執行
 }

@@ -12,10 +12,10 @@ EditorBuildSettings:
     path: Assets/Scenes/Preparation.unity
     guid: 0a4ea8bf841601a4cbfe583723d54ad6
   - enabled: 1
-    path: Assets/Scenes/Battle_Level001.unity
+    path: Assets/Scenes/SubStage1-1.unity
     guid: 2cda990e2423bbf4892e6590ba056729
   - enabled: 1
-    path: Assets/Scenes/Battle_Level002.unity
+    path: Assets/Scenes/SubStage1-2.unity
     guid: 51614d3b5b5559e4a9427e6385cd0b7c
   m_configObjects:
     com.unity.addressableassets: {fileID: 11400000, guid: 5f0f91bfd51eb184897146df712d2b00, type: 2}

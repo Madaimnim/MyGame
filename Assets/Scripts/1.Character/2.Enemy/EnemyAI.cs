@@ -3,10 +3,7 @@ using System.Collections;
 using UnityEngine;
 using System.Collections.Generic;
 
-//SetMoveStrategy(); // 改到獨立MoveController裡去
-//CoolDown方法待與BehaviorTree連動
-
-public class EnemyAI : MonoBehaviour, IAttackable
+public class EnemyAI : MonoBehaviour, IAttackable, IMoveable
 {
     //變數
     #region 變數
@@ -16,145 +13,233 @@ public class EnemyAI : MonoBehaviour, IAttackable
     public Rigidbody2D rb;
     public MoveStrategyBase moveStrategy; // 存儲移動策略
     public SkillStrategyBase skillStrategy; // 存儲技能策略
-    public List<EnemySkillSlot> enemySkillSlotList;
     public BehaviorTree behaviorTree;
     public ShadowController shadowController;
     public float stopMoveDragPower;
+    public Transform currentMoveTarget { get; private set; }
+    public bool isBehaviorTreeReady { get; private set; } = false;
 
-    public float skillSlot1CooldownTime;
-    public float skillSlot2CooldownTime;
-    public float skillSlot3CooldownTime;
-    public float skillSlot4CooldownTime;
+    //RequestAttack使用變數
+    #region
+    private IDamageable currentAttackDamageable;
+    private Transform currentAttackTarget;
+    private int currentAttackPower;
+    private float currentKnockbackForce;
+    private Vector3 currentKnockbackDirection;
+    private GameObject currentAttackPrefab;
+    #endregion
 
-    public GameObject skillSlot1DetectPrefab;
-    public GameObject skillSlot2DetectPrefab;
-    public GameObject skillSlot3DetectPrefab;
-    public GameObject skillSlot4DetectPrefab;
-
-
+    //冷卻時間、冷卻計時器、預製體用變數
+    #region   
+    [HideInInspector] public float[] slotCooldowns = new float[4];      // 冷卻時間（不變動，從 SkillData 來)
+    private float[] slotCooldownTimers = new float[4];                  // 冷卻計時器   
+    public GameObject[] slotDetectPrefabs = new GameObject[4];          // 偵測器物件
+    public string[] animationNames = new string[4];                      // 動畫名稱
+    #endregion
 
     #endregion
-    
+
     //生命週期
     #region Awake()方法
-    private void Awake() {}
+    private void Awake() { }
 
-    void Start() {
-        SetMoveStrategy(); 
+    private IEnumerator Start() {
+        yield return new WaitUntil(() => enemy.isEnemyDataReady);
+
+        SetCooldown();
+        InitiallySetMoveStrategy();
         SetBehaviorTree(); // 設定行為樹
     }
 
-    void Update() {
+    private void Update() {
+        UpdateCooldowns();
+        if (!isBehaviorTreeReady) return;
+        if (enemy.isPlayingActionAnimation) return;
         behaviorTree.Tick(); // 執行行為樹
+
     }
     #endregion
 
-    //設置行為樹
-    #region 私有SetBehaviorTree()方法
+    //初始化技能槽冷卻時間
+    #region
+    private void SetCooldown() {
+        for (int slot = 1; slot <= 4; slot++)
+        {
+            if (slotDetectPrefabs[slot - 1] != null)
+                slotCooldowns[slot - 1] = enemy.enemyStats.GetSkill(slot).cooldown;
+        }
+    }
+    #endregion
+
+    //更新冷卻方法
+    #region UpdateCooldowns()
+    private void UpdateCooldowns() {
+        for (int i = 0; i < 4; i++)
+        {
+            slotCooldownTimers[i] = Mathf.Max(0, slotCooldownTimers[i] - Time.deltaTime);
+        }
+
+    }
+    #endregion
+
+    //IAttackable需實踐方法，由Action_Attack實踐
+    #region CanUseSkill(int skillSlot)、UseSkill(int skillSlot)
+    public bool CanUseSkill(int skillSlot) {
+        int index = skillSlot - 1; // 技能槽從 1 開始，陣列從 0 開始
+        if (index < 0 || index >= slotDetectPrefabs.Length) return false;
+
+        GameObject detectPrefab = slotDetectPrefabs[index];
+        if (detectPrefab == null) return false;
+
+        float cooldownTimer = slotCooldownTimers[index];
+
+        TargetDetector detector = detectPrefab.GetComponent<TargetDetector>();
+
+        return detector != null && detector.hasTarget && cooldownTimer <= 0 && !enemy.isPlayingActionAnimation;
+    }
+
+    public void UseSkill(int skillSlot) {
+        int index = skillSlot - 1;
+        if (index < 0 || index >= slotDetectPrefabs.Length) return;
+
+
+
+        //Todo使用技能
+        currentAttackTarget = slotDetectPrefabs[index].GetComponent<TargetDetector>().targetTransform;
+
+        RequestAttack(skillSlot, currentAttackTarget, animationNames[index], currentAttackTarget.GetComponent<IDamageable>());
+        //技能進入冷卻
+        slotCooldownTimers[index] = slotCooldowns[index];
+        Debug.Log($"{slotCooldownTimers[index]}={slotCooldowns[index] }");
+    }
+    #endregion
+
+    //請求攻擊
+    #region RequestAttack(int slotID, Transform targetTransform,string animationName,IDamageable player)
+    public void RequestAttack(int slotID, Transform targetTransform, string animationName, IDamageable damageable) {
+
+        currentAttackDamageable = damageable;
+        currentAttackTarget = targetTransform;
+        currentAttackPower = enemy.enemyStats.skillPoolDtny[slotID].attackPower;
+        currentKnockbackForce = enemy.enemyStats.skillPoolDtny[slotID].knockbackForce;
+        currentKnockbackDirection = new Vector3(targetTransform.position.x - transform.position.x, targetTransform.position.y - transform.position.y, 0).normalized;
+        currentAttackPrefab = enemy.enemyStats.skillPoolDtny[slotID].attackPrefab;
+        bool isTargetOnRight = targetTransform.position.x > transform.position.x;
+        transform.localScale = new Vector3(isTargetOnRight ? -Mathf.Abs(transform.localScale.x) : Mathf.Abs(transform.localScale.x),
+                                     transform.localScale.y,
+                                     transform.localScale.z);
+        enemy.PlayAnimation(animationName);
+    }
+    #endregion
+    //攻擊:Animation Event使用
+    #region Attack()
+    public void Attack() {
+        if (currentAttackDamageable == null) return;
+        var targetMonoBehaviour = currentAttackDamageable as MonoBehaviour;
+        if (targetMonoBehaviour == null || !targetMonoBehaviour.gameObject.activeInHierarchy)
+        {
+            //目標已經死掉或被關閉，直接放棄
+            currentAttackDamageable = null;
+            return;
+        }
+
+        DamageInfo info = new DamageInfo()
+        {
+            damage = currentAttackPower,
+            knockbackForce = currentKnockbackForce,
+            knockbackDirection = currentKnockbackDirection
+        };
+        currentAttackDamageable.TakeDamage(info);
+    }
+    #endregion
+
+    //Todo生成技能
+    #region SpawnSkill()
+    private void SpawnSkill(GameObject attackPrefab) {
+        if (attackPrefab != null)
+        {
+            //todo
+        }
+    }
+    #endregion
+
+    //初始化MoveStrategy
+    #region 私有SetMoveStrategy方法
+    private void InitiallySetMoveStrategy() {
+        switch (enemy.enemyStats.moveStrategyType) // 根據 Enum 設置策略
+        {
+            case MoveStrategyType.Straight:
+                moveStrategy = new StraightMoveStrategy();
+                break;
+            case MoveStrategyType.Random:
+                moveStrategy = new RandomMoveStrategy();
+                break;
+            case MoveStrategyType.FollowPlayer:
+                moveStrategy = new FollowPlayerMoveStrategy();
+                break;
+            default:
+                Debug.LogError($"未定義的移動策略: {enemy.enemyStats.moveStrategyType}");
+                break;
+        }
+    }
+    #endregion
+
+    //改變移動策略
+    #region  ChangeMoveStrategy(MoveStrategyType type) 
+    public void ChangeMoveStrategy(MoveStrategyType type) {
+        switch (type)
+        {
+            case MoveStrategyType.Straight:
+                moveStrategy = new StraightMoveStrategy();
+                break;
+            case MoveStrategyType.Random:
+                moveStrategy = new RandomMoveStrategy();
+                break;
+            case MoveStrategyType.FollowPlayer:
+                moveStrategy = new FollowPlayerMoveStrategy();
+                break;
+            default:
+                Debug.LogError($"未定義的移動策略: {type}");
+                break;
+        }
+    }
+    #endregion
+
+    //初始設置行為樹
+    #region SetBehaviorTree()
     private void SetBehaviorTree() {
-        behaviorTree.SetRoot(new Selector(new List<Node> // Selector 來處理優先級
+        behaviorTree.SetRoot(new Selector(new List<Node>
         {
         new Action_Attack(this, 4),
         new Action_Attack(this, 3),
         new Action_Attack(this, 2),
         new Action_Attack(this, 1),
-        new Action_Move()
+        new Action_Move(this)
         })); ;
+        isBehaviorTreeReady = true;
     }
     #endregion
 
-
-    #region CanUseSkillSlot(int skillSlot)          bool 
-    public bool CanUseSkill(int skillSlot) {
-        switch (skillSlot)
-        {
-            case 1: return CanUseSkillSlot1();
-            case 2: return CanUseSkillSlot2();
-            case 3: return CanUseSkillSlot3();
-            case 4: return CanUseSkillSlot4();
-            default: return false;
-        }
-    }
-
-    public bool CanUseSkillSlot1() {
-        if (skillSlot1DetectPrefab == null) return false;
-        TargetDetector detector = skillSlot1DetectPrefab.GetComponent<TargetDetector>();
-        return detector != null && detector.hasTarget && skillSlot1CooldownTime <= 0;
-    }
-
-    public bool CanUseSkillSlot2() {
-        if (skillSlot2DetectPrefab == null) return false;
-        TargetDetector detector = skillSlot1DetectPrefab.GetComponent<TargetDetector>();
-        return detector != null && detector.hasTarget && skillSlot1CooldownTime <= 0;
-    }
-    public bool CanUseSkillSlot3() {
-        if (skillSlot3DetectPrefab == null) return false;
-        TargetDetector detector = skillSlot1DetectPrefab.GetComponent<TargetDetector>();
-        return detector != null && detector.hasTarget && skillSlot1CooldownTime <= 0;
-    }
-    public bool CanUseSkillSlot4() {
-        if (skillSlot4DetectPrefab == null) return false;
-        TargetDetector detector = skillSlot1DetectPrefab.GetComponent<TargetDetector>();
-        return detector != null && detector.hasTarget && skillSlot1CooldownTime <= 0;
-    }
-    #endregion
-
-    #region UseSkillSlot(int skillSlot)             void
-    public void UseSkill(int skillSlot) {
-        switch (skillSlot)
-        {
-            case 1: UseSkillSlot1(); break;
-            case 2: UseSkillSlot2(); break;
-            case 3: UseSkillSlot3(); break;
-            case 4: UseSkillSlot4(); break;
-        }
-    }
-
-    public void UseSkillSlot1() { } //skillSlot1CooldownTime = enemyStats.GetSkillAtSkillSlot(0).cooldownTime; Attack(); }
-    public void UseSkillSlot2() { }//skillSlot2CooldownTime = playerStats.GetSkillAtSkillSlot(1).cooldownTime; Attack(); }
-    public void UseSkillSlot3() { }//skillSlot3CooldownTime = playerStats.GetSkillAtSkillSlot(2).cooldownTime; Attack(); }
-    public void UseSkillSlot4() { }//skillSlot4CooldownTime = playerStats.GetSkillAtSkillSlot(3).cooldownTime; Attack(); }
-    #endregion
-
-    #region 私有SetMoveStrategy方法
-    private void SetMoveStrategy() {
-        //Todo switch (enemy.Stats.moveStrategyType) // 根據 Enum 設置策略
-        //{
-        //    case EnemyStatData.MoveStrategyType.Straight:
-        //        if (GameManager.Instance.debugSettings.logStrategy)
-        //            Debug.Log("選擇了Straight策略");
-        //        moveStrategy = new StraightMoveStrategy();
-        //        break;
-        //    case EnemyStatData.MoveStrategyType.Random:
-        //        if (GameManager.Instance.debugSettings.logStrategy)
-        //            Debug.Log("選擇了Random策略");
-        //        moveStrategy = new RandomMoveStrategy();
-        //        break;
-        //    case EnemyStatData.MoveStrategyType.FollowPlayer:
-        //        if (GameManager.Instance.debugSettings.logStrategy)
-        //            Debug.Log("選擇了FollowPlayer策略");
-        //        moveStrategy = new FollowPlayerMoveStrategy();
-        //        break;
-        //    default:
-        //        Debug.LogError($"未定義的移動策略: {enemy.Stats.moveStrategyType}");
-        //        break;
-        //}
-    }
-    #endregion
-
-    #region 公有Move方法()
+    //Move方法，由行為樹Action_Move呼叫
+    #region Move()
     public void Move() {
-        if (moveStrategy != null)
+        if (currentMoveTarget == null)
         {
-            animator.Play(Animator.StringToHash("Move"));
-            //behaviorTree.canChangeAnim = false;
+            ChangeMoveStrategy(MoveStrategyType.Random);
         }
         else
+            ChangeMoveStrategy(MoveStrategyType.FollowPlayer);
+
+        if (enemy.isEnemyDataReady)
         {
-            Debug.LogError(" moveStrategy是空的");
+            animator.Play(Animator.StringToHash("Move"));
         }
+        else
+            Debug.Log("EnemyData尚未準備好，沒有辦法移動");
     }
     #endregion
+
+    //Todo設定影子變化
     #region 公有AdjustShadowAlpha()方法，AnimationEvent調用
     public void AdjustShadowAlpha() {
         if (shadowController != null)
@@ -163,29 +248,34 @@ public class EnemyAI : MonoBehaviour, IAttackable
         }
         else
             Debug.LogError("shadowController為空");
-
     }
     #endregion
 
-    #region AnimationEvent
-    #region StartMoving()
+
+
+    //Animation Event 方法
+    #region StartMoving()、StopMoving()
     public void StartMoving() {
         rb.drag = 0;
         rb.velocity = new Vector2(0, 0);
-        //Todo rb.AddForce(new Vector2(enemy.Stats.moveSpeed * moveStrategy.MoveDirection().x, enemy.Stats.moveSpeed * moveStrategy.MoveDirection().y), ForceMode2D.Impulse);
+        Vector2 direction = moveStrategy.MoveDirection(this);
+        float speed = enemy.enemyStats.moveSpeed;
+        rb.AddForce(new Vector2(direction.x * speed, direction.y * speed), ForceMode2D.Impulse);
+        ClearMoveTarget();
     }
-    #endregion
-    #region StopMoving
     public void StopMoving() {
         rb.drag = stopMoveDragPower; // 設定較大的拖曳力，使角色自然減速
     }
     #endregion
-    #region ResetCanChangeAnim
-    public void ResetCanChangeAnim() {
-        //behaviorTree.canChangeAnim = true;
+
+    //供外部設定內部移動目標
+    #region
+    public void SetMoveTarget(Transform target) {
+        currentMoveTarget = target;
+    }
+
+    public void ClearMoveTarget() {
+        currentMoveTarget = null;
     }
     #endregion
-    #endregion
-
- 
 }

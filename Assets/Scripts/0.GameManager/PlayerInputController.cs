@@ -33,7 +33,7 @@ public class PlayerInputController : MonoBehaviour
     }
     private void FixedUpdate() {
         if (!isBattleInputEnabled) return;
-        HandleMovement(); // ✅ 正確用 FixedUpdate 處理剛體移動
+        HandleMovement(); // 正確用 FixedUpdate 處理剛體移動
     }
     #endregion
 
@@ -64,6 +64,7 @@ public class PlayerInputController : MonoBehaviour
 
     // 處理角色切換
     #region  HandlePlayerSwitch()
+    // 處理角色切換
     private void HandlePlayerSwitch() {
         // 數字鍵 1-9 切換角色（根據當前角色數量自適應）
         for (int i = 0; i < deployedPlayerIDsList.Count && i < 9; i++)
@@ -78,11 +79,31 @@ public class PlayerInputController : MonoBehaviour
         // 滑鼠點擊角色切換
         if (Input.GetMouseButtonDown(0))
         {
-            if (!EventSystem.current.IsPointerOverGameObject()) // 避免點擊 UI
+            // 這裡只是 Debug UI 狀態，不再 return
+            if (EventSystem.current.IsPointerOverGameObject())
             {
-                Collider2D hit = Physics2D.OverlapPoint(Camera.main.ScreenToWorldPoint(Input.mousePosition));
-                if (hit != null)
+                Debug.Log("點擊到 UI");
+            }
+
+            Vector2 mouseWorldPos = Camera.main.ScreenToWorldPoint(Input.mousePosition);
+
+            // 只檢測 Player 層
+            int layerMask = LayerMask.GetMask("Player");
+
+            // 用 OverlapPointAll 抓取所有 Collider
+            Collider2D[] hits = Physics2D.OverlapPointAll(mouseWorldPos, layerMask);
+
+            if (hits.Length == 0)
+            {
+                //Debug.Log($"沒有命中任何 Player 層物件");
+            }
+            else
+            {
+                foreach (var hit in hits)
                 {
+                    Debug.Log($"命中物件: {hit.gameObject.name}, Layer: {LayerMask.LayerToName(hit.gameObject.layer)}");
+
+                    // 嘗試匹配 deployedPlayersDtny
                     foreach (var kvp in deployedPlayersDtny)
                     {
                         if (hit.gameObject == kvp.Value)
@@ -92,7 +113,6 @@ public class PlayerInputController : MonoBehaviour
                             {
                                 SelectPlayer(index);
                             }
-                            break;
                         }
                     }
                 }
@@ -119,7 +139,7 @@ public class PlayerInputController : MonoBehaviour
     private void UpdateSelectionIndicator() {
         if (!deployedPlayersDtny.ContainsKey(deployedPlayerIDsList[currentPlayerIndex]))
         {
-            Debug.LogWarning("⚠ 玩家 ID 不存在於 deployedPlayersDtny！");
+            Debug.LogWarning("玩家 ID 不存在於 deployedPlayersDtny！");
             return;
         }
         int playerID = deployedPlayerIDsList[currentPlayerIndex];
@@ -127,13 +147,13 @@ public class PlayerInputController : MonoBehaviour
 
         if (player == null)
         {
-            Debug.LogWarning("⚠ 取得的 Player 為 null！");
+            Debug.LogWarning("取得的 Player 為 null！");
             return;
         }
 
         if (player.selectIndicatorPoint == null)
         {
-            Debug.LogWarning("⚠ Player 的 selectIndicatorPoint 為 null！");
+            Debug.LogWarning("Player 的 selectIndicatorPoint 為 null！");
             return;
         }
 
@@ -163,7 +183,14 @@ public class PlayerInputController : MonoBehaviour
         if (deployedPlayersDtny.ContainsKey(deployedPlayerIDsList[currentPlayerIndex]))
         {
             var currentPlayerObject = deployedPlayersDtny[currentId];
-            currentPlayerObject.GetComponent<PlayerMove>().Move(moveDirection);
+            var moveComp = currentPlayerObject.GetComponent<PlayerMove>();
+
+            if (moveComp != null)
+            {
+                moveComp.Move(moveDirection);
+            }
+            else
+                Debug.Log("角色身上沒有PlayerMove");
 
             if (Mathf.Abs(moveX) > 0.01f)
             {

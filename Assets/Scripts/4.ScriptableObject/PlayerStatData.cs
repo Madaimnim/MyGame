@@ -18,6 +18,7 @@ public class PlayerStatData : ScriptableObject
         public int level=1;
         public int currentEXP=0;
         public int[] expTable = new int[]{
+        4,6,9, 
         13, 18, 25, 34, 45, 58, 73, 90, 109, 130, // 1~10
         153, 178, 205, 234, 265, 298, 333, 370, 409, 450, // 11~20
         493, 538, 585, 634, 685, 738, 793, 850, 909, 970  // 21~30
@@ -48,7 +49,10 @@ public class PlayerStatData : ScriptableObject
             public int skillID;
             public string skillName;
             public int currentLevel = 1;
-            public float cooldownTime;
+            public int attack = 1;
+            public float cooldown;
+            public int skillUsageCount;
+            public int nextSkillLevelCount;
 
             public GameObject skillPrefab;
             public GameObject targetDetectPrefab;

@@ -1,10 +1,18 @@
 using UnityEngine;
 
+
+public class DamageInfo
+{
+    public int damage;
+    public float knockbackForce;
+    public Vector2 knockbackDirection;
+
+}
+
+
 public interface IDamageable
 {
-    void TakeDamage(
-        int damage,
-        float knockbackForce, 
-        Vector2 knockbackDirection);
+    void TakeDamage(DamageInfo info);
+
 }
 

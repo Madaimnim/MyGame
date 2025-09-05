@@ -10,9 +10,11 @@ public class Action_Attack : Node
     }
 
     public override NodeState Evaluate() {
-        if (!attacker.CanUseSkill(skillSlot))
+        Debug.Log("進入canUseSkill判斷");
+        if (!attacker.CanUseSkill(skillSlot)) {
             return NodeState.FAILURE;
-
+        }
+        Debug.Log("判斷成功進入攻擊UseSkill");
         attacker.UseSkill(skillSlot);
         return NodeState.SUCCESS;
     }

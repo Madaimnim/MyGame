@@ -42,7 +42,8 @@ public class PlayerExpUp : MonoBehaviour
     private void LevelUp() {
         Debug.Log($"這個腳色「{gameObject.name}」生到了等級{Stats.level}");
         TextPopupManager.Instance.ShowLevelUpPopup(Stats.level, transform);
+        
         //暫停遊戲
-        GamePauseManager.Instance.PauseGame();
+        //GamePauseManager.Instance.PauseGame();
     }
 }

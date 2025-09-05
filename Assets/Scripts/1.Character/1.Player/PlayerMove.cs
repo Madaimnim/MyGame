@@ -4,9 +4,6 @@ public class PlayerMove : MonoBehaviour
 {
     private Rigidbody2D rb;
     private Player player;
-    [Header("移動限制範圍（依角色類型）")]
-    public Collider2D meleeMovementBounds;
-    public Collider2D rangedMovementBounds;
 
     private void Awake() {
         rb = GetComponent<Rigidbody2D>();
@@ -17,20 +14,11 @@ public class PlayerMove : MonoBehaviour
         if (player == null || player.playerStats == null) return;
         if (player.isKnockback) return;
 
-        Collider2D currentBounds =
-            player.playerStats.playerType == PlayerStatData.PlayerStatsTemplate.PlayerType.Melee
-            ? meleeMovementBounds
-            : rangedMovementBounds;
-
-        if (currentBounds == null)
-            return;
-
+        //Debug.Log($"腳色移動方向為{direction}, 速度={player.playerStats?.moveSpeed}");
+        // 直接計算移動位置，不再使用 Bounds 限制
         Vector2 newPosition = rb.position + direction * player.playerStats.moveSpeed * Time.fixedDeltaTime;
-        Bounds bounds = currentBounds.bounds;
 
-        newPosition.x = Mathf.Clamp(newPosition.x, bounds.min.x, bounds.max.x);
-        newPosition.y = Mathf.Clamp(newPosition.y, bounds.min.y, bounds.max.y);
-
+        // 用 Rigidbody2D 物理方式移動，會自動和其他 Collider2D 發生碰撞
         rb.MovePosition(newPosition);
     }
 

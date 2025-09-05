@@ -206,9 +206,11 @@ MonoBehaviour:
   rotatePivot: {fileID: 0}
   spawnPivot: {fileID: 9197505400726502922}
   moveType: 4
-  skillDamage: 3
+  onHitType: 0
+  skillDamage: 1
   attackRecoveryTime: 0.2
   destroyDelay: 0.5
+  onHitDestroyDelay: 0
   moveSpeed: 0
   targetLayers:
     serializedVersion: 2

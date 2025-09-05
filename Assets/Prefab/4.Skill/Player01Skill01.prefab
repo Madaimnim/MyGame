@@ -190,7 +190,7 @@ MonoBehaviour:
   spawnPivot: {fileID: 4237132543364788592}
   moveType: 4
   onHitType: 0
-  skillDamage: 10
+  skillDamage: 1
   attackRecoveryTime: 0
   destroyDelay: 0.3
   onHitDestroyDelay: 0

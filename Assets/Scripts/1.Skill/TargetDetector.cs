@@ -9,6 +9,7 @@ public class TargetDetector : MonoBehaviour
     public LayerMask targetLayers;
     [HideInInspector] public bool hasTarget = false;
     [HideInInspector] public Transform targetTransform;
+
     private List<Transform> targetsList = new List<Transform>();
 
     private float targetUpdateCooldown = 0f; // 更新間隔計時器
@@ -49,7 +50,7 @@ public class TargetDetector : MonoBehaviour
         }
     }
 
-
+    //
     #region UpdateTargetInSecond(float targetUpdateInterval)
     private void UpdateTargetInSecond(float targetUpdateInterval) {
         targetUpdateCooldown -= Time.deltaTime;
@@ -59,6 +60,7 @@ public class TargetDetector : MonoBehaviour
             targetUpdateCooldown = targetUpdateInterval; //確保時間間隔穩定
         }
     }
+
     private void UpdateTargetTransform() {
         targetsList.RemoveAll(t => t == null); // 清除已銷毀的目標
 

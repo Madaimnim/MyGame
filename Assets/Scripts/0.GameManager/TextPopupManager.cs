@@ -1,6 +1,7 @@
 ﻿using UnityEngine;
 using TMPro;
 using System.Collections;
+using System.Collections.Generic;
 
 public class TextPopupManager : MonoBehaviour
 {
@@ -11,9 +12,16 @@ public class TextPopupManager : MonoBehaviour
     public GameObject TextPrefab_StageClear;
     public GameObject TextPrefab_StageDefeat;
     public GameObject TextPrefab_Resume;
+    public GameObject TextPrefab_Damage;
+    [Header("受傷害字體")]
+    public GameObject TextPrefab_TakeDamage;
+
+
+    private Dictionary<Transform, List<GameObject>> activeLevelUpPopups = new Dictionary<Transform, List<GameObject>>();
+    private Dictionary<Transform, List<GameObject>> activeTakeDamagePopups = new Dictionary<Transform, List<GameObject>>();
 
     //生命週期
-    #region
+    #region 生命週期
     private void Awake() {
         if(Instance == null)
         {
@@ -28,24 +36,134 @@ public class TextPopupManager : MonoBehaviour
 
     #endregion
 
+    //顯示受傷害字樣
+    #region ShowTakeDamagePopup(int damage, Transform target)
+    public void ShowTakeDamagePopup(int damage, Transform target) {
+        if (target == null) return;
 
-    //顯示升級
-    #region 顯示升級
-    public void ShowLevelUpPopup(int level, Transform target) {
+        // 基準位置（頭頂）
+        Vector3 basePos = target.position + new Vector3(0, 1.2f, 0);
 
-        GameObject popup = Instantiate(TextPrefab_LevelUp, target);
-        popup.transform.localPosition = new Vector3(0, 1.2f, 0); // 偏移到頭頂
+        // 在一個小範圍內隨機偏移
+        float range = 0.5f; // 隨機範圍大小
+        Vector3 randomOffset = new Vector3(
+            Random.Range(-range, range),
+            Random.Range(-range * 0.8f, range * 0.3f), // Y 軸也可以小幅隨機
+            0
+        );
 
-        // 直接修改文字 (假設 Prefab 上有 TextMeshPro)
-        TMP_Text tmpText = popup.GetComponentInChildren<TMP_Text>();
+        Vector3 spawnPos = basePos + randomOffset;
+
+        // 生成 Popup (不要掛在 target 底下，而是世界座標)
+        GameObject newPopup = Instantiate(TextPrefab_TakeDamage, spawnPos, Quaternion.identity);
+
+        // 文字設定
+        TMP_Text tmpText = newPopup.GetComponentInChildren<TMP_Text>();
         if (tmpText != null)
         {
-            tmpText.text = $"Level{level}";
+            tmpText.text = $"{damage}";
         }
-        Destroy(popup, 2f);
-        //StartCoroutine(FloatPopup(popup));
+
+        // 啟動浮動效果協程
+        StartCoroutine(FloatDamagePopup(newPopup));
     }
     #endregion
+
+    //顯示造成傷害字樣
+    #region ShoDamagePopup(int damage, Transform target)
+    public void ShowDamagePopup(int damage, Transform target) {
+        if (target == null) return;
+
+        // 基準位置（頭頂）
+        Vector3 basePos = target.position + new Vector3(0, 1.2f, 0);
+
+        // 在一個小範圍內隨機偏移
+        float range = 0.5f; // 隨機範圍大小
+        Vector3 randomOffset = new Vector3(
+            Random.Range(-range, range),
+            Random.Range(-range * 0.8f, range * 0.3f), // Y 軸也可以小幅隨機
+            0
+        );
+
+        Vector3 spawnPos = basePos + randomOffset;
+
+        // 生成 Popup (不要掛在 target 底下，而是世界座標)
+        GameObject newPopup = Instantiate(TextPrefab_Damage, spawnPos, Quaternion.identity);
+
+        // 文字設定
+        TMP_Text tmpText = newPopup.GetComponentInChildren<TMP_Text>();
+        if (tmpText != null)
+        {
+            tmpText.text = $"{damage}";
+        }
+
+        // 啟動浮動效果協程
+        StartCoroutine(FloatDamagePopup(newPopup));
+    }
+
+    #endregion
+
+    //顯示人物升級
+    #region  ShowLevelUpPopup(int level, Transform target)
+    public void ShowLevelUpPopup(int level, Transform target) {
+        CreateLevelUpPopup(TextPrefab_LevelUp, $"Level {level}", target);
+    }
+    #endregion
+
+    //顯示技能升級
+    #region ShowSkillLevelUpPopup(string skillName, int level, Transform target)
+    public void ShowSkillLevelUpPopup(string skillName, int level, Transform target) {
+        CreateLevelUpPopup(TextPrefab_LevelUp, $"{skillName}Lv.{level}", target);
+    }
+    #endregion
+
+    //共用方法：建立 Popup入駐列
+    #region CreateLevelUpPopup(GameObject prefab, string text, Transform target)
+    private void CreateLevelUpPopup(GameObject prefab, string text, Transform target) {
+        if (target == null) return;
+
+        if (!activeLevelUpPopups.ContainsKey(target))
+        {
+            activeLevelUpPopups[target] = new List<GameObject>();
+        }
+
+        float baseY = 1.2f;
+        float offsetStep = 0.4f;
+
+        // 先把舊的 Popup 全部往上推
+        foreach (var popup in activeLevelUpPopups[target])
+        {
+            if (popup != null)
+            {
+                popup.transform.localPosition += new Vector3(0, offsetStep, 0);
+            }
+        }
+
+        // 新 Popup 固定在基準位置
+        GameObject newPopup = Instantiate(prefab, target);
+        newPopup.transform.localPosition = new Vector3(0, baseY, 0);
+
+        TMP_Text tmpText = newPopup.GetComponentInChildren<TMP_Text>();
+        if (tmpText != null)
+        {
+            tmpText.text = text;
+        }
+
+        activeLevelUpPopups[target].Add(newPopup);
+        StartCoroutine(RemovePopupAfterDelay(newPopup, target, 2f));
+    }
+
+    private IEnumerator RemovePopupAfterDelay(GameObject popup, Transform target, float delay) {
+        yield return new WaitForSeconds(delay);
+
+        if (popup != null) Destroy(popup);
+        if (target != null && activeLevelUpPopups.ContainsKey(target))
+        {
+            activeLevelUpPopups[target].Remove(popup);
+        }
+    }
+    #endregion
+
     //顯示經驗值
     #region 顯示經驗值 
     public void ShowExpPopup(int expValue,Vector3 position) {
@@ -84,6 +202,34 @@ public class TextPopupManager : MonoBehaviour
     }
     #endregion
 
+    //傷害、受傷害字體隨機生成、縮放、漂浮效果
+    #region FloatDamagePopup(GameObject popup)
+    private IEnumerator FloatDamagePopup(GameObject popup) {
+        float duration = 0.7f;
+        float elapsed = 0f;
+
+        Vector3 startPos = popup.transform.position;
+        Vector3 endPos = startPos + new Vector3(0, 1.2f, 0); // 向上移動 1 單位
+
+        while (elapsed < duration)
+        {
+            if (popup == null) yield break;
+
+            elapsed += Time.deltaTime;
+            float t = elapsed / duration;
+
+            // 線性往上 + 一點縮放效果
+            popup.transform.position = Vector3.Lerp(startPos, endPos, t);
+
+            float scale = 1 + Mathf.Sin(t * Mathf.PI) * 0.8f; // 微彈縮放
+            popup.transform.localScale = Vector3.one * scale;
+
+            yield return null;
+        }
+
+        if (popup != null) Destroy(popup);
+    }
+    #endregion
 
     //字體彈跳效果
     #region 字體彈跳

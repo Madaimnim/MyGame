@@ -32,9 +32,8 @@ public class EnemyStateManager : MonoBehaviour
     }
 
 
-
-    #region SetEnemyStatesDtny(EnemyStatData enemyStatData)方法
     //GameManager載入資料時，存入本地的enemyStatesDtny
+    #region SetEnemyStatesDtny(EnemyStatData enemyStatData)方法
     public void SetEnemyStatesDtny(EnemyStatData enemyStatData) {
 
         enemyStatesDtny.Clear();
@@ -43,10 +42,10 @@ public class EnemyStateManager : MonoBehaviour
             enemyStatesDtny[stat.enemyID] = new EnemyStatsRuntime(stat);
         }
     }
-    #endregion
-
-    #region SpawnEnemy(int enemyID, Vector3 position, Quaternion rotation)
+    #endregion    
+    
     //怪物生成
+    #region SpawnEnemy(int enemyID, Vector3 position, Quaternion rotation)
     private GameObject SpawnEnemy(int enemyID, Vector3 position, Quaternion rotation, GameObject parentObject) {
         if (!enemyStatesDtny.TryGetValue(enemyID, out var enemyStats) || enemyStats.enemyPrefab == null)
         {
@@ -81,6 +80,8 @@ public class EnemyStateManager : MonoBehaviour
         public int maxHealth;
         public float moveSpeed;
         public int exp;
+
+        //決定移動的方向
         public MoveStrategyType moveStrategyType;
 
         public Sprite spriteIcon;
@@ -124,7 +125,7 @@ public class EnemyStateManager : MonoBehaviour
         {
             public int skillID;
             public string skillName;
-            public float cooldownTime;
+            public float cooldown;
             public float knockbackForce;
             public int attackPower;
             public GameObject attackPrefab;
@@ -133,7 +134,7 @@ public class EnemyStateManager : MonoBehaviour
             public SkillData(EnemyStatData.EnemyStatsTemplate.SkillData original) {
                 skillID = original.skillID;
                 skillName = original.skillName;
-                cooldownTime = original.cooldownTime;
+                cooldown = original.cooldown;
                 knockbackForce = original.knockbackForce;
                 attackPower = original.attackPower;
                 attackPrefab = original.attackPrefab;

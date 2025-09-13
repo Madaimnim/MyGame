@@ -5,22 +5,21 @@ using UnityEngine;
 public class GameWall : MonoBehaviour, IDamageable
 {
     #region 公開變數
-    public int gameWallID=1;            
+    public int gameWallID=1;     
     public string gameWallName ="CommonWall";
-    public int maxHp =10;
-    public int attackPower =1;
-    public float coolDownTime =0.1f;
+    public int maxHealth = 10;
+    public int attackPower =0;
+    public float coolDownTime =0f;
     public float flashWhiteTime =0.1f;
-    public GameObject damageTextPrefab; // 存儲讀取的傷害數字預製體
-
-    public event Action<int, int> ValueChanged;//int參數代表(當前血量, 最大血量)`
+   
     #endregion
 
     #region 私有變數
     private Animator animator;
     private Rigidbody2D rb;
     private SpriteRenderer spriteRenderer;
-    private int currentHp;
+    private int currentHealth;
+    private bool isDefeat=false;
     #endregion
 
     #region Awake()方法
@@ -30,36 +29,53 @@ public class GameWall : MonoBehaviour, IDamageable
 
     #region Start()方法
     private void Start() {
+        isDefeat=false;
+
         animator = GetComponent<Animator>();
         rb = GetComponent<Rigidbody2D>();
         spriteRenderer = GetComponent<SpriteRenderer>();
-        currentHp = maxHp;
-        ValueChanged?.Invoke(currentHp, maxHp);// 觸發事件，通知 UI 初始血量
+        currentHealth = maxHealth;
+        EventManager.Instance.Event_HpChanged?.Invoke(currentHealth, maxHealth,this);// 觸發事件，通知 UI 初始血量
     }
     #endregion
-        
-    #region TakeDamage()方法，
 
+    //受傷
+    #region 公開方法 TakeDamage()
     public void TakeDamage(DamageInfo info) {
-        currentHp -= info.damage;
-        currentHp = Mathf.Clamp(currentHp, 0, maxHp);
-        ValueChanged?.Invoke(currentHp, maxHp);//觸發事件，通知 UI 更新血量
-        ShowDamageText(info.damage);//顯示damage數字TEXT
-    }
-    #endregion
+        if (isDefeat) return;
 
-    #region 私有ShowDamageText(int damage)
-    private void ShowDamageText(int damage) {
-        if (damageTextPrefab == null)
+        currentHealth -= info.damage;
+        TextPopupManager.Instance.ShowTakeDamagePopup(info.damage, transform); // 顯示傷害數字
+
+        currentHealth = Mathf.Clamp(currentHealth, 0,maxHealth);
+        EventManager.Instance.Event_HpChanged?.Invoke(currentHealth, maxHealth,this); // 更新 UI 血量
+
+        if (currentHealth <= 0)
         {
-            Debug.LogError("傷害預製體未設置，請在GameWallStatData裡設置");
+            Die();
             return;
         }
-        Vector3 spawnPosition = transform.position + new Vector3(0, 1f, 0); // ✅ 讓數字浮動在敵人上方
 
-        GameObject damageTextObj = Instantiate(damageTextPrefab, spawnPosition, Quaternion.identity, transform);
-        damageTextObj.GetComponent<DamageTextController>().Setup(damage);
+        StartCoroutine(FlashWhite(0.1f)); // 執行閃白協程
+
+
     }
     #endregion
 
+    public void Die() {
+        isDefeat = true;
+        EventManager.Instance.Event_OnWallBroken.Invoke();
+    }
+
+    //受傷特效
+    #region 閃白受擊
+    private IEnumerator FlashWhite(float duration) {
+        if (spriteRenderer != null)
+        {
+            spriteRenderer.material = GameManager.Instance.flashMaterial;
+            yield return new WaitForSeconds(duration);
+            spriteRenderer.material = GameManager.Instance.normalMaterial;
+        }
+    }
+    #endregion
 }

@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.EventSystems;
+using Cinemachine;
 
 public class PlayerInputController : MonoBehaviour
 {
@@ -14,6 +15,8 @@ public class PlayerInputController : MonoBehaviour
     private List<int> deployedPlayerIDsList = new List<int>(); // 存放目前可用的角色 ID
     private int currentPlayerIndex = -1;  // 當前選擇的角色索引
 
+    [SerializeField] private CinemachineVirtualCamera virtualCam;
+
     //生命週期
     #region 
     private void Awake() {
@@ -26,14 +29,17 @@ public class PlayerInputController : MonoBehaviour
             Destroy(gameObject);
         }
     }
+    private void Start() {
+        virtualCam = FindObjectOfType<CinemachineVirtualCamera>();
+    }
 
-    void Update() {
+    private void Update() {
         if (!isBattleInputEnabled) return;
         HandlePlayerSwitch();
     }
     private void FixedUpdate() {
         if (!isBattleInputEnabled) return;
-        HandleMovement(); // 正確用 FixedUpdate 處理剛體移動
+        InputMove(); // 正確用 FixedUpdate 處理剛體移動
     }
     #endregion
 
@@ -131,6 +137,15 @@ public class PlayerInputController : MonoBehaviour
             currentPlayerIndex = index;
             UpdateSelectionIndicator();
         }
+
+        // [新增] 設定 Cinemachine Camera 的跟隨目標
+        int playerID = deployedPlayerIDsList[currentPlayerIndex];
+        if (deployedPlayersDtny.ContainsKey(playerID))
+        {
+            GameObject currentPlayer = deployedPlayersDtny[playerID];
+            CameraManager.Instance.Follow(currentPlayer.transform);
+        }
+
     }
     #endregion
 
@@ -170,9 +185,10 @@ public class PlayerInputController : MonoBehaviour
     #endregion
 
     //  控制當前角色移動
-    #region HandleMovement()
-    private void HandleMovement() {
+    #region InputMove()
+    private void InputMove() {
         if (deployedPlayerIDsList.Count == 0) return; // 確保場上有角色
+
 
         float moveX = Input.GetAxisRaw("Horizontal");
         float moveY = Input.GetAxisRaw("Vertical");
@@ -183,14 +199,18 @@ public class PlayerInputController : MonoBehaviour
         if (deployedPlayersDtny.ContainsKey(deployedPlayerIDsList[currentPlayerIndex]))
         {
             var currentPlayerObject = deployedPlayersDtny[currentId];
-            var moveComp = currentPlayerObject.GetComponent<PlayerMove>();
+            var player = currentPlayerObject.GetComponent<Player>();
 
-            if (moveComp != null)
+            if (player.isDead) return;
+
+            if (player != null)
             {
-                moveComp.Move(moveDirection);
+                player.TryMove(moveDirection);
             }
             else
                 Debug.Log("角色身上沒有PlayerMove");
+
+
 
             if (Mathf.Abs(moveX) > 0.01f)
             {

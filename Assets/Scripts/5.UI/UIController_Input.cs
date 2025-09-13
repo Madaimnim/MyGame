@@ -1,9 +1,9 @@
 ﻿using UnityEngine;
 using System.Collections.Generic;
 
-public class UIInputController : MonoBehaviour
+public class UIController_Input : MonoBehaviour
 {
-    public static UIInputController Instance { get; private set; }
+    public static UIController_Input Instance { get; private set; }
     [Header("#Esc鍵、I鍵開關的對象--------------------------------------------------------------------")]
 
     public bool isUIInputEnabled = false;

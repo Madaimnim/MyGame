@@ -27,10 +27,10 @@ public class EnemyAttackDetector : MonoBehaviour
     //生命週期
     #region //生命週期
     private void OnEnable() {
-        Player.Event_OnPlayerDie += HandlePlayerDie;
+        EventManager.Instance.Event_OnPlayerDie += HandlePlayerDie;
     }
     private void OnDisable() {
-        Player.Event_OnPlayerDie -= HandlePlayerDie;
+        EventManager.Instance.Event_OnPlayerDie -= HandlePlayerDie;
     }
 
     private void Update() {

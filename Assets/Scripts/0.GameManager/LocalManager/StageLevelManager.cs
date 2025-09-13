@@ -20,17 +20,45 @@ public class StageLevelManager : MonoBehaviour
     }
 
     private void OnEnable() {
-        Player.Event_OnPlayerDie += HandlePlayerDie;
+        Debug.Log("StageLevelManager 訂閱 Event_OnWallBroken");
+        EventManager.Instance.Event_OnPlayerDie += RespawnPlayer;
+        EventManager.Instance.Event_OnWallBroken += WallBroken;
+
     }
     private void OnDisable() {
-        Player.Event_OnPlayerDie -= HandlePlayerDie;
+        EventManager.Instance.Event_OnPlayerDie -= RespawnPlayer;
+        EventManager.Instance.Event_OnWallBroken -= WallBroken;
     }
     #endregion
 
     //當玩家死亡
-    private void HandlePlayerDie(IDamageable player) {
+    #region
+    private void RespawnPlayer(IDamageable player) {
+        //LevelDefeat();
+        StartCoroutine(RespawnPlayerCoroutine(player as Player,3));
+    }
+
+    private IEnumerator RespawnPlayerCoroutine(Player player,float respawnDelay) {
+        if (player == null) yield break;
+        Vector3 deathPos = player.transform.position;
+
+        // 顯示倒數 UI
+        TextPopupManager.Instance.ShowRespawnTimerPopup(player.transform, respawnDelay);
+
+        yield return new WaitForSeconds(respawnDelay);
+
+        player.Respawn();
+    }
+
+    #endregion
+
+
+    //當城牆毀壞
+    #region
+    private void WallBroken() {
         LevelDefeat();
     }
+    #endregion
 
     #region 註冊敵人生成數量
     public void RegisterEnemy() {
@@ -65,6 +93,7 @@ public class StageLevelManager : MonoBehaviour
     //通關失敗
     #region  LevelDefeat()
     private void LevelDefeat() {
+        Debug.Log("觸發Defeat跳躍字體");
         TextPopupManager.Instance.ShowStageDefeatPopup();
         FadeManager.Instance.FadeSetAlpha(0.3f);
 

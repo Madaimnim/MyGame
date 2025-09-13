@@ -23,17 +23,27 @@ public class SkillObject : MonoBehaviour
     #region 可設置變數：
 
     #region 攻擊動畫類型
-    [Header("攻擊動畫")]
+    [Header("攻擊動畫類型")]
     public AttackAnimationType attackAnimationType;                     //腳色攻擊動畫類型
+      
     public float attackSpawnDelayTime = 0f;                             //技能生成延遲
+
     public enum AttackAnimationType
     {
-        [InspectorName("攻擊01")] Attack01,
-        [InspectorName("攻擊02")] Attack02,
-        [InspectorName("其他01")] Other01,
-        [InspectorName("其他02")] Other02
+        [InspectorName("Attack01")] Attack01,
+        [InspectorName("Attack02")] Attack02,
+        [InspectorName("Attack03")] Attack03
     }
     #endregion
+
+    //提供Player取得攻擊動畫名稱
+    #region GetAnimationName(bool isMoving)
+    public string GetAnimationName(bool isMoving) {
+        string baseName = attackAnimationType.ToString();
+        return isMoving ? "Move" + baseName : baseName;
+    }
+    #endregion
+
     #region 旋轉變數
     [Header("**生成圖片設定**")]
     public bool canRotate = true;                                       //是否允許旋轉
@@ -87,7 +97,8 @@ public class SkillObject : MonoBehaviour
         skillMoveTypeDtny[moveType]?.Invoke();  
     }
     #endregion
-    
+
+    // SkillMoveType、OnHit字典初始化，並綁定方法
     #region InitialMoveTypeDtny()
     public enum SkillMoveType
     {
@@ -97,6 +108,8 @@ public class SkillObject : MonoBehaviour
         [InspectorName("直線飛行")] Straight,
         [InspectorName("生成於目標位置")] SpawnAtTarget
     }
+
+    //初始化追蹤方法的字典( SkillMoveType,綁定方法)
     private void InitialSkillMoveTypeDtny() {
         skillMoveTypeDtny = new Dictionary<SkillMoveType, Action> {
             { SkillMoveType.Station, StationMove },
@@ -106,12 +119,15 @@ public class SkillObject : MonoBehaviour
             { SkillMoveType.SpawnAtTarget, SpawnAtTarget }
         };
     }
+
     public enum OnHitType
     {
         [InspectorName("沒反應")] Nothing,                      //沒反應
         [InspectorName("命中消失")] Disappear,                  //命中即消失
         [InspectorName("命中後停留爆炸")] Explode,              //命中後停留爆炸
     }
+
+    //初始化OnHit方法的字典( OnHitType,綁定方法)
     private void InitialOnHitTypeDtny() {
         onHitTypeDtny = new Dictionary<OnHitType,Action> {
             { OnHitType.Nothing, OnHitNothing},
@@ -121,7 +137,8 @@ public class SkillObject : MonoBehaviour
     }
     #endregion
 
-    #region 調整生成位置與方向
+    //調整生成位置與方向
+    #region AdjustSkillPositionAndRotation()
     private void AdjustSkillPositionAndRotation() {
         
         if (targetTransform == null)
@@ -184,12 +201,16 @@ public class SkillObject : MonoBehaviour
     }
     #endregion
 
+    //技能物：生成方式&移動方法
     #region SkillMoveType方法
+
+    //原地不動
     #region StationMove()
     private void StationMove() {
-        // 原地不動
     }
     #endregion
+
+    //追蹤目標
     #region HomingMove()
     private void HomingMove() {
         if (targetTransform != null)
@@ -199,11 +220,15 @@ public class SkillObject : MonoBehaviour
         }
     }
     #endregion
+
+    //朝向目標
     #region StraightMove()
     private void StraightMove() {
         transform.position += (Vector3)(moveDirection * moveSpeed * Time.deltaTime);
     }
     #endregion
+
+    //朝向目標
     #region TowardMove()
     private void TowardMove() {
 
@@ -211,24 +236,31 @@ public class SkillObject : MonoBehaviour
 
     }
     #endregion
+
+    //生成在目標位置
     #region SpawnAtTarget()
     private void SpawnAtTarget() {
         // 這個方法是空的，因為 `Start()` 時已經調整了位置
     }
     #endregion
-    #endregion
-    #region OnHitType方法
-    #region OnHitNothing方法
-    private void OnHitNothing() {
-    }
+
     #endregion
 
+    //碰撞方法
+    #region OnHitDisappear()....
+
+    //碰撞消失
     #region OnHitDisappear()
     private void OnHitDisappear() {
         StartDestroyTimer(onHitDestroyDelay);                       //命中後重設自毀計時
     }
     #endregion
-
+    //碰撞無事
+    #region OnHitNothing方法
+    private void OnHitNothing() {
+    }
+    #endregion
+    //碰撞爆炸
     #region OnHitExplode()
     private void OnHitExplode() {
         StartDestroyTimer(onHitDestroyDelay);                       //命中後重設自毀計時
@@ -238,8 +270,8 @@ public class SkillObject : MonoBehaviour
 
     #endregion
 
-
-    #region 應用旋轉
+    //技能旋轉
+    #region ApplyRotation(bool isTargetOnLeft)
     private void ApplyRotation(bool isTargetOnLeft) {
         // 调整角度
         float adjustedAngle = rotateAngle; // 默认右侧角度
@@ -256,6 +288,7 @@ public class SkillObject : MonoBehaviour
     }
     #endregion
 
+    //由PlayerSkillSpanwer呼叫設定內部參數
     #region SetSkillProperties(Vector2 directionVector, float baseAttackPower, Transform targetTransform, float rotateAngle)
     public void SetSkillProperties(Vector2 directionVector, float baseAttackPower, Transform targetTransform, float rotateAngle) {
         initialDirection = directionVector.normalized;
@@ -266,6 +299,7 @@ public class SkillObject : MonoBehaviour
     }
     #endregion
 
+    //觸發TriggerEnter2D
     #region OnTriggerEnter2D
     private void OnTriggerEnter2D(Collider2D collision) {
         // 使用 LayerMask 來檢查是否在攻擊目標內
@@ -291,6 +325,8 @@ public class SkillObject : MonoBehaviour
     }
     #endregion
 
+    //自毀時間
+    #region StartDestroyTimer(float delay)
     public void StartDestroyTimer(float delay) {
         if (destroyCoroutine != null)
             StopCoroutine(destroyCoroutine);
@@ -301,4 +337,5 @@ public class SkillObject : MonoBehaviour
         yield return new WaitForSeconds(delay);
         Destroy(gameObject);
     }
+    #endregion
 }

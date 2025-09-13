@@ -184,15 +184,14 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   attackAnimationType: 0
-  attackSpawnDelayTime: 0.1
+  attackSpawnDelayTime: 0.3
   canRotate: 1
   rotatePivot: {fileID: 2130180057660526491}
   spawnPivot: {fileID: 4237132543364788592}
   moveType: 4
   onHitType: 0
-  skillDamage: 1
   attackRecoveryTime: 0
-  destroyDelay: 0.3
+  destroyDelay: 0.2
   onHitDestroyDelay: 0
   moveSpeed: 0
   targetLayers:

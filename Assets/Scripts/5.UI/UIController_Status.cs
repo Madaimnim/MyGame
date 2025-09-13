@@ -4,7 +4,7 @@ using UnityEngine.UI;
 using System.Collections.Generic;
 using System.Collections;
 
-public class UIStatusController : MonoBehaviour
+public class UIController_Status : MonoBehaviour
 {
     public Button ChangNextPlayerDisplayerButton;
     public Button ChangLastPlayerDisplayerButton;

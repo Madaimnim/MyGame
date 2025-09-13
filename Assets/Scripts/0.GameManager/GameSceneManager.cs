@@ -113,6 +113,10 @@ public class GameSceneManager: MonoBehaviour
         //加載場景，直到加載完成才進行下一行
         AsyncOperation newScene = SceneManager.LoadSceneAsync(sceneName, LoadSceneMode.Single);
         yield return new WaitUntil(() => newScene.isDone);
+        
+        //確認主要相機是唯一
+        CameraManager.Instance.CleanupExtraMainCameras();
+
 
         //紀錄當前場景名稱，並解除Loading鎖定
         currentSceneName = sceneName;

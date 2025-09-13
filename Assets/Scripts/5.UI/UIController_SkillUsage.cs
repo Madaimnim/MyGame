@@ -5,7 +5,7 @@ using UnityEngine.UI;
 using TMPro;
 
 
-public class UISkillUsageController : MonoBehaviour
+public class UIController_SkillUsage : MonoBehaviour
 {
     //包裹Class
     [System.Serializable] // 讓 Unity Inspector 可以顯示
@@ -52,7 +52,7 @@ public class UISkillUsageController : MonoBehaviour
     public void UpdateSkillUsageMasteryUI() {
         if (!PlayerStateManager.Instance.playerStatesDtny.TryGetValue(targetPlayerID, out var stats))
         {
-            Debug.LogError($"[UISkillUsageController] 找不到 PlayerStatsRuntime, playerID={targetPlayerID}");
+            Debug.LogError($"[UIController_SkillUsage] 找不到 PlayerStatsRuntime, playerID={targetPlayerID}");
             return;
         }
         if (UIManager.Instance == null || PlayerStateManager.Instance == null) return;
@@ -62,7 +62,7 @@ public class UISkillUsageController : MonoBehaviour
             var skill = stats.GetSkillInSkillPoolDtny(skillInfo.skillID);
             if (skill == null)
             {
-                Debug.LogWarning($"[UISkillUsageController] 技能 {skillInfo.skillID} 不存在於角色 {stats.playerName} 的技能池");
+                Debug.LogWarning($"[UIController_SkillUsage] 技能 {skillInfo.skillID} 不存在於角色 {stats.playerName} 的技能池");
                 continue;
             }
 

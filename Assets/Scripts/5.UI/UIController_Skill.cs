@@ -4,7 +4,7 @@ using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
 
-public class UISkillController : MonoBehaviour
+public class UIController_Skill : MonoBehaviour
 {
     [Header("狀態欄")]
     public Button[] slotSkillButtons;  // 技能槽4個按鈕
@@ -63,7 +63,7 @@ public class UISkillController : MonoBehaviour
         {
             if (i >= slotSkillButtons.Length || i >= slotSkillNames.Length)
             {
-                Debug.LogError($"❌ [UISkillController] 技能槽索引超出範圍: {i}");
+                Debug.LogError($"❌ [UIController_Skill] 技能槽索引超出範圍: {i}");
                 continue;
             }
             var skill = currentPlayer.GetSkillAtSkillSlot(i);

@@ -18,13 +18,14 @@ public class Enemy : MonoBehaviour, IDamageable
     public BehaviorTree behaviorTree;
     public AudioClip deathSFX;
     public GameObject attackDetector01;
+    public ShadowController shadowController;
     public EnemyStateManager.EnemyStatsRuntime enemyStats { get; private set; }
-    public Action<int, int> Event_HpChanged;
 
     private bool isDead = false;
     private int currentHealth;
+    public bool canRunAI { get; private set; } = false;
 
-    
+
     public bool isEnemyDataReady { private set; get; } = false;
     
 
@@ -37,8 +38,14 @@ public class Enemy : MonoBehaviour, IDamageable
     //生命週期
     #region 生命週期
     private void Awake() {}
-    private void OnEnable() {}
-    private void OnDisable() {}
+    private void OnEnable() {
+        EventManager.Instance.Event_BattleStart += EnableAIRun;
+        EventManager.Instance.Event_OnWallBroken += DisableAIRun;
+    }
+    private void OnDisable() {
+        EventManager.Instance.Event_BattleStart -= EnableAIRun;
+        EventManager.Instance.Event_OnWallBroken -= DisableAIRun;
+    }
 
     private IEnumerator Start() {
         if (enemyStats == null)
@@ -51,7 +58,7 @@ public class Enemy : MonoBehaviour, IDamageable
                 StageLevelManager.Instance.RegisterEnemy();
         }
 
-        Event_HpChanged?.Invoke(currentHealth, enemyStats.maxHealth);// 觸發事件，通知 UI 初始血量
+        EventManager.Instance.Event_HpChanged?.Invoke(currentHealth, enemyStats.maxHealth,this);// 觸發事件，通知 UI 初始血量
     }
     private void Update() { }
     #endregion
@@ -73,7 +80,7 @@ public class Enemy : MonoBehaviour, IDamageable
         TextPopupManager.Instance.ShowDamagePopup(info.damage, transform); // 顯示傷害數字;
 
         currentHealth = Mathf.Clamp(currentHealth, 0, enemyStats.maxHealth);
-        Event_HpChanged?.Invoke(currentHealth, enemyStats.maxHealth);//觸發事件，通知 UI 更新血量
+        EventManager.Instance.Event_HpChanged?.Invoke(currentHealth, enemyStats.maxHealth, this);// 觸發事件，通知 UI 初始血量
 
         StartCoroutine(Knockback(info.knockbackForce, info.knockbackDirection));
         StartCoroutine(FlashWhite(0.1f));//執行閃白協程，替換材質
@@ -135,6 +142,31 @@ public class Enemy : MonoBehaviour, IDamageable
             yield return new WaitForSeconds(0.2f);
             rb.velocity = Vector2.zero;
         }
+    }
+    #endregion
+
+    //啟用AI
+    #region EnableAIRun(IDamageable damagealbe)
+    private void EnableAIRun() {
+        canRunAI = true;
+    }
+    #endregion
+    //禁用AI
+    #region DisableAIRun(IDamageable damagealbe)
+    private void DisableAIRun() {
+        canRunAI = false;
+    }
+    #endregion
+
+    //Todo設定影子變化
+    #region 公有AdjustShadowAlpha()方法，AnimationEvent調用
+    public void AdjustShadowAlpha() {
+        if (shadowController != null)
+        {
+            shadowController.AdjustShadowAlpha();
+        }
+        else
+            Debug.LogError("shadowController為空");
     }
     #endregion
 }

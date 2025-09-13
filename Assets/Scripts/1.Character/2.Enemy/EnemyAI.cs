@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections;
+﻿using System.Collections;
 using UnityEngine;
 using System.Collections.Generic;
 
@@ -7,17 +6,19 @@ public class EnemyAI : MonoBehaviour, IAttackable, IMoveable
 {
     //變數
     #region 變數
-    public Enemy enemy;
-    public SpriteRenderer spriteRenderer;
-    public Animator animator;
-    public Rigidbody2D rb;
     public MoveStrategyBase moveStrategy; // 存儲移動策略
-    public SkillStrategyBase skillStrategy; // 存儲技能策略
-    public BehaviorTree behaviorTree;
-    public ShadowController shadowController;
+
+    [Header("AI樹更新頻率")]
+    public float updateInterval = 0.1f;
+    private float updateTimer = 0f;
+    [Header("移動停止的抓力")]
     public float stopMoveDragPower;
+    
+    private Enemy enemy;
     public Transform currentMoveTarget { get; private set; }
-    public bool isBehaviorTreeReady { get; private set; } = false;
+
+
+    private BehaviorTree behaviorTree;
 
     //RequestAttack使用變數
     #region
@@ -41,7 +42,10 @@ public class EnemyAI : MonoBehaviour, IAttackable, IMoveable
 
     //生命週期
     #region Awake()方法
-    private void Awake() { }
+    private void Awake() {
+        enemy = GetComponent<Enemy>();
+        behaviorTree = GetComponent<BehaviorTree>();
+    }
 
     private IEnumerator Start() {
         yield return new WaitUntil(() => enemy.isEnemyDataReady);
@@ -53,12 +57,25 @@ public class EnemyAI : MonoBehaviour, IAttackable, IMoveable
 
     private void Update() {
         UpdateCooldowns();
-        if (!isBehaviorTreeReady) return;
+        if (!enemy.canRunAI) return;
         if (enemy.isPlayingActionAnimation) return;
-        behaviorTree.Tick(); // 執行行為樹
+        RunBehaviorTree(); // 執行行為樹
 
     }
+    private void RunBehaviorTree() {
+        if (updateTimer <= 0f)
+        {
+            behaviorTree.Tick();
+            updateTimer = updateInterval;
+        }
+        updateTimer -= Time.deltaTime;
+    }
+
+
+    private void OnEnable() {  }
+    private void OnDisable() { }
     #endregion
+
 
     //初始化技能槽冷卻時間
     #region
@@ -110,7 +127,6 @@ public class EnemyAI : MonoBehaviour, IAttackable, IMoveable
         RequestAttack(skillSlot, currentAttackTarget, animationNames[index], currentAttackTarget.GetComponent<IDamageable>());
         //技能進入冷卻
         slotCooldownTimers[index] = slotCooldowns[index];
-        Debug.Log($"{slotCooldownTimers[index]}={slotCooldowns[index] }");
     }
     #endregion
 
@@ -216,39 +232,38 @@ public class EnemyAI : MonoBehaviour, IAttackable, IMoveable
         new Action_Attack(this, 1),
         new Action_Move(this)
         })); ;
-        isBehaviorTreeReady = true;
     }
     #endregion
 
     //Move方法，由行為樹Action_Move呼叫
     #region Move()
     public void Move() {
-        if (currentMoveTarget == null)
-        {
-            ChangeMoveStrategy(MoveStrategyType.Random);
-        }
-        else
-            ChangeMoveStrategy(MoveStrategyType.FollowPlayer);
+        //設定成往玩家移動
+        //if (currentMoveTarget == null)
+        //{
+        //    ChangeMoveStrategy(MoveStrategyType.Random);
+        //}
+        //else
+        //    ChangeMoveStrategy(MoveStrategyType.FollowPlayer);
 
         if (enemy.isEnemyDataReady)
         {
-            animator.Play(Animator.StringToHash("Move"));
+            StartCoroutine(MoveRoutine());
         }
         else
             Debug.Log("EnemyData尚未準備好，沒有辦法移動");
-    }
-    #endregion
 
-    //Todo設定影子變化
-    #region 公有AdjustShadowAlpha()方法，AnimationEvent調用
-    public void AdjustShadowAlpha() {
-        if (shadowController != null)
-        {
-            shadowController.AdjustShadowAlpha();
-        }
-        else
-            Debug.LogError("shadowController為空");
     }
+
+    //跳躍前亂數Delay
+    private IEnumerator MoveRoutine() {
+        //float delay = UnityEngine.Random.value;
+        float delay = Random.Range(0f, 0.5f);
+        yield return new WaitForSeconds(delay);
+
+        enemy.animator.Play(Animator.StringToHash("Move"));
+    }
+
     #endregion
 
 
@@ -256,20 +271,20 @@ public class EnemyAI : MonoBehaviour, IAttackable, IMoveable
     //Animation Event 方法
     #region StartMoving()、StopMoving()
     public void StartMoving() {
-        rb.drag = 0;
-        rb.velocity = new Vector2(0, 0);
+        enemy.rb.drag = 0;
+        enemy.rb.velocity = new Vector2(0, 0);
         Vector2 direction = moveStrategy.MoveDirection(this);
         float speed = enemy.enemyStats.moveSpeed;
-        rb.AddForce(new Vector2(direction.x * speed, direction.y * speed), ForceMode2D.Impulse);
+        enemy.rb.AddForce(new Vector2(direction.x * speed, direction.y * speed), ForceMode2D.Impulse);
         ClearMoveTarget();
     }
     public void StopMoving() {
-        rb.drag = stopMoveDragPower; // 設定較大的拖曳力，使角色自然減速
+        enemy.rb.drag = stopMoveDragPower; // 設定較大的拖曳力，使角色自然減速
     }
     #endregion
 
     //供外部設定內部移動目標
-    #region
+    #region SetMoveTarget(Transform target)
     public void SetMoveTarget(Transform target) {
         currentMoveTarget = target;
     }

@@ -2,19 +2,9 @@
 
 public class PlayerMove : MonoBehaviour
 {
-    private Rigidbody2D rb;
-    private Player player;
+    public void Move(Vector2 direction,Player player,Rigidbody2D rb) {
+        if (player.playerStats == null) return;
 
-    private void Awake() {
-        rb = GetComponent<Rigidbody2D>();
-        player = GetComponent<Player>();
-    }
-
-    public void Move(Vector2 direction) {
-        if (player == null || player.playerStats == null) return;
-        if (player.isKnockback) return;
-
-        //Debug.Log($"腳色移動方向為{direction}, 速度={player.playerStats?.moveSpeed}");
         // 直接計算移動位置，不再使用 Bounds 限制
         Vector2 newPosition = rb.position + direction * player.playerStats.moveSpeed * Time.fixedDeltaTime;
 

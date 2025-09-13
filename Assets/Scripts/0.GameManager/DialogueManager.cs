@@ -4,6 +4,7 @@ using System.Collections;
 
 public class DialogueManager : MonoBehaviour
 {
+
     //可Inspector自行定義輸入視窗
     #region class DialogueLine
     [System.Serializable]
@@ -44,7 +45,6 @@ public class DialogueManager : MonoBehaviour
             return;
         }
         Instance = this;
-        DontDestroyOnLoad(gameObject);  // 場景切換時不銷毀
     }
 
     private void Start() {
@@ -64,6 +64,7 @@ public class DialogueManager : MonoBehaviour
         dialoguePanel.SetActive(true);
 
         isDialogueRunning = true;
+
 
         currentLineIndex = 0;
         ShowNextLine();

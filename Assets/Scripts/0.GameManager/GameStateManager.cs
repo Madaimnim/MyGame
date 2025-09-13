@@ -52,7 +52,7 @@ public class GameStateManager : MonoBehaviour
     private void HandleGameStart() {
         GameSceneManager.Instance.LoadSceneGameStart();
         GameSceneManager.Instance.GameStartButton.gameObject.SetActive(true);   
-        UIInputController.Instance.isUIInputEnabled = false;
+        UIController_Input.Instance.isUIInputEnabled = false;
     }
     private void ExitGameStart() {
         GameSceneManager.Instance.GameStartButton.interactable=false;
@@ -71,12 +71,12 @@ public class GameStateManager : MonoBehaviour
         PlayerStateManager.Instance.DeactivateAllPlayer();
         GameSceneManager.Instance.LoadScenePreparation();
         GameSceneManager.Instance.GameStartButton.gameObject.SetActive(false);
-        UIInputController.Instance.isUIInputEnabled = true;
+        UIController_Input.Instance.isUIInputEnabled = true;
         TextPopupManager.Instance.TextPrefab_StageClear.transform.localPosition = Vector3.zero;
         TextPopupManager.Instance.TextPrefab_StageDefeat.transform.localPosition = Vector3.zero;
     }
     private void ExitPreparation() {
-        UIInputController.Instance.isUIInputEnabled = false;
+        UIController_Input.Instance.isUIInputEnabled = false;
         UIManager.Instance.CloseAllUIPanels();
     }
     #endregion
@@ -84,10 +84,10 @@ public class GameStateManager : MonoBehaviour
     //進出戰鬥場景
     #region Handle、ExitBattle(string sceneName)
     private void HandleBattle(string sceneName) {
-        StartCoroutine(HandleBattle_Co(sceneName));
+        StartCoroutine(HandleBattle_Coroutine(sceneName));
     }
     
-    private IEnumerator HandleBattle_Co(string sceneName) {
+    private IEnumerator HandleBattle_Coroutine(string sceneName) {
         // 等待場景載入完成（含淡出/加載/淡入流程）
         yield return GameSceneManager.Instance.LoadSceneForSceneName_Co(sceneName);
         //再等一幀
@@ -97,14 +97,13 @@ public class GameStateManager : MonoBehaviour
         PlayerStateManager.Instance.ActivateAllPlayer();
         // 再初始化輸入與清單
         PlayerInputController.Instance.InitailPlayerList();
-        
-        yield return new WaitForSeconds(0.5f);
 
-        DialogueManager.Instance.StartDialogue();
-
-        yield return new WaitUntil(() => DialogueManager.Instance.isDialogueRunning == false);
+        //DialogueManager.Instance.StartDialogue();
+        //yield return new WaitUntil(() => DialogueManager.Instance.isDialogueRunning == false);
+        yield return null;
 
         PlayerInputController.Instance.isBattleInputEnabled = true;
+        EventManager.Instance.Event_BattleStart.Invoke();
     }
 
 

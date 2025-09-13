@@ -13,6 +13,7 @@ public class TextPopupManager : MonoBehaviour
     public GameObject TextPrefab_StageDefeat;
     public GameObject TextPrefab_Resume;
     public GameObject TextPrefab_Damage;
+    public GameObject TextPrafab_RespawnTimer;
     [Header("受傷害字體")]
     public GameObject TextPrefab_TakeDamage;
 
@@ -34,6 +35,28 @@ public class TextPopupManager : MonoBehaviour
         }
     }
 
+    #endregion
+
+    //顯示玩家復活倒數
+    #region ShowRespawnTimerPopup(Transform target,float respanwTime)
+    public void ShowRespawnTimerPopup(Transform target,float respanwTime) {
+        Vector3 basePos = target.position + new Vector3(0,1f,0);
+        GameObject newPopup = Instantiate(TextPrafab_RespawnTimer,basePos,Quaternion.identity);
+        TMP_Text tmpText = newPopup.GetComponentInChildren<TMP_Text>();
+        if (tmpText == null) return;
+
+        StartCoroutine(UpdateRespawnTimer(tmpText, respanwTime));
+    }
+
+    private IEnumerator UpdateRespawnTimer(TMP_Text tmpText ,float time) {
+        for (float t=time;t>0;t--)
+        {
+            tmpText.text =$"{t}";
+            yield return new WaitForSeconds(1);
+        }
+        Destroy(tmpText);
+
+    }
     #endregion
 
     //顯示受傷害字樣

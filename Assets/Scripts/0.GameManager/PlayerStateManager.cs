@@ -76,6 +76,8 @@ public class PlayerStateManager : MonoBehaviour
     }
     #endregion
 
+    //產生戰鬥、UI腳色
+    #region SpawnPlayerAndUIPlayer(int playerID,PlayerStatsRuntime stats)
     private void SpawnPlayerAndUIPlayer(int playerID,PlayerStatsRuntime stats) {
         //生成battle角色物件
         GameObject battlePlayerObject = GetSpawnPlayer(playerID, Vector3.zero, Quaternion.identity, playerParent);
@@ -89,7 +91,7 @@ public class PlayerStateManager : MonoBehaviour
         unlockedPlayersDtny[playerID] = new UnlockedPlayerData { battlePlayerObject = battlePlayerObject, uiPlayerObject = uiPlayerObject, stats = stats };
         Debug.Log($"角色 {playerID}{playerStatesDtny[playerID].playerName} 解鎖");
     }
-
+    #endregion
 
     //解鎖技能&裝備技能槽技能(int playerID)，預設解鎖1、2技能
     #region SetupDefaultSkills(int playerID)
@@ -128,26 +130,8 @@ public class PlayerStateManager : MonoBehaviour
     }
     #endregion
 
-    //激活所有腳色，並放置到關卡的出生點上
-    #region ActivateALLPlayer()方法
-    //public void ActivateAllPlayer() {
-    //    //位移量
-    //    float offsetY = -1;
-    //    Vector3 spawnPos = stageSpawnPosition;
-    //    foreach (var kv in deployedPlayersDtny)
-    //    {
-    //        var currentPlayerObject = kv.Value;
-    //        if (!currentPlayerObject) continue;
-    //        currentPlayerObject.SetActive(true);
-    //        currentPlayerObject.transform.position = spawnPos;
-    //
-    //        //Debug.Log($"{ currentPlayerObject.name}被放置到{spawnPos}");
-    //
-    //        spawnPos = new Vector3(spawnPos.x, spawnPos.y + offsetY, spawnPos.z);
-    //        //Debug.Log($"出生點位置更新{spawnPos}");
-    //    }
-    //}
-
+    //啟用所有deployedPlayerDtny裡的腳色
+    #region ActivateAllPlayer()
     public void ActivateAllPlayer() {
         float offsetY = -1;
         Vector3 spawnPos = stageSpawnPosition;
@@ -163,7 +147,9 @@ public class PlayerStateManager : MonoBehaviour
             spawnPos = new Vector3(spawnPos.x, spawnPos.y + offsetY, spawnPos.z);
         }
     }
-
+    #endregion
+    //生成腳色逐一向下位移
+    #region IEnumerator SpawnWithDrop(GameObject player, Vector3 groundPos) {
     private IEnumerator SpawnWithDrop(GameObject player, Vector3 groundPos) {
         // 從上方開始 (比地面高一點，例如 +3)
         Vector3 startPos = groundPos + new Vector3(0, 10f, 0);
@@ -193,16 +179,10 @@ public class PlayerStateManager : MonoBehaviour
         // 最後確保回到地面
         player.transform.position = groundPos;
     }
-
-
-
-
-
-
     #endregion
 
     //反激活角色，並重置位置到原點
-    #region 
+    #region DeactivateAllPlayer()
     public void DeactivateAllPlayer() {
         foreach (var kv in deployedPlayersDtny) {
             var currentPlayerObject = kv.Value;
@@ -213,11 +193,9 @@ public class PlayerStateManager : MonoBehaviour
     }
     #endregion
 
-
-
     // =================================================== RUNTIME 狀態類 ==========================================================
-    
-    //PlayerStatsRuntime(內含方法) 
+
+    //PlayerStatsRuntime :Player中的playerStats
     #region class PlayerStatsRuntime
     [System.Serializable]
     public class PlayerStatsRuntime
@@ -305,15 +283,15 @@ public class PlayerStateManager : MonoBehaviour
         }
         #endregion
 
-        //取得skillPool字典裡的技能(skillID)
+        //用skillID取得SkillData       (skillPoolDtny中)
         #region GetSkillInSkillPoolDtny(int skillID)
         public SkillData GetSkillInSkillPoolDtny(int skillID) {
             return skillPoolDtny.TryGetValue(skillID, out SkillData skill) ? skill : null;
         }
         #endregion
-        
-        //取得技能槽上技能(slotIndex)
-        # region GetSkillAtSkillSlot(int slotIndex) 
+
+        //用slotIndex取得SkillData     (腳色技能槽上)
+        #region GetSkillAtSkillSlot(int slotIndex) 
         public SkillData GetSkillAtSkillSlot(int slotIndex) {
             if (slotIndex < 0 || slotIndex >= equippedSkillIDList.Count)
             {
@@ -323,6 +301,22 @@ public class PlayerStateManager : MonoBehaviour
 
             int skillID = equippedSkillIDList[slotIndex];
             return skillID != -1 ? GetSkillInSkillPoolDtny(skillID) : null;
+        }
+        #endregion
+
+        //用slotIndex取得SkillName     (腳色技能槽上)
+        #region GetSkillNameAtSlot(int slotIndex)
+        public string GetSkillNameAtSlot(int slotIndex) {
+            var skill = GetSkillAtSkillSlot(slotIndex);
+            return skill != null ? skill.skillName : "";
+        }
+        #endregion
+
+        //用slotIndex取得currentLevel     (腳色技能槽上)
+        #region GetSkillLevelAtSlot(int slotIndex)
+        public int GetSkillLevelAtSlot(int slotIndex) {
+            var skill = GetSkillAtSkillSlot(slotIndex);
+            return skill != null ? skill.currentLevel : 0;
         }
         #endregion
 
@@ -359,7 +353,8 @@ public class PlayerStateManager : MonoBehaviour
         //  (4)設置兩者：Player內的4個「偵測器」變數。
         #region SetSkillAtSlot(int slotIndex, int skillID)
         public void SetSkillAtSlot(int slotIndex, int skillID) {
-            #region 確認SkillID存在，且已存在解鎖技能池裡
+            //確認SkillID存在，且已存在解鎖技能池裡
+            #region 
             if (slotIndex < 0 || slotIndex >= 4) return;
             if (skillID <= 0)
             {
@@ -380,7 +375,8 @@ public class PlayerStateManager : MonoBehaviour
                 }
             }
             #endregion
-            #region 透過SkillPoolDtny取得指定SkillID的newSkill
+            //透過SkillPoolDtny取得指定SkillID的newSkill
+            #region 
             if (!skillPoolDtny.TryGetValue(skillID, out SkillData newSkill))
             {
                 Debug.LogError($"[SetSkillAtSlot] 無法取得技能 ID: {skillID}");
@@ -389,9 +385,8 @@ public class PlayerStateManager : MonoBehaviour
             #endregion
 
             equippedSkillIDList[slotIndex] = skillID;
-
-            #region 取得戰鬥用腳色物件
             // 取得戰鬥用角色
+            #region 
             GameObject battlePlayerObject = Instance.GetUnlockedPlayerObject(playerID);
             if (battlePlayerObject == null)
             {
@@ -399,8 +394,8 @@ public class PlayerStateManager : MonoBehaviour
                 return;
             }
             #endregion
-            #region 取得UI預覽用腳色物件
             // 取得UI 預覽角色
+            #region 
             GameObject previewPlayerObject = UIManager.Instance.activeUIPlayersDtny.ContainsKey(playerID)
                 ? UIManager.Instance.activeUIPlayersDtny[playerID]
                 : null;
@@ -410,20 +405,24 @@ public class PlayerStateManager : MonoBehaviour
             }
             #endregion
 
-            #region 設置戰鬥用腳色的技能偵測器，及物件內Player腳本的CooldownTime1-4、DetectPrefab1-4。
+            //設置戰鬥用腳色的技能偵測器，及物件內Player腳本的cooldown、detectPrefab、skillName。
+            #region 
             Player player = battlePlayerObject.GetComponent<Player>();
             RemoveSkillDetector(player, slotIndex);
             SetPlayerSkillSlotDetectPrefab(player, battlePlayerObject, slotIndex, newSkill);
-            SetPlayerSkillSlotCooldownTime(player, slotIndex, newSkill);
+            SetPlayerSkillSlotCooldown(player, slotIndex, newSkill);
+
             #endregion
-            #region 設置UI預覽用腳色的技能偵測器，及物件內Player腳本的CooldownTime1-4、DetectPrefab1-4。
+            //設置UI預覽用腳色的技能偵測器，及物件內Player腳本的CooldownTime1-4、DetectPrefab1-4。
+            #region 
             player = previewPlayerObject.GetComponent<Player>();
             RemoveSkillDetector(player, slotIndex);
             SetPlayerSkillSlotDetectPrefab(player, previewPlayerObject, slotIndex, newSkill);
-            SetPlayerSkillSlotCooldownTime(player, slotIndex, newSkill);
+            SetPlayerSkillSlotCooldown(player, slotIndex, newSkill);
             #endregion
         }
 
+        //移除技能偵測器
         #region RemoveSkillDetector(Player player, int slotIndex)
         private void RemoveSkillDetector(Player player, int slotIndex) {
             if (player == null) return;
@@ -438,6 +437,7 @@ public class PlayerStateManager : MonoBehaviour
         }
         #endregion
 
+        //設定Player中SkillSlot.detectPrefab
         #region SetPlayerSkillSlotDetectPrefab(Player player, GameObject playerObject, int slotIndex, SkillData skill)
         private void SetPlayerSkillSlotDetectPrefab(Player player, GameObject playerObject, int slotIndex, SkillData skill) {
             GameObject detectorObject = EquipTargetDetectPrefab(playerObject, skill, slotIndex);
@@ -456,7 +456,8 @@ public class PlayerStateManager : MonoBehaviour
                 default: Debug.LogError($"[SetPlayerSkillSlotDetectPrefab] 無效的技能槽索引: {slotIndex}"); break;
             }
         }
-        #region 裝備及生成技能偵測器
+        //裝備及生成技能偵測器
+        #region  EquipTargetDetectPrefab(GameObject playerObject, SkillData skill, int slotIndex) 
         private GameObject EquipTargetDetectPrefab(GameObject playerObject, SkillData skill, int slotIndex) {
             if (playerObject == null) return null;
             if (skill == null) return null;
@@ -476,8 +477,9 @@ public class PlayerStateManager : MonoBehaviour
 
         #endregion
         
-        #region SetPlayerSkillSlotCooldownTime(Player player, int slotIndex, SkillData newSkill)
-        private void SetPlayerSkillSlotCooldownTime(Player player, int slotIndex, SkillData newSkill) {
+        //設定Player中SkillSlot.coodown
+        #region SetPlayerSkillSlotCooldown(Player player, int slotIndex, SkillData newSkill)
+        private void SetPlayerSkillSlotCooldown(Player player, int slotIndex, SkillData newSkill) {
             switch (slotIndex)
             {
                 case 0: player.skillSlots[0].cooldown = newSkill.cooldown; break;
@@ -489,9 +491,11 @@ public class PlayerStateManager : MonoBehaviour
         }
         #endregion
 
+
         #endregion
     }
     #endregion
+
 
     //GameManager載入資料時，存入本地的playerStatesDtny
     #region SetPlayerStatesDtny(PlayerStatData playerStatData)方法

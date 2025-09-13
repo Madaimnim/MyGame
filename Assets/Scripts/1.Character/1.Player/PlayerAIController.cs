@@ -3,11 +3,13 @@ using System.Collections.Generic;
 
 public class PlayerAIController : MonoBehaviour,IMoveable
 {
+    [Header("AI樹更新頻率")]
+    public float updateInterval = 0.1f;
+    private float updateTimer = 0f;
     private BehaviorTree behaviorTree;
     private Player player;
 
-    private float behaviorTreeUpdateCooldown = 0f;
-    private float behaviorTreeUpdateInterval = 0.1f;        //每1秒更新一次AI樹
+
 
     private void Start() {
         player = GetComponent<Player>();
@@ -16,16 +18,17 @@ public class PlayerAIController : MonoBehaviour,IMoveable
     }
 
     private void Update() {
+        if (!player.canRunAI) return;
         RunBehaviorTree();
     }
 
     private void RunBehaviorTree() {
-        if (behaviorTreeUpdateCooldown <= 0f)
+        if (updateTimer <= 0f)
         {
             behaviorTree.Tick();
-            behaviorTreeUpdateCooldown = behaviorTreeUpdateInterval;
+            updateTimer = updateInterval;
         }
-        behaviorTreeUpdateCooldown -= Time.deltaTime;
+        updateTimer -= Time.deltaTime;
     }
 
     public void Move() { 

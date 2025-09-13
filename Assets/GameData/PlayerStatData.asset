@@ -18,7 +18,7 @@ MonoBehaviour:
     level: 1
     currentEXP: 0
     expTable: 0d0000001200000019000000220000002d0000003a000000490000005a0000006d0000008200000099000000b2000000cd000000ea000000090100002a0100004d0100007201000099010000c2010000ed0100001a020000490200007a020000ad020000e202000019030000520300008d030000ca030000
-    maxHealth: 50
+    maxHealth: 3
     attackPower: 1
     moveSpeed: 3
     playerType: 0
@@ -28,8 +28,8 @@ MonoBehaviour:
     - skillID: 1
       skillName: "\u528D\u65AC"
       currentLevel: 1
-      attack: 1
-      cooldown: 3
+      attack: 5
+      cooldown: 0.5
       skillUsageCount: 0
       nextSkillLevelCount: 10
       skillPrefab: {fileID: 1868301516382297822, guid: bee82ac91c521d24b938786f51b7c88d, type: 3}
@@ -37,8 +37,8 @@ MonoBehaviour:
     - skillID: 2
       skillName: "\u91CD\u64CA"
       currentLevel: 1
-      attack: 1
-      cooldown: 0
+      attack: 10
+      cooldown: 3
       skillUsageCount: 0
       nextSkillLevelCount: 10
       skillPrefab: {fileID: 7327708947082931564, guid: ebc3332d416aec74cb1e857b78e74da3, type: 3}
@@ -59,9 +59,9 @@ MonoBehaviour:
     level: 1
     currentEXP: 0
     expTable: 0d0000001200000019000000220000002d0000003a000000490000005a0000006d0000008200000099000000b2000000cd000000ea000000090100002a0100004d0100007201000099010000c2010000ed0100001a020000490200007a020000ad020000e202000019030000520300008d030000ca030000
-    maxHealth: 5
+    maxHealth: 1
     attackPower: 1
-    moveSpeed: 2
+    moveSpeed: 4
     playerType: 1
     playerPrefab: {fileID: 1901394458928384591, guid: 0d87d99a51500fd418339ea0f269bb01, type: 3}
     damageTextPrefab: {fileID: 1607938802007343288, guid: 0d86880a858ce654c8236cd3c5a778c5, type: 3}
@@ -70,7 +70,7 @@ MonoBehaviour:
       skillName: "\u5C04\u64CA"
       currentLevel: 1
       attack: 1
-      cooldown: 0
+      cooldown: 0.2
       skillUsageCount: 0
       nextSkillLevelCount: 100
       skillPrefab: {fileID: 1868301516382297822, guid: e9482e1a632b9db42abfad2b78ec208a, type: 3}

@@ -1,5 +1,5 @@
 public interface IAttackable
 {
-    bool CanUseSkill(int skillSlot);
-    void UseSkill(int skillSlot);
+    bool CanUseSkill(int slotIndex);
+    void UseSkill(int slotIndex);
 }

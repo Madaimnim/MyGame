@@ -59,7 +59,7 @@ public class GameStateManager : MonoBehaviour
         PlayerStateManager.Instance.UnlockAndSpawnPlayer(1);
         PlayerStateManager.Instance.playerStatesDtny[1].UnlockSkill(2);
         PlayerStateManager.Instance.playerStatesDtny[1].UnlockSkill(3);
-        PlayerStateManager.Instance.SetupDefaultSkills(1);
+        PlayerStateManager.Instance.SetupDefaultSkills(1,1,0);
 
         //PlayerStateManager.Instance.UnlockAndSpawnPlayer(2);
         //PlayerStateManager.Instance.SetupDefaultSkills(2);

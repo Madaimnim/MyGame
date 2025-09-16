@@ -101,32 +101,40 @@ public class EnemyAI : MonoBehaviour, IAttackable, IMoveable
 
     //IAttackable需實踐方法，由Action_Attack實踐
     #region CanUseSkill(int skillSlot)、UseSkill(int skillSlot)
-    public bool CanUseSkill(int skillSlot) {
-        int index = skillSlot - 1; // 技能槽從 1 開始，陣列從 0 開始
-        if (index < 0 || index >= slotDetectPrefabs.Length) return false;
+    public bool CanUseSkill(int slotIndex) {
+        if (slotIndex < 0 || slotIndex >= slotDetectPrefabs.Length) return false;
 
-        GameObject detectPrefab = slotDetectPrefabs[index];
+        GameObject detectPrefab = slotDetectPrefabs[slotIndex];
         if (detectPrefab == null) return false;
 
-        float cooldownTimer = slotCooldownTimers[index];
-
+        float cooldownTimer = slotCooldownTimers[slotIndex];
+        
         TargetDetector detector = detectPrefab.GetComponent<TargetDetector>();
+        if (detector == null) return false;
+
+        // 同步 currentAttackTarget與detector裡的target
+        if (detector.hasTarget)
+        {
+            currentAttackTarget = detector.targetTransform;
+        }
+        else
+        {
+            currentAttackTarget = null;
+            currentAttackDamageable = null; // 順便清空，避免用到舊的
+        }
 
         return detector != null && detector.hasTarget && cooldownTimer <= 0 && !enemy.isPlayingActionAnimation;
     }
 
-    public void UseSkill(int skillSlot) {
-        int index = skillSlot - 1;
-        if (index < 0 || index >= slotDetectPrefabs.Length) return;
-
-
+    public void UseSkill(int slotIndex) {
+        if (slotIndex < 0 || slotIndex >= slotDetectPrefabs.Length) return;
 
         //Todo使用技能
-        currentAttackTarget = slotDetectPrefabs[index].GetComponent<TargetDetector>().targetTransform;
+        currentAttackTarget = slotDetectPrefabs[slotIndex].GetComponent<TargetDetector>().targetTransform;
 
-        RequestAttack(skillSlot, currentAttackTarget, animationNames[index], currentAttackTarget.GetComponent<IDamageable>());
+        RequestAttack(slotIndex+1, currentAttackTarget, animationNames[slotIndex], currentAttackTarget.GetComponent<IDamageable>());
         //技能進入冷卻
-        slotCooldownTimers[index] = slotCooldowns[index];
+        slotCooldownTimers[slotIndex] = slotCooldowns[slotIndex];
     }
     #endregion
 
@@ -147,6 +155,7 @@ public class EnemyAI : MonoBehaviour, IAttackable, IMoveable
         enemy.PlayAnimation(animationName);
     }
     #endregion
+
     //攻擊:Animation Event使用
     #region Attack()
     public void Attack() {
@@ -177,6 +186,28 @@ public class EnemyAI : MonoBehaviour, IAttackable, IMoveable
             //todo
         }
     }
+    #endregion
+
+    //Move方法，由行為樹Action_Move呼叫
+    #region Move()
+    public void Move() {
+        if (enemy.isEnemyDataReady)
+        {
+            StartCoroutine(MoveRoutine());
+        }
+        else
+            Debug.Log("EnemyData尚未準備好，沒有辦法移動");
+    }
+
+    //跳躍前亂數Delay
+    private IEnumerator MoveRoutine() {
+        //float delay = UnityEngine.Random.value;
+        float delay = Random.Range(0f, 0.5f);
+        yield return new WaitForSeconds(delay);
+
+        enemy.animator.Play(Animator.StringToHash("Move"));
+    }
+
     #endregion
 
     //初始化MoveStrategy
@@ -221,52 +252,19 @@ public class EnemyAI : MonoBehaviour, IAttackable, IMoveable
     }
     #endregion
 
-    //初始設置行為樹
+    //初始化BehaviorTree
     #region SetBehaviorTree()
     private void SetBehaviorTree() {
         behaviorTree.SetRoot(new Selector(new List<Node>
         {
-        new Action_Attack(this, 4),
         new Action_Attack(this, 3),
         new Action_Attack(this, 2),
         new Action_Attack(this, 1),
+        new Action_Attack(this, 0),
         new Action_Move(this)
         })); ;
     }
     #endregion
-
-    //Move方法，由行為樹Action_Move呼叫
-    #region Move()
-    public void Move() {
-        //設定成往玩家移動
-        //if (currentMoveTarget == null)
-        //{
-        //    ChangeMoveStrategy(MoveStrategyType.Random);
-        //}
-        //else
-        //    ChangeMoveStrategy(MoveStrategyType.FollowPlayer);
-
-        if (enemy.isEnemyDataReady)
-        {
-            StartCoroutine(MoveRoutine());
-        }
-        else
-            Debug.Log("EnemyData尚未準備好，沒有辦法移動");
-
-    }
-
-    //跳躍前亂數Delay
-    private IEnumerator MoveRoutine() {
-        //float delay = UnityEngine.Random.value;
-        float delay = Random.Range(0f, 0.5f);
-        yield return new WaitForSeconds(delay);
-
-        enemy.animator.Play(Animator.StringToHash("Move"));
-    }
-
-    #endregion
-
-
 
     //Animation Event 方法
     #region StartMoving()、StopMoving()

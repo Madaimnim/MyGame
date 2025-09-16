@@ -226,24 +226,11 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   playerID: 1
   selectIndicatorPoint: {fileID: 3680016166740253231}
-  skillSlots:
-  - cooldown: 0
-    cooldownTimer: 0
-    detectPrefab: {fileID: 0}
-  - cooldown: 0
-    cooldownTimer: 0
-    detectPrefab: {fileID: 0}
-  - cooldown: 0
-    cooldownTimer: 0
-    detectPrefab: {fileID: 0}
-  - cooldown: 0
-    cooldownTimer: 0
-    detectPrefab: {fileID: 0}
+  playerAI: {fileID: -4492181130241527848}
   animator: {fileID: 1901394458928384586}
   collider: {fileID: 1901394458928384581}
   rb: {fileID: 1901394458928384605}
   spriteRenderer: {fileID: 1901394458928384584}
-  skillSpawner: {fileID: 1901394458928384579}
   playerMove: {fileID: -444560043973899828}
   shadowController: {fileID: 3338530419213012809}
   deathSFX: {fileID: 0}
@@ -259,7 +246,25 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ca6e799b3c7d1444988ab4e6bf81d381, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  skillSpawner: {fileID: 1901394458928384579}
   updateInterval: 0.1
+  skillSlots:
+  - skillID: 0
+    cooldown: 0
+    cooldownTimer: 0
+    detectPrefab: {fileID: 0}
+  - skillID: 0
+    cooldown: 0
+    cooldownTimer: 0
+    detectPrefab: {fileID: 0}
+  - skillID: 0
+    cooldown: 0
+    cooldownTimer: 0
+    detectPrefab: {fileID: 0}
+  - skillID: 0
+    cooldown: 0
+    cooldownTimer: 0
+    detectPrefab: {fileID: 0}
 --- !u!114 &-444560043973899828
 MonoBehaviour:
   m_ObjectHideFlags: 0

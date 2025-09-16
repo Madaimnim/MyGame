@@ -3,19 +3,19 @@ using UnityEngine;
 public class Action_Attack : Node
 {
     private IAttackable attacker;
-    private int skillSlot;
-    public Action_Attack(IAttackable attacker, int skillSlot) {
+    private int slotIndex;
+    public Action_Attack(IAttackable attacker, int slotIndex) {
         this.attacker = attacker;
-        this.skillSlot = skillSlot;
+        this.slotIndex = slotIndex;
     }
 
     public override NodeState Evaluate() {
 
-        if (!attacker.CanUseSkill(skillSlot)) {
+        if (!attacker.CanUseSkill(slotIndex)) {
             return NodeState.FAILURE;
         }
 
-        attacker.UseSkill(skillSlot);
+        attacker.UseSkill(slotIndex);
         return NodeState.SUCCESS;
     }
 }

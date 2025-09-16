@@ -25,7 +25,7 @@ public class PlayerSkillSpawner : MonoBehaviour
                 int currentSkillUsageCount = player.playerStats.GetSkillAtSkillSlot(slotIndex).skillUsageCount++;
                 int nextSkillUsageCount = player.playerStats.GetSkillAtSkillSlot(slotIndex).nextSkillLevelCount;
                 if (currentSkillUsageCount >= nextSkillUsageCount)
-                    player.SkillLevelUp(slotIndex);
+                    player.playerAI.SkillLevelUp(slotIndex);
             }
         }
     }

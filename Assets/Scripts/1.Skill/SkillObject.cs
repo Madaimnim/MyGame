@@ -54,7 +54,6 @@ public class SkillObject : MonoBehaviour
     [Header("基本參數")]
     public SkillMoveType moveType;                                      //移動方法
     public OnHitType onHitType;
-    public float attackRecoveryTime = 0f;                               //攻擊動畫後硬直時間
     public float destroyDelay = 0f;                                     //自毀時間
     public float onHitDestroyDelay = 0f;                                //碰撞自毀時間
     public float moveSpeed = 0f;                                        //移動速度
@@ -62,21 +61,17 @@ public class SkillObject : MonoBehaviour
     public Vector2 skillOffset = Vector2.zero;                          //生成的偏移量
     public float knockbackForce = 0f;                                   //擊退力
 
-    [Header("行為參數")]
-    public Vector2 scaleFactor = Vector2.one;                           //變形量
-    public int moveCount = 0;                                           //異動次數
-    public float resetDestroyDelay = 0f;                                //重設自毀時間
-    public int chaseNextTargetCount = 0;                                //追擊目標次數
-    public GameObject splitPrefab;                                      //分裂預製體
+    //Todo[Header("行為參數")]
 
-    [Header("觸擊效果")]
-    public int multiHitCount = 0;                                       //多重傷害次數
-    public float dotDamage = 0f;                                        //持續傷害
-    public float dotDuration = 0f;                                      //持續傷害時間
-    public float attackReduction = 0f;                                  //降傷比例
-    public float attackReductionDuration = 0f;                          //降傷持續時間
-    public float speedReduction = 0f;                                   //降速比例
-    public float speedReductionDuration = 0f;                           //降速持續時間
+    //Todo
+    //[Header("觸擊效果")]
+    //public int multiHitCount = 0;                                       //多重傷害次數
+    //public float dotDamage = 0f;                                        //持續傷害
+    //public float dotDuration = 0f;                                      //持續傷害時間
+    //public float attackReduction = 0f;                                  //降傷比例
+    //public float attackReductionDuration = 0f;                          //降傷持續時間
+    //public float speedReduction = 0f;                                   //降速比例
+    //public float speedReductionDuration = 0f;                           //降速持續時間
     #endregion
 
     #endregion

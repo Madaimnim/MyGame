@@ -11,7 +11,7 @@ public class PlayerInputController : MonoBehaviour
 
     public bool isBattleInputEnabled = false;
 
-    private Dictionary<int, GameObject> deployedPlayersDtny = new Dictionary<int, GameObject>(); // 直接從 PlayerStateManager 取得
+    private Dictionary<int, GameObject> deployedPlayersGameObjectDtny = new Dictionary<int, GameObject>(); 
     private List<int> deployedPlayerIDsList = new List<int>(); // 存放目前可用的角色 ID
     private int currentPlayerIndex = -1;  // 當前選擇的角色索引
 
@@ -50,7 +50,7 @@ public class PlayerInputController : MonoBehaviour
         if (deployedPlayerIDsList.Count > 0)
         {
             SelectPlayer(0);  // 預設選擇第一個角色
-            Debug.Log($"PlayerInputController已初始化當前角色控制為{deployedPlayersDtny[1].name}");
+            Debug.Log($"PlayerInputController已初始化當前角色控制為{deployedPlayersGameObjectDtny[1].name}");
         }
     }
     #endregion
@@ -58,8 +58,8 @@ public class PlayerInputController : MonoBehaviour
     // 更新玩家列表
     #region UpdatePlayerList()
     private void UpdatePlayerList() {
-        deployedPlayersDtny = PlayerStateManager.Instance.deployedPlayersDtny; // 直接引用 Dictionary
-        deployedPlayerIDsList = new List<int>(deployedPlayersDtny.Keys); // 取得所有可用的角色 ID
+        deployedPlayersGameObjectDtny = PlayerStateManager.Instance.deployedPlayersGameObjectDtny; // 直接引用 Dictionary
+        deployedPlayerIDsList = new List<int>(deployedPlayersGameObjectDtny.Keys); // 取得所有可用的角色 ID
 
         if (deployedPlayerIDsList.Count == 0)
         {
@@ -109,8 +109,8 @@ public class PlayerInputController : MonoBehaviour
                 {
                     Debug.Log($"命中物件: {hit.gameObject.name}, Layer: {LayerMask.LayerToName(hit.gameObject.layer)}");
 
-                    // 嘗試匹配 deployedPlayersDtny
-                    foreach (var kvp in deployedPlayersDtny)
+                    // 嘗試匹配 deployedPlayersGameObjectDtny
+                    foreach (var kvp in deployedPlayersGameObjectDtny)
                     {
                         if (hit.gameObject == kvp.Value)
                         {
@@ -140,9 +140,9 @@ public class PlayerInputController : MonoBehaviour
 
         // [新增] 設定 Cinemachine Camera 的跟隨目標
         int playerID = deployedPlayerIDsList[currentPlayerIndex];
-        if (deployedPlayersDtny.ContainsKey(playerID))
+        if (deployedPlayersGameObjectDtny.ContainsKey(playerID))
         {
-            GameObject currentPlayer = deployedPlayersDtny[playerID];
+            GameObject currentPlayer = deployedPlayersGameObjectDtny[playerID];
             CameraManager.Instance.Follow(currentPlayer.transform);
         }
 
@@ -152,13 +152,13 @@ public class PlayerInputController : MonoBehaviour
     // 更新選框的位置
     #region UpdateSelectionIndicator()
     private void UpdateSelectionIndicator() {
-        if (!deployedPlayersDtny.ContainsKey(deployedPlayerIDsList[currentPlayerIndex]))
+        if (!deployedPlayersGameObjectDtny.ContainsKey(deployedPlayerIDsList[currentPlayerIndex]))
         {
-            Debug.LogWarning("玩家 ID 不存在於 deployedPlayersDtny！");
+            Debug.LogWarning("玩家 ID 不存在於 deployedPlayersGameObjectDtny！");
             return;
         }
         int playerID = deployedPlayerIDsList[currentPlayerIndex];
-        Player player = PlayerStateManager.Instance.GetDeployedPlayerObject(playerID).GetComponent<Player>();
+        Player player = PlayerStateManager.Instance.GetBattlePlayerObject(playerID).GetComponent<Player>();
 
         if (player == null)
         {
@@ -196,9 +196,9 @@ public class PlayerInputController : MonoBehaviour
         Vector2 moveDirection = new Vector2(moveX, moveY).normalized;
 
         int currentId = deployedPlayerIDsList[currentPlayerIndex];
-        if (deployedPlayersDtny.ContainsKey(deployedPlayerIDsList[currentPlayerIndex]))
+        if (deployedPlayersGameObjectDtny.ContainsKey(deployedPlayerIDsList[currentPlayerIndex]))
         {
-            var currentPlayerObject = deployedPlayersDtny[currentId];
+            var currentPlayerObject = deployedPlayersGameObjectDtny[currentId];
             var player = currentPlayerObject.GetComponent<Player>();
 
             if (player.isDead) return;

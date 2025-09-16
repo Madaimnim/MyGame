@@ -31,8 +31,8 @@ public class TestManager : MonoBehaviour
         PlayerStateManager.Instance.playerStatesDtny[1].UnlockSkill(testPlayerSkillID);
         PlayerStateManager.Instance.playerStatesDtny[playerID].SetSkillAtSlot(0, testPlayerSkillID);
 
-        PlayerStateManager.Instance.deployedPlayersDtny[playerID].SetActive(true);
-        PlayerStateManager.Instance.deployedPlayersDtny[playerID].transform.position = playerSpawnTransform.position;
+        PlayerStateManager.Instance.deployedPlayersGameObjectDtny[playerID].SetActive(true);
+        PlayerStateManager.Instance.deployedPlayersGameObjectDtny[playerID].transform.position = playerSpawnTransform.position;
 
 
         PlayerInputController.Instance.InitailPlayerList();

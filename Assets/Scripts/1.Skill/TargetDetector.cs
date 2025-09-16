@@ -44,7 +44,6 @@ public class TargetDetector : MonoBehaviour
             if (targetTransform == collision.transform)
             {
                 targetTransform = null;
-                hasTarget = false;
                 UpdateTargetTransform();
             }
         }

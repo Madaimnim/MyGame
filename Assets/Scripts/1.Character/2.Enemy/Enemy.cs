@@ -32,9 +32,6 @@ public class Enemy : MonoBehaviour, IDamageable
     [HideInInspector] public bool isPlayingActionAnimation = false;
     #endregion
 
-
-
-
     //生命週期
     #region 生命週期
     private void Awake() {}

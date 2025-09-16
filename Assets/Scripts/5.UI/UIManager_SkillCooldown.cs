@@ -38,14 +38,13 @@ public class UIManager_SkillCooldown : MonoBehaviour
     // 註冊角色的技能槽（比如四個技能）
     #region RegisterPlayerSkills(Player player, Transform parent)
     public void RegisterPlayerSkills(Player player, Transform parent) {
-        for (int i = 0; i < player.skillSlots.Length; i++)
+        for (int i = 0; i < player.GetSkillSlotsLength(); i++)
         {
-            var slot = player.skillSlots[i];
-            if (slot == null) continue;
-            if (string.IsNullOrEmpty(player.GetSkillName(i))) continue;
+            var slotData = player.GetSkillSlotData(i);
+            if (slotData == null || string.IsNullOrEmpty(slotData.skillName)) continue;
 
             UIController_SkillCooldown ui = Instantiate(skillCooldownUIPrefab, parent);
-            ui.Setup(slot, player, i);
+            ui.Setup(player.GetSkillSlot(i), player.playerAI, i); // 傳 SkillSlot + PlayerAI
             activeCooldownUIs.Add(ui);
         }
     }
@@ -55,11 +54,11 @@ public class UIManager_SkillCooldown : MonoBehaviour
     #region
 
     // 更新UIController上的UI技能冷卻
-    #region UpdateSkillCooldown(int slotIndex, float current, float max, Player player)
-    private void UpdateSkillCooldown(int slotIndex, float current, float max, Player player) {
+    #region UpdateSkillCooldown(int slotIndex, float current, float max, PlayerAI playerAI)
+    private void UpdateSkillCooldown(int slotIndex, float current, float max, PlayerAI playerAI) {
         foreach (var ui in activeCooldownUIs)
         {
-            if (ui.IsBoundTo(player, slotIndex))
+            if (ui.IsBoundTo(playerAI, slotIndex))
             {
                 ui.UpdateCooldownUI(current, max);
             }
@@ -68,11 +67,11 @@ public class UIManager_SkillCooldown : MonoBehaviour
     #endregion
 
     // 更新UIController上的技能資訊
-    #region UpdateSkillInfo(int slotIndex, Player player)
-    private void UpdateSkillInfo(int slotIndex, Player player) {
+    #region UpdateSkillInfo(int slotIndex, PlayerAI playerAI)
+    private void UpdateSkillInfo(int slotIndex, PlayerAI playerAI) {
         foreach (var ui in activeCooldownUIs)
         {
-            if (ui.IsBoundTo(player, slotIndex))
+            if (ui.IsBoundTo(playerAI, slotIndex))
             {
                 ui.RefreshSkillInfo();
             }

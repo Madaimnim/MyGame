@@ -3,33 +3,35 @@ using System.Collections;
 using UnityEngine;
 using System.Collections.Generic;
 
-public class Player : MonoBehaviour, IDamageable, IAttackable
+public class Player : MonoBehaviour, IDamageable
 {
     //SkillSLot類
     #region  class SkillSlot
     [Serializable]
     public class SkillSlot
     {
-        [HideInInspector] public int skillID;          // 插槽裝的技能
-        [HideInInspector] public float cooldown;       // 固定冷卻時間
-        [HideInInspector] public float cooldownTimer;  // 倒數
-        [HideInInspector] public GameObject detectPrefab; // 偵測用物件     
+        public PlayerStateManager.PlayerStatsRuntime.SkillData skillData; // 指向已有的技能資料
+        public float cooldownTimer;  // 只有 runtime 需要
+        public GameObject detectPrefab; // 角色場景裡生成的 Detector
+
     }
+
+    private SkillSlot[] skillSlots = new SkillSlot[4];       // 四個技能槽統一管理
     #endregion
+
+    public string GetSkillName(int slotIndex) => playerStats.GetSkillNameAtSlot(slotIndex);
+    public int GetSkillLevel(int slotIndex) => playerStats.GetSkillLevelAtSlot(slotIndex);
 
     //變數
     #region
     public int playerID;
     public GameObject selectIndicatorPoint;
-
-    public SkillSlot[] skillSlots = new SkillSlot[4];       // 四個技能槽統一管理
-
-    public PlayerStateManager.PlayerStatsRuntime playerStats{ get; private set; }
+    public PlayerAI playerAI;
+    public PlayerStateManager.PlayerStatsRuntime playerStats { get; private set; }
     public Animator animator;
     public Collider2D collider;
     public Rigidbody2D rb;
     public SpriteRenderer spriteRenderer;
-    public PlayerSkillSpawner skillSpawner;
     public PlayerMove playerMove;
 
     public ShadowController shadowController;
@@ -43,8 +45,7 @@ public class Player : MonoBehaviour, IDamageable, IAttackable
     public bool isDead { get; private set; } = false;
     public bool isPlayingAttackAnimation { get; private set; } = false;
     public bool isMoving { get; private set; } = false;
-    public string GetSkillName(int slotIndex) => playerStats.GetSkillNameAtSlot(slotIndex);
-    public int GetSkillLevel(int slotIndex) => playerStats.GetSkillLevelAtSlot(slotIndex);
+
 
     private int currentHealth;
 
@@ -58,10 +59,10 @@ public class Player : MonoBehaviour, IDamageable, IAttackable
 
     private IEnumerator Start() {
         yield return StartCoroutine(GameManager.Instance.WaitForDataReady());
-        
+
     }
     private void Update() {
-        UpdateCooldowns();   // 每幀更新技能冷卻時間
+
     }
 
     private void OnEnable() {
@@ -84,7 +85,7 @@ public class Player : MonoBehaviour, IDamageable, IAttackable
             EventManager.Instance.Event_OnWallBroken += DisableAIRun;
             EventManager.Instance.Event_OnWallBroken += DisableRespawn;
         }
-            
+
 
     }
 
@@ -106,6 +107,25 @@ public class Player : MonoBehaviour, IDamageable, IAttackable
         }
     }
     #endregion
+    //技能槽冷卻
+    #region UpdateSkillCooldowns()
+    public void UpdateSkillCooldowns() {
+        for (int i = 0; i < skillSlots.Length; i++)
+        {
+            var slot = skillSlots[i];
+            if (slot == null || slot.skillData == null) continue;
+
+            slot.cooldownTimer = Mathf.Max(0, slot.cooldownTimer - Time.deltaTime);
+            EventManager.Instance.Event_SkillCooldownChanged?.Invoke(
+                i,
+                slot.cooldownTimer,
+                slot.skillData.cooldown,
+                playerAI
+            );
+        }
+    }
+    #endregion
+
     //延遲註冊UI
     #region IEnumerator DelayedRegisterUI()
     private IEnumerator DelayedRegisterUI() {
@@ -114,112 +134,10 @@ public class Player : MonoBehaviour, IDamageable, IAttackable
     }
     #endregion
 
-    //BehaviorTree判斷技能是否冷卻完成
-    #region CanUseSkill(int skillSlot)
-    public bool CanUseSkill(int skillSlot) {
-        int slotIndex = skillSlot - 1;
-        if (IsSlotIndexWrong(slotIndex)) return false;
-        
-        var slot = skillSlots[slotIndex];
-        if (slot.detectPrefab == null) return false;
-
-        var detector = slot.detectPrefab.GetComponent<TargetDetector>();
-        return detector != null && detector.hasTarget && slot.cooldownTimer <= 0;
-    }
-    #endregion
-
-    //BehaviorTree的Action_Attack執行判斷
-    #region  UseSkill(int slotSlot)
-    public void UseSkill(int slotSlot) {
-        int slotIndex = slotSlot-1;
-        if (IsSlotIndexWrong(slotIndex)) return;
-        if (isPlayingAttackAnimation)
-        {
-            
-            //return;
-        }
-
-        var slot = skillSlots[slotIndex];
-        var skillData = playerStats?.GetSkillAtSkillSlot(slotIndex);
-        if (skillData == null) return;
-
-        // 設置冷卻
-        slot.cooldownTimer = slot.cooldown;
-
-        // 播放攻擊
-        Attack(slotIndex, slot.detectPrefab, skillData.skillPrefab);
-    }
-    #endregion
-
-    //確認SlotIndex是否正確
-    #region IsSlotIndexWrong(int slotIndex)
-    private bool IsSlotIndexWrong(int slotIndex) {
-        return slotIndex < 0 && slotIndex >= skillSlots.Length;
-    }
-    #endregion
-
-    // 技能冷卻更新 
-    #region UpdateCooldowns()
-    private void UpdateCooldowns() {
-        for(int i = 0; i < skillSlots.Length; i++)
-        {
-            var slot = skillSlots[i];
-            if (slot == null) continue;
-            slot.cooldownTimer = Mathf.Max(0,slot.cooldownTimer-Time.deltaTime);
-            EventManager.Instance.Event_SkillCooldownChanged?.Invoke(i, slot.cooldownTimer, slot.cooldown, this);
-        }
-    }
-    #endregion
-
     //設置是否在攻擊動畫
     #region SetPlayingAttackAnimation(bool b)
     public void SetPlayingAttackAnimation(bool b) {
         isPlayingAttackAnimation = b;
-    }
-    #endregion
-
-    //攻擊
-    #region 公開Attack()方法
-    private void Attack(int slotIndex, GameObject detectPrefab, GameObject skillPrefab) {
-        if (DialogueManager.Instance.isDialogueRunning) return;
-        if (isPlayingAttackAnimation)
-        {
-           
-            //return;
-        }
-
-        SkillObject skillObject = skillPrefab.GetComponent<SkillObject>();        
-        if (skillObject == null) return;
-        TargetDetector targetDetector= detectPrefab.GetComponent<TargetDetector>();
-        if (targetDetector == null) return;
-        if (targetDetector.targetTransform == null)
-        {
-            Debug.LogWarning("Attack()中止：targetTransform 已被 Destroy 或不存在");
-            return;
-        }
-
-        // 翻轉角色朝向
-        bool isTargetOnLeft = targetDetector.targetTransform.position.x < transform.position.x;
-        transform.localScale = new Vector3(isTargetOnLeft ? -Mathf.Abs(transform.localScale.x) : Mathf.Abs(transform.localScale.x),
-                                     transform.localScale.y,
-                                     transform.localScale.z);
-
-
-        string animName = skillObject.GetAnimationName(isMoving);
-        animator.Play(Animator.StringToHash(animName),-1,0f);
-
-        StartCoroutine(skillSpawner.SpawnSkillAfterDelay(slotIndex,skillObject.attackSpawnDelayTime, skillPrefab, detectPrefab));
-    }
-    #endregion
-
-    //技能升級
-    #region SkillLevelUp(){}
-    public void SkillLevelUp(int slotIndex) {
-        playerStats.GetSkillAtSkillSlot(slotIndex).currentLevel++;
-        playerStats.GetSkillAtSkillSlot(slotIndex).attack++;
-        playerStats.GetSkillAtSkillSlot(slotIndex).nextSkillLevelCount += playerStats.GetSkillAtSkillSlot(slotIndex).currentLevel * 10;
-        TextPopupManager.Instance.ShowSkillLevelUpPopup(playerStats.GetSkillAtSkillSlot(slotIndex).skillName, playerStats.GetSkillAtSkillSlot(slotIndex).currentLevel, transform);
-        EventManager.Instance.Event_SkillInfoChanged?.Invoke(slotIndex, this);
     }
     #endregion
 
@@ -235,7 +153,7 @@ public class Player : MonoBehaviour, IDamageable, IAttackable
         {
             animator.Play(Animator.StringToHash("Move"));
         }
-        playerMove.Move(direction,this,rb);
+        playerMove.Move(direction, this, rb);
     }
     #endregion
 
@@ -250,7 +168,7 @@ public class Player : MonoBehaviour, IDamageable, IAttackable
         TextPopupManager.Instance.ShowTakeDamagePopup(info.damage, transform); // 顯示傷害數字
 
         currentHealth = Mathf.Clamp(currentHealth, 0, playerStats.maxHealth);
-        EventManager.Instance.Event_HpChanged?.Invoke(currentHealth, playerStats.maxHealth,this); // 更新 UI 血量
+        EventManager.Instance.Event_HpChanged?.Invoke(currentHealth, playerStats.maxHealth, this); // 更新 UI 血量
 
         if (currentHealth <= 0)
         {
@@ -271,8 +189,8 @@ public class Player : MonoBehaviour, IDamageable, IAttackable
     private void Die() {
         //Debug.Log("玩家死亡");
         isDead = true;
-        
-        VFXManager.Instance.Play("PlayerDeath",transform.position);
+
+        VFXManager.Instance.Play("PlayerDeath", transform.position);
         AudioManager.Instance.PlaySFX(deathSFX, 0.5f);
 
         DisableAIRun();
@@ -303,7 +221,7 @@ public class Player : MonoBehaviour, IDamageable, IAttackable
         isDead = false;
         isKnockback = false;
         currentHealth = playerStats.maxHealth;
-        EventManager.Instance.Event_HpChanged?.Invoke(currentHealth, playerStats.maxHealth,this);
+        EventManager.Instance.Event_HpChanged?.Invoke(currentHealth, playerStats.maxHealth, this);
 
         //Todo:VFXManager.Instance.Play("PlayerDeath", transform.position);
         //Todo:AudioManager.Instance.PlaySFX(deathSFX, 0.5f);
@@ -354,11 +272,16 @@ public class Player : MonoBehaviour, IDamageable, IAttackable
     }
     #endregion
 
-    //提供PlayerStateManager呼叫初始化使用
+    //提供PlayerStateManager呼叫初始化playerStats使用
     #region Initialize(PlayerStateManager.PlayerStatsRuntime stats)
     public void Initialize(PlayerStateManager.PlayerStatsRuntime stats) {
         playerStats = stats;
         transform.name = $"Player_{playerStats.playerID} ({playerStats.playerName})";
+
+        for (int i = 0; i < skillSlots.Length; i++)
+        {
+            skillSlots[i] = new SkillSlot();
+        }
     }
     #endregion
 
@@ -375,7 +298,6 @@ public class Player : MonoBehaviour, IDamageable, IAttackable
     }
     #endregion
 
-
     //啟用復活
     #region DisableAIRun()
     private void EnableRespawn() {
@@ -388,4 +310,57 @@ public class Player : MonoBehaviour, IDamageable, IAttackable
         canRespawn = false;
     }
     #endregion
+
+    //設置技能槽skillSlots[]的技能
+    #region SetSkillSlot(int slotIndex, PlayerStateManager.PlayerStatsRuntime.SkillData skillData)
+    public void SetSkillSlot(int slotIndex, PlayerStateManager.PlayerStatsRuntime.SkillData skillData) {
+        if (slotIndex < 0 || slotIndex >= skillSlots.Length) return;
+        if (skillData == null) return;
+
+        var slot = skillSlots[slotIndex];
+        slot.skillData = skillData;
+        slot.cooldownTimer = 0;
+
+        // 清理舊的 detectPrefab
+        if (slot.detectPrefab != null)
+        {
+            Destroy(slot.detectPrefab);
+            slot.detectPrefab = null;
+        }
+
+        // 生成新的 detectPrefab（若有）
+        if (skillData.targetDetectPrefab != null)
+        {
+            slot.detectPrefab = Instantiate(skillData.targetDetectPrefab, transform);
+            slot.detectPrefab.transform.localPosition = Vector3.zero;
+            slot.detectPrefab.name = $"TargetDetector_{skillData.skillID}";
+        }
+    }
+    #endregion
+
+    //對外API
+    #region
+    public SkillSlot GetSkillSlot(int slotIndex) {
+        if (slotIndex < 0 || slotIndex >= skillSlots.Length) return null;
+        return skillSlots[slotIndex];
+    }
+    public int GetSkillSlotsLength() {
+        return skillSlots.Length;
+    }
+
+    public PlayerStateManager.PlayerStatsRuntime.SkillData GetSkillSlotData(int slotIndex) {
+        if (slotIndex < 0 || slotIndex >= skillSlots.Length) return null;
+        return skillSlots[slotIndex].skillData;
+    }
+    public float GetSkillSlotCooldownTimer(int slotIndex) {
+        if (slotIndex < 0 || slotIndex >= skillSlots.Length) return -1f;
+        return skillSlots[slotIndex].cooldownTimer;
+    }
+    public GameObject GetSkillSlotDetector(int slotIndex) {
+        if (slotIndex < 0 || slotIndex >= skillSlots.Length) return null;
+        return skillSlots[slotIndex].detectPrefab;
+    }
+
+    #endregion
+
 }

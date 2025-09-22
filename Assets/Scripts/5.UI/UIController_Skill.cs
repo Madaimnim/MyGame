@@ -12,7 +12,7 @@ public class UIController_Skill : MonoBehaviour
     public GameObject skillSelectionPanel;  // 技能選擇面板
     public GameObject skillSelectionButtonPrefab;  // 技能選擇按鈕的預製體
 
-    private PlayerStateManager.PlayerStatsRuntime currentPlayer;
+    private PlayerStatsRuntime currentPlayer;
     private Vector2 originSkillSelectionPanelPosition;
 
 
@@ -36,7 +36,7 @@ public class UIController_Skill : MonoBehaviour
 
     private IEnumerator WaitAndInit() {
         yield return new WaitUntil(() => UIManager.Instance != null && PlayerStateManager.Instance != null);
-        PlayerStateManager.Instance.playerStatesDtny.TryGetValue(UIManager.Instance.currentPlayerId, out currentPlayer);
+        PlayerStateManager.Instance.TryGetState(UIManager.Instance.currentPlayerId, out currentPlayer);
         originSkillSelectionPanelPosition = skillSelectionPanel.transform.position;
         skillSelectionPanel.SetActive(false);
         for (int i = 0; i < slotSkillButtons.Length; i++)
@@ -66,15 +66,15 @@ public class UIController_Skill : MonoBehaviour
                 Debug.LogError($"❌ [UIController_Skill] 技能槽索引超出範圍: {i}");
                 continue;
             }
-            var skill = currentPlayer.GetSkillAtSkillSlot(i);
-            slotSkillNames[i].text = skill != null ? skill.skillName : "空";
+            var skill = currentPlayer.GetSkillDataRuntimeAtSlot(i);
+            slotSkillNames[i].text = skill != null ? skill.SkillName : "空";
         }
     }
     #endregion
 
     #region 顯示可選技能列表
     private void ShowAvailableSkills(int slotIndex) {
-        List<PlayerStateManager.PlayerStatsRuntime.SkillData> availableSkills = new List<PlayerStateManager.PlayerStatsRuntime.SkillData>();
+        List<PlayerSkillRuntime> availableSkills = new List<PlayerSkillRuntime>();
 
         skillSelectionPanel.transform.position = originSkillSelectionPanelPosition;
 
@@ -87,11 +87,11 @@ public class UIController_Skill : MonoBehaviour
         }
 
         // 獲取當前角色的所有可用技能（已解鎖但未裝備的）
-        foreach (var skillID in currentPlayer.unlockedSkillIDList)
+        foreach (var skillID in currentPlayer.UnlockedSkillIDList)
         {
-            if (!currentPlayer.equippedSkillIDList.Contains(skillID))
+            if (!currentPlayer.EquippedSkillIDList.Contains(skillID))
             {
-                var skill = currentPlayer.skillPoolDtny[skillID];
+                var skill = currentPlayer.SkillPoolDtny[skillID];
                 if (skill != null)
                 {
                     availableSkills.Add(skill);
@@ -108,10 +108,10 @@ public class UIController_Skill : MonoBehaviour
 
             if (skillText != null)
             {
-                skillText.text = skill.skillName;
+                skillText.text = skill.SkillName;
             }
 
-            skillButton.onClick.AddListener(() => EquipSkill(slotIndex, skill.skillID));
+            skillButton.onClick.AddListener(() => EquipSkill(slotIndex, skill.SkillId));
         }
 
         // 顯示技能選擇面板

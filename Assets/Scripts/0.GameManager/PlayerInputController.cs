@@ -20,14 +20,13 @@ public class PlayerInputController : MonoBehaviour
     //生命週期
     #region 
     private void Awake() {
-        if (Instance == null)
-        {
-            Instance = this;
-        }
-        else
+        if (Instance != null && Instance != this)
         {
             Destroy(gameObject);
+            return;
         }
+        Instance = this;
+        DontDestroyOnLoad(gameObject);
     }
     private void Start() {
         virtualCam = FindObjectOfType<CinemachineVirtualCamera>();
@@ -50,7 +49,7 @@ public class PlayerInputController : MonoBehaviour
         if (deployedPlayerIDsList.Count > 0)
         {
             SelectPlayer(0);  // 預設選擇第一個角色
-            Debug.Log($"PlayerInputController已初始化當前角色控制為{deployedPlayersGameObjectDtny[1].name}");
+            //Debug.Log($"PlayerInputController已初始化當前角色控制為{deployedPlayersGameObjectDtny[1].name}");
         }
     }
     #endregion
@@ -201,7 +200,7 @@ public class PlayerInputController : MonoBehaviour
             var currentPlayerObject = deployedPlayersGameObjectDtny[currentId];
             var player = currentPlayerObject.GetComponent<Player>();
 
-            if (player.isDead) return;
+            if (player.IsDead) return;
 
             if (player != null)
             {

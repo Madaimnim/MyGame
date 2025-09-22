@@ -12,236 +12,40 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 2690380dfa063354a82db572263b9eca, type: 3}
   m_Name: PlayerStatData
   m_EditorClassIdentifier: 
-  playerStatsList:
-  - playerID: 1
-    playerName: "\u6230\u58EB"
-    level: 1
-    currentEXP: 0
-    expTable: 0d0000001200000019000000220000002d0000003a000000490000005a0000006d0000008200000099000000b2000000cd000000ea000000090100002a0100004d0100007201000099010000c2010000ed0100001a020000490200007a020000ad020000e202000019030000520300008d030000ca030000
-    maxHealth: 3
-    attackPower: 1
-    moveSpeed: 3
-    playerType: 0
-    playerPrefab: {fileID: 1901394458928384591, guid: c1a9c12d802fc0446a22a42d0c13403e, type: 3}
-    damageTextPrefab: {fileID: 1607938802007343288, guid: 0d86880a858ce654c8236cd3c5a778c5, type: 3}
+  playerStatsTemplateList:
+  - Id: 1001
+    Level: 1
+    Name: "\u528D\u5175"
+    MaxHp: 3
+    AttackPower: 1
+    MoveSpeed: 3
+    CharPrefab: {fileID: 1901394458928384591, guid: c1a9c12d802fc0446a22a42d0c13403e, type: 3}
+    SpriteIcon: {fileID: 0}
+    SkillSlotCount: 4
+    UnlockedSkillIDList: 
     skillPoolList:
-    - skillID: 1
-      skillName: "\u528D\u65AC"
-      currentLevel: 1
-      attack: 5
-      cooldown: 0.5
-      skillUsageCount: 0
-      nextSkillLevelCount: 10
-      skillPrefab: {fileID: 1868301516382297822, guid: bee82ac91c521d24b938786f51b7c88d, type: 3}
-      targetDetectPrefab: {fileID: 3457001140423233958, guid: 84b845aceaf3a27428687d6c246943ec, type: 3}
-    - skillID: 2
-      skillName: "\u91CD\u64CA"
-      currentLevel: 1
-      attack: 10
-      cooldown: 3
-      skillUsageCount: 0
-      nextSkillLevelCount: 10
-      skillPrefab: {fileID: 7327708947082931564, guid: ebc3332d416aec74cb1e857b78e74da3, type: 3}
-      targetDetectPrefab: {fileID: 1240820100763929428, guid: 97300d7895f13084783945f8167006d2, type: 3}
-    - skillID: 3
-      skillName: "\u65CB\u98A8\u65AC"
-      currentLevel: 1
-      attack: 1
-      cooldown: 0
-      skillUsageCount: 0
-      nextSkillLevelCount: 10
-      skillPrefab: {fileID: 7327708947082931564, guid: ebc3332d416aec74cb1e857b78e74da3, type: 3}
-      targetDetectPrefab: {fileID: 1240820100763929428, guid: 97300d7895f13084783945f8167006d2, type: 3}
-    unlockedSkillIDList: 
-    equippedSkillIDList: ffffffffffffffffffffffffffffffff
-  - playerID: 2
-    playerName: "\u5F13\u624B"
-    level: 1
-    currentEXP: 0
-    expTable: 0d0000001200000019000000220000002d0000003a000000490000005a0000006d0000008200000099000000b2000000cd000000ea000000090100002a0100004d0100007201000099010000c2010000ed0100001a020000490200007a020000ad020000e202000019030000520300008d030000ca030000
-    maxHealth: 1
-    attackPower: 1
-    moveSpeed: 4
-    playerType: 1
-    playerPrefab: {fileID: 1901394458928384591, guid: 0d87d99a51500fd418339ea0f269bb01, type: 3}
-    damageTextPrefab: {fileID: 1607938802007343288, guid: 0d86880a858ce654c8236cd3c5a778c5, type: 3}
+    - SkillId: 1
+      SkillName: "\u666E\u901A\u653B\u64CA"
+      SkillPower: 1
+      SkillCooldown: 0.8
+      KnockbackForce: 5
+      SkillPrefab: {fileID: 1868301516382297822, guid: bee82ac91c521d24b938786f51b7c88d, type: 3}
+      TargetDetectPrefab: {fileID: 3457001140423233958, guid: 84b845aceaf3a27428687d6c246943ec, type: 3}
+  - Id: 1002
+    Level: 1
+    Name: "\u5F13\u624B"
+    MaxHp: 1
+    AttackPower: 1
+    MoveSpeed: 4
+    CharPrefab: {fileID: 1901394458928384591, guid: 0d87d99a51500fd418339ea0f269bb01, type: 3}
+    SpriteIcon: {fileID: 0}
+    SkillSlotCount: 4
+    UnlockedSkillIDList: 
     skillPoolList:
-    - skillID: 1
-      skillName: "\u5C04\u64CA"
-      currentLevel: 1
-      attack: 1
-      cooldown: 0.2
-      skillUsageCount: 0
-      nextSkillLevelCount: 100
-      skillPrefab: {fileID: 1868301516382297822, guid: e9482e1a632b9db42abfad2b78ec208a, type: 3}
-      targetDetectPrefab: {fileID: 2003774139042550798, guid: 95167d54ba66b37429c084cc1d1c6065, type: 3}
-    - skillID: 3
-      skillName: "\u591A\u91CD\u5C04\u64CA"
-      currentLevel: 1
-      attack: 1
-      cooldown: 0
-      skillUsageCount: 0
-      nextSkillLevelCount: 100
-      skillPrefab: {fileID: 0}
-      targetDetectPrefab: {fileID: 0}
-    - skillID: 0
-      skillName: 
-      currentLevel: 1
-      attack: 1
-      cooldown: 0
-      skillUsageCount: 0
-      nextSkillLevelCount: 100
-      skillPrefab: {fileID: 0}
-      targetDetectPrefab: {fileID: 0}
-    unlockedSkillIDList: 
-    equippedSkillIDList: 01000000ffffffffffffffffffffffff
-  - playerID: 3
-    playerName: "\u54E5\u5E03\u6797"
-    level: 3
-    currentEXP: 0
-    expTable: 0d0000001200000019000000220000002d0000003a000000490000005a0000006d0000008200000099000000b2000000cd000000ea000000090100002a0100004d0100007201000099010000c2010000ed0100001a020000490200007a020000ad020000e202000019030000520300008d030000ca030000
-    maxHealth: 700
-    attackPower: 200
-    moveSpeed: 1
-    playerType: 0
-    playerPrefab: {fileID: 1901394458928384591, guid: fac17571dfa75c24d91b7b378396d20e, type: 3}
-    damageTextPrefab: {fileID: 0}
-    skillPoolList:
-    - skillID: 0
-      skillName: 
-      currentLevel: 1
-      attack: 1
-      cooldown: 0
-      skillUsageCount: 0
-      nextSkillLevelCount: 100
-      skillPrefab: {fileID: 0}
-      targetDetectPrefab: {fileID: 0}
-    - skillID: 0
-      skillName: 
-      currentLevel: 1
-      attack: 1
-      cooldown: 0
-      skillUsageCount: 0
-      nextSkillLevelCount: 100
-      skillPrefab: {fileID: 0}
-      targetDetectPrefab: {fileID: 0}
-    - skillID: 0
-      skillName: 
-      currentLevel: 1
-      attack: 1
-      cooldown: 0
-      skillUsageCount: 0
-      nextSkillLevelCount: 100
-      skillPrefab: {fileID: 0}
-      targetDetectPrefab: {fileID: 0}
-    - skillID: 0
-      skillName: 
-      currentLevel: 1
-      attack: 1
-      cooldown: 0
-      skillUsageCount: 0
-      nextSkillLevelCount: 100
-      skillPrefab: {fileID: 0}
-      targetDetectPrefab: {fileID: 0}
-    unlockedSkillIDList: 01000000
-    equippedSkillIDList: 01000000ffffffffffffffffffffffff
-  - playerID: 4
-    playerName: "\u53F2\u840A\u59C6"
-    level: 700
-    currentEXP: 0
-    expTable: 0d0000001200000019000000220000002d0000003a000000490000005a0000006d0000008200000099000000b2000000cd000000ea000000090100002a0100004d0100007201000099010000c2010000ed0100001a020000490200007a020000ad020000e202000019030000520300008d030000ca030000
-    maxHealth: 1000
-    attackPower: 300
-    moveSpeed: 10
-    playerType: 0
-    playerPrefab: {fileID: 1901394458928384591, guid: 0d87d99a51500fd418339ea0f269bb01, type: 3}
-    damageTextPrefab: {fileID: 0}
-    skillPoolList:
-    - skillID: 0
-      skillName: 
-      currentLevel: 1
-      attack: 1
-      cooldown: 0
-      skillUsageCount: 0
-      nextSkillLevelCount: 100
-      skillPrefab: {fileID: 0}
-      targetDetectPrefab: {fileID: 0}
-    - skillID: 0
-      skillName: 
-      currentLevel: 1
-      attack: 1
-      cooldown: 0
-      skillUsageCount: 0
-      nextSkillLevelCount: 100
-      skillPrefab: {fileID: 0}
-      targetDetectPrefab: {fileID: 0}
-    - skillID: 0
-      skillName: 
-      currentLevel: 1
-      attack: 1
-      cooldown: 0
-      skillUsageCount: 0
-      nextSkillLevelCount: 100
-      skillPrefab: {fileID: 0}
-      targetDetectPrefab: {fileID: 0}
-    - skillID: 0
-      skillName: 
-      currentLevel: 1
-      attack: 1
-      cooldown: 0
-      skillUsageCount: 0
-      nextSkillLevelCount: 100
-      skillPrefab: {fileID: 0}
-      targetDetectPrefab: {fileID: 0}
-    unlockedSkillIDList: 
-    equippedSkillIDList: ffffffffffffffffffffffffffffffff
-  - playerID: 5
-    playerName: "\u5C0F\u53F2\u840A\u59C6"
-    level: 10000
-    currentEXP: 0
-    expTable: 0d0000001200000019000000220000002d0000003a000000490000005a0000006d0000008200000099000000b2000000cd000000ea000000090100002a0100004d0100007201000099010000c2010000ed0100001a020000490200007a020000ad020000e202000019030000520300008d030000ca030000
-    maxHealth: 5000
-    attackPower: 1000
-    moveSpeed: 10
-    playerType: 0
-    playerPrefab: {fileID: 1901394458928384591, guid: 0d87d99a51500fd418339ea0f269bb01, type: 3}
-    damageTextPrefab: {fileID: 0}
-    skillPoolList:
-    - skillID: 0
-      skillName: 
-      currentLevel: 1
-      attack: 1
-      cooldown: 0
-      skillUsageCount: 0
-      nextSkillLevelCount: 100
-      skillPrefab: {fileID: 0}
-      targetDetectPrefab: {fileID: 0}
-    - skillID: 0
-      skillName: 
-      currentLevel: 1
-      attack: 1
-      cooldown: 0
-      skillUsageCount: 0
-      nextSkillLevelCount: 100
-      skillPrefab: {fileID: 0}
-      targetDetectPrefab: {fileID: 0}
-    - skillID: 0
-      skillName: 
-      currentLevel: 1
-      attack: 1
-      cooldown: 0
-      skillUsageCount: 0
-      nextSkillLevelCount: 100
-      skillPrefab: {fileID: 0}
-      targetDetectPrefab: {fileID: 0}
-    - skillID: 0
-      skillName: 
-      currentLevel: 1
-      attack: 1
-      cooldown: 0
-      skillUsageCount: 0
-      nextSkillLevelCount: 100
-      skillPrefab: {fileID: 0}
-      targetDetectPrefab: {fileID: 0}
-    unlockedSkillIDList: 
-    equippedSkillIDList: ffffffffffffffffffffffffffffffff
+    - SkillId: 1
+      SkillName: "\u666E\u901A\u653B\u64CA"
+      SkillPower: 1
+      SkillCooldown: 0.1
+      KnockbackForce: 1
+      SkillPrefab: {fileID: 1868301516382297822, guid: e9482e1a632b9db42abfad2b78ec208a, type: 3}
+      TargetDetectPrefab: {fileID: 2003774139042550798, guid: 95167d54ba66b37429c084cc1d1c6065, type: 3}

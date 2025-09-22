@@ -13,37 +13,39 @@ MonoBehaviour:
   m_Name: EnemyStatData
   m_EditorClassIdentifier: 
   enemyStatsList:
-  - enemyID: 1
-    enemyName: "\u53F2\u840A\u59C6"
+  - id: 2001
+    name: "\u53F2\u840A\u59C6"
     level: 1
     maxHealth: 3
+    attackPower: 1
     moveSpeed: 2
+    prefab: {fileID: 6620357324717576252, guid: aa87e46c63625174d84e532f142c761b, type: 3}
+    spriteIcon: {fileID: 0}
+    skillSlotCount: 2
     exp: 1
     moveStrategyType: 0
-    spriteIcon: {fileID: 0}
-    enemyPrefab: {fileID: 6620357324717576252, guid: aa87e46c63625174d84e532f142c761b, type: 3}
-    damageTextPrefab: {fileID: 1607938802007343288, guid: 0d86880a858ce654c8236cd3c5a778c5, type: 3}
     skillPoolList:
-    - skillID: 1
+    - skillId: 1
       skillName: "\u666E\u901A\u653B\u64CA"
-      cooldown: 1
+      skillPower: 1
+      skillCooldown: 1
       knockbackForce: 2
-      attackPower: 1
-      attackPrefab: {fileID: 0}
-  - enemyID: 2
-    enemyName: "\u6A39\u7CBE"
+      skillPrefab: {fileID: 0}
+  - id: 2002
+    name: "\u6A39\u7CBE"
     level: 1
     maxHealth: 5
+    attackPower: 1
     moveSpeed: 2
+    prefab: {fileID: 4738781730734430214, guid: 6561cd463a9afda43a6d7c34ef0a5e52, type: 3}
+    spriteIcon: {fileID: 0}
+    skillSlotCount: 2
     exp: 2
     moveStrategyType: 0
-    spriteIcon: {fileID: 0}
-    enemyPrefab: {fileID: 6620357324717576252, guid: aa87e46c63625174d84e532f142c761b, type: 3}
-    damageTextPrefab: {fileID: 1607938802007343288, guid: 0d86880a858ce654c8236cd3c5a778c5, type: 3}
     skillPoolList:
-    - skillID: 1
+    - skillId: 1
       skillName: "\u666E\u901A\u653B\u64CA"
-      cooldown: 1
+      skillPower: 1
+      skillCooldown: 1
       knockbackForce: 2
-      attackPower: 1
-      attackPrefab: {fileID: 0}
+      skillPrefab: {fileID: 0}

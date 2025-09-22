@@ -9,14 +9,13 @@ public class UIController_Input : MonoBehaviour
     public bool isUIInputEnabled = false;
 
     private void Awake() {
-        if (Instance == null)
-        {
-            Instance = this;
-        }
-        else
+        if (Instance != null && Instance != this)
         {
             Destroy(gameObject);
+            return;
         }
+        Instance = this;
+        //DontDestroyOnLoad(gameObject); 掛在主物件才需要
     }
 
     private void Update() {

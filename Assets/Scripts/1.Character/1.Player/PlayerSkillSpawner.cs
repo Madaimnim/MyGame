@@ -10,48 +10,36 @@ public class PlayerSkillSpawner : MonoBehaviour
         player = GetComponent<Player>();
     }
 
-    //延遲生成技能
-    #region SpawnSkillAfterDelay(float delayTime, GameObject skillPrefab, GameObject detectPrefab)
-    public IEnumerator SpawnSkillAfterDelay(int slotIndex, float delayTime, GameObject skillPrefab, GameObject detectPrefab) {
-        yield return new WaitForSeconds(delayTime);
-
-        if (detectPrefab != null)
+    //生成技能
+    public void SpawnSkill(int slotIndex, PlayerSkillRuntime playerSkillRuntime, GameObject detector) {
+        TargetDetector targetDetector = detector.GetComponent<TargetDetector>();
+        if (targetDetector == null || !targetDetector.hasTarget || targetDetector.targetTransform == null)
         {
-            TargetDetector detector = detectPrefab.GetComponent<TargetDetector>();
-            if (detector != null && detector.targetTransform != null)
-            {
-                SpawnAttack(player.playerStats.attackPower, skillPrefab, detector.targetTransform, player.playerStats.GetSkillAtSkillSlot(slotIndex).attack);
-
-                int currentSkillUsageCount = player.playerStats.GetSkillAtSkillSlot(slotIndex).skillUsageCount++;
-                int nextSkillUsageCount = player.playerStats.GetSkillAtSkillSlot(slotIndex).nextSkillLevelCount;
-                if (currentSkillUsageCount >= nextSkillUsageCount)
-                    player.playerAI.SkillLevelUp(slotIndex);
-            }
-        }
-    }
-
-    public void SpawnAttack(int playerAttack,GameObject skillPrefab, Transform targetTransform,int skillAttack) {
-        if (skillPrefab == null || targetTransform == null)
-        {
-            Debug.LogError("❌ SpawnAttack: SkillPrefab 或 TargetTransform 為空！");
+            Debug.Log(" 沒有有效目標，取消技能生成");
             return;
         }
 
-        // 計算方向
-        Vector2 directionVector = (Vector2)(targetTransform.position - transform.position).normalized;
+        // 攻擊力計算
+        int playerAttackPower = player.GetPlayerAttackPower();
+        int skillAttackPower = playerSkillRuntime.SkillPower;
+        int finalAttackPower = playerAttackPower + skillAttackPower;
+
+        // 計算方向與旋轉角度
+        Vector2 directionVector = (Vector2)(targetDetector.targetTransform.position - transform.position).normalized;
         float rotateAngle = Mathf.Atan2(directionVector.y, directionVector.x) * Mathf.Rad2Deg;
 
-        // 生成技能
-        GameObject currentSkillPrefab = Instantiate(skillPrefab, transform.position, Quaternion.identity);
-        currentSkillPrefab.SetActive(false);               // 避免異常行為，先關閉
+        // 生成技能物件，設定屬性
+        GameObject currentSkillPrefab = Instantiate(playerSkillRuntime.SkillPrefab, transform.position, Quaternion.identity);
+        currentSkillPrefab.SetActive(false); // 先關閉避免出現異常
+        SetSkillObjectProperties(currentSkillPrefab, directionVector, finalAttackPower, targetDetector.targetTransform, rotateAngle);
+        currentSkillPrefab.SetActive(true);
 
-        // 設置技能屬性
-        SetSkillObjectProperties(currentSkillPrefab, directionVector, playerAttack+skillAttack, targetTransform, rotateAngle);
-        currentSkillPrefab.SetActive(true); // 啟用
+        player.StatsRuntime.SkillSlots[slotIndex].TriggerCooldown();
+
+        player.StatsRuntime.OnSkillUsed(slotIndex, transform);
+
     }
-    #endregion
 
-    #region 設定技能屬性
     private void SetSkillObjectProperties(GameObject currentSkillPrefab, Vector2 directionVector, int finalAttack,Transform targetTransform, float rotateAngle) {
         SkillObject skillObject = currentSkillPrefab.GetComponent<SkillObject>();
         if (skillObject != null)
@@ -68,5 +56,4 @@ public class PlayerSkillSpawner : MonoBehaviour
             Debug.LogError("❌ AttackSpawner: 無法找到 Player001Skill001 腳本！");
         }
     }
-    #endregion
 }

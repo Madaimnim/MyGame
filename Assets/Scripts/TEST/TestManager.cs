@@ -16,7 +16,7 @@ public class TestManager : MonoBehaviour
 
     public IEnumerator Start(){
         yield return StartCoroutine(GameManager.Instance.WaitForDataReady());
-        StartCoroutine(CreatPlayer());
+        //StartCoroutine(CreatPlayer());
 
         yield return null;
 
@@ -26,18 +26,19 @@ public class TestManager : MonoBehaviour
     //生成測試腳色在測試場景
     #region
     public IEnumerator CreatPlayer() {
-        PlayerStateManager.Instance.UnlockAndSpawnPlayer(playerID);
-
-        PlayerStateManager.Instance.playerStatesDtny[1].UnlockSkill(testPlayerSkillID);
-        PlayerStateManager.Instance.playerStatesDtny[playerID].SetSkillAtSlot(0, testPlayerSkillID);
-
-        PlayerStateManager.Instance.deployedPlayersGameObjectDtny[playerID].SetActive(true);
-        PlayerStateManager.Instance.deployedPlayersGameObjectDtny[playerID].transform.position = playerSpawnTransform.position;
-
-
-        PlayerInputController.Instance.InitailPlayerList();
-
-        PlayerInputController.Instance.isBattleInputEnabled = true;
+        //Todo
+        //PlayerStateManager.Instance.UnlockAndSpawnPlayer(playerID);
+        //
+        //PlayerStateManager.Instance.playerStatesDtny[1].UnlockSkill(testPlayerSkillID);
+        //PlayerStateManager.Instance.playerStatesDtny[playerID].SetSkillAtSlot(0, testPlayerSkillID);
+        //
+        //PlayerStateManager.Instance.deployedPlayersGameObjectDtny[playerID].SetActive(true);
+        //PlayerStateManager.Instance.deployedPlayersGameObjectDtny[playerID].transform.position = playerSpawnTransform.position;
+        //
+        //
+        //PlayerInputController.Instance.InitailPlayerList();
+        //
+        //PlayerInputController.Instance.isBattleInputEnabled = true;
 
         yield return null;
     }

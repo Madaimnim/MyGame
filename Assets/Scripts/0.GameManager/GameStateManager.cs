@@ -8,7 +8,8 @@ using TMPro;
 
 public class GameStateManager : MonoBehaviour
 {
-    public static GameStateManager Instance;
+    public static GameStateManager Instance{get ; private set;}
+
     public GameState currentState = GameState.GameStart;
     #region Enum 定義
     public enum GameState
@@ -23,15 +24,13 @@ public class GameStateManager : MonoBehaviour
     #endregion
     #region 單例模式
     private void Awake() {
-        if (Instance == null)
-        {
-            Instance = this;
-            DontDestroyOnLoad(gameObject); // 確保跨場景存活
-        }
-        else
+        if (Instance != null && Instance != this)
         {
             Destroy(gameObject);
+            return;
         }
+        Instance = this;
+        DontDestroyOnLoad(gameObject);
     }
     #endregion
 
@@ -56,13 +55,17 @@ public class GameStateManager : MonoBehaviour
     }
     private void ExitGameStart() {
         GameSceneManager.Instance.GameStartButton.interactable=false;
-        PlayerStateManager.Instance.UnlockAndSpawnPlayer(1);
-        PlayerStateManager.Instance.playerStatesDtny[1].UnlockSkill(2);
-        PlayerStateManager.Instance.playerStatesDtny[1].UnlockSkill(3);
-        PlayerStateManager.Instance.SetupDefaultSkills(1,1,0);
+        PlayerStateManager.Instance.UnlockPlayer(1001);
+        PlayerStateManager.Instance.SpawnBothPlayers(1001);
+        PlayerStateManager.Instance.GetState(1001).UnlockSkill(1);
+        PlayerStateManager.Instance.GetState(1001).UnlockSkill(2);
+        PlayerStateManager.Instance.GetState(1001).UnlockSkill(3);
+        PlayerStateManager.Instance.SetupPlayerSkillSlot(1001,0,1);
 
-        //PlayerStateManager.Instance.UnlockAndSpawnPlayer(2);
-        //PlayerStateManager.Instance.SetupDefaultSkills(2);
+        PlayerStateManager.Instance.UnlockPlayer(1002);
+        PlayerStateManager.Instance.SpawnBothPlayers(1002);
+        PlayerStateManager.Instance.GetState(1002).UnlockSkill(1);
+        PlayerStateManager.Instance.SetupPlayerSkillSlot(1002,0,1);
     }
 
     //進出準備場景

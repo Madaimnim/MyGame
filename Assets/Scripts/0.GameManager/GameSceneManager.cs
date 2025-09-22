@@ -25,15 +25,14 @@ public class GameSceneManager: MonoBehaviour
     //生命週期
     #region
     private void Awake() {
-        if (Instance == null)
-        {
-            Instance = this;
-            DontDestroyOnLoad(gameObject);
-        }
-        else
+        if (Instance != null && Instance != this)
         {
             Destroy(gameObject);
+            return;
         }
+        Instance = this;
+        DontDestroyOnLoad(gameObject);
+
         GameStartButton.gameObject.SetActive(false);
     }
 

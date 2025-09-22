@@ -7,6 +7,9 @@ onBoardingDoNotAskAgain = true
 showPackageIndexes = false
 showStatusBar = false
 scopes = {
+	"last_search.DD5CDD96" = "ref:Assets/Scripts/1.Character/2.Enemy/Enemy.cs"
+	"OpenInspectorPreview.DD5CDD96" = "0"
+	"currentGroup.DD5CDD96" = "all"
 }
 providers = {
 	adb = {
@@ -53,6 +56,8 @@ providers = {
 objectSelectors = {
 }
 recentSearches = [
+	"ref:Assets/Scripts/1.Character/2.Enemy/Enemy.cs"
+	"ref:Assets/Scripts/1.Character/2.Enemy/EnemyAttackDetector.cs"
 ]
 searchItemFavorites = [
 ]

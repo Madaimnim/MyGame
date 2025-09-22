@@ -50,7 +50,7 @@ public class UIController_SkillUsage : MonoBehaviour
     //更新UI技能熟練度介面
     #region UpdateSkillUsageMasteryUI()
     public void UpdateSkillUsageMasteryUI() {
-        if (!PlayerStateManager.Instance.playerStatesDtny.TryGetValue(targetPlayerID, out var stats))
+        if (!PlayerStateManager.Instance.TryGetState(targetPlayerID, out var playerStatsRuntime))
         {
             Debug.LogError($"[UIController_SkillUsage] 找不到 PlayerStatsRuntime, playerID={targetPlayerID}");
             return;
@@ -59,32 +59,32 @@ public class UIController_SkillUsage : MonoBehaviour
 
         foreach (var skillInfo in skillsInfoList)
         {
-            var skill = stats.GetSkillInSkillPoolDtny(skillInfo.skillID);
-            if (skill == null)
+            var playerSkillDataRuntime = playerStatsRuntime.GetSkillDataRuntimeForId(skillInfo.skillID);
+            if (playerSkillDataRuntime == null)
             {
-                Debug.LogWarning($"[UIController_SkillUsage] 技能 {skillInfo.skillID} 不存在於角色 {stats.playerName} 的技能池");
+                Debug.LogWarning($"[UIController_SkillUsage] 技能 {skillInfo.skillID} 不存在於角色 {playerStatsRuntime.Name} 的技能池");
                 continue;
             }
 
             // 技能等級
-            if (skillInfo.levelText != null) skillInfo.levelText.text = $"Lv.{skill.currentLevel}";
-            if (skillInfo.nextLevelText != null) skillInfo.nextLevelText.text = $"Lv.{skill.currentLevel + 1}";
+            if (skillInfo.levelText != null) skillInfo.levelText.text = $"Lv.{playerSkillDataRuntime.SkillLevel}";
+            if (skillInfo.nextLevelText != null) skillInfo.nextLevelText.text = $"Lv.{playerSkillDataRuntime.SkillLevel + 1}";
 
             // 攻擊力
-            if (skillInfo.attackText != null) skillInfo.attackText.text = $"ATK:{skill.attack}";
-            if (skillInfo.nextAttackText != null) skillInfo.nextAttackText.text = $"ATK:{skill.attack + 1}";
+            if (skillInfo.attackText != null) skillInfo.attackText.text = $"ATK:{playerSkillDataRuntime.SkillPower}";
+            if (skillInfo.nextAttackText != null) skillInfo.nextAttackText.text = $"ATK:{playerSkillDataRuntime.SkillPower + 1}";
 
             // 使用次數（需求數先用 nextSkillLevelCount）
             if (skillInfo.usageText != null)
-                skillInfo.usageText.text = $"使用次數:{skill.skillUsageCount}/{skill.nextSkillLevelCount}";
+                skillInfo.usageText.text = $"使用次數:{playerSkillDataRuntime.SkillUsageCount}/{playerSkillDataRuntime.NextSkillLevelCount}";
             
             //expBar 伸縮
             if (skillInfo.expBar != null)
             {
                 float progress = 0f;
 
-                if (skill.nextSkillLevelCount > 0) // 避免除以 0
-                    progress = Mathf.Clamp01((float)skill.skillUsageCount / skill.nextSkillLevelCount);
+                if (playerSkillDataRuntime.NextSkillLevelCount > 0) // 避免除以 0
+                    progress = Mathf.Clamp01((float)playerSkillDataRuntime.SkillUsageCount / playerSkillDataRuntime.NextSkillLevelCount);
 
                 Vector3 scale = skillInfo.expBar.transform.localScale;
                 scale.x = progress; //  根據進度改 X 軸

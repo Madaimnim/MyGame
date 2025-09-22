@@ -8374,7 +8374,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 8588244553171898216, guid: 755551f29c152384cafc723cf33cb4ad, type: 3}
       propertyPath: m_AnchoredPosition.x
-      value: 90.785
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 8588244553171898216, guid: 755551f29c152384cafc723cf33cb4ad, type: 3}
       propertyPath: m_AnchoredPosition.y
@@ -8387,6 +8387,10 @@ PrefabInstance:
     - target: {fileID: 8588244553270891377, guid: 755551f29c152384cafc723cf33cb4ad, type: 3}
       propertyPath: m_SizeDelta.y
       value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 8588244553680918164, guid: 755551f29c152384cafc723cf33cb4ad, type: 3}
+      propertyPath: currentPlayerId
+      value: -1
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 755551f29c152384cafc723cf33cb4ad, type: 3}

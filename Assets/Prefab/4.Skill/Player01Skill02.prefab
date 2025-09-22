@@ -114,10 +114,10 @@ SpriteRenderer:
   m_FlipX: 0
   m_FlipY: 0
   m_DrawMode: 0
-  m_Size: {x: 1, y: 1}
+  m_Size: {x: 2.25, y: 2.25}
   m_AdaptiveModeThreshold: 0.5
   m_SpriteTileMode: 0
-  m_WasSpriteAssigned: 1
+  m_WasSpriteAssigned: 0
   m_MaskInteraction: 0
   m_SpriteSortPoint: 0
 --- !u!50 &7327708947082931568
@@ -159,7 +159,7 @@ BoxCollider2D:
     border: {x: 0, y: 0, z: 0, w: 0}
     pivot: {x: 0.5, y: 0}
     oldSize: {x: 2.25, y: 2.25}
-    newSize: {x: 1, y: 1}
+    newSize: {x: 2.25, y: 2.25}
     adaptiveTilingThreshold: 0.5
     drawMode: 0
     adaptiveTiling: 0
@@ -207,8 +207,6 @@ MonoBehaviour:
   spawnPivot: {fileID: 9197505400726502922}
   moveType: 4
   onHitType: 0
-  skillDamage: 1
-  attackRecoveryTime: 0.2
   destroyDelay: 0.5
   onHitDestroyDelay: 0
   moveSpeed: 0
@@ -217,15 +215,3 @@ MonoBehaviour:
     m_Bits: 256
   skillOffset: {x: 0, y: 0}
   knockbackForce: 1
-  scaleFactor: {x: 1, y: 1}
-  moveCount: 0
-  resetDestroyDelay: 0
-  chaseNextTargetCount: 0
-  splitPrefab: {fileID: 0}
-  multiHitCount: 0
-  dotDamage: 0
-  dotDuration: 0
-  attackReduction: 0
-  attackReductionDuration: 0
-  speedReduction: 0
-  speedReductionDuration: 0

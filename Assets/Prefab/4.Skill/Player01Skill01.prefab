@@ -87,7 +87,7 @@ SpriteRenderer:
   m_Size: {x: 1.3125, y: 1.625}
   m_AdaptiveModeThreshold: 0.5
   m_SpriteTileMode: 0
-  m_WasSpriteAssigned: 1
+  m_WasSpriteAssigned: 0
   m_MaskInteraction: 0
   m_SpriteSortPoint: 0
 --- !u!50 &1868301516382297794
@@ -127,7 +127,7 @@ PolygonCollider2D:
   m_Offset: {x: 0, y: 0}
   m_SpriteTilingProperty:
     border: {x: 0, y: 0, z: 0, w: 0}
-    pivot: {x: 0.5, y: 0}
+    pivot: {x: 0.5, y: 0.5}
     oldSize: {x: 1.3125, y: 1.625}
     newSize: {x: 1.3125, y: 1.625}
     adaptiveTilingThreshold: 0.5
@@ -188,29 +188,16 @@ MonoBehaviour:
   canRotate: 1
   rotatePivot: {fileID: 2130180057660526491}
   spawnPivot: {fileID: 4237132543364788592}
-  moveType: 4
+  moveType: 2
   onHitType: 0
-  attackRecoveryTime: 0
   destroyDelay: 0.2
-  onHitDestroyDelay: 0
-  moveSpeed: 0
+  onHitDestroyDelay: 5
+  moveSpeed: 30
   targetLayers:
     serializedVersion: 2
     m_Bits: 256
   skillOffset: {x: 0, y: 0}
   knockbackForce: 1
-  scaleFactor: {x: 1, y: 1}
-  moveCount: 0
-  resetDestroyDelay: 0
-  chaseNextTargetCount: 0
-  splitPrefab: {fileID: 0}
-  multiHitCount: 0
-  dotDamage: 0
-  dotDuration: 0
-  attackReduction: 0
-  attackReductionDuration: 0
-  speedReduction: 0
-  speedReductionDuration: 0
 --- !u!1 &1913024244329165672
 GameObject:
   m_ObjectHideFlags: 0

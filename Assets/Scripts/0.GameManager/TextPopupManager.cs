@@ -5,7 +5,7 @@ using System.Collections.Generic;
 
 public class TextPopupManager : MonoBehaviour
 {
-    public static TextPopupManager Instance;
+    public static TextPopupManager Instance{ get; private set; }
 
     public GameObject TextPrefab_Exp;
     public GameObject TextPrefab_LevelUp;
@@ -24,18 +24,23 @@ public class TextPopupManager : MonoBehaviour
     //生命週期
     #region 生命週期
     private void Awake() {
-        if(Instance == null)
-        {
-            Instance = this;
-            DontDestroyOnLoad(gameObject);
-        }
-        else
+        if (Instance != null && Instance != this)
         {
             Destroy(gameObject);
+            return;
         }
+        Instance = this;
+        DontDestroyOnLoad(gameObject);
     }
 
     #endregion
+
+    private void OnEnable() {
+        EventManager.Instance.Event_SkillLevelUp += ShowSkillLevelUpPopup;
+    }
+    private void OnDisable() {
+        EventManager.Instance.Event_SkillLevelUp -= ShowSkillLevelUpPopup;
+    }
 
     //顯示玩家復活倒數
     #region ShowRespawnTimerPopup(Transform target,float respanwTime)
@@ -135,8 +140,8 @@ public class TextPopupManager : MonoBehaviour
 
     //顯示技能升級
     #region ShowSkillLevelUpPopup(string skillName, int level, Transform target)
-    public void ShowSkillLevelUpPopup(string skillName, int level, Transform target) {
-        CreateLevelUpPopup(TextPrefab_LevelUp, $"{skillName}Lv.{level}", target);
+    public void ShowSkillLevelUpPopup(PlayerSkillRuntime playerSkillDataRuntime, Transform ownerTransform) {
+        CreateLevelUpPopup(TextPrefab_LevelUp, $"{playerSkillDataRuntime.SkillName}Lv.{playerSkillDataRuntime.SkillLevel}", ownerTransform);
     }
     #endregion
 

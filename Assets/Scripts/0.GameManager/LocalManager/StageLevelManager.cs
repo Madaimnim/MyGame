@@ -4,7 +4,7 @@ using UnityEngine;
 
 public class StageLevelManager : MonoBehaviour
 {
-    public static StageLevelManager Instance;
+    public static StageLevelManager Instance { get; private set; }
     private int enemyCount; //當前關卡敵人的數量
 
     //生命週期
@@ -20,7 +20,6 @@ public class StageLevelManager : MonoBehaviour
     }
 
     private void OnEnable() {
-        Debug.Log("StageLevelManager 訂閱 Event_OnWallBroken");
         EventManager.Instance.Event_OnPlayerDie += RespawnPlayer;
         EventManager.Instance.Event_OnWallBroken += WallBroken;
 

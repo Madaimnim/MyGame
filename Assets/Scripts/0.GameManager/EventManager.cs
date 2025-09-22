@@ -1,27 +1,30 @@
 using System;
 using UnityEngine;
 
+[DefaultExecutionOrder(-50)]   // 讓 EventManager 先於大多數腳本執行
 public class EventManager : MonoBehaviour
 {
+
     public static EventManager Instance { get; private set; }
 
     public Action<IDamageable> Event_OnPlayerDie;
     public Action Event_OnWallBroken;
+    public Action<int, Player> Event_SkillInfoChanged;
+    public Action<PlayerSkillRuntime,Transform> Event_SkillLevelUp;
+
     public Action<int, int, IDamageable> Event_HpChanged;
-    public Action<int, float, float, PlayerAI> Event_SkillCooldownChanged;
-    public Action<int, PlayerAI> Event_SkillInfoChanged;
+    public Action<int, float, float, Player> Event_SkillCooldownChanged;
+
     public Action Event_BattleStart;
 
     private void Awake() {
-        if (Instance == null)
-        {
-            Instance = this;
-            DontDestroyOnLoad(gameObject);
-        }
-        else
+        if (Instance != null && Instance != this)
         {
             Destroy(gameObject);
+            return;
         }
+        Instance = this;
+        DontDestroyOnLoad(gameObject);
     }
 
 }

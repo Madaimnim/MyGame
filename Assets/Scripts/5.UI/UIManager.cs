@@ -18,20 +18,20 @@ public class UIManager : MonoBehaviour
 
     private UIController_Skill uiSkillController;
     #region 角色管理
-    public int currentPlayerId = 1;   // 貫穿整個 UI 的核心變數
+    public int currentPlayerId = -1;   // 貫穿整個 UI 的核心變數
     #endregion
 
     //生命週期
     #region 生命週期
     private void Awake() {
-        if (Instance == null)
-        {
-            Instance = this;
-        }
-        else
+        if (Instance != null && Instance != this)
         {
             Destroy(gameObject);
+            return;
         }
+        Instance = this;
+        //DontDestroyOnLoad(gameObject); 掛在主物件才需要
+
         uiSkillController = GetComponentInChildren<UIController_Skill>();
     }
 
@@ -41,7 +41,13 @@ public class UIManager : MonoBehaviour
 
     private IEnumerator Start() {
         yield return StartCoroutine(GameManager.Instance.WaitForDataReady());
-        UpdateUICrrentIndexAndPlayer(); // ✅ 初始化 UI
+
+        if (PlayerStateManager.Instance.unlockedPlayerIDsHashSet.Count > 0)
+        {
+            currentPlayerId = PlayerStateManager.Instance.unlockedPlayerIDsHashSet.First(); // 真實 ID
+        }
+
+        UpdateUICrrentIndexAndPlayer(); // 初始化 UI
     }
     #endregion
 
@@ -118,40 +124,42 @@ public class UIManager : MonoBehaviour
     public void UpdateUICrrentIndexAndPlayer() {
         var unlockedPlayerIDs = PlayerStateManager.Instance.unlockedPlayerIDsHashSet;
 
-        if (unlockedPlayerIDs.Count == 0)
+        if (unlockedPlayerIDs.Count == 0)   return;
+        // 如果 currentPlayerId 不在已解鎖清單，就指定第一個
+        if (!unlockedPlayerIDs.Contains(currentPlayerId))
+            currentPlayerId = unlockedPlayerIDs.First();
+        if (PlayerStateManager.Instance.TryGetState(currentPlayerId, out var newPlayer))
         {
-            return;
+            EventBus.Trigger(new UICurrentPlayerChangEvent(newPlayer));
         }
-
-        // 確保 currentIndex 在合理範圍
-        currentPlayerId = Mathf.Clamp(currentPlayerId, 0, unlockedPlayerIDs.Count);
-        PlayerStateManager.PlayerStatsRuntime newPlayer = PlayerStateManager.Instance.playerStatesDtny[currentPlayerId];
-
-        EventBus.Trigger(new UICurrentPlayerChangEvent(PlayerStateManager.Instance.playerStatesDtny[currentPlayerId]));
+        else
+        {
+            Debug.LogError($"❌ UpdateUICrrentIndexAndPlayer: 找不到 ID={currentPlayerId} 的玩家狀態");
+        }
     }
     #endregion
 
     //提供外部方法變更currentIndex
     #region ChangCurrentPlayerID(int AddNumber)
     public void ChangCurrentPlayerID(int AddNumber) {
-        var unlockedPlayerIDs = PlayerStateManager.Instance.unlockedPlayerIDsHashSet;
+        var unlockedPlayerIDs = PlayerStateManager.Instance.unlockedPlayerIDsHashSet.ToList();
 
         if (unlockedPlayerIDs.Count == 0) return;
 
-        currentPlayerId = (currentPlayerId - 1 + AddNumber + unlockedPlayerIDs.Count) % unlockedPlayerIDs.Count + 1;
-        UpdateUICrrentIndexAndPlayer();
+        // 取得目前 ID 在列表的索引
+        int currentIndex = unlockedPlayerIDs.IndexOf(currentPlayerId);
+        if (currentIndex == -1) currentIndex = 0; // 找不到就回第一個
 
+        // 算新的索引
+        int newIndex = (currentIndex + AddNumber + unlockedPlayerIDs.Count) % unlockedPlayerIDs.Count;
+
+        // **直接把真實的玩家 ID 存回 currentPlayerId**
+        currentPlayerId = unlockedPlayerIDs[newIndex];
+
+        Debug.Log($"✅ 切換角色 → 真實 ID = {currentPlayerId}");
+
+        UpdateUICrrentIndexAndPlayer();
         uiSkillController.skillSelectionPanel.SetActive(false);
-    }
-
-    public void SetCurrentPlayer(int newPlayerID) {
-        var unlockedPlayerIDs = PlayerStateManager.Instance.unlockedPlayerIDsHashSet;
-
-        if (unlockedPlayerIDs.Count == 0) return;
-        if (newPlayerID < 1 || newPlayerID > unlockedPlayerIDs.Count) return;
-
-        currentPlayerId = newPlayerID;
-        UpdateUICrrentIndexAndPlayer();
     }
 
     #endregion

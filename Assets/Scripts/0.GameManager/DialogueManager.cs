@@ -4,6 +4,7 @@ using System.Collections;
 
 public class DialogueManager : MonoBehaviour
 {
+    public static DialogueManager Instance { get; private set; }
 
     //可Inspector自行定義輸入視窗
     #region class DialogueLine
@@ -18,8 +19,6 @@ public class DialogueManager : MonoBehaviour
 
     //變數
     #region
-    public static DialogueManager Instance;
-
     [Header("UI 元素")]
     public GameObject dialoguePanel;    // 對話 UI Panel
     public TMP_Text speakerText;        // 顯示講話的人
@@ -41,10 +40,11 @@ public class DialogueManager : MonoBehaviour
     private void Awake() {
         if (Instance != null && Instance != this)
         {
-            Destroy(gameObject);  // 避免重複生成
+            Destroy(gameObject);
             return;
         }
         Instance = this;
+        //DontDestroyOnLoad(gameObject); 掛在主物件才需要
     }
 
     private void Start() {

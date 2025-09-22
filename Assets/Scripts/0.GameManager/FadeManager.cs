@@ -6,7 +6,7 @@ using System.Collections;
 public class FadeManager : MonoBehaviour
 {
     #region 公開定義
-    public static FadeManager Instance;
+    public static FadeManager Instance { get; private set; }
     [Header("#場景切換用：黑色UI_Image-------------------------------------------------------------------")]
     public Image fadeImage;
     public float fadeDuration = 1.0f;
@@ -14,15 +14,13 @@ public class FadeManager : MonoBehaviour
 
     #region Awake()方法
     private void Awake() {
-        if (Instance == null)
-        {
-            Instance = this;
-            DontDestroyOnLoad(gameObject); // 保持跨場景存在
-        }
-        else
+        if (Instance != null && Instance != this)
         {
             Destroy(gameObject);
+            return;
         }
+        Instance = this;
+        DontDestroyOnLoad(gameObject);
     }
     #endregion
 

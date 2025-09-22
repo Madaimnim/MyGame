@@ -4,27 +4,22 @@ public class GamePauseManager : MonoBehaviour
 {
     //變數
     #region 
-    public static GamePauseManager Instance;
+    public static GamePauseManager Instance { get ; private set;}
 
     private bool isPaused = false;
     #endregion
     //生命週期
     #region Awake()方法
     private void Awake() {
-        if (Instance == null)
-        {
-            Instance = this;
-            DontDestroyOnLoad(gameObject);
-        }
-        else
+        if (Instance != null && Instance != this)
         {
             Destroy(gameObject);
+            return;
         }
+        Instance = this;
+        DontDestroyOnLoad(gameObject);
     }
   
-    private void Update() {
-
-    }
     #endregion
 
     #region 公開方法PauseGame()

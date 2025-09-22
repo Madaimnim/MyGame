@@ -437,15 +437,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 0c0d73ebd28277448a0b50dedb6d8486, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  enemyID: 1
+  enemyID: 2001
   enemyAI: {fileID: 2934137200844612837}
-  animator: {fileID: 6620357324717576226}
-  rb: {fileID: 6620357324717576225}
-  spriteRenderer: {fileID: 6620357324717576254}
   behaviorTree: {fileID: 7197685115958151156}
   deathSFX: {fileID: 8300000, guid: 9c00a392c4ee4434d85c2de632c499fc, type: 3}
   attackDetector01: {fileID: 7236361915574631382}
-  shadowController: {fileID: 7360173464816407122}
   isPlayingActionAnimation: 0
 --- !u!114 &2934137200844612837
 MonoBehaviour:

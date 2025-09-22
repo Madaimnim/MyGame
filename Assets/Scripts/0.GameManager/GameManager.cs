@@ -20,15 +20,13 @@ public class GameManager : MonoBehaviour
 
     #region 生命週期方法
     private void Awake() {
-        if (Instance == null)
-        {
-            Instance = this;
-            DontDestroyOnLoad(gameObject);
-        }
-        else
+        if (Instance != null && Instance != this)
         {
             Destroy(gameObject);
+            return;
         }
+        Instance = this;
+        DontDestroyOnLoad(gameObject);
     }
     private IEnumerator Start() {
         yield return Addressables.InitializeAsync();

@@ -8,17 +8,13 @@ public class CameraManager : MonoBehaviour
     private CinemachineVirtualCamera virtualCam;
 
     private void Awake() {
-        if (Instance == null)
-        {
-            Instance = this;
-            DontDestroyOnLoad(gameObject); // 跨場景保留
-
-        }
-        else
+        if (Instance != null && Instance != this)
         {
             Destroy(gameObject);
             return;
         }
+        Instance = this;
+        DontDestroyOnLoad(gameObject);
 
         // 嘗試自動抓取 VirtualCamera
         virtualCam = GetComponentInChildren<CinemachineVirtualCamera>();

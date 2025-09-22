@@ -1,27 +1,39 @@
-﻿using System.Collections;
-using UnityEngine;
+﻿using UnityEngine;
+using System.Collections;
 using System.Collections.Generic;
 
 public class EnemyAI : MonoBehaviour, IAttackable, IMoveable
 {
-    //變數
-    #region 變數
-    public MoveStrategyBase moveStrategy; // 存儲移動策略
-
     [Header("AI樹更新頻率")]
     public float updateInterval = 0.1f;
     private float updateTimer = 0f;
+    private BehaviorTree behaviorTree;
+    private Enemy enemy;
+
+    private PendingSkillSlot currentPendingSkillSlot;
+    private class PendingSkillSlot
+    {
+        public int slotIndex;
+        public EnemySkillRuntime skillData;
+        public GameObject detector;
+    }
+
+
     [Header("移動停止的抓力")]
     public float stopMoveDragPower;
-    
-    private Enemy enemy;
+
+
     public Transform currentMoveTarget { get; private set; }
 
 
-    private BehaviorTree behaviorTree;
-
     //RequestAttack使用變數
     #region
+
+
+
+    #region 變數
+    public MoveStrategyBase moveStrategy; // 存儲移動策略
+
     private IDamageable currentAttackDamageable;
     private Transform currentAttackTarget;
     private int currentAttackPower;
@@ -57,7 +69,7 @@ public class EnemyAI : MonoBehaviour, IAttackable, IMoveable
 
     private void Update() {
         UpdateCooldowns();
-        if (!enemy.canRunAI) return;
+        if (!enemy.CanRunAI) return;
         if (enemy.isPlayingActionAnimation) return;
         RunBehaviorTree(); // 執行行為樹
 
@@ -72,7 +84,7 @@ public class EnemyAI : MonoBehaviour, IAttackable, IMoveable
     }
 
 
-    private void OnEnable() {  }
+    private void OnEnable() { }
     private void OnDisable() { }
     #endregion
 
@@ -83,7 +95,7 @@ public class EnemyAI : MonoBehaviour, IAttackable, IMoveable
         for (int slot = 1; slot <= 4; slot++)
         {
             if (slotDetectPrefabs[slot - 1] != null)
-                slotCooldowns[slot - 1] = enemy.enemyStats.GetSkill(slot).cooldown;
+                slotCooldowns[slot - 1] = enemy.StatsRuntime.GetSkill(slot).SkillCooldown;
         }
     }
     #endregion
@@ -108,7 +120,7 @@ public class EnemyAI : MonoBehaviour, IAttackable, IMoveable
         if (detectPrefab == null) return false;
 
         float cooldownTimer = slotCooldownTimers[slotIndex];
-        
+
         TargetDetector detector = detectPrefab.GetComponent<TargetDetector>();
         if (detector == null) return false;
 
@@ -132,22 +144,26 @@ public class EnemyAI : MonoBehaviour, IAttackable, IMoveable
         //Todo使用技能
         currentAttackTarget = slotDetectPrefabs[slotIndex].GetComponent<TargetDetector>().targetTransform;
 
-        RequestAttack(slotIndex+1, currentAttackTarget, animationNames[slotIndex], currentAttackTarget.GetComponent<IDamageable>());
+        RequestAttack(slotIndex + 1, currentAttackTarget, animationNames[slotIndex], currentAttackTarget.GetComponent<IDamageable>());
         //技能進入冷卻
         slotCooldownTimers[slotIndex] = slotCooldowns[slotIndex];
     }
     #endregion
 
+    public bool CanMove() {
+        return enemy.CanMove;
+    }
+
     //請求攻擊
     #region RequestAttack(int slotID, Transform targetTransform,string animationName,IDamageable player)
-    public void RequestAttack(int slotID, Transform targetTransform, string animationName, IDamageable damageable) {
+    public void RequestAttack(int skillId, Transform targetTransform, string animationName, IDamageable damageable) {
 
         currentAttackDamageable = damageable;
         currentAttackTarget = targetTransform;
-        currentAttackPower = enemy.enemyStats.skillPoolDtny[slotID].attackPower;
-        currentKnockbackForce = enemy.enemyStats.skillPoolDtny[slotID].knockbackForce;
+        currentAttackPower = enemy.StatsRuntime.SkillPoolDtny[skillId].SkillPower;
+        currentKnockbackForce = enemy.StatsRuntime.SkillPoolDtny[skillId].KnockbackForce;
         currentKnockbackDirection = new Vector3(targetTransform.position.x - transform.position.x, targetTransform.position.y - transform.position.y, 0).normalized;
-        currentAttackPrefab = enemy.enemyStats.skillPoolDtny[slotID].attackPrefab;
+        currentAttackPrefab = enemy.StatsRuntime.SkillPoolDtny[skillId].SkillPrefab;
         bool isTargetOnRight = targetTransform.position.x > transform.position.x;
         transform.localScale = new Vector3(isTargetOnRight ? -Mathf.Abs(transform.localScale.x) : Mathf.Abs(transform.localScale.x),
                                      transform.localScale.y,
@@ -201,11 +217,10 @@ public class EnemyAI : MonoBehaviour, IAttackable, IMoveable
 
     //跳躍前亂數Delay
     private IEnumerator MoveRoutine() {
-        //float delay = UnityEngine.Random.value;
         float delay = Random.Range(0f, 0.5f);
         yield return new WaitForSeconds(delay);
 
-        enemy.animator.Play(Animator.StringToHash("Move"));
+        enemy.PlayAnimation("Move");
     }
 
     #endregion
@@ -213,7 +228,7 @@ public class EnemyAI : MonoBehaviour, IAttackable, IMoveable
     //初始化MoveStrategy
     #region 私有SetMoveStrategy方法
     private void InitiallySetMoveStrategy() {
-        switch (enemy.enemyStats.moveStrategyType) // 根據 Enum 設置策略
+        switch (enemy.StatsRuntime.MoveStrategyType) // 根據 Enum 設置策略
         {
             case MoveStrategyType.Straight:
                 moveStrategy = new StraightMoveStrategy();
@@ -225,7 +240,7 @@ public class EnemyAI : MonoBehaviour, IAttackable, IMoveable
                 moveStrategy = new FollowPlayerMoveStrategy();
                 break;
             default:
-                Debug.LogError($"未定義的移動策略: {enemy.enemyStats.moveStrategyType}");
+                Debug.LogError($"未定義的移動策略: {enemy.StatsRuntime.MoveStrategyType}");
                 break;
         }
     }
@@ -269,15 +284,15 @@ public class EnemyAI : MonoBehaviour, IAttackable, IMoveable
     //Animation Event 方法
     #region StartMoving()、StopMoving()
     public void StartMoving() {
-        enemy.rb.drag = 0;
-        enemy.rb.velocity = new Vector2(0, 0);
+        enemy.RB.drag = 0;
+        enemy.RB.velocity = new Vector2(0, 0);
         Vector2 direction = moveStrategy.MoveDirection(this);
-        float speed = enemy.enemyStats.moveSpeed;
-        enemy.rb.AddForce(new Vector2(direction.x * speed, direction.y * speed), ForceMode2D.Impulse);
+        float speed = enemy.StatsRuntime.MoveSpeed;
+        enemy.RB.AddForce(new Vector2(direction.x * speed, direction.y * speed), ForceMode2D.Impulse);
         ClearMoveTarget();
     }
     public void StopMoving() {
-        enemy.rb.drag = stopMoveDragPower; // 設定較大的拖曳力，使角色自然減速
+        enemy.RB.drag = stopMoveDragPower; // 設定較大的拖曳力，使角色自然減速
     }
     #endregion
 

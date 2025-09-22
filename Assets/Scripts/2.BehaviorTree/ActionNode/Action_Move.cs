@@ -7,7 +7,7 @@ public class Action_Move : Node
         this.moveCharacter=moveCharacter;
     }
     public override NodeState Evaluate() {
-        if (true) 
+        if (moveCharacter.CanMove()) 
         {
             moveCharacter.Move();
             return NodeState.SUCCESS;

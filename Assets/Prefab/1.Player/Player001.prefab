@@ -66,7 +66,6 @@ GameObject:
   - component: {fileID: -444560043973899828}
   - component: {fileID: 1901394458928384579}
   - component: {fileID: 1901394458928384578}
-  - component: {fileID: 363619117296785542}
   m_Layer: 6
   m_Name: Player001
   m_TagString: Untagged
@@ -224,15 +223,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 91cb9264c08bde6498cf7fd38d8b11aa, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  playerID: 1
   selectIndicatorPoint: {fileID: 3680016166740253231}
   playerAI: {fileID: -4492181130241527848}
-  animator: {fileID: 1901394458928384586}
-  collider: {fileID: 1901394458928384581}
-  rb: {fileID: 1901394458928384605}
-  spriteRenderer: {fileID: 1901394458928384584}
   playerMove: {fileID: -444560043973899828}
-  shadowController: {fileID: 3338530419213012809}
   deathSFX: {fileID: 0}
 --- !u!114 &-4492181130241527848
 MonoBehaviour:
@@ -246,25 +239,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ca6e799b3c7d1444988ab4e6bf81d381, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  skillSpawner: {fileID: 1901394458928384579}
   updateInterval: 0.1
-  skillSlots:
-  - skillID: 0
-    cooldown: 0
-    cooldownTimer: 0
-    detectPrefab: {fileID: 0}
-  - skillID: 0
-    cooldown: 0
-    cooldownTimer: 0
-    detectPrefab: {fileID: 0}
-  - skillID: 0
-    cooldown: 0
-    cooldownTimer: 0
-    detectPrefab: {fileID: 0}
-  - skillID: 0
-    cooldown: 0
-    cooldownTimer: 0
-    detectPrefab: {fileID: 0}
+  skillSpawner: {fileID: 1901394458928384579}
 --- !u!114 &-444560043973899828
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -301,19 +277,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 032d1b645f3c07b49bfd6d8a7615c927, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
---- !u!114 &363619117296785542
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1901394458928384591}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 2817ac25a3675ef479dfbb007dafe992, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  player: {fileID: 1901394458928384577}
 --- !u!1 &3680016166740253231
 GameObject:
   m_ObjectHideFlags: 0

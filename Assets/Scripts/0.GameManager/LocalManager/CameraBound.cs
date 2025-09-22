@@ -5,10 +5,14 @@ using UnityEngine;
 
 public class CameraBound : MonoBehaviour
 {
-    public Collider2D collider2D;
+    private Collider2D col;
+    private void Awake() {
+        col = GetComponent<PolygonCollider2D>();
+    }
+
     private void Start()
     {
-        CameraManager.Instance.SetConfiner(collider2D);
+        CameraManager.Instance.SetConfiner(col);
     }
 
 }

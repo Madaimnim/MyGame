@@ -4,7 +4,7 @@ using UnityEngine;
 
 public class VFXManager : MonoBehaviour
 {
-    public static VFXManager Instance;
+    public static VFXManager Instance { get; private set; }
 
     [System.Serializable]
     public class VFXPair
@@ -17,18 +17,17 @@ public class VFXManager : MonoBehaviour
     private Dictionary<string, GameObject> effectDict = new();
 
     private void Awake() {
-        if (Instance == null)
-        {
-            Instance = this;
-            DontDestroyOnLoad(gameObject);
-            foreach (var vfxPair in effectsList)
-            {
-                effectDict[vfxPair.key] = vfxPair.prefab;
-            }
-        }
-        else
+        if (Instance != null && Instance != this)
         {
             Destroy(gameObject);
+            return;
+        }
+        Instance = this;
+        DontDestroyOnLoad(gameObject);
+
+        foreach (var vfxPair in effectsList)
+        {
+            effectDict[vfxPair.key] = vfxPair.prefab;
         }
     }
 

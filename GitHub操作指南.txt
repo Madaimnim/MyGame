@@ -1,14 +1,31 @@
+指定用 bash 來執行這個腳本（在 Git Bash、WSL、Linux 都OK）。
+#!/bin/bash
+
 切換到專案的資料料夾
 cd /d/Practice/TowerDefenseGame
 
-把這個資料夾裡所有變更過的檔案（修改、新增、刪除）都加入 Git 暫存區（staging area）
+取得當前日期與時間（格式：YYYY-MM-DD HH:MM:SS）
+current_time=$(date +"%Y-%m-%d %H:%M:%S")
+
+
+
+把目前目錄下所有「新檔與已修改檔」加入暫存（staging）。
+＊注意：刪除的檔案不會被 git add . 自動納入；若要包含刪除，改用 git add -A 或 git add -u。
 git add .
 
-建立一個 commit，訊息是「更新專案」，把暫存的檔案變更紀錄下來。
-git commit -m "更新專案"
 
-把本地的 main 分支推送到遠端的 origin（通常是 GitHub）。
+# 判斷是否有變更（工作區 & 暫存區）
+if git diff --quiet && git diff --cached --quiet; then
+    echo "沒有檔案變更，不會建立 commit。"
+else
+
+以訊息「更新專案 - <時間>」建立一個 commit。
+git commit -m "更新專案 - $current_time"
+
+把將本地 main 分支推送到遠端 origin（通常是 GitHub）。第一次推送可能會在遠端建立 main 分支。
 git push origin main
+echo "已推送到遠端 main 分支。"
+
 
 等使用者按任意鍵才結束，避免執行完就直接關閉終端視窗。
 read -p "按任意鍵繼續..."

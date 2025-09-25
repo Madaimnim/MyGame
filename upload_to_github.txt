@@ -9,12 +9,12 @@ git add -A   # -A 可同時包含修改、新增、刪除檔案
 
 # 判斷是否有變更（工作區 & 暫存區）
 if git diff --quiet && git diff --cached --quiet; then
-    echo "⚠ 沒有檔案變更，不會建立 commit。"
+    echo "沒有檔案變更，不會建立 commit。"
 else
     # 有變更才建立 commit 並推送
     git commit -m "更新專案 - $current_time"
     git push origin main
-    echo "✅ 已推送到遠端 main 分支。"
+    echo "已推送到遠端 main 分支。"
 fi
 
 # 避免腳本結束後視窗馬上關閉

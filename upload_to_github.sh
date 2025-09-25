@@ -29,6 +29,6 @@ else
     git log -1 --oneline --decorate
 fi
 
-# 顯示提示，等按鍵後自動結束
+# 顯示提示，等按鍵後自動結束視窗
 read -n 1 -s -r -p "按下任意鍵關閉..."
 exit

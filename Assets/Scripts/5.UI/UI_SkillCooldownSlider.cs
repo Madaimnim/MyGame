@@ -11,14 +11,14 @@ public class UI_SkillCooldownSlider : MonoBehaviour
 
     private Player boundPlayer;
     private int boundSlotIndex;
-    private SkillSlotRuntime<PlayerSkillRuntime> boundSlot; // 綁定 SkillSlot 直接讀取資訊
+    private SkillSlotRuntime boundSlot; // 綁定 SkillSlot 直接讀取資訊
 
     // 初始化
     #region Setup(string skillName, Player player, int slotIndex)
     public void Setup(int slotIndex, Player player ) {
         boundPlayer = player;
         boundSlotIndex = slotIndex;
-        boundSlot = player.StatsRuntime.SkillSlots[slotIndex];
+        boundSlot = player.Runtime.SkillSlots[slotIndex];
 
         skillNameText.text =$"{boundSlot.SkillData.SkillName} Lv.{boundSlot.SkillData.SkillLevel}" ;
     }

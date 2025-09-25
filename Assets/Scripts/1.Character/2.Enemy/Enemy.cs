@@ -7,15 +7,24 @@ using UnityEngine;
 using Unity.VisualScripting;
 using System.Runtime.InteropServices.WindowsRuntime;
 
-public class Enemy : Char<EnemyStatsRuntime,EnemySkillRuntime>
+public class Enemy :MonoBehaviour,IDamageable
 {
+    public EnemyStatsRuntime Runtime { get; private set; }
+    public CharHealthComponent CharHealthComponent { get; protected set; }
+
+    //IHealData
+    public int CurrentHp { get; private set; }
+    public int MaxHp { get; private set; }
+
     //變數
     #region 公開變數
+
+
+
     [Header("場景內預製體：手動賦予enemyID，new一個StatRuntime")]
     public int enemyID;
     public EnemyAI enemyAI;
-    public int CurrentHp { get; private set; }
-    public int MaxHp { get; private set; }
+
 
     public BehaviorTree behaviorTree;
     public AudioClip deathSFX;
@@ -28,48 +37,156 @@ public class Enemy : Char<EnemyStatsRuntime,EnemySkillRuntime>
 
     [HideInInspector] public bool isPlayingActionAnimation = false;
     #endregion
+    public int Id { get; protected set; }
+    public bool IsDead { get; protected set; } = false;
+    public bool IsKnockbacking { get; protected set; } = false;
+    public bool IsPlayingAttackAnimation { get; protected set; } = false;
+    public bool CanRunAI { get; protected set; } = false;
+    public bool CanMove { get; protected set; } = true;
 
-    //生命週期
-    #region 生命週期
-    protected override void Awake() {
-        base.Awake();
+    public Rigidbody2D Rb { get; protected set; }
+    public SpriteRenderer Spr { get; protected set; }
+    public Animator Ani { get; protected set; }
+    public Collider2D Col { get; protected set; }
+    public ShadowController ShadowControl { get; protected set; }
+    public IDamageable owner { get; protected set; }
 
+    private void Awake() {
+        Rb = GetComponent<Rigidbody2D>();
+        Spr = GetComponent<SpriteRenderer>();
+        Ani = GetComponent<Animator>();
+        Col = GetComponent<Collider2D>();
+        ShadowControl = GetComponentInChildren<ShadowController>();
     }
 
-    protected override void OnEnable() {
-        base.OnEnable();
+    private void OnEnable() {
+        ResetMaterial();
 
-        EventManager.Instance.Event_BattleStart += EnableAIRun;
-        EventManager.Instance.Event_OnWallBroken += DisableAIRun;
+        GameEventSystem.Instance.Event_BattleStart += EnableAIRun;
+        GameEventSystem.Instance.Event_OnWallBroken += DisableAIRun;
     }
     private void OnDisable() {
-        EventManager.Instance.Event_BattleStart -= EnableAIRun;
-        EventManager.Instance.Event_OnWallBroken -= DisableAIRun;
+        if (CharHealthComponent != null)
+        {
+            CharHealthComponent.OnDie -= OnEnemyDie;
+            CharHealthComponent.OnHpChanged -= OnEnemyHpChanged;
+
+        }
+
+
+        GameEventSystem.Instance.Event_BattleStart -= EnableAIRun;
+        GameEventSystem.Instance.Event_OnWallBroken -= DisableAIRun;
     }
 
     private IEnumerator Start() {
-        if (StatsRuntime == null)
+        if (Runtime == null)
         {
-            yield return StartCoroutine(GameManager.Instance.WaitForDataReady());
+            yield return StartCoroutine(GameSystem.Instance.WaitForDataReady());
             SetEnemyData();
             isEnemyDataReady = true;
-            MaxHp = StatsRuntime.MaxHp;
+            MaxHp = Runtime.MaxHp;
             CurrentHp = MaxHp;
             if (StageLevelManager.Instance != null)
                 StageLevelManager.Instance.RegisterEnemy();
         }
 
-        EventManager.Instance.Event_HpChanged?.Invoke(CurrentHp, MaxHp, this);// 觸發事件，通知 UI 初始血量
+        GameEventSystem.Instance.Event_HpChanged?.Invoke(CurrentHp, MaxHp, this);// 觸發事件，通知 UI 初始血量
     }
+
+
+    public virtual void Initialize(EnemyStatsRuntime runtime, IDamageable damageable) {
+        //HealthComponent
+        CharHealthComponent = new CharHealthComponent(Runtime);
+        CharHealthComponent.OnDie += OnEnemyDie;
+        CharHealthComponent.OnHpChanged += OnEnemyHpChanged;
+
+        Runtime = runtime;
+        owner = damageable;
+        Id = runtime.StatsData.Id;
+    }
+
+
+    public void OnEnemyDie() {
+
+    }
+
+    public void OnEnemyHpChanged(int currentHp,int maxHp) {
+
+    }
+
+
+
+
+
+
+    //被擊退
+    protected virtual IEnumerator Knockback(float force, Vector2 knockbackDirection) {
+        if (Rb != null)
+        {
+            IsKnockbacking = true;
+
+            Rb.velocity = Vector2.zero; // 先清除當前速度，避免擊退力疊加
+            Rb.AddForce(force * knockbackDirection, ForceMode2D.Impulse); // 添加瞬間衝擊力
+            yield return new WaitForSeconds(0.2f);
+            Rb.velocity = Vector2.zero;
+
+            IsKnockbacking = false;
+        }
+    }
+
+    //閃白特效
+    protected virtual IEnumerator FlashWhite(float duration) {
+        if (Spr != null)
+        {
+            Spr.material = GameSystem.Instance.flashMaterial;
+            yield return new WaitForSeconds(duration);
+            Spr.material = GameSystem.Instance.normalMaterial;
+        }
+    }
+
+    //重置狀態參數
+    protected virtual void ResetState() {
+        IsPlayingAttackAnimation = false;
+        IsKnockbacking = false;
+        IsDead = false;
+    }
+
+    //啟用AI
+    protected virtual void EnableAIRun() {
+        CanRunAI = true;
+    }
+
+    //禁用AI
+    protected virtual void DisableAIRun() {
+        CanRunAI = false;
+    }
+
+    public virtual void PlayAnimation(string animationName) {
+        Ani?.Play(Animator.StringToHash(animationName));
+    }
+    protected void ResetMaterial() {
+        if (Spr != null)
+            Spr.material = GameSystem.Instance.normalMaterial;
+    }
+
+
+
+
+
+
+
     private void Update() { }
-    #endregion
 
     //受傷
     #region TakeDamage(DamageInfo info) 
-    public override void TakeDamage(DamageInfo info) {
-        if (IsDead) return; 
+    public void TakeDamage(DamageInfo info) {
+        if (IsDead) return;
 
-        base.TakeDamage(info);
+        if (IsDead || Runtime == null) return;
+        Runtime.TakeDamage(info.damage);
+
+        if (Runtime.CurrentHp <= 0 && !IsDead)
+            Die();
 
 
         TextPopupManager.Instance.ShowDamagePopup(info.damage, transform); // 顯示傷害數字;
@@ -81,11 +198,10 @@ public class Enemy : Char<EnemyStatsRuntime,EnemySkillRuntime>
     #endregion
     //死亡
     #region Die()方法
-    protected override void Die() {
-        base.Die();
+    public void Die() {
         StageLevelManager.Instance?.EnemyDefeated();
-        PlayerStateManager.Instance.AddExpToAllPlayers(StatsRuntime.Exp);
-        TextPopupManager.Instance.ShowExpPopup(StatsRuntime.Exp, transform.position);
+        //PlayerStateManager.Instance.AddExpToAllPlayers(Runtime.Exp);
+        TextPopupManager.Instance.ShowExpPopup(Runtime.Exp, transform.position);
         AudioManager.Instance.PlaySFX(deathSFX, 0.5f);
         EnemyStateManager.Instance.UnregisterEnemy(this);
 
@@ -95,23 +211,26 @@ public class Enemy : Char<EnemyStatsRuntime,EnemySkillRuntime>
 
 
     public void Initialize(EnemyStatsRuntime stats) {
-        StatsRuntime = stats;
-        StatsRuntime.InitializeOwner(this);   // 保證血量初始化
-        CurrentHp = StatsRuntime.CurrentHp;
-        MaxHp = StatsRuntime.MaxHp;
+        Runtime = stats;
+       
+        CurrentHp = Runtime.CurrentHp;
+        MaxHp = Runtime.MaxHp;
 
-        transform.name = $"Enemy_{StatsRuntime.Id} ({StatsRuntime.Name})";
+        transform.name = $"Enemy_{Runtime.StatsData.Id} ({Runtime.StatsData.Name})";
+
+
+        Runtime.InitializeOwner(this);   // 保證血量初始化
 
         EnemyStateManager.Instance?.RegisterEnemy(this); // ← 統一註冊
     }
 
     //Todo
-    //初始化StatsRuntime，來自enemyStatesDtny[enemyID]
+    //初始化Runtime，來自enemyStatesDtny[enemyID]
     private void SetEnemyData() {
-        StatsRuntime = EnemyStateManager.Instance.CreateRuntime(enemyID);
-        if (StatsRuntime == null) return;
+        Runtime = EnemyStateManager.Instance.CreateRuntime(enemyID);
+        if (Runtime == null) return;
 
-        Id = StatsRuntime.Id;
+        Id = Runtime.StatsData.Id;
         EnemyStateManager.Instance.RegisterEnemy(this);
     }
 

@@ -87,9 +87,9 @@ public class UIController_Skill : MonoBehaviour
         }
 
         // 獲取當前角色的所有可用技能（已解鎖但未裝備的）
-        foreach (var skillID in currentPlayer.UnlockedSkillIDList)
+        foreach (var skillID in currentPlayer.UnlockedSkillIdList)
         {
-            if (!currentPlayer.EquippedSkillIDList.Contains(skillID))
+            if (!currentPlayer.EquippedSkillIdList.Contains(skillID))
             {
                 var skill = currentPlayer.SkillPoolDtny[skillID];
                 if (skill != null)

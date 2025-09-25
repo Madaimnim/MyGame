@@ -13,6 +13,5 @@ public class DamageInfo
 public interface IDamageable
 {
     void TakeDamage(DamageInfo info);
-
 }
 

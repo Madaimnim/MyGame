@@ -1050,7 +1050,7 @@ TilemapRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 2100000, guid: e1108d09f733cac4eb14f41e32cb0033, type: 2}
+  - {fileID: 10754, guid: 0000000000000000f000000000000000, type: 0}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -1177,11 +1177,10 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   gameWallID: 1
   gameWallName: CommonWall
-  maxHp: 10
+  maxHealth: 10
   attackPower: 1
   coolDownTime: 0.1
   flashWhiteTime: 0.1
-  damageTextPrefab: {fileID: 1607938802007343288, guid: 0d86880a858ce654c8236cd3c5a778c5, type: 3}
 --- !u!114 &7211354785041409007
 MonoBehaviour:
   m_ObjectHideFlags: 0

@@ -44,7 +44,7 @@ public class UIController_Status : MonoBehaviour
 
     private void OnUICurrentPlayerChanged(UICurrentPlayerChangEvent eventData) {
         currentPlayer = eventData.currentPlayer;
-        SetActiveUIPlayer(currentPlayer.Id);
+        SetActiveUIPlayer(currentPlayer.StatsData.Id);
         RefreshPlayerStatusText();
     }
 
@@ -62,12 +62,12 @@ public class UIController_Status : MonoBehaviour
             return;
         }
 
-        statusTextsArray[0].text = $"等級: {currentPlayer.Level}";
+        statusTextsArray[0].text = $"等級: {currentPlayer.CurrentLevel}";
         statusTextsArray[1].text = $"HP: {currentPlayer.MaxHp}/{currentPlayer.MaxHp}";
-        statusTextsArray[2].text = $"名稱: {currentPlayer.Name}";
-        statusTextsArray[3].text = $"攻擊力: {currentPlayer.AttackPower}";
+        statusTextsArray[2].text = $"名稱: {currentPlayer.StatsData.Name}";
+        statusTextsArray[3].text = $"攻擊力: {currentPlayer.StatsData.AttackPower}";
         statusTextsArray[4].text = $"經驗值: {currentPlayer.CurrentExp}/{currentPlayer.CurrentExp}";
-        statusTextsArray[5].text = $"速度: {currentPlayer.MoveSpeed}";
+        statusTextsArray[5].text = $"速度: {currentPlayer.StatsData.MoveSpeed}";
     }
     #endregion
 

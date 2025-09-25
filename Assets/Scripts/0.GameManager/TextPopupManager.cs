@@ -36,10 +36,10 @@ public class TextPopupManager : MonoBehaviour
     #endregion
 
     private void OnEnable() {
-        EventManager.Instance.Event_SkillLevelUp += ShowSkillLevelUpPopup;
+        GameEventSystem.Instance.Event_SkillLevelUp += ShowSkillLevelUpPopup;
     }
     private void OnDisable() {
-        EventManager.Instance.Event_SkillLevelUp -= ShowSkillLevelUpPopup;
+        GameEventSystem.Instance.Event_SkillLevelUp -= ShowSkillLevelUpPopup;
     }
 
     //顯示玩家復活倒數

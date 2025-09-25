@@ -287,6 +287,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: Enemy001 (4)
       objectReference: {fileID: 0}
+    - target: {fileID: 6620357324717576254, guid: aa87e46c63625174d84e532f142c761b, type: 3}
+      propertyPath: m_Materials.Array.data[0]
+      value: 
+      objectReference: {fileID: 10754, guid: 0000000000000000f000000000000000, type: 0}
     - target: {fileID: 6620357324717576255, guid: aa87e46c63625174d84e532f142c761b, type: 3}
       propertyPath: m_RootOrder
       value: 4
@@ -533,6 +537,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: Enemy001 (3)
       objectReference: {fileID: 0}
+    - target: {fileID: 6620357324717576254, guid: aa87e46c63625174d84e532f142c761b, type: 3}
+      propertyPath: m_Materials.Array.data[0]
+      value: 
+      objectReference: {fileID: 10754, guid: 0000000000000000f000000000000000, type: 0}
     - target: {fileID: 6620357324717576255, guid: aa87e46c63625174d84e532f142c761b, type: 3}
       propertyPath: m_RootOrder
       value: 3
@@ -771,7 +779,7 @@ TilemapRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 2100000, guid: e1108d09f733cac4eb14f41e32cb0033, type: 2}
+  - {fileID: 2100000, guid: ce71ba01014fe3043971f56059a6c29d, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -4606,7 +4614,7 @@ TilemapRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 2100000, guid: e1108d09f733cac4eb14f41e32cb0033, type: 2}
+  - {fileID: 2100000, guid: ce71ba01014fe3043971f56059a6c29d, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -6723,6 +6731,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: Enemy001 (5)
       objectReference: {fileID: 0}
+    - target: {fileID: 6620357324717576254, guid: aa87e46c63625174d84e532f142c761b, type: 3}
+      propertyPath: m_Materials.Array.data[0]
+      value: 
+      objectReference: {fileID: 10754, guid: 0000000000000000f000000000000000, type: 0}
     - target: {fileID: 6620357324717576255, guid: aa87e46c63625174d84e532f142c761b, type: 3}
       propertyPath: m_RootOrder
       value: 5
@@ -6881,6 +6893,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: Enemy001 (1)
       objectReference: {fileID: 0}
+    - target: {fileID: 6620357324717576254, guid: aa87e46c63625174d84e532f142c761b, type: 3}
+      propertyPath: m_Materials.Array.data[0]
+      value: 
+      objectReference: {fileID: 10754, guid: 0000000000000000f000000000000000, type: 0}
     - target: {fileID: 6620357324717576255, guid: aa87e46c63625174d84e532f142c761b, type: 3}
       propertyPath: m_RootOrder
       value: 1
@@ -7163,6 +7179,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: Enemy001 (2)
       objectReference: {fileID: 0}
+    - target: {fileID: 6620357324717576254, guid: aa87e46c63625174d84e532f142c761b, type: 3}
+      propertyPath: m_Materials.Array.data[0]
+      value: 
+      objectReference: {fileID: 10754, guid: 0000000000000000f000000000000000, type: 0}
     - target: {fileID: 6620357324717576255, guid: aa87e46c63625174d84e532f142c761b, type: 3}
       propertyPath: m_RootOrder
       value: 2
@@ -7304,6 +7324,10 @@ PrefabInstance:
   m_Modification:
     m_TransformParent: {fileID: 1153310442}
     m_Modifications:
+    - target: {fileID: 4738781730734430212, guid: 6561cd463a9afda43a6d7c34ef0a5e52, type: 3}
+      propertyPath: m_Materials.Array.data[0]
+      value: 
+      objectReference: {fileID: 10754, guid: 0000000000000000f000000000000000, type: 0}
     - target: {fileID: 4738781730734430213, guid: 6561cd463a9afda43a6d7c34ef0a5e52, type: 3}
       propertyPath: m_RootOrder
       value: 6
@@ -7438,6 +7462,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: Enemy001
       objectReference: {fileID: 0}
+    - target: {fileID: 6620357324717576254, guid: aa87e46c63625174d84e532f142c761b, type: 3}
+      propertyPath: m_Materials.Array.data[0]
+      value: 
+      objectReference: {fileID: 10754, guid: 0000000000000000f000000000000000, type: 0}
     - target: {fileID: 6620357324717576255, guid: aa87e46c63625174d84e532f142c761b, type: 3}
       propertyPath: m_RootOrder
       value: 0

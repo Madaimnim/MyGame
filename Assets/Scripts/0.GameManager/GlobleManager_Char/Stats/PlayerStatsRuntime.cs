@@ -2,118 +2,85 @@ using System;
 using System.Collections.Generic;
 using UnityEngine;
 
-
 [System.Serializable]
-public class PlayerStatsRuntime : CharStats<PlayerSkillRuntime>, IRuntime
+public class PlayerStatsRuntime : IHealthData,IExpData
 {
-    public int CurrentHp
-    {
-        get => _currentHp;
-        protected set
-        {
-            int newValue = Mathf.Clamp(value, 0, MaxHp);
-            if (_currentHp == newValue) return;
-
-            Debug.Log($"[HP變更] {Name} 從 {_currentHp} → {newValue} / {MaxHp}");
-            _currentHp = newValue;
-
-            if (EventManager.Instance != null)
-                EventManager.Instance.Event_HpChanged?.Invoke(_currentHp, MaxHp, owner);
-            else
-                Debug.LogError(" EventManager.Instance 為 null，無法觸發血量事件");
-        }
-    }
-    private int _currentHp;
-    public int CurrentExp { get; private set; }
-    public GameObject BattlePlayerObject { get; set; }
-    public GameObject UiPlayerObject { get; set; }
-    public Dictionary<int, PlayerSkillRuntime> SkillPoolDtny { get; private set; } = new Dictionary<int, PlayerSkillRuntime>();
-    public List<int> UnlockedSkillIDList { get; private set; } = new List<int>();
-    public List<int> EquippedSkillIDList { get; private set; } = new List<int>();
+    // Template Data
+    public StatsData StatsData;
+    public VisualData VisualData;
+    public Dictionary<int, PlayerSkillRuntime> SkillPoolDtny = new Dictionary<int, PlayerSkillRuntime>();
+    public List<int> UnlockedSkillIdList = new List<int>();
+    private int[] _expTable;
+    private int _beginLevle;
 
 
-    public static readonly int[] ExpTable = new int[]{
-        4,6,9,
-        13, 18, 25, 34, 45, 58, 73, 90, 109, 130, // 1~10
-        153, 178, 205, 234, 265, 298, 333, 370, 409, 450, // 11~20
-        493, 538, 585, 634, 685, 738, 793, 850, 909, 970  // 21~30
-        };
+    //IHealthData
+    public int CurrentHp { get; set; }    
+    public int MaxHp => StatsData.MaxHp;
 
-    public virtual void TakeDamage(int dmg) {
-        CurrentHp -= dmg; // 自動觸發事件
-    }
-    public virtual void Heal(int amount) {
-        CurrentHp += amount; // 自動觸發事件
-    }
-    public bool IsDead => _currentHp <= 0;
+    //IExpData
+    public int CurrentLevel { get; set; }
+    public int CurrentExp { get; set; }
+    public int[] ExpTable => _expTable;
 
+    public List<int> EquippedSkillIdList = new List<int>();
+    public GameObject BattlePlayerObject;
+    public GameObject UiPlayerObject;
+
+    public SkillSlotRuntime[] SkillSlots;
+
+    public IDamageable Owner;
 
     public PlayerStatsRuntime(PlayerStatsTemplate template) {
-        //CharStats
-        Id = template.Id;
-        Name = template.Name;
-        Level = template.Level;
-        MaxHp = template.MaxHp;
-        AttackPower = template.AttackPower;
-        MoveSpeed = template.MoveSpeed;
-        CharPrefab = template.CharPrefab;
-        SpriteIcon = template.SpriteIcon;
-        SkillSlotCount = template.SkillSlotCount;
-        //PlayerRuntime獨有
-        CurrentExp = 0;
-        //
-        foreach (var skill in template.skillPoolList)
+        // Template
+        StatsData = new StatsData(template.StatsData);
+        VisualData = new VisualData(template.VisualData);
+        foreach (var skill in template.SkillPoolList)
             SkillPoolDtny[skill.SkillId] = new PlayerSkillRuntime(skill);
+        UnlockedSkillIdList = new List<int>(template.UnlockedSkillIdList);
+        _expTable = template.ExpTable;
+        _beginLevle = template.BeginLevel;
+       // ----------------Runtime------------------------
+       //IHealthData
+       CurrentHp = StatsData.MaxHp;
 
-        UnlockedSkillIDList = new List<int>(template.UnlockedSkillIDList);
-
-        EquippedSkillIDList = new List<int>();
-        for (int i = 0; i < SkillSlotCount; i++)
-            EquippedSkillIDList.Add(-1);
-
-        InitializeSkillSlots(SkillSlotCount);
+        //IExpData
+        CurrentExp = 0;
+        CurrentLevel = _beginLevle;
 
 
-        InitializeSkillSlots(SkillSlotCount);      //初始化技能槽數量
+
+        EquippedSkillIdList = new List<int>();
+        for (int i = 0; i < StatsData.SkillSlotCount; i++)
+            EquippedSkillIdList.Add(-1);
+
+        InitializeSkillSlots(StatsData.SkillSlotCount);
     }
 
-    public override void InitializeOwner(IDamageable damageable) {
-        base.InitializeOwner(damageable);
-        CurrentHp = MaxHp;
+    public void InitializeSkillSlots(int slotCount) {
+        SkillSlots = new SkillSlotRuntime[slotCount];
+        for (int i = 0; i < slotCount; i++)
+        {
+            SkillSlots[i] = new SkillSlotRuntime(i);
+        }
     }
 
-    public void RecoverHp() {
-        CurrentHp = MaxHp;
-    }
 
     public PlayerSkillRuntime GetSkillDataRuntimeAtSlot(int slotIndex) {
-        if (slotIndex < 0 || slotIndex >= EquippedSkillIDList.Count) return null;
-        int skillID = EquippedSkillIDList[slotIndex];
-        return skillID != -1 ? GetSkillDataRuntimeForId(skillID) : null;
-    }           // API：用 slot index 取技能 
-    public PlayerSkillRuntime GetSkillDataRuntimeForId(int skillID) {
-        return SkillPoolDtny.TryGetValue(skillID, out var skill) ? skill : null;
-    }                   // API：用 id 取技能
-    public void GainExp(int exp) {
-        CurrentExp += exp;
-
-        while (CurrentExp >= GetExpToNextLevel() && Level < ExpTable.Length)
-        {
-            CurrentExp -= GetExpToNextLevel();
-            Level++;
-            LevelUp();
-        }
-    }                                           // API：獲得經驗值    
-    public int GetExpToNextLevel() {
-        if (Level >= ExpTable.Length)
-            return int.MaxValue;
-
-        return ExpTable[Level - 1];
-    }                                         //取得下一級所需經驗
-    private void LevelUp() {
-        TextPopupManager.Instance.ShowLevelUpPopup(Level, BattlePlayerObject.transform);
-
+        if (slotIndex < 0 || slotIndex >= EquippedSkillIdList.Count) return null;
+        int skillId = EquippedSkillIdList[slotIndex];
+        return skillId != -1 ? GetSkillDataRuntimeForId(skillId) : null;
     }
+
+    public PlayerSkillRuntime GetSkillDataRuntimeForId(int skillId) {
+        return SkillPoolDtny.TryGetValue(skillId, out var skill) ? skill : null;
+    }
+
+    public void InitializeOwner(IDamageable owner) {
+        Owner = owner;
+    }
+
+
     public void OnSkillUsed(int slotIndex, Transform ownerTransform) {
         var playerSkillRuntime = GetSkillDataRuntimeAtSlot(slotIndex);
         if (playerSkillRuntime == null) return;
@@ -121,40 +88,75 @@ public class PlayerStatsRuntime : CharStats<PlayerSkillRuntime>, IRuntime
         bool leveledUp = playerSkillRuntime.AddSkillUsageCount();
         if (leveledUp)
         {
-            EventManager.Instance.Event_SkillLevelUp?.Invoke(playerSkillRuntime, ownerTransform);
-            EventManager.Instance.Event_SkillInfoChanged?.Invoke(slotIndex, ownerTransform.GetComponent<Player>());
+            GameEventSystem.Instance.Event_SkillLevelUp?.Invoke(playerSkillRuntime, ownerTransform);
+            GameEventSystem.Instance.Event_SkillInfoChanged?.Invoke(slotIndex, ownerTransform.GetComponent<Player>());
         }
     }
-    public void UnlockSkill(int skillID) {
-        if (!SkillPoolDtny.ContainsKey(skillID)) { Debug.LogWarning($"SkillPoolDtny不包含 ID:{skillID}"); ; return; }
-        if (UnlockedSkillIDList.Contains(skillID)) { Debug.LogWarning($"UnlockedSkillIDList已解鎖 ID:{skillID}{SkillPoolDtny[skillID].SkillName}"); ; return; }
 
-        UnlockedSkillIDList.Add(skillID);
-    }                                   // API：解鎖技能
-    public void SetSkillAtSlot(int slotIndex, int skillID) {
-        if (slotIndex < 0 || slotIndex >= SkillSlotCount) { Debug.LogWarning($"slotIndex{slotIndex}超出技能槽索引"); return; }
-        if (!SkillPoolDtny.ContainsKey(skillID)){Debug.LogWarning($"角色{Id}試圖裝備SkillPoolDtny沒有的技能 ID: {skillID}"); return;}
-        if (!UnlockedSkillIDList.Contains(skillID)){Debug.LogWarning($"角色{Id}試圖裝備未解鎖的技能 ID: {skillID}"); return;}
-        if (!SkillPoolDtny.TryGetValue(skillID, out PlayerSkillRuntime skillData)) {Debug.LogError($"[SetSkillAtSlot] 無法取得技能 ID: {skillID}");return;}
-        if (slotIndex >= EquippedSkillIDList.Count){Debug.LogError($"[SetSkillAtSlot] 技能槽 {slotIndex} 超出 EquippedSkillIDList 範圍"); return; }
+    public void UnlockSkill(int skillId) {
+        if (!SkillPoolDtny.ContainsKey(skillId))
+        {
+            Debug.LogWarning($"SkillPoolDtny不包含 ID:{skillId}");
+            return;
+        }
+        if (UnlockedSkillIdList.Contains(skillId))
+        {
+            Debug.LogWarning($"UnlockedSkillIdList已解鎖 ID:{skillId} {SkillPoolDtny[skillId].SkillName}");
+            return;
+        }
 
-        EquippedSkillIDList[slotIndex] = skillID;
+        UnlockedSkillIdList.Add(skillId);
+    }
 
-        GameObject battlePlayerObject = BattlePlayerObject;
-        if (battlePlayerObject == null) Debug.LogError($"BattlePlayerObject為null");
+    public void SetSkillAtSlot(int slotIndex, int skillId) {
+        if (slotIndex < 0 || slotIndex >= StatsData.SkillSlotCount)
+        {
+            Debug.LogWarning($"slotIndex {slotIndex} 超出技能槽索引");
+            return;
+        }
+        if (!SkillPoolDtny.ContainsKey(skillId))
+        {
+            Debug.LogWarning($"角色 {StatsData.Id} 試圖裝備 SkillPoolDtny 沒有的技能 ID: {skillId}");
+            return;
+        }
+        if (!UnlockedSkillIdList.Contains(skillId))
+        {
+            Debug.LogWarning($"角色 {StatsData.Id} 試圖裝備未解鎖的技能 ID: {skillId}");
+            return;
+        }
+        if (!SkillPoolDtny.TryGetValue(skillId, out PlayerSkillRuntime skillData))
+        {
+            Debug.LogError($"[SetSkillAtSlot] 無法取得技能 ID: {skillId}");
+            return;
+        }
+        if (slotIndex >= EquippedSkillIdList.Count)
+        {
+            Debug.LogError($"[SetSkillAtSlot] 技能槽 {slotIndex} 超出 EquippedSkillIdList 範圍");
+            return;
+        }
+
+        EquippedSkillIdList[slotIndex] = skillId;
+
+        if (BattlePlayerObject == null)
+        {
+            Debug.LogError("BattlePlayerObject 為 null");
+        }
         else
-            battlePlayerObject.GetComponent<Player>()?.SetSkillSlot(slotIndex, skillData); 
-        GameObject previewPlayerObject = UIManager.Instance.activeUIPlayersDtny.ContainsKey(Id)
-            ? UIManager.Instance.activeUIPlayersDtny[Id]
+        {
+            BattlePlayerObject.GetComponent<Player>()?.SetSkillSlot(slotIndex, skillData);
+        }
+
+        GameObject previewPlayerObject = UIManager.Instance.activeUIPlayersDtny.ContainsKey(StatsData.Id)
+            ? UIManager.Instance.activeUIPlayersDtny[StatsData.Id]
             : null;
+
         if (previewPlayerObject != null)
         {
             previewPlayerObject.GetComponent<Player>()?.SetSkillSlot(slotIndex, skillData);
         }
         else
         {
-            Debug.LogError($"[SetSkillAtSlot] 未找到 UI 預覽角色 {Id}");
+            Debug.LogError($"[SetSkillAtSlot] 未找到 UI 預覽角色 {StatsData.Id}");
         }
-    }                   // API：設定技能槽
-
+    }
 }

@@ -4,10 +4,10 @@ using UnityEngine;
 using UnityEngine.AddressableAssets;
 using UnityEngine.ResourceManagement.AsyncOperations;
 
-public class GameManager : MonoBehaviour
+public class GameSystem : MonoBehaviour
 {
     #region 定義
-    public static GameManager Instance { get; private set; }
+    public static GameSystem Instance { get; private set; }
 
     [Header("全局角色材質")]
     public Material normalMaterial;

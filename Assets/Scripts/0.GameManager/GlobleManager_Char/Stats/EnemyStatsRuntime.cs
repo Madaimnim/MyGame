@@ -3,43 +3,46 @@ using System.Collections.Generic;
 using UnityEngine;
 
 [System.Serializable]
-public class EnemyStatsRuntime :CharStats<EnemySkillRuntime>,IRuntime
+public class EnemyStatsRuntime:IHealthData
 {
-    //敵人獨有屬性
-    // 動態（可選：如果覺得不需要，可以砍掉）
-    public int CurrentHp{ get;private set; }
 
-    // 敵人共用屬性
-    public int Exp { get; protected set; }
-    public float KnockbackResistance { get; protected set; }
+    public StatsData StatsData;
+    public VisualData VisualData;
+    public int MaxHp { get;  }
+    public int CurrentHp { get; set; }
 
-    public MoveStrategyType MoveStrategyType;
+    public SkillSlotRuntime[] SkillSlots;
+    public int Exp { get; private set; }
+    public MoveStrategyType MoveStrategyType { get; private set; }
     public Dictionary<int, EnemySkillRuntime> SkillPoolDtny { get; private set; }
+    public IDamageable Owner;
+
 
     public EnemyStatsRuntime(EnemyStatsTemplate template) {
-        //CharStats
-        Id = template.Id;
-        Name = template.Name;
-        Level = template.Level;
-        MaxHp = template.MaxHp;
-        AttackPower = template.AttackPower;
-        MoveSpeed = template.MoveSpeed;
-        CharPrefab = template.CharPrefab;
-        SpriteIcon = template.SpriteIcon;
-        SkillSlotCount = template.SkillSlotCount;
-        //Runtime
+        StatsData = new StatsData(template.StatsData);
         Exp = template.Exp;
 
         CurrentHp = MaxHp;
 
         SkillPoolDtny = new Dictionary<int, EnemySkillRuntime>();
-        foreach (var skill in template.skillPoolList)
+        foreach (var skill in template.SkillPoolList)
         {
             SkillPoolDtny[skill.SkillId] = new EnemySkillRuntime(skill);
         }
-        InitializeSkillSlots(template.SkillSlotCount);
+        InitializeSkillSlots(StatsData.SkillSlotCount);
     }
 
+    public void InitializeSkillSlots(int slotCount) {
+        SkillSlots = new SkillSlotRuntime[slotCount];
+        for (int i = 0; i < slotCount; i++)
+        {
+            SkillSlots[i] = new SkillSlotRuntime(i);
+        }
+    }
+
+    public void InitializeOwner(IDamageable owner) {
+        Owner = owner;
+    }
 
     public virtual void TakeDamage(int dmg) {
         CurrentHp -= dmg; // 自動觸發事件
@@ -50,7 +53,7 @@ public class EnemyStatsRuntime :CharStats<EnemySkillRuntime>,IRuntime
         {
             return skill;
         }
-        Debug.LogError($"Skill {slotId} 不存在於敵人 {Name}");
+        Debug.LogError($"Skill {slotId} 不存在於敵人 {StatsData.Name}");
         return null;
     }
 }

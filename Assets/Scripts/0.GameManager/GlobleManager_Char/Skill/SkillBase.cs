@@ -3,11 +3,12 @@ using System.Collections.Generic;
 using UnityEngine;
 
 [System.Serializable]
-public abstract class SkillBase 
+public class SkillBase 
 {
     public int SkillId;
     public string SkillName;
     public int SkillPower;
+    public int SkillLevel;
     public float SkillCooldown;
     public float KnockbackForce;
     public GameObject SkillPrefab;

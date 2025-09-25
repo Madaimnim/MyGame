@@ -3,7 +3,7 @@ using UnityEngine;
 using UnityEngine.EventSystems;
 using Cinemachine;
 
-public class PlayerInputController : MonoBehaviour
+public class PlayerInputController : MonoBehaviour,IInputProvider
 {
     public static PlayerInputController Instance { get; private set; }
     public GameObject selectionIndicatorPrefab;  // 選框預製體
@@ -17,8 +17,9 @@ public class PlayerInputController : MonoBehaviour
 
     [SerializeField] private CinemachineVirtualCamera virtualCam;
 
-    //生命週期
-    #region 
+    private Vector2 _cachedMoveDirection = Vector2.zero;
+
+    #region 生命週期
     private void Awake() {
         if (Instance != null && Instance != this)
         {
@@ -31,31 +32,48 @@ public class PlayerInputController : MonoBehaviour
     private void Start() {
         virtualCam = FindObjectOfType<CinemachineVirtualCamera>();
     }
-
     private void Update() {
         if (!isBattleInputEnabled) return;
         HandlePlayerSwitch();
+
+        _cachedMoveDirection = GetMoveDirection();
     }
     private void FixedUpdate() {
         if (!isBattleInputEnabled) return;
-        InputMove(); // 正確用 FixedUpdate 處理剛體移動
+        ApplyMovement();
     }
     #endregion
 
+    //IInputProvider
+    public Vector2 GetMoveDirection() {
+        float moveX = Input.GetAxisRaw("Horizontal");
+        float moveY = Input.GetAxisRaw("Vertical");
+        return new Vector2(moveX, moveY).normalized;
+    }
+
+    //提供當前角色移動方向
+    private void ApplyMovement() {
+        if (deployedPlayerIDsList.Count == 0) return; // 確保場上有角色
+
+        int currentId = deployedPlayerIDsList[currentPlayerIndex];
+        if (!deployedPlayersGameObjectDtny.ContainsKey(currentId)) return;
+        var currentPlayerObject = deployedPlayersGameObjectDtny[currentId];
+        var player = currentPlayerObject.GetComponent<Player>();
+        if (player == null) { Debug.LogWarning("移動控制對象player==null"); ;return; }
+
+        player.ApplyInput(_cachedMoveDirection);
+    }
+
     //初始化角色清單，並預選第一個角色
-    #region InitailPlayerList()
     public void InitailPlayerList() {
         UpdatePlayerList(); // 初始化角色列表
         if (deployedPlayerIDsList.Count > 0)
         {
             SelectPlayer(0);  // 預設選擇第一個角色
-            //Debug.Log($"PlayerInputController已初始化當前角色控制為{deployedPlayersGameObjectDtny[1].name}");
         }
     }
-    #endregion
 
     // 更新玩家列表
-    #region UpdatePlayerList()
     private void UpdatePlayerList() {
         deployedPlayersGameObjectDtny = PlayerStateManager.Instance.deployedPlayersGameObjectDtny; // 直接引用 Dictionary
         deployedPlayerIDsList = new List<int>(deployedPlayersGameObjectDtny.Keys); // 取得所有可用的角色 ID
@@ -65,10 +83,7 @@ public class PlayerInputController : MonoBehaviour
             Debug.LogWarning("目前沒有可控制的角色！");
         }
     }
-    #endregion
 
-    // 處理角色切換
-    #region  HandlePlayerSwitch()
     // 處理角色切換
     private void HandlePlayerSwitch() {
         // 數字鍵 1-9 切換角色（根據當前角色數量自適應）
@@ -124,10 +139,8 @@ public class PlayerInputController : MonoBehaviour
             }
         }
     }
-    #endregion
 
-    // 選擇角色
-    #region SelectPlayer(int index)
+    // 選擇角色、指標跟隨、相機跟隨
     private void SelectPlayer(int index) {
         if (index < 0 || index >= deployedPlayerIDsList.Count) return;
 
@@ -137,7 +150,7 @@ public class PlayerInputController : MonoBehaviour
             UpdateSelectionIndicator();
         }
 
-        // [新增] 設定 Cinemachine Camera 的跟隨目標
+        //設定 Cinemachine Camera 的跟隨目標
         int playerID = deployedPlayerIDsList[currentPlayerIndex];
         if (deployedPlayersGameObjectDtny.ContainsKey(playerID))
         {
@@ -146,10 +159,8 @@ public class PlayerInputController : MonoBehaviour
         }
 
     }
-    #endregion
 
-    // 更新選框的位置
-    #region UpdateSelectionIndicator()
+    // 更新指標的位置
     private void UpdateSelectionIndicator() {
         if (!deployedPlayersGameObjectDtny.ContainsKey(deployedPlayerIDsList[currentPlayerIndex]))
         {
@@ -159,67 +170,15 @@ public class PlayerInputController : MonoBehaviour
         int playerID = deployedPlayerIDsList[currentPlayerIndex];
         Player player = PlayerStateManager.Instance.GetBattlePlayerObject(playerID).GetComponent<Player>();
 
-        if (player == null)
-        {
-            Debug.LogWarning("取得的 Player 為 null！");
-            return;
-        }
+        if (player == null) { Debug.LogWarning("取得的 Player 為 null！"); return; }
+        if (player.SelectIndicatorPoint == null) { Debug.LogWarning("Player 的 selectIndicatorPoint 為 null！"); return; }
 
-        if (player.selectIndicatorPoint == null)
-        {
-            Debug.LogWarning("Player 的 selectIndicatorPoint 為 null！");
-            return;
-        }
-
-        Transform indicatorPoint = player.selectIndicatorPoint.transform;
+        Transform indicatorPoint = player.SelectIndicatorPoint.transform;
 
         if (currentSelectionIndicator == null)
-        {
             currentSelectionIndicator = Instantiate(selectionIndicatorPrefab, indicatorPoint);
-        }
 
         currentSelectionIndicator.transform.SetParent(indicatorPoint);
         currentSelectionIndicator.transform.localPosition = Vector3.zero;
     }
-    #endregion
-
-    //  控制當前角色移動
-    #region InputMove()
-    private void InputMove() {
-        if (deployedPlayerIDsList.Count == 0) return; // 確保場上有角色
-
-
-        float moveX = Input.GetAxisRaw("Horizontal");
-        float moveY = Input.GetAxisRaw("Vertical");
-
-        Vector2 moveDirection = new Vector2(moveX, moveY).normalized;
-
-        int currentId = deployedPlayerIDsList[currentPlayerIndex];
-        if (deployedPlayersGameObjectDtny.ContainsKey(deployedPlayerIDsList[currentPlayerIndex]))
-        {
-            var currentPlayerObject = deployedPlayersGameObjectDtny[currentId];
-            var player = currentPlayerObject.GetComponent<Player>();
-
-            if (player.IsDead) return;
-
-            if (player != null)
-            {
-                player.TryMove(moveDirection);
-            }
-            else
-                Debug.Log("角色身上沒有PlayerMove");
-
-
-
-            if (Mathf.Abs(moveX) > 0.01f)
-            {
-                Transform t = currentPlayerObject.transform;
-                Vector3 s = t.localScale;
-                float mag = Mathf.Abs(s.x);                  // 保留原本的絕對大小
-                s.x = (moveX < 0f) ? -mag : mag;             // 左負右正
-                t.localScale = s;
-            }
-        }
-    }
-    #endregion
 }

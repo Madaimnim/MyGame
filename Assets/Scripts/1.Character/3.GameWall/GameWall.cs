@@ -35,7 +35,7 @@ public class GameWall : MonoBehaviour, IDamageable
         rb = GetComponent<Rigidbody2D>();
         spriteRenderer = GetComponent<SpriteRenderer>();
         currentHealth = maxHealth;
-        EventManager.Instance.Event_HpChanged?.Invoke(currentHealth, maxHealth,this);// 觸發事件，通知 UI 初始血量
+        GameEventSystem.Instance.Event_HpChanged?.Invoke(currentHealth, maxHealth,this);// 觸發事件，通知 UI 初始血量
     }
     #endregion
 
@@ -48,7 +48,7 @@ public class GameWall : MonoBehaviour, IDamageable
         TextPopupManager.Instance.ShowTakeDamagePopup(info.damage, transform); // 顯示傷害數字
 
         currentHealth = Mathf.Clamp(currentHealth, 0,maxHealth);
-        EventManager.Instance.Event_HpChanged?.Invoke(currentHealth, maxHealth,this); // 更新 UI 血量
+        GameEventSystem.Instance.Event_HpChanged?.Invoke(currentHealth, maxHealth,this); // 更新 UI 血量
 
         if (currentHealth <= 0)
         {
@@ -64,7 +64,7 @@ public class GameWall : MonoBehaviour, IDamageable
 
     public void Die() {
         isDefeat = true;
-        EventManager.Instance.Event_OnWallBroken.Invoke();
+        GameEventSystem.Instance.Event_OnWallBroken.Invoke();
     }
 
     //受傷特效
@@ -72,9 +72,9 @@ public class GameWall : MonoBehaviour, IDamageable
     private IEnumerator FlashWhite(float duration) {
         if (spriteRenderer != null)
         {
-            spriteRenderer.material = GameManager.Instance.flashMaterial;
+            spriteRenderer.material = GameSystem.Instance.flashMaterial;
             yield return new WaitForSeconds(duration);
-            spriteRenderer.material = GameManager.Instance.normalMaterial;
+            spriteRenderer.material = GameSystem.Instance.normalMaterial;
         }
     }
     #endregion

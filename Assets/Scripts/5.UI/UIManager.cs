@@ -40,7 +40,7 @@ public class UIManager : MonoBehaviour
     }
 
     private IEnumerator Start() {
-        yield return StartCoroutine(GameManager.Instance.WaitForDataReady());
+        yield return StartCoroutine(GameSystem.Instance.WaitForDataReady());
 
         if (PlayerStateManager.Instance.unlockedPlayerIDsHashSet.Count > 0)
         {

@@ -27,12 +27,12 @@ public class UI_HpSlider : MonoBehaviour
     #endregion
 
     private void OnEnable() {
-        EventManager.Instance.Event_HpChanged += UpdateUIValue;            //監聽Enemy的血量變化
+        GameEventSystem.Instance.Event_HpChanged += UpdateUIValue;            //監聽Enemy的血量變化
 
     }
 
     private void OnDisable() {
-        EventManager.Instance.Event_HpChanged -= UpdateUIValue;            //監聽Enemy的血量變化
+        GameEventSystem.Instance.Event_HpChanged -= UpdateUIValue;            //監聽Enemy的血量變化
     }
 
     // UI_BattlePlayerPanel綁定血條使用
@@ -43,8 +43,8 @@ public class UI_HpSlider : MonoBehaviour
         //  綁定的當下強制刷新一次
         if (thisDamageable is Player player)
         {
-            int cur = player.StatsRuntime.CurrentHp;
-            int max = player.StatsRuntime.MaxHp;
+            int cur = player.Runtime.CurrentHp;
+            int max = player.Runtime.MaxHp;
             UpdateUIValue(cur, max, thisDamageable);
         }
     }

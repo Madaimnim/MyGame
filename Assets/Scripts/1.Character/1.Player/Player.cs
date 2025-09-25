@@ -3,67 +3,140 @@ using System.Collections;
 using UnityEngine;
 using System.Collections.Generic;
 
-public class Player : Char<PlayerStatsRuntime, PlayerSkillRuntime>
+public class Player:MonoBehaviour,IDamageable
 {
-    #region 變數
-    public GameObject selectIndicatorPoint;
-    public PlayerAI playerAI;
+    //封裝--------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+    public PlayerStatsRuntime Runtime { get; private set; }
+    public CharHealthComponent CharHealthComponent { get; protected set; }
+    public CharRespawnComponent CharRespawnComponent { get; protected set; }
+    public CharAnimationComponent CharAnimationComponent { get;protected set; }
+    public CharEffectComponent CharEffectComponent { get; protected set; }
+    public CharExpComponent CharExpComponent { get; protected set; }
 
-    public PlayerMove playerMove;
-    public AudioClip deathSFX;
+    public CharBattleComponent CharBattleComponent { get; protected set; }
+    public CharMovementComponent CharMovementComponent { get; protected set; }
+    public CharAIComponent CharAIComponent { get; protected set; }
 
-    private GameObject[] detectors;             //玩家腳色自有一份Detector，不在Runtime上唯一取用
+    //Unity元件--------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+    public Rigidbody2D Rb { get; protected set; }
+    public SpriteRenderer Spr { get; protected set; }
+    public Animator Ani{ get; protected set; }
+    public Collider2D Col { get; protected set; }
+    public ShadowController ShadowControl { get; protected set; }
+    //UI面向API--------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+    public int GetCurrentHp() => CharHealthComponent.CurrentHp;
+    public int GetMaxHp() => CharHealthComponent.MaxHp;
+    public int GetCurrentExp() => CharExpComponent.CurrentExp;
+    //public int GetExpToNextLevel() => Runtime.;
+    public int GetCurrentLevel() => CharExpComponent.CurrentLevel;
+
+    //公開--------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+    public GameObject SelectIndicatorPoint;
+    public PlayerAI PlayerAI;
+    public bool IsDead => CharHealthComponent.IsDead;
+    public bool IsKnockbacking => CharBattleComponent.IsKnockbacking;
+
+    //私有--------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+    private GameObject[] _detectors;             //玩家腳色自有一份Detector，不在Runtime上唯一取用
 
 
-    public bool canRespawn { get; private set; } = true;
+    #region 生命週期
+    private void Awake() {
+        Rb = GetComponent<Rigidbody2D>();
+        Spr = GetComponent<SpriteRenderer>();
+        Ani = GetComponent<Animator>();
+        Col = GetComponent<Collider2D>();
+        ShadowControl = GetComponentInChildren<ShadowController>();
+    }
+    private void OnEnable() {
 
-    public bool isPlayingAttackAnimation { get; private set; } = false;
-    public bool isMoving { get; private set; } = false;
+    }
+    private void OnDisable() {
+        if (CharRespawnComponent != null) CharRespawnComponent.OnRespawn -= OnRespawn;
+        if (CharHealthComponent != null)
+        {
+            CharHealthComponent.OnDie -= OnDie;
+            CharHealthComponent.OnHpChanged -= OnHpChanged;
+        }
+        if (CharExpComponent != null)
+        {
+            CharExpComponent.OnLevelUp -= OnLevelUp;
+            CharExpComponent.OnExpGained -= OnExpGained;
+            CharExpComponent.OnExpChanged -= OnExpChanged;
+        }
 
+
+        if (UIManager_BattlePlayer.Instance != null)
+        {
+            UIManager_BattlePlayer.Instance.UnregisterPlayer(this);
+        }      
+
+        if (GameEventSystem.Instance != null)
+        {
+            GameEventSystem.Instance.Event_BattleStart -= EnableAIRun;
+            GameEventSystem.Instance.Event_OnWallBroken -= DisableAIRun;
+            if (CharRespawnComponent != null)
+            {
+                GameEventSystem.Instance.Event_BattleStart -= CharRespawnComponent.EnableRespawn;
+                GameEventSystem.Instance.Event_OnWallBroken -= CharRespawnComponent.DisableRespawn;
+            }
+        }
+    }
     #endregion
 
-    //生命週期
-    #region 生命週期
-    protected override void Awake() {
-        base.Awake();
-    }
+    public void Initialize(PlayerStatsRuntime stats) {
+        Runtime = stats;
 
-    protected override void OnEnable() {
-        base.OnEnable();
-        ResetState();
+        //初始化模組、訂閱模組事件-----------------------------------------------------------------------------------------------------------------------------------------------------------------------
+        CharHealthComponent = new CharHealthComponent(Runtime);
+        CharHealthComponent.OnDie +=OnDie;
+        CharHealthComponent.OnHpChanged +=OnHpChanged;
 
+        CharRespawnComponent = new CharRespawnComponent(this);
+        CharRespawnComponent.OnRespawn += OnRespawn;
+
+        CharAnimationComponent = new CharAnimationComponent(Ani);
+
+        CharEffectComponent = new CharEffectComponent(Runtime.VisualData,transform);
+
+        CharExpComponent = new CharExpComponent(Runtime);
+        CharExpComponent.OnLevelUp += OnLevelUp;
+        CharExpComponent.OnExpGained += OnExpGained;
+        CharExpComponent.OnExpChanged += OnExpChanged;
+
+        CharBattleComponent = new CharBattleComponent();
+
+        CharMovementComponent = new CharMovementComponent(Rb);
+
+        CharAIComponent = new CharAIComponent();
+
+        //角色物件命名---------------------------------------------------------------------------------------------------------------------------------------------------------------------
+        transform.name = $"玩家ID_{Runtime.StatsData.Id}:({Runtime.StatsData.Name})";
+        _detectors = new GameObject[Runtime.SkillSlots.Length];
+
+        //訂閱外部事件---------------------------------------------------------------------------------------------------------------------------------------------------------------------
+        if (GameEventSystem.Instance != null)
+        {
+            GameEventSystem.Instance.Event_BattleStart += EnableAIRun;
+            GameEventSystem.Instance.Event_OnWallBroken += DisableAIRun;
+
+            GameEventSystem.Instance.Event_BattleStart += CharRespawnComponent.EnableRespawn;
+            GameEventSystem.Instance.Event_OnWallBroken += CharRespawnComponent.DisableRespawn;
+        }
+
+        //註冊UI:顯示血量、技能冷卻
         if (UIManager_BattlePlayer.Instance != null)
         {
             StartCoroutine(DelayedRegisterUI());
         }
-
-        if (EventManager.Instance != null)
-        {
-            EventManager.Instance.Event_BattleStart += EnableAIRun;
-            EventManager.Instance.Event_OnWallBroken += DisableAIRun;
-            EventManager.Instance.Event_BattleStart += EnableRespawn;
-            EventManager.Instance.Event_OnWallBroken += DisableRespawn;
-        }
+        //初始化狀態--------------------------------------------------------------------------------------------------------------------------------------------------------------------
+        ResetState();
+        Runtime.InitializeOwner(this);
     }
 
-    private void OnDisable() {
-        if (UIManager_BattlePlayer.Instance != null)
-        {
-            UIManager_BattlePlayer.Instance.UnregisterPlayer(this);
-        }
-        
-        if (EventManager.Instance != null)
-        {
-            EventManager.Instance.Event_BattleStart -= EnableAIRun;
-            EventManager.Instance.Event_OnWallBroken -= DisableAIRun;
-            EventManager.Instance.Event_BattleStart -= EnableRespawn;
-            EventManager.Instance.Event_OnWallBroken -= DisableRespawn;
-        }
-    }
-    #endregion
 
     public void UpdateSkillCooldowns() {
-        foreach (var slot in StatsRuntime.SkillSlots)
+        foreach (var slot in Runtime.SkillSlots)
         {
             slot?.TickCooldown(Time.deltaTime);
         }
@@ -75,117 +148,167 @@ public class Player : Char<PlayerStatsRuntime, PlayerSkillRuntime>
     }
 
     public void SetPlayingAttackAnimation(bool b) {
-        isPlayingAttackAnimation = b;
+        CharAnimationComponent.IsPlayingAttackAnimation = b;
     }
-    public void TryMove(Vector2 direction) {
-        if (IsDead || IsKnockbacking) return;
+    //移動輸入窗口
+    public void ApplyInput(Vector2 direction) {
+        if (CharHealthComponent.IsDead || CharBattleComponent.IsKnockbacking) return;
 
-        isMoving = direction != Vector2.zero;
+        //移動
+        if (direction == Vector2.zero) CharMovementComponent.Stop();
+        else CharMovementComponent.Move(direction, Runtime.StatsData.MoveSpeed);
+        
+        //撥放移動動畫
+        if (!CharAnimationComponent.IsPlayingAttackAnimation && CharMovementComponent.IsMoving)
+            CharAnimationComponent.Play("Move");
 
-        if (!isPlayingAttackAnimation && isMoving)
+        //翻轉朝向
+        UpdateFacing(direction);
+    }
+
+    private void UpdateFacing(Vector2 direction) {
+        if (Mathf.Abs(direction.x) > 0.01f)
         {
-            PlayAnimation("Move");
+            var s = transform.localScale;
+            float mag = Mathf.Abs(s.x);
+            s.x = (direction.x < 0f) ? -mag : mag;
+            transform.localScale = s;
         }
-        playerMove.Move(direction, this, RB);
     }
 
-    public override void TakeDamage(DamageInfo info) {
-        if (StatsRuntime == null) return;
-
-        base.TakeDamage(info);
-        TextPopupManager.Instance.ShowTakeDamagePopup(info.damage, transform); // 顯示傷害數字
+    public void TakeDamage(DamageInfo info) {
+        if (Runtime == null) return;
+        CharHealthComponent.TakeDamage(info.damage);
 
         StartCoroutine(FlashWhite(0.1f)); // 執行閃白協程
         StartCoroutine(Knockback(info.knockbackForce, info.knockbackDirection));
 
+        TextPopupManager.Instance.ShowTakeDamagePopup(info.damage, transform); // 顯示傷害數字
     }
-    protected override void Die() {
-        base.Die();
-
-        VFXManager.Instance.Play("PlayerDeath", transform.position);
-        AudioManager.Instance.PlaySFX(deathSFX, 0.5f);
-
+    //HealthComponent
+    public void OnDie() {
         DisableAIRun();
 
-        Collider2D[] colliders = GetComponentsInChildren<Collider2D>();
-        foreach (var col in colliders)
-        {
+        foreach (var col in GetComponentsInChildren<Collider2D>())
             col.enabled = false;
-        }
-
-        if (SRender != null)
+        if (Spr != null)
         {
-            Color c = SRender.color;
+            Color c = Spr.color;
             c.a = 0.5f;  // 透明度 0=完全透明，1=完全不透明，你可以調整成 0.3~0.7
-            SRender.color = c;
+            Spr.color = c;
         }
 
-        PlayAnimation("Die");
+        CharAnimationComponent.Play("Die");
+        CharEffectComponent.PlayDeathEffect();
 
-        ShadControl.SetShadowOffset();
+        ShadowControl.SetShadowOffset();
 
-        EventManager.Instance.Event_OnPlayerDie?.Invoke(this);
+        GameEventSystem.Instance.Event_OnPlayerDie?.Invoke(this);
     }
-
-
-    public void Respawn() {
+    public void OnHpChanged(int currentHp,int maxHp) {
+        
+    }
+    //RespawnComponent
+    public void OnRespawn() {
         ResetState();
-        StatsRuntime.RecoverHp();
-        EnableAIRun();
-
-
         Collider2D[] colliders = GetComponentsInChildren<Collider2D>();
         foreach (var col in colliders)
         {
             col.enabled = true;
         }
-
-        if (SRender != null)
+        if (Spr != null)
         {
-            Color c = SRender.color;
+            Color c = Spr.color;
             c.a = 1f;
-            SRender.color = c;
+            Spr.color = c;
         }
 
-        PlayAnimation("Idle");
-
-        ShadControl.ResetShadow();
+        CharAnimationComponent.Play("Idle");
+        ShadowControl.ResetShadow();
+        EnableAIRun();
+    }
+    //ExpComponent
+    public void OnLevelUp(int newLevel) {
+        TextPopupManager.Instance.ShowLevelUpPopup(newLevel, transform);
+        //撥放音效
+    }
+    public void OnExpGained(int exp) {
+        //跳出獲得經驗值動畫
+    }
+    public void OnExpChanged(int currentExp ,int expToNext) {
+        //更新UI
     }
 
-    //提供PlayerStateManager呼叫初始化StatsRuntime使用
 
-    public void Initialize(PlayerStatsRuntime stats) {
-        StatsRuntime = stats;
-        Id = StatsRuntime.Id;
-        transform.name = $"玩家ID_{StatsRuntime.Id}:({StatsRuntime.Name})";
-        detectors = new GameObject[StatsRuntime.SkillSlots.Length];
 
-        StatsRuntime.InitializeOwner(this);
+    //被擊退
+    protected virtual IEnumerator Knockback(float force, Vector2 knockbackDirection) {
+        if (Rb != null)
+        {
+            CharBattleComponent.IsKnockbacking = true;
+
+            Rb.velocity = Vector2.zero; // 先清除當前速度，避免擊退力疊加
+            Rb.AddForce(force * knockbackDirection, ForceMode2D.Impulse); // 添加瞬間衝擊力
+            yield return new WaitForSeconds(0.2f);
+            Rb.velocity = Vector2.zero;
+
+            CharBattleComponent.IsKnockbacking = false;
+        }
+    }
+    //閃白特效
+    protected virtual IEnumerator FlashWhite(float duration) {
+        if (Spr != null)
+        {
+            Spr.material = GameSystem.Instance.flashMaterial;
+            yield return new WaitForSeconds(duration);
+            Spr.material = GameSystem.Instance.normalMaterial;
+        }
     }
 
+    //重置狀態參數
+    public void ResetState() {
+        CharAnimationComponent.IsPlayingAttackAnimation = false;
+        CharBattleComponent.IsKnockbacking = false;
+        CharHealthComponent.ResetCurrentHp();
 
-    //啟禁用AI、啟禁用復活
-    private void EnableRespawn() {
-        canRespawn = true;
+        if (Spr != null)
+        { // 確保顏色重設
+            var c = Spr.color;
+            c.a = 1f;
+            Spr.color = c;
+        }
     }
-    private void DisableRespawn() {
-        canRespawn = false;
+
+    //啟用AI
+    public void EnableAIRun() {
+        CharAIComponent.CanRunAI = true;
     }
+
+    //禁用AI
+    public void DisableAIRun() {
+        CharAIComponent.CanRunAI = false;
+    }
+
+    protected void ResetMaterial() {
+        if (Spr != null)
+            Spr.material = GameSystem.Instance.normalMaterial;
+    }
+
 
     //取得人物狀態API
-    public int GetPlayerAttackPower() => StatsRuntime.AttackPower;
-    public int GetSkillSlotsLength() => StatsRuntime.SkillSlots.Length;
+    public int GetPlayerAttackPower() => Runtime.StatsData.AttackPower;
+    public int GetSkillSlotsLength() => Runtime.SkillSlots.Length;
 
     public void SetSkillSlot(int slotIndex, PlayerSkillRuntime skillData) {
-        if (slotIndex < 0 || slotIndex >= StatsRuntime.SkillSlots.Length) return;
+        if (slotIndex < 0 || slotIndex >= Runtime.SkillSlots.Length) return;
         // 綁定資料
-        StatsRuntime.SkillSlots[slotIndex].BindSkill(skillData);
+        Runtime.SkillSlots[slotIndex].BindSkill(skillData);
 
         // 清理舊 Detector（只清理自己這個 Player 身上的，不影響別人）
-        if (detectors[slotIndex] != null)
+        if (_detectors[slotIndex] != null)
         {
-            Destroy(detectors[slotIndex]);
-            detectors[slotIndex] = null;
+            Destroy(_detectors[slotIndex]);
+            _detectors[slotIndex] = null;
         }
 
         // 生成新 Detector
@@ -194,13 +317,13 @@ public class Player : Char<PlayerStatsRuntime, PlayerSkillRuntime>
             var detector = Instantiate(skillData.TargetDetectPrefab, transform);
             detector.transform.localPosition = Vector3.zero;
             detector.name = $"TargetDetector_{skillData.SkillName}_ID:{skillData.SkillId}";
-            detectors[slotIndex] = detector;
+            _detectors[slotIndex] = detector;
         }
 
     }
 
     public GameObject GetSkillSlotDetector(int slotIndex) =>
-    (slotIndex < 0 || slotIndex >= detectors.Length) ? null : detectors[slotIndex];
+    (slotIndex < 0 || slotIndex >= _detectors.Length) ? null : _detectors[slotIndex];
 
 
 }

@@ -15,7 +15,6 @@ GameObject:
   - component: {fileID: 1901394458928384605}
   - component: {fileID: 1901394458928384577}
   - component: {fileID: 5081692193626905293}
-  - component: {fileID: -784742385834960563}
   - component: {fileID: 1901394458928384579}
   - component: {fileID: 1901394458928384578}
   m_Layer: 6
@@ -175,10 +174,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 91cb9264c08bde6498cf7fd38d8b11aa, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  selectIndicatorPoint: {fileID: 5535622795397535964}
-  playerAI: {fileID: 5081692193626905293}
-  playerMove: {fileID: -784742385834960563}
-  deathSFX: {fileID: 0}
+  SelectIndicatorPoint: {fileID: 5535622795397535964}
+  PlayerAI: {fileID: 5081692193626905293}
 --- !u!114 &5081692193626905293
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -193,18 +190,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   updateInterval: 0.1
   skillSpawner: {fileID: 1901394458928384579}
---- !u!114 &-784742385834960563
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1901394458928384591}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 6d76b8fe7f980b1488409a5def55f567, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
 --- !u!114 &1901394458928384579
 MonoBehaviour:
   m_ObjectHideFlags: 0

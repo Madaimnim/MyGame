@@ -1503,8 +1503,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 18ab2c48bf337d94aacacc65a1ef39b0, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  normalMaterial: {fileID: 2100000, guid: e1108d09f733cac4eb14f41e32cb0033, type: 2}
-  flashMaterial: {fileID: 2100000, guid: 343628f4e759ecf46b917b0ca0685d23, type: 2}
 --- !u!114 &641719556317753157
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -8683,7 +8681,7 @@ MonoBehaviour:
   equipmentUIPanel: {fileID: 0}
   skillsUIPanel: {fileID: 3600708893622171315}
   formationUIPanel: {fileID: 0}
-  currentPlayerId: 1
+  currentPlayerId: -1
 --- !u!114 &8588244553680918165
 MonoBehaviour:
   m_ObjectHideFlags: 0

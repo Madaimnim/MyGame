@@ -59,7 +59,6 @@ public class GameStateManager : MonoBehaviour
         PlayerStateManager.Instance.SpawnBothPlayers(1001);
         PlayerStateManager.Instance.GetState(1001).UnlockSkill(1);
         PlayerStateManager.Instance.GetState(1001).UnlockSkill(2);
-        PlayerStateManager.Instance.GetState(1001).UnlockSkill(3);
         PlayerStateManager.Instance.SetupPlayerSkillSlot(1001,0,1);
 
         PlayerStateManager.Instance.UnlockPlayer(1002);
@@ -98,7 +97,7 @@ public class GameStateManager : MonoBehaviour
 
         //新場景就緒後再啟用玩家
         PlayerStateManager.Instance.ActivateAllPlayer();
-        // 再初始化輸入與清單
+        //初始化輸入與清單
         PlayerInputController.Instance.InitailPlayerList();
 
         //DialogueManager.Instance.StartDialogue();
@@ -106,7 +105,7 @@ public class GameStateManager : MonoBehaviour
         yield return null;
 
         PlayerInputController.Instance.isBattleInputEnabled = true;
-        EventManager.Instance.Event_BattleStart.Invoke();
+        GameEventSystem.Instance.Event_BattleStart.Invoke();
     }
 
 

@@ -5,19 +5,19 @@ using System.Collections;
 
 
 [System.Serializable]
-public class SkillSlotRuntime<TSkill> where TSkill : SkillBase
+public class SkillSlotRuntime
 {
     public int SlotIndex { get; private set; }
     public float CooldownTimer { get; private set; }
-    public TSkill SkillData { get; private set; }
+    public SkillBase SkillData { get; private set; }
 
 
     public SkillSlotRuntime(int slotIndex) {
-        SlotIndex = slotIndex;
+        slotIndex = slotIndex;
         CooldownTimer = 0f;
     }
 
-    public void BindSkill(TSkill data) {
+    public void BindSkill(SkillBase data) {
         SkillData = data;
         CooldownTimer = 0f;
     }

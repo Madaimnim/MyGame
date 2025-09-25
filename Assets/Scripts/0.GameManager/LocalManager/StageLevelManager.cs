@@ -20,13 +20,13 @@ public class StageLevelManager : MonoBehaviour
     }
 
     private void OnEnable() {
-        EventManager.Instance.Event_OnPlayerDie += RespawnPlayer;
-        EventManager.Instance.Event_OnWallBroken += WallBroken;
+        GameEventSystem.Instance.Event_OnPlayerDie += RespawnPlayer;
+        GameEventSystem.Instance.Event_OnWallBroken += WallBroken;
 
     }
     private void OnDisable() {
-        EventManager.Instance.Event_OnPlayerDie -= RespawnPlayer;
-        EventManager.Instance.Event_OnWallBroken -= WallBroken;
+        GameEventSystem.Instance.Event_OnPlayerDie -= RespawnPlayer;
+        GameEventSystem.Instance.Event_OnWallBroken -= WallBroken;
     }
     #endregion
 
@@ -46,7 +46,7 @@ public class StageLevelManager : MonoBehaviour
 
         yield return new WaitForSeconds(respawnDelay);
 
-        player.Respawn();
+        player.CharRespawnComponent.Respawn();
     }
 
     #endregion

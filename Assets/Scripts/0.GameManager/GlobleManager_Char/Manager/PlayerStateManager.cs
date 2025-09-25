@@ -5,9 +5,10 @@ using System;
 using UnityEngine.UIElements;
 using Unity.VisualScripting.Antlr3.Runtime.Misc;
 
-public class PlayerStateManager : CharStateManagerBase<PlayerStatsRuntime,PlayerSkillRuntime>
+public class PlayerStateManager:MonoBehaviour
 {
     public static PlayerStateManager Instance { get; private set; }
+    private Dictionary<int, PlayerStatsRuntime> _playerStatsDtny = new Dictionary<int, PlayerStatsRuntime>();
 
     [Header("父物件設定")]
     public GameObject playerParent;
@@ -35,7 +36,41 @@ public class PlayerStateManager : CharStateManagerBase<PlayerStatsRuntime,Player
             runtimeList.Add(new PlayerStatsRuntime(stat));
         SetStates(runtimeList);
     }
-    protected override bool IsValidId(int id) => IDValidator.IsPlayerID(id);
+
+    private bool IsValidId(int id) => IDValidator.IsPlayerID(id);
+
+    protected void SetStates(List<PlayerStatsRuntime> statsList) {
+        _playerStatsDtny.Clear();
+        foreach (var stat in statsList)
+        {
+            if (!IsValidId(stat.StatsData.Id))
+            {
+                Debug.LogError($"[{GetType().Name}] Id {stat.StatsData.Id} 不在合法區間");
+                continue;
+            }
+            if (_playerStatsDtny.ContainsKey(stat.StatsData.Id))
+            {
+                Debug.LogError($"[{GetType().Name}] 發現重複的 Id {stat.StatsData.Id}");
+                continue;
+            }
+
+            _playerStatsDtny[stat.StatsData.Id] = stat;
+        }
+    }
+
+    public PlayerStatsRuntime GetState(int id) {
+        if (_playerStatsDtny.TryGetValue(id, out var state))
+        {
+            return state;
+        }
+        Debug.LogError($"[{GetType().Name}] 找不到 Id {id} 的狀態");
+        return null;
+    }
+
+    public bool TryGetState(int id, out PlayerStatsRuntime state) {
+        return _playerStatsDtny.TryGetValue(id, out state);
+    }
+
 
     //生成腳色
     public bool UnlockPlayer(int playerId) {
@@ -51,7 +86,7 @@ public class PlayerStateManager : CharStateManagerBase<PlayerStatsRuntime,Player
         SpawnUIPlayer(playerId);
     }
     public GameObject SpawnBattlePlayer(int playerId) {
-        if (!statesDtny.TryGetValue(playerId, out var playerStatsRuntime)) return null;
+        if (!_playerStatsDtny.TryGetValue(playerId, out var playerStatsRuntime)) return null;
 
         var playerObj= SpawnPlayerObject(playerStatsRuntime, playerParent.transform);
         if (playerObj != null) 
@@ -61,7 +96,7 @@ public class PlayerStateManager : CharStateManagerBase<PlayerStatsRuntime,Player
         return playerObj;
     }
     public GameObject SpawnUIPlayer(int playerId) {
-        if (!statesDtny.TryGetValue(playerId, out var playerStatsRuntime)) return null;
+        if (!_playerStatsDtny.TryGetValue(playerId, out var playerStatsRuntime)) return null;
 
         var playerObj = SpawnPlayerObject(playerStatsRuntime, playerPreviewParent.transform);
         if (playerObj != null)
@@ -73,9 +108,9 @@ public class PlayerStateManager : CharStateManagerBase<PlayerStatsRuntime,Player
         return playerObj;
     }
     private GameObject SpawnPlayerObject(PlayerStatsRuntime playerStatsRuntime, Transform parent) {
-        if (playerStatsRuntime.CharPrefab == null) return null;
+        if (playerStatsRuntime.VisualData.CharPrefab == null) return null;
 
-        GameObject playerObj = Instantiate(playerStatsRuntime.CharPrefab, Vector3.zero, Quaternion.identity, parent);
+        GameObject playerObj = Instantiate(playerStatsRuntime.VisualData.CharPrefab, Vector3.zero, Quaternion.identity, parent);
         playerObj.SetActive(false);
         playerObj.transform.localPosition = Vector3.zero;
 
@@ -90,7 +125,7 @@ public class PlayerStateManager : CharStateManagerBase<PlayerStatsRuntime,Player
 
     //技能槽設置
     public void SetupPlayerSkillSlot(int playerId, int slotIndex, int skillId) {
-        if (!statesDtny.TryGetValue(playerId, out var playerStatsRuntime))
+        if (!_playerStatsDtny.TryGetValue(playerId, out var playerStatsRuntime))
         {
             Debug.LogError($"[SetupPlayerSkillSlot] 找不到玩家 ID:{playerId}");
             return;
@@ -103,13 +138,13 @@ public class PlayerStateManager : CharStateManagerBase<PlayerStatsRuntime,Player
         uiPlayersGameObjectDtny[playerId]?.GetComponent<Player>()?.SetSkillSlot(slotIndex, playerStatsRuntime.GetSkillDataRuntimeForId(skillId));
     }
 
-    public void AddExpToAllPlayers(int exp) {
-        if (exp <= 0) return;
-        foreach (var kv in statesDtny)
-        {
-            kv.Value.GainExp(exp);
-        }
-    }
+    //public void AddExpToAllPlayers(int exp) {
+    //    if (exp <= 0) return;
+    //    foreach (var kv in _playerStatsDtny)
+    //    {
+    //        kv.Value.Owner;
+    //    }
+    //}
 
     //啟用/停用角色
     public void ActivateAllPlayer() {
@@ -163,10 +198,10 @@ public class PlayerStateManager : CharStateManagerBase<PlayerStatsRuntime,Player
 
     //API：查詢
     public GameObject GetBattlePlayerObject(int playerID) {
-        return statesDtny.TryGetValue(playerID, out var stats) ? stats.BattlePlayerObject : null;
+        return _playerStatsDtny.TryGetValue(playerID, out var stats) ? stats.BattlePlayerObject : null;
     }
     public GameObject GetUIPlayerObject(int playerID) {
-        return statesDtny.TryGetValue(playerID, out var stats) ? stats.UiPlayerObject : null;
+        return _playerStatsDtny.TryGetValue(playerID, out var stats) ? stats.UiPlayerObject : null;
     }
 }
 

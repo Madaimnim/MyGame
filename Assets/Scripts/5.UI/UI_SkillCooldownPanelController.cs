@@ -13,18 +13,18 @@ public class UI_SkillCooldownPanelController : MonoBehaviour
 
 
     private void OnEnable() {
-        if (EventManager.Instance != null)
+        if (GameEventSystem.Instance != null)
         {
-            EventManager.Instance.Event_SkillCooldownChanged += UpdateSkillCooldown;
-            EventManager.Instance.Event_SkillInfoChanged += UpdateSkillInfo;
+            GameEventSystem.Instance.Event_SkillCooldownChanged += UpdateSkillCooldown;
+            GameEventSystem.Instance.Event_SkillInfoChanged += UpdateSkillInfo;
 
         }
     }
     private void OnDisable() {
-        if (EventManager.Instance != null)
+        if (GameEventSystem.Instance != null)
         {
-            EventManager.Instance.Event_SkillCooldownChanged -= UpdateSkillCooldown;
-            EventManager.Instance.Event_SkillInfoChanged -= UpdateSkillInfo;
+            GameEventSystem.Instance.Event_SkillCooldownChanged -= UpdateSkillCooldown;
+            GameEventSystem.Instance.Event_SkillInfoChanged -= UpdateSkillInfo;
 
         }
     }
@@ -35,7 +35,7 @@ public class UI_SkillCooldownPanelController : MonoBehaviour
         boundPlayer = player;
         for (int slotIndex = 0; slotIndex < player.GetSkillSlotsLength(); slotIndex++)
         {
-            var slotData = player.StatsRuntime.GetSkillDataRuntimeAtSlot(slotIndex);
+            var slotData = player.Runtime.GetSkillDataRuntimeAtSlot(slotIndex);
             if (slotData == null || string.IsNullOrEmpty(slotData.SkillName)) continue;
             //生成Slider
             var cooldownSlot = Instantiate(skillCooldownSliderPrefab, skillSliderParent);
@@ -49,7 +49,7 @@ public class UI_SkillCooldownPanelController : MonoBehaviour
     // 更新UISlot上的UI技能冷卻
     #region
     public void UpdateSkillCooldown(int slotIndex, float current, float max, Player player) {
-        if (boundPlayer == null || player != boundPlayer.playerAI) return; // 過濾不是我的角色
+        if (boundPlayer == null || player != boundPlayer.PlayerAI) return; // 過濾不是我的角色
 
         foreach (var slider in activeCooldownSlotList)
             if (slider.IsBoundTo(player, slotIndex))
@@ -60,7 +60,7 @@ public class UI_SkillCooldownPanelController : MonoBehaviour
     // 更新UIController上的技能資訊
     #region UpdateSkillInfo(int slotIndex, PlayerAI playerAI)
     public void UpdateSkillInfo(int slotIndex, Player player) {
-        if (boundPlayer == null || player != boundPlayer.playerAI) return;
+        if (boundPlayer == null || player != boundPlayer.PlayerAI) return;
 
         foreach (var slider in activeCooldownSlotList)
             if (slider.IsBoundTo(player, slotIndex))

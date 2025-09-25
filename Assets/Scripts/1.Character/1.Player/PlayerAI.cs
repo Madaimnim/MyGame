@@ -2,7 +2,7 @@ using UnityEngine;
 using System.Collections;
 using System.Collections.Generic;
 
-public class PlayerAI : MonoBehaviour, IAttackable, IMoveable
+public class PlayerAI : MonoBehaviour, IAttackable, IMoveable,IInputProvider
 {
     [Header("AI樹更新頻率")]
     public float updateInterval = 0.1f;
@@ -32,7 +32,7 @@ public class PlayerAI : MonoBehaviour, IAttackable, IMoveable
     }
 
     private void Update() {
-        if (!player.CanRunAI) return;
+        if (!player.CharAIComponent.CanRunAI) return;
         player.UpdateSkillCooldowns(); // Player 負責管理自己的技能槽冷卻
         RunBehaviorTree();
     }
@@ -59,18 +59,23 @@ public class PlayerAI : MonoBehaviour, IAttackable, IMoveable
         if (detectorPrefab == null)  return false;                                          //沒有偵測器預製體
         var targetDetector = detectorPrefab.GetComponent<TargetDetector>();
 
-        return targetDetector != null && targetDetector.hasTarget && player.StatsRuntime.SkillSlots[slotIndex].CooldownTimer <= 0;
+        return targetDetector != null && targetDetector.hasTarget && player.Runtime.SkillSlots[slotIndex].CooldownTimer <= 0;
     }
     #endregion
 
+    public Vector2 GetMoveDirection() {
+        //Todo
+        return Vector2.zero; 
+    }
+
     public bool CanMove() {
-        return player.CanMove;
+        return player.CharMovementComponent.CanMove;
     }
 
     //行為樹：暫存技能資訊
     #region UseSkill(int slotIndex)
     public void UseSkill(int slotIndex) {
-        var skillData = player.StatsRuntime.GetSkillDataRuntimeAtSlot(slotIndex);
+        var skillData = player.Runtime.GetSkillDataRuntimeAtSlot(slotIndex);
         if (skillData == null) return;
         var detector = player.GetSkillSlotDetector(slotIndex);
         if (detector == null) return;
@@ -86,7 +91,7 @@ public class PlayerAI : MonoBehaviour, IAttackable, IMoveable
             detector = detector
         };
 
-        if (player.isPlayingAttackAnimation) return;
+        if (player.CharAnimationComponent.IsPlayingAttackAnimation) return;
         else
             PlayAttackAnimation(slotIndex, skillData, targetDetector);
     }
@@ -104,10 +109,10 @@ public class PlayerAI : MonoBehaviour, IAttackable, IMoveable
         );
 
         // 播放動畫
-        if(player.isMoving)
-            player.PlayAnimation($"MoveSkill{skillData.SkillId}");
+        if(player.CharMovementComponent.IsMoving)
+            player.CharAnimationComponent.Play($"MoveSkill{skillData.SkillId}");
         else
-            player.PlayAnimation($"Skill{skillData.SkillId}");
+            player.CharAnimationComponent.Play($"Skill{skillData.SkillId}");
     }
     #endregion
 

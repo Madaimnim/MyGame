@@ -15,10 +15,10 @@ public class EnemyMoveDetector : MonoBehaviour
     private readonly HashSet<Transform> targetTransforms = new();
 
     private void OnEnable() {
-        EventManager.Instance.Event_OnPlayerDie += HandlePlayerDie;
+        GameEventSystem.Instance.Event_OnPlayerDie += HandlePlayerDie;
     }
     private void OnDisable() {
-        EventManager.Instance.Event_OnPlayerDie -= HandlePlayerDie;
+        GameEventSystem.Instance.Event_OnPlayerDie -= HandlePlayerDie;
     }
 
     private void Update() {

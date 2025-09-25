@@ -1,11 +1,11 @@
 using System;
 using UnityEngine;
 
-[DefaultExecutionOrder(-50)]   // 讓 EventManager 先於大多數腳本執行
-public class EventManager : MonoBehaviour
+[DefaultExecutionOrder(-50)]   // 讓 GameEventSystem 先於大多數腳本執行
+public class GameEventSystem : MonoBehaviour
 {
 
-    public static EventManager Instance { get; private set; }
+    public static GameEventSystem Instance { get; private set; }
 
     public Action<IDamageable> Event_OnPlayerDie;
     public Action Event_OnWallBroken;

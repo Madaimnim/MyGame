@@ -15,6 +15,9 @@ else
     git commit -m "更新專案 - $current_time"
     git push origin main
     echo "已推送到遠端 main 分支。"
+
+    echo "📌 最新 Commit："
+    git log -1 --oneline --decorate
 fi
 
 # 顯示提示，等按鍵後自動結束

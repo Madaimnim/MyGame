@@ -11,14 +11,14 @@ git add -A   # -A 可同時包含修改、新增、刪除檔案
 if git diff --quiet && git diff --cached --quiet; then
     echo "沒有檔案變更，不會建立 commit。"
 else
-    # [新增] 允許輸入自訂 commit 訊息（預設：更新專案）
+  # 允許輸入自訂 commit 訊息（預設：更新專案）
     read -p "請輸入 commit 訊息（預設：更新專案）：" user_msg
     if [[ -z "${user_msg// }" ]]; then
       user_msg="更新專案"
     fi
 
     # 有變更才建立 commit 並推送
-    git commit -m "更新專案 - $current_time"
+    git commit -m "$user_msg - $current_time"
 
     # 推送
     git push origin main

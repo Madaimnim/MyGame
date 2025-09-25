@@ -1,4 +1,4 @@
-
+#!/bin/bash
 cd /d/Practice/TowerDefenseGame
 
 # 取得當前日期與時間（格式：YYYY-MM-DD HH:MM:SS）

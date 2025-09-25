@@ -92,7 +92,9 @@ public class Enemy :MonoBehaviour,IDamageable
 
         GameEventSystem.Instance.Event_HpChanged?.Invoke(CurrentHp, MaxHp, this);// 觸發事件，通知 UI 初始血量
     }
-
+    private void Update() {
+        if (!GameSystem.Instance.GameStateManager.IsControlEnabled) return;
+    }
 
     public virtual void Initialize(EnemyStatsRuntime runtime, IDamageable damageable) {
         //HealthComponent
@@ -138,9 +140,9 @@ public class Enemy :MonoBehaviour,IDamageable
     protected virtual IEnumerator FlashWhite(float duration) {
         if (Spr != null)
         {
-            Spr.material = GameSystem.Instance.flashMaterial;
+            Spr.material = GameSystem.Instance.FlashMaterial;
             yield return new WaitForSeconds(duration);
-            Spr.material = GameSystem.Instance.normalMaterial;
+            Spr.material = GameSystem.Instance.NormalMaterial;
         }
     }
 
@@ -166,16 +168,10 @@ public class Enemy :MonoBehaviour,IDamageable
     }
     protected void ResetMaterial() {
         if (Spr != null)
-            Spr.material = GameSystem.Instance.normalMaterial;
+            Spr.material = GameSystem.Instance.NormalMaterial;
     }
 
 
-
-
-
-
-
-    private void Update() { }
 
     //受傷
     #region TakeDamage(DamageInfo info) 

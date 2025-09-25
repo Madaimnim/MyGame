@@ -85,7 +85,6 @@ public class StageLevelManager : MonoBehaviour
         FadeManager.Instance.FadeSetAlpha(0.3f);
 
         StartCoroutine(WaitAndGoPrepareState());
-        //GameStateManager.Instance.SetState(GameStateManager.GameState.Preparation);
     }
     #endregion
 
@@ -119,7 +118,7 @@ public class StageLevelManager : MonoBehaviour
         }
 
         // ¤Á´«ª¬ºA
-        GameStateManager.Instance.SetState(GameStateManager.GameState.Preparation);
+        GameSystem.Instance.GameStateManager.SetState(GameStateManager.GameState.Preparation);
     }
     #endregion
 }

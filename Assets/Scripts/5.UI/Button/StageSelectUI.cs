@@ -106,7 +106,7 @@ public class StageSelectUI : MonoBehaviour
     // Inspector 綁定：點子關卡
     #region OnSubStageClicked(string sceneName)
     public void OnSubStageClicked(string sceneName) {
-        GameStateManager.Instance.SetState(GameStateManager.GameState.Battle, sceneName);
+        GameSystem.Instance.GameStateManager.SetState(GameStateManager.GameState.Battle, sceneName);
     }
     #endregion
 

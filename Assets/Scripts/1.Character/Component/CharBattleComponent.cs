@@ -10,4 +10,8 @@ public class CharBattleComponent
     public CharBattleComponent() {
 
     }
+
+    public void DoAttack() {
+
+    }
 }

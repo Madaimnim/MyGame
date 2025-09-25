@@ -1453,7 +1453,6 @@ GameObject:
   m_Component:
   - component: {fileID: 2983711387574672375}
   - component: {fileID: 2983711387574672374}
-  - component: {fileID: 641719556317753157}
   - component: {fileID: 641719556317753159}
   - component: {fileID: 4217123043138436876}
   - component: {fileID: 2047462328069337770}
@@ -1503,19 +1502,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 18ab2c48bf337d94aacacc65a1ef39b0, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
---- !u!114 &641719556317753157
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 2983711387574672369}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 8bc396311d0a09747a9b6c15a1e467d6, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  currentState: 0
+  NormalMaterial: {fileID: 2100000, guid: ce71ba01014fe3043971f56059a6c29d, type: 2}
+  FlashMaterial: {fileID: 2100000, guid: 343628f4e759ecf46b917b0ca0685d23, type: 2}
 --- !u!114 &641719556317753159
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1612,7 +1600,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   selectionIndicatorPrefab: {fileID: 4167029791549883717, guid: f83ade4c18471fb429dc1ccc80f42329, type: 3}
-  isBattleInputEnabled: 0
   virtualCam: {fileID: 0}
 --- !u!114 &443111853
 MonoBehaviour:
@@ -8054,7 +8041,7 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 641719556317753157}
+      - m_Target: {fileID: 0}
         m_TargetAssemblyTypeName: GameStateManager, Assembly-CSharp
         m_MethodName: EnterPrepareState
         m_Mode: 1

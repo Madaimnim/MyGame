@@ -8442,6 +8442,14 @@ PrefabInstance:
       propertyPath: m_Name
       value: GameManager
       objectReference: {fileID: 0}
+    - target: {fileID: 2983711387574672374, guid: 755551f29c152384cafc723cf33cb4ad, type: 3}
+      propertyPath: flashMaterial
+      value: 
+      objectReference: {fileID: 2100000, guid: 343628f4e759ecf46b917b0ca0685d23, type: 2}
+    - target: {fileID: 2983711387574672374, guid: 755551f29c152384cafc723cf33cb4ad, type: 3}
+      propertyPath: normalMaterial
+      value: 
+      objectReference: {fileID: 2100000, guid: ce71ba01014fe3043971f56059a6c29d, type: 2}
     - target: {fileID: 2983711387574672375, guid: 755551f29c152384cafc723cf33cb4ad, type: 3}
       propertyPath: m_RootOrder
       value: 2

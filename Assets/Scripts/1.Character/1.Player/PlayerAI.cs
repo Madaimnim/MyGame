@@ -20,17 +20,13 @@ public class PlayerAI : MonoBehaviour, IAttackable, IMoveable,IInputProvider
 
     public PlayerSkillSpawner skillSpawner;
 
-    //生命週期
-    #region
-
+    #region 生命週期
     private void Awake() {}
-
     private void Start() {
         player = GetComponent<Player>();
         behaviorTree = GetComponent<BehaviorTree>();
         SetBehaviorTree();
     }
-
     private void Update() {
         if (!player.CharAIComponent.CanRunAI) return;
         player.UpdateSkillCooldowns(); // Player 負責管理自己的技能槽冷卻
@@ -39,7 +35,6 @@ public class PlayerAI : MonoBehaviour, IAttackable, IMoveable,IInputProvider
     #endregion
 
     //執行技能樹
-    #region RunBehaviorTree()
     private void RunBehaviorTree() {
         if (updateTimer <= 0f)
         {
@@ -48,10 +43,8 @@ public class PlayerAI : MonoBehaviour, IAttackable, IMoveable,IInputProvider
         }
         updateTimer -= Time.deltaTime;
     }
-    #endregion
 
     //行為樹：判斷是否可使用技能
-    #region CanUseSkill(int skillSlot)
     public bool CanUseSkill(int slotIndex) {
         if (!IsIndexCorrect(slotIndex)) return false;                             //錯誤SlotIndex
         
@@ -61,11 +54,16 @@ public class PlayerAI : MonoBehaviour, IAttackable, IMoveable,IInputProvider
 
         return targetDetector != null && targetDetector.hasTarget && player.Runtime.SkillSlots[slotIndex].CooldownTimer <= 0;
     }
-    #endregion
 
+    //IInputProvider
     public Vector2 GetMoveDirection() {
-        //Todo
-        return Vector2.zero; 
+        // 行為樹運算，決定方向
+        return Vector2.zero;
+    }
+
+    public bool IsAttackPressed() {
+        // 行為樹決定是否釋放技能
+        return false;
     }
 
     public bool CanMove() {

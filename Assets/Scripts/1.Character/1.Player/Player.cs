@@ -35,7 +35,7 @@ public class Player:MonoBehaviour,IDamageable
     public PlayerAI PlayerAI;
     public bool IsDead => CharHealthComponent.IsDead;
     public bool IsKnockbacking => CharBattleComponent.IsKnockbacking;
-
+    public IInputProvider InputProvider { get; private set; }
     //私有--------------------------------------------------------------------------------------------------------------------------------------------------------------------------
     private GameObject[] _detectors;             //玩家腳色自有一份Detector，不在Runtime上唯一取用
 
@@ -48,9 +48,7 @@ public class Player:MonoBehaviour,IDamageable
         Col = GetComponent<Collider2D>();
         ShadowControl = GetComponentInChildren<ShadowController>();
     }
-    private void OnEnable() {
-
-    }
+    private void OnEnable(){}
     private void OnDisable() {
         if (CharRespawnComponent != null) CharRespawnComponent.OnRespawn -= OnRespawn;
         if (CharHealthComponent != null)
@@ -82,6 +80,21 @@ public class Player:MonoBehaviour,IDamageable
             }
         }
     }
+    private void Update() {
+        //確定當前狀態能不能控制
+
+        if (InputProvider == null) return;
+        // 移動輸入
+        Vector2 dir = InputProvider.GetMoveDirection();
+        ApplyInput(dir);
+
+        // 攻擊輸入（如果是 AI，就來自行為樹）
+        if (InputProvider.IsAttackPressed())
+        {
+            CharBattleComponent.DoAttack(); // 或呼叫技能系統
+        }
+    }
+
     #endregion
 
     public void Initialize(PlayerStatsRuntime stats) {
@@ -134,6 +147,15 @@ public class Player:MonoBehaviour,IDamageable
         Runtime.InitializeOwner(this);
     }
 
+    //設定控制來源
+    public void SetInputProvider(IInputProvider provider) {
+        InputProvider = provider;
+        // 如果是 AI → 開啟 AI
+        if (provider is PlayerInputController)
+            DisableAIRun(); 
+        else
+            EnableAIRun();
+    }
 
     public void UpdateSkillCooldowns() {
         foreach (var slot in Runtime.SkillSlots)
@@ -165,7 +187,6 @@ public class Player:MonoBehaviour,IDamageable
         //翻轉朝向
         UpdateFacing(direction);
     }
-
     private void UpdateFacing(Vector2 direction) {
         if (Mathf.Abs(direction.x) > 0.01f)
         {
@@ -240,8 +261,6 @@ public class Player:MonoBehaviour,IDamageable
     }
 
 
-
-    //被擊退
     protected virtual IEnumerator Knockback(float force, Vector2 knockbackDirection) {
         if (Rb != null)
         {
@@ -255,17 +274,16 @@ public class Player:MonoBehaviour,IDamageable
             CharBattleComponent.IsKnockbacking = false;
         }
     }
-    //閃白特效
     protected virtual IEnumerator FlashWhite(float duration) {
         if (Spr != null)
         {
-            Spr.material = GameSystem.Instance.flashMaterial;
+            Spr.material = GameSystem.Instance.FlashMaterial;
             yield return new WaitForSeconds(duration);
-            Spr.material = GameSystem.Instance.normalMaterial;
+            Spr.material = GameSystem.Instance.NormalMaterial;
         }
     }
 
-    //重置狀態參數
+    //重置狀態
     public void ResetState() {
         CharAnimationComponent.IsPlayingAttackAnimation = false;
         CharBattleComponent.IsKnockbacking = false;
@@ -278,27 +296,24 @@ public class Player:MonoBehaviour,IDamageable
             Spr.color = c;
         }
     }
+    protected void ResetMaterial() {
+        if (Spr != null)
+            Spr.material = GameSystem.Instance.NormalMaterial;
+    }
 
-    //啟用AI
+
+    //AI
     public void EnableAIRun() {
         CharAIComponent.CanRunAI = true;
     }
-
-    //禁用AI
     public void DisableAIRun() {
         CharAIComponent.CanRunAI = false;
-    }
-
-    protected void ResetMaterial() {
-        if (Spr != null)
-            Spr.material = GameSystem.Instance.normalMaterial;
     }
 
 
     //取得人物狀態API
     public int GetPlayerAttackPower() => Runtime.StatsData.AttackPower;
     public int GetSkillSlotsLength() => Runtime.SkillSlots.Length;
-
     public void SetSkillSlot(int slotIndex, PlayerSkillRuntime skillData) {
         if (slotIndex < 0 || slotIndex >= Runtime.SkillSlots.Length) return;
         // 綁定資料
@@ -321,7 +336,6 @@ public class Player:MonoBehaviour,IDamageable
         }
 
     }
-
     public GameObject GetSkillSlotDetector(int slotIndex) =>
     (slotIndex < 0 || slotIndex >= _detectors.Length) ? null : _detectors[slotIndex];
 

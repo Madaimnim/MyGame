@@ -2,6 +2,7 @@
 using UnityEngine;
 using UnityEngine.EventSystems;
 using Cinemachine;
+using System;
 
 public class PlayerInputController : MonoBehaviour,IInputProvider
 {
@@ -9,15 +10,14 @@ public class PlayerInputController : MonoBehaviour,IInputProvider
     public GameObject selectionIndicatorPrefab;  // 選框預製體
     private GameObject currentSelectionIndicator;// 當前選框（標示當前控制的角色）
 
-    public bool isBattleInputEnabled = false;
-
     private Dictionary<int, GameObject> deployedPlayersGameObjectDtny = new Dictionary<int, GameObject>(); 
     private List<int> deployedPlayerIDsList = new List<int>(); // 存放目前可用的角色 ID
     private int currentPlayerIndex = -1;  // 當前選擇的角色索引
 
     [SerializeField] private CinemachineVirtualCamera virtualCam;
 
-    private Vector2 _cachedMoveDirection = Vector2.zero;
+    private bool _canControl = false;
+    private GameStateManager _gameStateManger; // 依賴注入進來
 
     #region 生命週期
     private void Awake() {
@@ -29,39 +29,51 @@ public class PlayerInputController : MonoBehaviour,IInputProvider
         Instance = this;
         DontDestroyOnLoad(gameObject);
     }
+    private void OnEnable() {
+    }
+    private void OnDisable() {
+        if (_gameStateManger != null)
+            _gameStateManger.OnControlEnabledChanged -= OnControlEnabledChanged;
+    }
     private void Start() {
         virtualCam = FindObjectOfType<CinemachineVirtualCamera>();
     }
     private void Update() {
-        if (!isBattleInputEnabled) return;
+        //確定當前狀態能不能控制
+        if (!_canControl) return;
         HandlePlayerSwitch();
-
-        _cachedMoveDirection = GetMoveDirection();
-    }
-    private void FixedUpdate() {
-        if (!isBattleInputEnabled) return;
-        ApplyMovement();
     }
     #endregion
 
-    //IInputProvider
-    public Vector2 GetMoveDirection() {
-        float moveX = Input.GetAxisRaw("Horizontal");
-        float moveY = Input.GetAxisRaw("Vertical");
-        return new Vector2(moveX, moveY).normalized;
+    //  Init 注入 GameStateManager
+    public void Initialize(GameStateManager gameStateManger) {
+        _gameStateManger = gameStateManger ?? throw new ArgumentNullException(nameof(gameStateManger));
+        _gameStateManger.OnControlEnabledChanged += OnControlEnabledChanged;
     }
 
-    //提供當前角色移動方向
-    private void ApplyMovement() {
-        if (deployedPlayerIDsList.Count == 0) return; // 確保場上有角色
 
-        int currentId = deployedPlayerIDsList[currentPlayerIndex];
-        if (!deployedPlayersGameObjectDtny.ContainsKey(currentId)) return;
-        var currentPlayerObject = deployedPlayersGameObjectDtny[currentId];
-        var player = currentPlayerObject.GetComponent<Player>();
-        if (player == null) { Debug.LogWarning("移動控制對象player==null"); ;return; }
+    public void OnControlEnabledChanged(bool canControl) {
+        _canControl = canControl;
+        Debug.Log($"[PlayerInputController] OnControlEnabledChanged={canControl}");
+    }
 
-        player.ApplyInput(_cachedMoveDirection);
+    //IInputProvider
+    public Vector2 GetMoveDirection() {
+        if (_canControl)
+        {
+            float moveX = Input.GetAxisRaw("Horizontal");
+            float moveY = Input.GetAxisRaw("Vertical");
+            return new Vector2(moveX, moveY).normalized;
+        }
+        else
+            return Vector2.zero;
+
+    }
+    public bool IsAttackPressed() {
+        if (_canControl)
+            return Input.GetKeyDown(KeyCode.Space);
+        else
+            return false;
     }
 
     //初始化角色清單，並預選第一個角色
@@ -142,22 +154,40 @@ public class PlayerInputController : MonoBehaviour,IInputProvider
 
     // 選擇角色、指標跟隨、相機跟隨
     private void SelectPlayer(int index) {
+        //if (index < 0 || index >= deployedPlayerIDsList.Count) return;
+        //
+        //if (currentPlayerIndex != index) // 只有當角色變更時才更新
+        //{
+        //    currentPlayerIndex = index;
+        //    UpdateSelectionIndicator();
+        //}
+        //
+        ////設定 Cinemachine Camera 的跟隨目標
+        //int playerID = deployedPlayerIDsList[currentPlayerIndex];
+        //if (deployedPlayersGameObjectDtny.ContainsKey(playerID))
+        //{
+        //    GameObject currentPlayer = deployedPlayersGameObjectDtny[playerID];
+        //    CameraManager.Instance.Follow(currentPlayer.transform);
+        //}
         if (index < 0 || index >= deployedPlayerIDsList.Count) return;
 
-        if (currentPlayerIndex != index) // 只有當角色變更時才更新
+        currentPlayerIndex = index;
+
+        // 選中的 → 玩家控制
+        int selectedId = deployedPlayerIDsList[index];
+        var selectedPlayer = deployedPlayersGameObjectDtny[selectedId].GetComponent<Player>();
+        selectedPlayer.SetInputProvider(this); // 指定玩家輸入控制
+
+        // 其他角色 → AI 控制
+        foreach (var kvp in deployedPlayersGameObjectDtny)
         {
-            currentPlayerIndex = index;
-            UpdateSelectionIndicator();
+            if (kvp.Key == selectedId) continue; // 略過選中的
+            var p = kvp.Value.GetComponent<Player>();
+            p.SetInputProvider(p.GetComponent<PlayerAI>()); // 指定 AI 控制
         }
 
-        //設定 Cinemachine Camera 的跟隨目標
-        int playerID = deployedPlayerIDsList[currentPlayerIndex];
-        if (deployedPlayersGameObjectDtny.ContainsKey(playerID))
-        {
-            GameObject currentPlayer = deployedPlayersGameObjectDtny[playerID];
-            CameraManager.Instance.Follow(currentPlayer.transform);
-        }
-
+        UpdateSelectionIndicator();
+        CameraManager.Instance.Follow(selectedPlayer.transform);
     }
 
     // 更新指標的位置

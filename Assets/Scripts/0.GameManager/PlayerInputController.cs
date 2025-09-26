@@ -17,7 +17,7 @@ public class PlayerInputController : MonoBehaviour,IInputProvider
     [SerializeField] private CinemachineVirtualCamera virtualCam;
 
     private bool _canControl = false;
-    private GameStateManager _gameStateManger; // 依賴注入進來
+    private GameStateSystem _gameStateManger; // 依賴注入進來
 
     #region 生命週期
     private void Awake() {
@@ -45,8 +45,8 @@ public class PlayerInputController : MonoBehaviour,IInputProvider
     }
     #endregion
 
-    //  Init 注入 GameStateManager
-    public void Initialize(GameStateManager gameStateManger) {
+    //  Init 注入 GameStateSystem
+    public void Initialize(GameStateSystem gameStateManger) {
         _gameStateManger = gameStateManger ?? throw new ArgumentNullException(nameof(gameStateManger));
         _gameStateManger.OnControlEnabledChanged += OnControlEnabledChanged;
     }

@@ -5,7 +5,7 @@ using UnityEngine;
 public class PlayerSpawnPoint : MonoBehaviour
 {
     private IEnumerator Start() {
-        yield return StartCoroutine(GameSystem.Instance.WaitForDataReady());
+        yield return StartCoroutine(GameManager.Instance.WaitForDataReady());
         if (PlayerStateManager.Instance != null)
         {
             PlayerStateManager.Instance.stageSpawnPosition = gameObject.transform.position;

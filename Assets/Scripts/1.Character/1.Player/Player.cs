@@ -277,9 +277,9 @@ public class Player:MonoBehaviour,IDamageable
     protected virtual IEnumerator FlashWhite(float duration) {
         if (Spr != null)
         {
-            Spr.material = GameSystem.Instance.FlashMaterial;
+            Spr.material = GameManager.Instance.FlashMaterial;
             yield return new WaitForSeconds(duration);
-            Spr.material = GameSystem.Instance.NormalMaterial;
+            Spr.material = GameManager.Instance.NormalMaterial;
         }
     }
 
@@ -298,7 +298,7 @@ public class Player:MonoBehaviour,IDamageable
     }
     protected void ResetMaterial() {
         if (Spr != null)
-            Spr.material = GameSystem.Instance.NormalMaterial;
+            Spr.material = GameManager.Instance.NormalMaterial;
     }
 
 

@@ -118,7 +118,7 @@ public class StageLevelManager : MonoBehaviour
         }
 
         // ¤Á´«ª¬ºA
-        GameSystem.Instance.GameStateManager.SetState(GameStateManager.GameState.Preparation);
+        GameManager.Instance.GameStateSystem.SetState(GameStateSystem.GameState.Preparation);
     }
     #endregion
 }

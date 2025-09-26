@@ -1,9 +1,6 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using System;
-using UnityEngine.UIElements;
-using Unity.VisualScripting.Antlr3.Runtime.Misc;
 
 public class PlayerStateManager:MonoBehaviour
 {
@@ -36,10 +33,8 @@ public class PlayerStateManager:MonoBehaviour
             runtimeList.Add(new PlayerStatsRuntime(stat));
         SetStates(runtimeList);
     }
-
     private bool IsValidId(int id) => IDValidator.IsPlayerID(id);
-
-    protected void SetStates(List<PlayerStatsRuntime> statsList) {
+    public void SetStates(List<PlayerStatsRuntime> statsList) {
         _playerStatsDtny.Clear();
         foreach (var stat in statsList)
         {

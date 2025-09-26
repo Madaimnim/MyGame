@@ -15,7 +15,7 @@ public class TestManager : MonoBehaviour
 
 
     public IEnumerator Start(){
-        yield return StartCoroutine(GameSystem.Instance.WaitForDataReady());
+        yield return StartCoroutine(GameManager.Instance.WaitForDataReady());
         //StartCoroutine(CreatPlayer());
 
         yield return null;

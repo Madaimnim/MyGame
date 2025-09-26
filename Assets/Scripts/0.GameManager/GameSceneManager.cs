@@ -37,7 +37,7 @@ public class GameSceneManager: MonoBehaviour
     }
 
     private IEnumerator Start() {
-        yield return StartCoroutine(GameSystem.Instance.WaitForDataReady());
+        yield return StartCoroutine(GameManager.Instance.WaitForDataReady());
         GameStartButton.gameObject.SetActive(true);
     }
     #endregion
@@ -98,11 +98,11 @@ public class GameSceneManager: MonoBehaviour
         }
         isLoadingScene = true;
 
-        // 確保 GameSystem 的資料已加載完畢
-        if (!GameSystem.Instance.IsAllDataLoaded)
+        // 確保 GameManager 的資料已加載完畢
+        if (!GameManager.Instance.IsAllDataLoaded)
         {
-            Debug.LogError("GameSystem.Instance.IsAllDataLoaded，資料未完成加載，等待中...");
-            yield return new WaitUntil(() => GameSystem.Instance.IsAllDataLoaded);
+            Debug.LogError("GameManager.Instance.IsAllDataLoaded，資料未完成加載，等待中...");
+            yield return new WaitUntil(() => GameManager.Instance.IsAllDataLoaded);
         }
 
         // 執行淡出效果

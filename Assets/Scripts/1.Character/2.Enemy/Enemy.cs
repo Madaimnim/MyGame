@@ -81,7 +81,7 @@ public class Enemy :MonoBehaviour,IDamageable
     private IEnumerator Start() {
         if (Runtime == null)
         {
-            yield return StartCoroutine(GameSystem.Instance.WaitForDataReady());
+            yield return StartCoroutine(GameManager.Instance.WaitForDataReady());
             SetEnemyData();
             isEnemyDataReady = true;
             MaxHp = Runtime.MaxHp;
@@ -93,7 +93,7 @@ public class Enemy :MonoBehaviour,IDamageable
         GameEventSystem.Instance.Event_HpChanged?.Invoke(CurrentHp, MaxHp, this);// 觸發事件，通知 UI 初始血量
     }
     private void Update() {
-        if (!GameSystem.Instance.GameStateManager.IsControlEnabled) return;
+        if (!GameManager.Instance.GameStateSystem.IsControlEnabled) return;
     }
 
     public virtual void Initialize(EnemyStatsRuntime runtime, IDamageable damageable) {
@@ -140,9 +140,9 @@ public class Enemy :MonoBehaviour,IDamageable
     protected virtual IEnumerator FlashWhite(float duration) {
         if (Spr != null)
         {
-            Spr.material = GameSystem.Instance.FlashMaterial;
+            Spr.material = GameManager.Instance.FlashMaterial;
             yield return new WaitForSeconds(duration);
-            Spr.material = GameSystem.Instance.NormalMaterial;
+            Spr.material = GameManager.Instance.NormalMaterial;
         }
     }
 
@@ -168,7 +168,7 @@ public class Enemy :MonoBehaviour,IDamageable
     }
     protected void ResetMaterial() {
         if (Spr != null)
-            Spr.material = GameSystem.Instance.NormalMaterial;
+            Spr.material = GameManager.Instance.NormalMaterial;
     }
 
 

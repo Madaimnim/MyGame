@@ -4,25 +4,25 @@ using UnityEngine;
 
 public class BattleHandler : IGameStateHandler
 {
-    private readonly GameSystem _gameSystem;
+    private readonly ICoroutineRunner _runner;
     private readonly GameSceneManager _sceneManager;
     private readonly PlayerStateManager _playerStateManager;
     private readonly PlayerInputController _inputController;
 
     public BattleHandler(
-        GameSystem gameSystem, 
+        ICoroutineRunner runner, 
         GameSceneManager sceneManager, 
         PlayerStateManager playerStateManager, 
         PlayerInputController inputController
         ) {
-        _gameSystem = gameSystem;
+        _runner = runner;
         _sceneManager = sceneManager;
         _playerStateManager = playerStateManager;
         _inputController = inputController;
         ;
     }
     public void Enter(string sceneName = null) {
-        _gameSystem.StartCoroutine(EnterBattleCoroutine(sceneName));
+        _runner.StartCoroutine(EnterBattleCoroutine(sceneName));
     }
 
     public void Exit() {

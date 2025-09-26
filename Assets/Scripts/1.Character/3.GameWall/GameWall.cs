@@ -72,9 +72,9 @@ public class GameWall : MonoBehaviour, IDamageable
     private IEnumerator FlashWhite(float duration) {
         if (spriteRenderer != null)
         {
-            spriteRenderer.material = GameSystem.Instance.FlashMaterial;
+            spriteRenderer.material = GameManager.Instance.FlashMaterial;
             yield return new WaitForSeconds(duration);
-            spriteRenderer.material = GameSystem.Instance.NormalMaterial;
+            spriteRenderer.material = GameManager.Instance.NormalMaterial;
         }
     }
     #endregion

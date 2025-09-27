@@ -4,23 +4,21 @@ using UnityEngine;
 
 public class PreparationHandler : IGameStateHandler
 {
-    private readonly PlayerStateManager _playerStateManager;
-    private readonly GameSceneManager _sceneManager;
+    private readonly PlayerSystem _playerSystem;
+    private readonly GameSceneSystem _sceneSystem;
     private readonly UIController_Input _uiController;
 
     public PreparationHandler(
-        PlayerStateManager playerStateManager,
-        GameSceneManager sceneManager,
+        PlayerSystem playerSystem,
+        GameSceneSystem sceneSystem,
         UIController_Input uiController
         ) {
-        _playerStateManager = playerStateManager;
-        _sceneManager = sceneManager;
+        _playerSystem = playerSystem;
+        _sceneSystem = sceneSystem;
         _uiController = uiController;
     }
-    public void Enter(string sceneName = null) {
-        _playerStateManager.DeactivateAllPlayer();
-        _sceneManager.LoadScenePreparation();
-        _sceneManager.GameStartButton.gameObject.SetActive(false);
+    public void Enter(string sceneKey = null) {
+        _sceneSystem.LoadSceneByKey(sceneKey?? "Preparation");
         _uiController.isUIInputEnabled = true;
         TextPopupManager.Instance.TextPrefab_StageClear.transform.localPosition = Vector3.zero;
     }

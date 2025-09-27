@@ -1,0 +1,82 @@
+﻿using UnityEngine;
+using UnityEngine.AddressableAssets;
+using UnityEngine.ResourceManagement.AsyncOperations;
+using UnityEngine.ResourceManagement.ResourceProviders;
+using System.Collections;
+
+public class GameSceneSystem : SubSystemBase
+{
+    private ICoroutineRunner _runner;
+    private SceneConfig _sceneConfig;
+    private string _currentSceneAddress;
+    private bool _isLoadingScene = false;
+    private AsyncOperationHandle<SceneInstance>? _currentSceneHandle;
+
+    //新增事件給 UI 使用
+    public event System.Action<float> OnSceneLoadProgress; // 0~1
+    public event System.Action<string> OnSceneLoaded;
+
+    public GameSceneSystem(GameManager gm) : base(gm) {
+        _runner = new CoroutineRunnerAdapter(gm);
+    }
+
+    public override void Initialize() {
+        _sceneConfig = GameManager.SceneConfig;
+    }
+    public override void Update(float deltaTime) { }
+    public override void Shutdown() { }
+
+    public void LoadSceneByKey(string key) {
+        string address = _sceneConfig.GetAddress(key);
+        if (!string.IsNullOrEmpty(address))
+            _runner.StartCoroutine(LoadScene(address));
+    }
+    private IEnumerator LoadScene(string address) {
+        //GamePauseManager.Instance.ResumeGame();
+        if (address == _currentSceneAddress) yield break;
+        if (_isLoadingScene) yield break;
+        _isLoadingScene = true;
+        yield return new WaitUntil(() => GameManager.IsAllDataLoaded);
+        yield return FadeManager.Instance.FadeOut();
+        yield return new WaitForSecondsRealtime(FadeManager.Instance.fadeDuration);
+  
+        // 卸載舊場景
+        if (_currentSceneHandle.HasValue)
+        {
+            yield return Addressables.UnloadSceneAsync(_currentSceneHandle.Value);
+            _currentSceneHandle = null;
+        }
+
+        // 載入新場景
+        AsyncOperationHandle<SceneInstance> handle =Addressables.LoadSceneAsync(address, UnityEngine.SceneManagement.LoadSceneMode.Single, activateOnLoad: true);
+        //事件呼叫(傳入讀取進度%)
+        while (!handle.IsDone)
+        {
+            OnSceneLoadProgress?.Invoke(handle.PercentComplete);
+            yield return null;
+        }
+
+        if (handle.Status == AsyncOperationStatus.Succeeded)
+        {
+            CameraManager.Instance.CleanupExtraMainCameras();
+            _currentSceneHandle = handle;
+            _currentSceneAddress = address;
+
+            OnSceneLoadProgress?.Invoke(1f);
+            yield return new WaitForSeconds(1f);
+            UIManager.Instance.SetLoadingUI(false);
+
+            yield return FadeManager.Instance.FadeIn();
+            UIManager.Instance.SetLoadingUI(false);
+
+            OnSceneLoaded?.Invoke(address);
+            GameEventSystem.Instance.Event_SceneLoaded?.Invoke(address);
+        }
+        else
+        {
+            Debug.LogError($"場景載入失敗: {address}");
+        }
+        _isLoadingScene = false;
+    }
+
+}

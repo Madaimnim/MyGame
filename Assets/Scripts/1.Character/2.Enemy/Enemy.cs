@@ -60,8 +60,6 @@ public class Enemy :MonoBehaviour,IDamageable
     }
 
     private void OnEnable() {
-        ResetMaterial();
-
         GameEventSystem.Instance.Event_BattleStart += EnableAIRun;
         GameEventSystem.Instance.Event_OnWallBroken += DisableAIRun;
     }
@@ -140,9 +138,9 @@ public class Enemy :MonoBehaviour,IDamageable
     protected virtual IEnumerator FlashWhite(float duration) {
         if (Spr != null)
         {
-            Spr.material = GameManager.Instance.FlashMaterial;
+            Spr.material = Runtime.VisualData.FlashMaterial;
             yield return new WaitForSeconds(duration);
-            Spr.material = GameManager.Instance.NormalMaterial;
+            Spr.material = Runtime.VisualData.NormalMaterial;
         }
     }
 
@@ -168,7 +166,7 @@ public class Enemy :MonoBehaviour,IDamageable
     }
     protected void ResetMaterial() {
         if (Spr != null)
-            Spr.material = GameManager.Instance.NormalMaterial;
+            Spr.material = Runtime.VisualData.NormalMaterial;
     }
 
 
@@ -213,11 +211,10 @@ public class Enemy :MonoBehaviour,IDamageable
         MaxHp = Runtime.MaxHp;
 
         transform.name = $"Enemy_{Runtime.StatsData.Id} ({Runtime.StatsData.Name})";
-
-
         Runtime.InitializeOwner(this);   // 保證血量初始化
 
         EnemyStateManager.Instance?.RegisterEnemy(this); // ← 統一註冊
+        ResetMaterial();
     }
 
     //Todo
@@ -228,6 +225,7 @@ public class Enemy :MonoBehaviour,IDamageable
 
         Id = Runtime.StatsData.Id;
         EnemyStateManager.Instance.RegisterEnemy(this);
+        ResetMaterial();
     }
 
 }

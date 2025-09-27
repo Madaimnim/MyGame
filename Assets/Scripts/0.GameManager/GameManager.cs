@@ -7,24 +7,32 @@ using UnityEngine.ResourceManagement.AsyncOperations;
 public class GameManager : MonoBehaviour
 {
     public static GameManager Instance { get; private set; }
+    //Config
+    public PrefabConfig PrefabConfig => _prefabConfig;
+    [SerializeField] private PrefabConfig _prefabConfig;
+    public SceneConfig SceneConfig => _sceneConfig;
+    [SerializeField] private SceneConfig _sceneConfig;
+
+    public Transform PlayerBattleParent;
+    public Transform PlayerUiParent;
+    public Vector3 PlayerSpawnPosition;
+
+    public Dictionary<GameStateSystem.GameState,IGameStateHandler> GameStateHandlers { get; private set; }
+
+    //子系統
     public GameStateSystem GameStateSystem { get; private set; }
-    public PlayerStateManager PlayerStateManager { get; private set; }
-
-
+    public GameSceneSystem GameSceneSystem { get;private set; }
     public PlayerInputController PlayerInputController { get; private set; }
-
-    [Header("全局角色材質")]
-    public Material NormalMaterial;
-    public Material FlashMaterial;
+    public PlayerSystem PlayerSystem { get; private set; }
 
     public bool IsAllDataLoaded => IsPlayerDataLoaded && IsEnemyDataLoaded;
     public bool IsPlayerDataLoaded { get; private set; } = false;
     public bool IsEnemyDataLoaded { get; private set; } = false;
 
+
     private readonly List<SubSystemBase> _subSystems = new();
     private GameStateRouter _gameStateRouter;
 
-    #region 生命週期
     private void Awake() {
         //單例
         if (Instance != null && Instance != this)
@@ -35,51 +43,41 @@ public class GameManager : MonoBehaviour
         Instance = this;
         DontDestroyOnLoad(gameObject);
 
+
+        UIManager.Instance.SetLoadingUI(true);
+
         //建子系統
         GameStateSystem = new GameStateSystem(this);
+        GameSceneSystem = new GameSceneSystem(this);
+        PlayerInputController = new PlayerInputController(this);
+        _gameStateRouter = new GameStateRouter(this);
+        PlayerSystem = new PlayerSystem(this);
 
-        //找到 MonoBehaviour 並注入依賴
-        PlayerInputController = FindObjectOfType<PlayerInputController>();
-        if (PlayerInputController != null)
-            PlayerInputController.Initialize(GameStateSystem);
-        else
-            Debug.LogWarning("PlayerInputController not found in scene!");
-
-        //1.建立服務(轉接器包裝)
-        var sceneServiceAdapter = new SceneServiceAdapter();
-        var uiInputSetviceAdapter = new UIInputServiceAdapter();
-        var playerRosterAdapter = new PlayerRosterAdapter();
-        var gameEventSAdapter = new GameEventsAdapter();
-
-        //2.建 Handler map並建構子給_gameStateRouter
+        //建 Handler map並建構子給_gameStateRouter
         var runner = new CoroutineRunnerAdapter(this);
-
-        var handlers = new Dictionary<GameStateSystem.GameState, IGameStateHandler>{
-            { GameStateSystem.GameState.GameStart, new GameStartHandler(GameSceneManager.Instance, UIController_Input.Instance,PlayerStateManager.Instance) },
-            { GameStateSystem.GameState.Preparation, new PreparationHandler(PlayerStateManager.Instance, GameSceneManager.Instance, UIController_Input.Instance) },
-            { GameStateSystem.GameState.Battle, new BattleHandler(runner, GameSceneManager.Instance, PlayerStateManager.Instance, PlayerInputController) },
-            // EndGameHandler 之後再加
+        GameStateHandlers = new Dictionary<GameStateSystem.GameState, IGameStateHandler>{
+            { GameStateSystem.GameState.GameStart, new GameStartHandler(runner,GameSceneSystem, UIController_Input.Instance,PlayerSystem) },
+            { GameStateSystem.GameState.Preparation, new PreparationHandler(PlayerSystem, GameSceneSystem, UIController_Input.Instance) },
+            { GameStateSystem.GameState.Battle, new BattleHandler( GameSceneSystem, PlayerSystem, PlayerInputController) },
         };
-        _gameStateRouter = new GameStateRouter(GameStateSystem,handlers);
+
 
         //所有子系統初始化
         foreach (var sub in _subSystems)  sub.Initialize();
     }
     private void OnDisable() { }
-
     private IEnumerator Start() {
         yield return Addressables.InitializeAsync();
-
         yield return LoadPlayerStatsList();
         yield return LoadEnemyStatsList();
-    }
 
+        // 遊戲一開始 → 自動切到 StartScene
+        GameSceneSystem.LoadSceneByKey("Start");
+    }
     private void Update() {
         float dt = Time.deltaTime;
         foreach (var sub in _subSystems)  sub.Update(dt); 
     }
-
-    #endregion
 
     public void RegisterSubsystem(SubSystemBase subSystem) {
         if (!_subSystems.Contains(subSystem))
@@ -88,17 +86,17 @@ public class GameManager : MonoBehaviour
 
 
     private IEnumerator LoadPlayerStatsList() {
-        string address = "Assets/GameData/PlayerStatData.asset";
+        string address = "PlayerStatData";
         AsyncOperationHandle<PlayerStatData> handle = Addressables.LoadAssetAsync<PlayerStatData>(address);
         yield return handle;
         if (handle.Status == AsyncOperationStatus.Succeeded)
         {
-            PlayerStateManager.Instance.SetPlayerStatesDtny(handle.Result);
+            PlayerSystem.SetPlayerStatsRuntimes(handle.Result);
             IsPlayerDataLoaded = true;
         }
     }
     private IEnumerator LoadEnemyStatsList() {
-        string address = "Assets/GameData/EnemyStatData.asset";
+        string address = "EnemyStatData";
         AsyncOperationHandle<EnemyStatData> handle = Addressables.LoadAssetAsync<EnemyStatData>(address);
         yield return handle;
         if (handle.Status == AsyncOperationStatus.Succeeded)

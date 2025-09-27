@@ -5,7 +5,7 @@ using UnityEngine;
 public class EndGameHandler : IGameStateHandler
 {
 
-    public EndGameHandler(GameSceneManager sceneManager) {
+    public EndGameHandler(GameSceneSystem sceneSystem) {
 
     }
     public void Enter(string sceneName) {

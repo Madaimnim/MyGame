@@ -12,7 +12,6 @@ public class Player:MonoBehaviour,IDamageable
     public CharAnimationComponent CharAnimationComponent { get;protected set; }
     public CharEffectComponent CharEffectComponent { get; protected set; }
     public CharExpComponent CharExpComponent { get; protected set; }
-
     public CharBattleComponent CharBattleComponent { get; protected set; }
     public CharMovementComponent CharMovementComponent { get; protected set; }
     public CharAIComponent CharAIComponent { get; protected set; }
@@ -82,7 +81,6 @@ public class Player:MonoBehaviour,IDamageable
     }
     private void Update() {
         //確定當前狀態能不能控制
-
         if (InputProvider == null) return;
         // 移動輸入
         Vector2 dir = InputProvider.GetMoveDirection();
@@ -163,12 +161,12 @@ public class Player:MonoBehaviour,IDamageable
             slot?.TickCooldown(Time.deltaTime);
         }
     }
+
     //延遲註冊UI
     private IEnumerator DelayedRegisterUI() {
         yield return null;
         UIManager_BattlePlayer.Instance.RegisterPlayerPanelUI(this);
     }
-
     public void SetPlayingAttackAnimation(bool b) {
         CharAnimationComponent.IsPlayingAttackAnimation = b;
     }
@@ -277,9 +275,9 @@ public class Player:MonoBehaviour,IDamageable
     protected virtual IEnumerator FlashWhite(float duration) {
         if (Spr != null)
         {
-            Spr.material = GameManager.Instance.FlashMaterial;
+            Spr.material = Runtime.VisualData.FlashMaterial;
             yield return new WaitForSeconds(duration);
-            Spr.material = GameManager.Instance.NormalMaterial;
+            Spr.material = Runtime.VisualData.NormalMaterial;
         }
     }
 
@@ -298,7 +296,7 @@ public class Player:MonoBehaviour,IDamageable
     }
     protected void ResetMaterial() {
         if (Spr != null)
-            Spr.material = GameManager.Instance.NormalMaterial;
+            Spr.material = Runtime.VisualData.NormalMaterial;
     }
 
 

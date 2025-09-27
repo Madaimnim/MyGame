@@ -25,6 +25,8 @@ MonoBehaviour:
     CharPrefab: {fileID: 1901394458928384591, guid: 0d87d99a51500fd418339ea0f269bb01, type: 3}
     SpriteIcon: {fileID: 0}
     DeathSFX: {fileID: 0}
+    NormalMaterial: {fileID: 2100000, guid: ce71ba01014fe3043971f56059a6c29d, type: 2}
+    FlashMaterial: {fileID: 2100000, guid: 343628f4e759ecf46b917b0ca0685d23, type: 2}
   BeginLevel: 1
   SkillPoolList:
   - SkillId: 1

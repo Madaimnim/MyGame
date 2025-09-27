@@ -4,57 +4,38 @@ using UnityEngine.EventSystems;
 using Cinemachine;
 using System;
 
-public class PlayerInputController : MonoBehaviour,IInputProvider
+public class PlayerInputController :SubSystemBase,IInputProvider
 {
-    public static PlayerInputController Instance { get; private set; }
-    public GameObject selectionIndicatorPrefab;  // 選框預製體
-    private GameObject currentSelectionIndicator;// 當前選框（標示當前控制的角色）
+    private GameObject _selectionIndicator;  // 選框箭頭
 
-    private Dictionary<int, GameObject> deployedPlayersGameObjectDtny = new Dictionary<int, GameObject>(); 
-    private List<int> deployedPlayerIDsList = new List<int>(); // 存放目前可用的角色 ID
+    private Dictionary<int, GameObject> _deployedPlayersGameObjectDtny; 
+    private List<int> _deployedPlayerIDsList ; // 存放目前可用的角色 ID
     private int currentPlayerIndex = -1;  // 當前選擇的角色索引
 
-    [SerializeField] private CinemachineVirtualCamera virtualCam;
+    private CinemachineVirtualCamera _virtualCam;
+    private GameStateSystem _gameStateSystem;
 
     private bool _canControl = false;
-    private GameStateSystem _gameStateManger; // 依賴注入進來
 
-    #region 生命週期
-    private void Awake() {
-        if (Instance != null && Instance != this)
-        {
-            Destroy(gameObject);
-            return;
-        }
-        Instance = this;
-        DontDestroyOnLoad(gameObject);
+    public PlayerInputController(GameManager gm) :base(gm){
+        _deployedPlayerIDsList = new List<int>();
+        _deployedPlayersGameObjectDtny = new Dictionary<int, GameObject>();
     }
-    private void OnEnable() {
+
+  
+
+    public override void Initialize() {
+        _gameStateSystem = GameManager.GameStateSystem;
+        _virtualCam = UnityEngine.Object.FindObjectOfType<CinemachineVirtualCamera>();
+        _gameStateSystem.OnControlEnabledChanged += OnControlEnabledChanged;
     }
-    private void OnDisable() {
-        if (_gameStateManger != null)
-            _gameStateManger.OnControlEnabledChanged -= OnControlEnabledChanged;
-    }
-    private void Start() {
-        virtualCam = FindObjectOfType<CinemachineVirtualCamera>();
-    }
-    private void Update() {
-        //確定當前狀態能不能控制
+    public override void Update(float deltaTime) {
         if (!_canControl) return;
         HandlePlayerSwitch();
     }
-    #endregion
-
-    //  Init 注入 GameStateSystem
-    public void Initialize(GameStateSystem gameStateManger) {
-        _gameStateManger = gameStateManger ?? throw new ArgumentNullException(nameof(gameStateManger));
-        _gameStateManger.OnControlEnabledChanged += OnControlEnabledChanged;
-    }
-
-
-    public void OnControlEnabledChanged(bool canControl) {
-        _canControl = canControl;
-        Debug.Log($"[PlayerInputController] OnControlEnabledChanged={canControl}");
+    public override void Shutdown() {
+        if (_gameStateSystem != null)
+            _gameStateSystem.OnControlEnabledChanged -= OnControlEnabledChanged;
     }
 
     //IInputProvider
@@ -75,11 +56,17 @@ public class PlayerInputController : MonoBehaviour,IInputProvider
         else
             return false;
     }
+    public void OnControlEnabledChanged(bool canControl) {
+        _canControl = canControl;
+        Debug.Log($"[PlayerInputController] OnControlEnabledChanged={canControl}");
+    }
+
+ 
 
     //初始化角色清單，並預選第一個角色
     public void InitailPlayerList() {
         UpdatePlayerList(); // 初始化角色列表
-        if (deployedPlayerIDsList.Count > 0)
+        if (_deployedPlayerIDsList.Count > 0)
         {
             SelectPlayer(0);  // 預設選擇第一個角色
         }
@@ -87,10 +74,10 @@ public class PlayerInputController : MonoBehaviour,IInputProvider
 
     // 更新玩家列表
     private void UpdatePlayerList() {
-        deployedPlayersGameObjectDtny = PlayerStateManager.Instance.deployedPlayersGameObjectDtny; // 直接引用 Dictionary
-        deployedPlayerIDsList = new List<int>(deployedPlayersGameObjectDtny.Keys); // 取得所有可用的角色 ID
+        _deployedPlayersGameObjectDtny = PlayerStateManager.Instance.DeployedPlayersGameObjectDtny; // 直接引用 Dictionary
+        _deployedPlayerIDsList = new List<int>(_deployedPlayersGameObjectDtny.Keys); // 取得所有可用的角色 ID
 
-        if (deployedPlayerIDsList.Count == 0)
+        if (_deployedPlayerIDsList.Count == 0)
         {
             Debug.LogWarning("目前沒有可控制的角色！");
         }
@@ -99,7 +86,7 @@ public class PlayerInputController : MonoBehaviour,IInputProvider
     // 處理角色切換
     private void HandlePlayerSwitch() {
         // 數字鍵 1-9 切換角色（根據當前角色數量自適應）
-        for (int i = 0; i < deployedPlayerIDsList.Count && i < 9; i++)
+        for (int i = 0; i < _deployedPlayerIDsList.Count && i < 9; i++)
         {
             if (Input.GetKeyDown(KeyCode.Alpha1 + i))
             {
@@ -135,12 +122,12 @@ public class PlayerInputController : MonoBehaviour,IInputProvider
                 {
                     Debug.Log($"命中物件: {hit.gameObject.name}, Layer: {LayerMask.LayerToName(hit.gameObject.layer)}");
 
-                    // 嘗試匹配 deployedPlayersGameObjectDtny
-                    foreach (var kvp in deployedPlayersGameObjectDtny)
+                    // 嘗試匹配 _deployedPlayersGameObjectDtny
+                    foreach (var kvp in _deployedPlayersGameObjectDtny)
                     {
                         if (hit.gameObject == kvp.Value)
                         {
-                            int index = deployedPlayerIDsList.IndexOf(kvp.Key);
+                            int index = _deployedPlayerIDsList.IndexOf(kvp.Key);
                             if (index != -1)
                             {
                                 SelectPlayer(index);
@@ -154,32 +141,17 @@ public class PlayerInputController : MonoBehaviour,IInputProvider
 
     // 選擇角色、指標跟隨、相機跟隨
     private void SelectPlayer(int index) {
-        //if (index < 0 || index >= deployedPlayerIDsList.Count) return;
-        //
-        //if (currentPlayerIndex != index) // 只有當角色變更時才更新
-        //{
-        //    currentPlayerIndex = index;
-        //    UpdateSelectionIndicator();
-        //}
-        //
-        ////設定 Cinemachine Camera 的跟隨目標
-        //int playerID = deployedPlayerIDsList[currentPlayerIndex];
-        //if (deployedPlayersGameObjectDtny.ContainsKey(playerID))
-        //{
-        //    GameObject currentPlayer = deployedPlayersGameObjectDtny[playerID];
-        //    CameraManager.Instance.Follow(currentPlayer.transform);
-        //}
-        if (index < 0 || index >= deployedPlayerIDsList.Count) return;
+        if (index < 0 || index >= _deployedPlayerIDsList.Count) return;
 
         currentPlayerIndex = index;
 
         // 選中的 → 玩家控制
-        int selectedId = deployedPlayerIDsList[index];
-        var selectedPlayer = deployedPlayersGameObjectDtny[selectedId].GetComponent<Player>();
+        int selectedId = _deployedPlayerIDsList[index];
+        var selectedPlayer = _deployedPlayersGameObjectDtny[selectedId].GetComponent<Player>();
         selectedPlayer.SetInputProvider(this); // 指定玩家輸入控制
 
         // 其他角色 → AI 控制
-        foreach (var kvp in deployedPlayersGameObjectDtny)
+        foreach (var kvp in _deployedPlayersGameObjectDtny)
         {
             if (kvp.Key == selectedId) continue; // 略過選中的
             var p = kvp.Value.GetComponent<Player>();
@@ -192,23 +164,23 @@ public class PlayerInputController : MonoBehaviour,IInputProvider
 
     // 更新指標的位置
     private void UpdateSelectionIndicator() {
-        if (!deployedPlayersGameObjectDtny.ContainsKey(deployedPlayerIDsList[currentPlayerIndex]))
+        if (!_deployedPlayersGameObjectDtny.ContainsKey(_deployedPlayerIDsList[currentPlayerIndex]))
         {
-            Debug.LogWarning("玩家 ID 不存在於 deployedPlayersGameObjectDtny！");
+            Debug.LogWarning("玩家 ID 不存在於 _deployedPlayersGameObjectDtny！");
             return;
         }
-        int playerID = deployedPlayerIDsList[currentPlayerIndex];
+        int playerID = _deployedPlayerIDsList[currentPlayerIndex];
         Player player = PlayerStateManager.Instance.GetBattlePlayerObject(playerID).GetComponent<Player>();
 
         if (player == null) { Debug.LogWarning("取得的 Player 為 null！"); return; }
         if (player.SelectIndicatorPoint == null) { Debug.LogWarning("Player 的 selectIndicatorPoint 為 null！"); return; }
 
         Transform indicatorPoint = player.SelectIndicatorPoint.transform;
-
-        if (currentSelectionIndicator == null)
-            currentSelectionIndicator = Instantiate(selectionIndicatorPrefab, indicatorPoint);
-
-        currentSelectionIndicator.transform.SetParent(indicatorPoint);
-        currentSelectionIndicator.transform.localPosition = Vector3.zero;
+        Debug.LogWarning($"預置_selectionIndicator為:{_selectionIndicator!=null}");
+        if(_selectionIndicator==null)_selectionIndicator = UnityEngine.Object.Instantiate(GameManager.PrefabConfig.SelectionIndicatorPrefab);
+        Debug.LogWarning($"設定後_selectionIndicator為:{_selectionIndicator != null}");
+        _selectionIndicator.transform.SetParent(indicatorPoint);
+        _selectionIndicator.transform.localPosition = Vector3.zero;
     }
+
 }

@@ -6,10 +6,10 @@ public class PlayerSpawnPoint : MonoBehaviour
 {
     private IEnumerator Start() {
         yield return StartCoroutine(GameManager.Instance.WaitForDataReady());
-        if (PlayerStateManager.Instance != null)
+        if (GameManager.Instance.PlayerSystem != null)
         {
-            PlayerStateManager.Instance.stageSpawnPosition = gameObject.transform.position;
-            PlayerStateManager.Instance.ActivateAllPlayer();
+            GameManager.Instance.PlayerSpawnPosition = gameObject.transform.position;
+            GameManager.Instance.PlayerSystem.ActivateAllPlayer();
         }
         else
             Debug.LogWarning("PlayerStateManager不存在目前場景");

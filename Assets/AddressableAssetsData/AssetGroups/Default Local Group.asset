@@ -18,11 +18,27 @@ MonoBehaviour:
   m_GUID: 9605ede188f3ffd49a937a8ecbb0b29f
   m_SerializeEntries:
   - m_GUID: 8bcc953aa0cbf6648b43d406bc53f5f5
-    m_Address: Assets/GameData/EnemyStatData.asset
+    m_Address: EnemyStatData
     m_ReadOnly: 0
     m_SerializedLabels: []
   - m_GUID: 6aad0a54c70e45447b8c5d3ce0f41911
-    m_Address: Assets/GameData/PlayerStatData.asset
+    m_Address: PlayerStatData
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+  - m_GUID: 2cda990e2423bbf4892e6590ba056729
+    m_Address: Battle1-1
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+  - m_GUID: 51614d3b5b5559e4a9427e6385cd0b7c
+    m_Address: Battle1-2
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+  - m_GUID: 0a4ea8bf841601a4cbfe583723d54ad6
+    m_Address: Preparation
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+  - m_GUID: 49a73f6a50adef144a5b89e2dbdd5ec2
+    m_Address: Start
     m_ReadOnly: 0
     m_SerializedLabels: []
   m_ReadOnly: 0

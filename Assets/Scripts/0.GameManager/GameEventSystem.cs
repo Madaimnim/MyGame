@@ -6,15 +6,16 @@ public class GameEventSystem : MonoBehaviour
 {
 
     public static GameEventSystem Instance { get; private set; }
-
+    //¾Ô°«
+    public Action<int, int, IDamageable> Event_HpChanged;
     public Action<IDamageable> Event_OnPlayerDie;
     public Action Event_OnWallBroken;
     public Action<int, Player> Event_SkillInfoChanged;
     public Action<PlayerSkillRuntime,Transform> Event_SkillLevelUp;
-
-    public Action<int, int, IDamageable> Event_HpChanged;
     public Action<int, float, float, Player> Event_SkillCooldownChanged;
 
+    //³õ´º
+    public Action<string> Event_SceneLoaded;
     public Action Event_BattleStart;
 
     private void Awake() {

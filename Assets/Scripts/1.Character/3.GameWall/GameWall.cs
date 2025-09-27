@@ -11,7 +11,9 @@ public class GameWall : MonoBehaviour, IDamageable
     public int attackPower =0;
     public float coolDownTime =0f;
     public float flashWhiteTime =0.1f;
-   
+    public Material NormalMaterial;
+    public Material FlashMaterial;
+
     #endregion
 
     #region 私有變數
@@ -72,9 +74,9 @@ public class GameWall : MonoBehaviour, IDamageable
     private IEnumerator FlashWhite(float duration) {
         if (spriteRenderer != null)
         {
-            spriteRenderer.material = GameManager.Instance.FlashMaterial;
+            spriteRenderer.material = FlashMaterial;
             yield return new WaitForSeconds(duration);
-            spriteRenderer.material = GameManager.Instance.NormalMaterial;
+            spriteRenderer.material = NormalMaterial;
         }
     }
     #endregion

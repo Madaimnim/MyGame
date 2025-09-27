@@ -1,45 +1,49 @@
-using System.Collections;
-using System.Collections.Generic;
+using UnityEngine.UI;
 using UnityEngine;
+using System.Collections;
 
 public class BattleHandler : IGameStateHandler
 {
-    private readonly ICoroutineRunner _runner;
-    private readonly GameSceneManager _sceneManager;
-    private readonly PlayerStateManager _playerStateManager;
+    private readonly GameSceneSystem _sceneSystem;
+    private readonly PlayerSystem _playerSystem;
     private readonly PlayerInputController _inputController;
 
     public BattleHandler(
-        ICoroutineRunner runner, 
-        GameSceneManager sceneManager, 
-        PlayerStateManager playerStateManager, 
-        PlayerInputController inputController
+            GameSceneSystem sceneSystem,
+            PlayerSystem playerSystem,
+            PlayerInputController inputController
         ) {
-        _runner = runner;
-        _sceneManager = sceneManager;
-        _playerStateManager = playerStateManager;
+        _sceneSystem = sceneSystem;
+        _playerSystem = playerSystem;
         _inputController = inputController;
-        ;
+
+        // 訂閱事件
+        GameEventSystem.Instance.Event_SceneLoaded+=OnSceneLoaded;
     }
-    public void Enter(string sceneName = null) {
-        _runner.StartCoroutine(EnterBattleCoroutine(sceneName));
+    public void Enter(string sceneKey = null) {
+        // 只觸發場景載入，不在這裡直接初始化
+        _sceneSystem.LoadSceneByKey(sceneKey??"Battle_Default");
     }
 
     public void Exit() {
+        GameEventSystem.Instance.Event_SceneLoaded -= OnSceneLoaded;
+
         TextPopupManager.Instance.TextPrefab_StageClear.SetActive(false);
         TextPopupManager.Instance.TextPrefab_StageDefeat.SetActive(false);
     }
 
-    private IEnumerator EnterBattleCoroutine(string sceneName) {
-        yield return _sceneManager.LoadSceneForSceneName_Co(sceneName);
-        yield return null;
+    private void OnSceneLoaded(string sceneKey) {
+        if (SceneKeyUtility.IsBattle(sceneKey)) // 只要是戰鬥場景就會進來
+        {
+            _playerSystem.ActivateAllPlayer();
+            _inputController.InitailPlayerList();
+            GameEventSystem.Instance.Event_BattleStart?.Invoke();
+        }
+    }
 
-        _playerStateManager.ActivateAllPlayer();
-        _inputController.InitailPlayerList();
-
-        yield return null;
-
-        GameEventSystem.Instance.Event_BattleStart.Invoke();
+    public static class SceneKeyUtility
+    {
+        public static bool IsBattle(string key) => key.StartsWith("Battle");
     }
 
 }

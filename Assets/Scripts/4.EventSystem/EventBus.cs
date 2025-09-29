@@ -26,6 +26,7 @@ public static class EventBus
     public static void Trigger<T>(T eventData) {
         if (eventDictionary.ContainsKey(typeof(T)) && eventDictionary[typeof(T)] != null)
         {
+            //µo¨Æ¥ó
             ((Action<T>)eventDictionary[typeof(T)]).Invoke(eventData);
         }
     }

@@ -123,7 +123,7 @@ public class Player:MonoBehaviour,IDamageable
 
         //角色物件命名---------------------------------------------------------------------------------------------------------------------------------------------------------------------
         transform.name = $"玩家ID_{Runtime.StatsData.Id}:({Runtime.StatsData.Name})";
-        _detectors = new GameObject[Runtime.SkillSlots.Length];
+        _detectors = new GameObject[Runtime.StatsData.SkillSlotCount];
 
         //訂閱外部事件---------------------------------------------------------------------------------------------------------------------------------------------------------------------
         if (GameEventSystem.Instance != null)
@@ -221,7 +221,8 @@ public class Player:MonoBehaviour,IDamageable
         CharEffectComponent.PlayDeathEffect();
 
         ShadowControl.SetShadowOffset();
-
+        
+        //發事件
         GameEventSystem.Instance.Event_OnPlayerDie?.Invoke(this);
     }
     public void OnHpChanged(int currentHp,int maxHp) {
@@ -311,9 +312,9 @@ public class Player:MonoBehaviour,IDamageable
 
     //取得人物狀態API
     public int GetPlayerAttackPower() => Runtime.StatsData.AttackPower;
-    public int GetSkillSlotsLength() => Runtime.SkillSlots.Length;
+    public int GetSkillSlotsLength() => Runtime.StatsData.SkillSlotCount;
     public void SetSkillSlot(int slotIndex, PlayerSkillRuntime skillData) {
-        if (slotIndex < 0 || slotIndex >= Runtime.SkillSlots.Length) return;
+        if (slotIndex < 0 || slotIndex >= Runtime.StatsData.SkillSlotCount) return;
         // 綁定資料
         Runtime.SkillSlots[slotIndex].BindSkill(skillData);
 

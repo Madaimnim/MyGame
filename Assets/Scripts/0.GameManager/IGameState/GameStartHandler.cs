@@ -25,18 +25,17 @@ public class GameStartHandler : IGameStateHandler
         UIManager.Instance.SetLoadingUI(true);
         _runner.StartCoroutine(WaitForSceconds_LoadScene(1f, sceneKey));
     }
-
     public void Exit() {
         _playerSystem.UnlockPlayer(1001);
-        _playerSystem.SpawnBothPlayers(1001);
-        _playerSystem.GetStatsRuntime(1001).UnlockSkill(1);
-        _playerSystem.GetStatsRuntime(1001).UnlockSkill(2);
-        _playerSystem.SetupPlayerSkillSlot(1001, 0, 1);
+        _playerSystem.SpawnBattlePlayer(1001);
+        _playerSystem.PlayerStatsRuntimes[1001].AddUnlockSkillList(1);
+        //_playerSystem.PlayerStatsRuntimes[1001].AddUnlockSkillList(2);
+        _playerSystem.SkillSystem.EquipSkill(1001, 0, 1);
 
         _playerSystem.UnlockPlayer(1002);
-        _playerSystem.SpawnBothPlayers(1002);
-        _playerSystem.GetStatsRuntime(1002).UnlockSkill(1);
-        _playerSystem.SetupPlayerSkillSlot(1002, 0, 1);
+        _playerSystem.SpawnBattlePlayer(1002);
+        //_playerSystem.PlayerStatsRuntimes[1002].AddUnlockSkillList(1);
+        //_playerSystem.SkillSystem.EquipSkill(1002, 0, 1);
 
         _playerSystem.DeactivateAllPlayer();
     }

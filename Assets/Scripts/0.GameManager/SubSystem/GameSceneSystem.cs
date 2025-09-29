@@ -32,14 +32,14 @@ public class GameSceneSystem : SubSystemBase
             _runner.StartCoroutine(LoadScene(address));
     }
     private IEnumerator LoadScene(string address) {
-        //GamePauseManager.Instance.ResumeGame();
         if (address == _currentSceneAddress) yield break;
         if (_isLoadingScene) yield break;
         _isLoadingScene = true;
         yield return new WaitUntil(() => GameManager.IsAllDataLoaded);
         yield return FadeManager.Instance.FadeOut();
         yield return new WaitForSecondsRealtime(FadeManager.Instance.fadeDuration);
-  
+        UIManager.Instance.SetLoadingUI(true);
+
         // 卸載舊場景
         if (_currentSceneHandle.HasValue)
         {
@@ -49,9 +49,10 @@ public class GameSceneSystem : SubSystemBase
 
         // 載入新場景
         AsyncOperationHandle<SceneInstance> handle =Addressables.LoadSceneAsync(address, UnityEngine.SceneManagement.LoadSceneMode.Single, activateOnLoad: true);
-        //事件呼叫(傳入讀取進度%)
+        
         while (!handle.IsDone)
         {
+            //發事件
             OnSceneLoadProgress?.Invoke(handle.PercentComplete);
             yield return null;
         }
@@ -62,15 +63,15 @@ public class GameSceneSystem : SubSystemBase
             _currentSceneHandle = handle;
             _currentSceneAddress = address;
 
+            //發事件
             OnSceneLoadProgress?.Invoke(1f);
-            yield return new WaitForSeconds(1f);
+            yield return new WaitForSeconds(0.5f);
             UIManager.Instance.SetLoadingUI(false);
 
             yield return FadeManager.Instance.FadeIn();
-            UIManager.Instance.SetLoadingUI(false);
 
+            //發事件
             OnSceneLoaded?.Invoke(address);
-            GameEventSystem.Instance.Event_SceneLoaded?.Invoke(address);
         }
         else
         {

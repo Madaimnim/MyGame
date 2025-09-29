@@ -19,12 +19,18 @@ public class UIController_Skill : MonoBehaviour
 
     //生命週期
     #region 生命週期
-    private void OnEnable() { 
+    private void OnEnable() {
+        GameEventSystem.Instance.Event_SkillEquipped += OnSkillEquippedUI;
+        GameEventSystem.Instance.Event_SkillUnlocked += OnSkillUnlockedUI;
+
         EventBus.Listen<UICurrentPlayerChangEvent>(OnCurrentPlayerChanged);
         StartCoroutine(WaitAndInit());
     }
 
     private void OnDisable() {
+        GameEventSystem.Instance.Event_SkillEquipped -= OnSkillEquippedUI;
+        GameEventSystem.Instance.Event_SkillUnlocked -= OnSkillUnlockedUI;
+
         EventBus.StopListen<UICurrentPlayerChangEvent>(OnCurrentPlayerChanged);
         for (int i = 0; i < slotSkillButtons.Length; i++)
         {
@@ -35,8 +41,8 @@ public class UIController_Skill : MonoBehaviour
 
 
     private IEnumerator WaitAndInit() {
-        yield return new WaitUntil(() => UIManager.Instance != null && PlayerStateManager.Instance != null);
-        PlayerStateManager.Instance.TryGetState(UIManager.Instance.currentPlayerId, out currentPlayer);
+        yield return new WaitUntil(() => UIManager.Instance != null && GameManager.Instance.PlayerSystem != null);
+        GameManager.Instance.PlayerSystem.TryGetStatsRuntime(UIManager.Instance.currentPlayerId, out currentPlayer);
         originSkillSelectionPanelPosition = skillSelectionPanel.transform.position;
         skillSelectionPanel.SetActive(false);
         for (int i = 0; i < slotSkillButtons.Length; i++)
@@ -46,16 +52,27 @@ public class UIController_Skill : MonoBehaviour
         }
         RefreshSkillSlotButtonText();
     }
+    
+    //Todo
+    private void OnSkillEquippedUI(int id,int slotIndex, PlayerSkillRuntime skillRuntime) {
+        if (currentPlayer == null) return;
+        var skill = currentPlayer.GetSkillRuntimeAtSlot(slotIndex);
+        slotSkillNames[slotIndex].text = skill != null ? skill.SkillName : "空";
+    }
+    //Todo
+    private void OnSkillUnlockedUI(int playerId, int skillId) {
+        // 例如刷新技能清單
+        if (currentPlayer != null && currentPlayer.StatsData.Id == playerId)
+        {
+            RefreshSkillSlotButtonText();
+        }
+    }
 
 
-    #region 當「當前腳色變更」事件觸發時，更新本地currentPlayer，並刷新技能槽4個Text
     private void OnCurrentPlayerChanged(UICurrentPlayerChangEvent eventData) {
         currentPlayer = eventData.currentPlayer;
         RefreshSkillSlotButtonText();
     }
-    #endregion
-
-    #region 更新技能槽4個TEXT
     private void RefreshSkillSlotButtonText() {
         if (currentPlayer == null) return;
 
@@ -66,13 +83,11 @@ public class UIController_Skill : MonoBehaviour
                 Debug.LogError($"❌ [UIController_Skill] 技能槽索引超出範圍: {i}");
                 continue;
             }
-            var skill = currentPlayer.GetSkillDataRuntimeAtSlot(i);
+            var skill = currentPlayer.GetSkillRuntimeAtSlot(i);
             slotSkillNames[i].text = skill != null ? skill.SkillName : "空";
         }
     }
-    #endregion
 
-    #region 顯示可選技能列表
     private void ShowAvailableSkills(int slotIndex) {
         List<PlayerSkillRuntime> availableSkills = new List<PlayerSkillRuntime>();
 
@@ -89,9 +104,9 @@ public class UIController_Skill : MonoBehaviour
         // 獲取當前角色的所有可用技能（已解鎖但未裝備的）
         foreach (var skillID in currentPlayer.UnlockedSkillIdList)
         {
-            if (!currentPlayer.EquippedSkillIdList.Contains(skillID))
+            if (!currentPlayer.HasEquippedSkill(skillID))
             {
-                var skill = currentPlayer.SkillPoolDtny[skillID];
+                var skill = currentPlayer.PlayerSkillRuntimeDtny[skillID];
                 if (skill != null)
                 {
                     availableSkills.Add(skill);
@@ -117,19 +132,16 @@ public class UIController_Skill : MonoBehaviour
         // 顯示技能選擇面板
         skillSelectionPanel.SetActive(availableSkills.Count > 0);
     }
-    #endregion
-
-    #region 透過PlayerStateManager的SetSkillAtSlot裝備技能，並刷新4個技能槽的TEXT
     private void EquipSkill(int slotIndex, int skillID) {
         if (currentPlayer == null) return;
 
         // 直接更新技能
-        currentPlayer.SetSkillAtSlot(slotIndex, skillID);
+        currentPlayer.SkillSystem.EquipSkill(currentPlayer.StatsData.Id, slotIndex, skillID);
 
         // 直接觸發 UI 更新（整個技能欄）
         RefreshSkillSlotButtonText();
 
         skillSelectionPanel.SetActive(false);
     }
-    #endregion
+
 }

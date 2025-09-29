@@ -27,13 +27,13 @@ public class TestManager : MonoBehaviour
     #region
     public IEnumerator CreatPlayer() {
         //Todo
-        //PlayerStateManager.Instance.UnlockAndSpawnPlayer(playerID);
+        //GameManager.Instance.PlayerSystem.UnlockAndSpawnPlayer(playerID);
         //
-        //PlayerStateManager.Instance.playerStatesDtny[1].UnlockSkill(testPlayerSkillID);
-        //PlayerStateManager.Instance.playerStatesDtny[playerID].SetSkillAtSlot(0, testPlayerSkillID);
+        //GameManager.Instance.PlayerSystem.playerStatesDtny[1].AddUnlockSkill(testPlayerSkillID);
+        //GameManager.Instance.PlayerSystem.playerStatesDtny[playerID].SetSkillAtSlot(0, testPlayerSkillID);
         //
-        //PlayerStateManager.Instance.deployedPlayersGameObjectDtny[playerID].SetActive(true);
-        //PlayerStateManager.Instance.deployedPlayersGameObjectDtny[playerID].transform.position = playerSpawnTransform.position;
+        //GameManager.Instance.PlayerSystem.deployedPlayersGameObjectDtny[playerID].SetActive(true);
+        //GameManager.Instance.PlayerSystem.deployedPlayersGameObjectDtny[playerID].transform.position = playerSpawnTransform.position;
         //
         //
         //PlayerInputController.Instance.InitailPlayerList();

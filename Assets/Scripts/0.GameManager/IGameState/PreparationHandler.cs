@@ -4,18 +4,14 @@ using UnityEngine;
 
 public class PreparationHandler : IGameStateHandler
 {
-    private readonly PlayerSystem _playerSystem;
+
     private readonly GameSceneSystem _sceneSystem;
-    private readonly UIController_Input _uiController;
+    private  UIController_Input _uiController => UIController_Input.Instance;
 
     public PreparationHandler(
-        PlayerSystem playerSystem,
-        GameSceneSystem sceneSystem,
-        UIController_Input uiController
+        GameSceneSystem sceneSystem
         ) {
-        _playerSystem = playerSystem;
         _sceneSystem = sceneSystem;
-        _uiController = uiController;
     }
     public void Enter(string sceneKey = null) {
         _sceneSystem.LoadSceneByKey(sceneKey?? "Preparation");

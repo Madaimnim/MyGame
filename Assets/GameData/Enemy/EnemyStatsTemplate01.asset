@@ -17,7 +17,7 @@ MonoBehaviour:
     Name: "\u7DA0\u8272\u679C\u51CD"
     MaxHp: 5
     AttackPower: 1
-    MoveSpeed: 3
+    MoveSpeed: 6
     KnockbackPower: 0
     KnockbackResistance: 0
     SkillSlotCount: 1

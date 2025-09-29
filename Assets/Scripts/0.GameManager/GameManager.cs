@@ -3,7 +3,9 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.AddressableAssets;
 using UnityEngine.ResourceManagement.AsyncOperations;
+using System;
 
+[DefaultExecutionOrder(-50)]
 public class GameManager : MonoBehaviour
 {
     public static GameManager Instance { get; private set; }
@@ -14,7 +16,6 @@ public class GameManager : MonoBehaviour
     [SerializeField] private SceneConfig _sceneConfig;
 
     public Transform PlayerBattleParent;
-    public Transform PlayerUiParent;
     public Vector3 PlayerSpawnPosition;
 
     public Dictionary<GameStateSystem.GameState,IGameStateHandler> GameStateHandlers { get; private set; }
@@ -29,6 +30,8 @@ public class GameManager : MonoBehaviour
     public bool IsPlayerDataLoaded { get; private set; } = false;
     public bool IsEnemyDataLoaded { get; private set; } = false;
 
+    //事件
+    public event Action OnAllSubSystemReady;
 
     private readonly List<SubSystemBase> _subSystems = new();
     private GameStateRouter _gameStateRouter;
@@ -43,9 +46,6 @@ public class GameManager : MonoBehaviour
         Instance = this;
         DontDestroyOnLoad(gameObject);
 
-
-        UIManager.Instance.SetLoadingUI(true);
-
         //建子系統
         GameStateSystem = new GameStateSystem(this);
         GameSceneSystem = new GameSceneSystem(this);
@@ -57,13 +57,16 @@ public class GameManager : MonoBehaviour
         var runner = new CoroutineRunnerAdapter(this);
         GameStateHandlers = new Dictionary<GameStateSystem.GameState, IGameStateHandler>{
             { GameStateSystem.GameState.GameStart, new GameStartHandler(runner,GameSceneSystem, UIController_Input.Instance,PlayerSystem) },
-            { GameStateSystem.GameState.Preparation, new PreparationHandler(PlayerSystem, GameSceneSystem, UIController_Input.Instance) },
+            { GameStateSystem.GameState.Preparation, new PreparationHandler( GameSceneSystem) },
             { GameStateSystem.GameState.Battle, new BattleHandler( GameSceneSystem, PlayerSystem, PlayerInputController) },
         };
 
 
         //所有子系統初始化
         foreach (var sub in _subSystems)  sub.Initialize();
+        
+        //發事件
+        OnAllSubSystemReady?.Invoke();
     }
     private void OnDisable() { }
     private IEnumerator Start() {
@@ -79,11 +82,11 @@ public class GameManager : MonoBehaviour
         foreach (var sub in _subSystems)  sub.Update(dt); 
     }
 
+    //繼承SubSystemBase的子系統，建構子時自動訂閱
     public void RegisterSubsystem(SubSystemBase subSystem) {
         if (!_subSystems.Contains(subSystem))
             _subSystems.Add(subSystem);
     }
-
 
     private IEnumerator LoadPlayerStatsList() {
         string address = "PlayerStatData";

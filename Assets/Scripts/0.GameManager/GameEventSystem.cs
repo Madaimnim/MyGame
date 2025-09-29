@@ -10,12 +10,17 @@ public class GameEventSystem : MonoBehaviour
     public Action<int, int, IDamageable> Event_HpChanged;
     public Action<IDamageable> Event_OnPlayerDie;
     public Action Event_OnWallBroken;
+    //playerStatsRuntime
     public Action<int, Player> Event_SkillInfoChanged;
     public Action<PlayerSkillRuntime,Transform> Event_SkillLevelUp;
+    //Todo 冷卻更新需呼叫，尚未實作
     public Action<int, float, float, Player> Event_SkillCooldownChanged;
+    //SkillSystem
+    public Action<int, int, PlayerSkillRuntime> Event_SkillEquipped;
+    public Action<int, int> Event_SkillUnlocked;
+
 
     //場景
-    public Action<string> Event_SceneLoaded;
     public Action Event_BattleStart;
 
     private void Awake() {

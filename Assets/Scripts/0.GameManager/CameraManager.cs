@@ -18,33 +18,18 @@ public class CameraManager : MonoBehaviour
 
         // 嘗試自動抓取 VirtualCamera
         virtualCam = GetComponentInChildren<CinemachineVirtualCamera>();
-        if (virtualCam == null)
-        {
-            Debug.LogError("CameraManager 找不到 CinemachineVirtualCamera！");
-        }
+        if (virtualCam == null) Debug.LogError("CameraManager 找不到 CinemachineVirtualCamera！");
+
+        GameManager.Instance.OnAllSubSystemReady += OnAllSubSystemInitialReady;
     }
 
     //CM相機的Follow跟隨方法
-    #region Follow(Transform target)
     public void Follow(Transform target) {
-        if (virtualCam != null)
-        {
-            virtualCam.Follow = target;
-            //Debug.Log($"CameraManager: VirtualCam 正在跟隨 {target.name}");
-        }
+        if (virtualCam != null) virtualCam.Follow = target;
     }
-    #endregion
-
-    ////CM相機的移除跟隨腳色方法
-    #region ClearFollow()
     public void ClearFollow() {
-        if (virtualCam != null)
-        {
-            virtualCam.Follow = null;
-            Debug.Log("CameraManager: VirtualCam 已清除跟隨目標");
-        }
+        if (virtualCam != null) virtualCam.Follow = null;
     }
-    #endregion
 
     //只刪除「MainCamera」Tag 的相機
     #region CleanupExtraMainCameras()
@@ -78,4 +63,8 @@ public class CameraManager : MonoBehaviour
         }
     }
     #endregion
+
+    private void OnAllSubSystemInitialReady() {
+        GameManager.Instance.PlayerInputController.OnBattlePlayerSelected += Follow;
+    }
 }

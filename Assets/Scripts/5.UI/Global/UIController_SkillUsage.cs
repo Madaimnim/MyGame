@@ -42,7 +42,7 @@ public class UIController_SkillUsage : MonoBehaviour
     #endregion
 
     private IEnumerator WaitAndInit() {
-        yield return new WaitUntil(() =>  PlayerStateManager.Instance != null);
+        yield return new WaitUntil(() =>  GameManager.Instance.PlayerSystem != null);
         UpdateSkillUsageMasteryUI();
     }
 
@@ -50,12 +50,12 @@ public class UIController_SkillUsage : MonoBehaviour
     //更新UI技能熟練度介面
     #region UpdateSkillUsageMasteryUI()
     public void UpdateSkillUsageMasteryUI() {
-        if (!PlayerStateManager.Instance.TryGetState(targetPlayerID, out var playerStatsRuntime))
+        if (!GameManager.Instance.PlayerSystem.TryGetStatsRuntime(targetPlayerID, out var playerStatsRuntime))
         {
             Debug.LogError($"[UIController_SkillUsage] 找不到 PlayerStatsRuntime, playerID={targetPlayerID}");
             return;
         }
-        if (UIManager.Instance == null || PlayerStateManager.Instance == null) return;
+        if (UIManager.Instance == null || GameManager.Instance.PlayerSystem == null) return;
 
         foreach (var skillInfo in skillsInfoList)
         {

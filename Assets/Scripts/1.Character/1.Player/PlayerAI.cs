@@ -73,7 +73,7 @@ public class PlayerAI : MonoBehaviour, IAttackable, IMoveable,IInputProvider
     //行為樹：暫存技能資訊
     #region UseSkill(int slotIndex)
     public void UseSkill(int slotIndex) {
-        var skillData = player.Runtime.GetSkillDataRuntimeAtSlot(slotIndex);
+        var skillData = player.Runtime.GetSkillRuntimeAtSlot(slotIndex);
         if (skillData == null) return;
         var detector = player.GetSkillSlotDetector(slotIndex);
         if (detector == null) return;

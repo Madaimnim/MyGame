@@ -10,7 +10,7 @@ public class UIController_Status : MonoBehaviour
     public Button ChangLastPlayerDisplayerButton;
     public TextMeshProUGUI[] statusTextsArray; // 角色基本狀態顯示（前 6 個）
     private PlayerStatsRuntime currentPlayer;
-
+    private PlayerSystem _playerSystem => GameManager.Instance.PlayerSystem;
 
     private void OnEnable() {
         EventBus.Listen<UICurrentPlayerChangEvent>(OnUICurrentPlayerChanged);
@@ -25,13 +25,13 @@ public class UIController_Status : MonoBehaviour
 
 
     private IEnumerator WaitAndInit() {
-        yield return new WaitUntil(() => UIManager.Instance != null && PlayerStateManager.Instance != null);
+        yield return new WaitUntil(() => UIManager.Instance != null && _playerSystem != null);
         yield return new WaitUntil(() => UIManager.Instance.currentPlayerId != -1);
 
         ChangNextPlayerDisplayerButton.onClick.AddListener(ChangNextPlayerDisplay);
         ChangLastPlayerDisplayerButton.onClick.AddListener(ChangLastPlayerDisplay);
 
-        if (!PlayerStateManager.Instance.TryGetState(UIManager.Instance.currentPlayerId, out currentPlayer))
+        if (!_playerSystem.TryGetStatsRuntime(UIManager.Instance.currentPlayerId, out currentPlayer))
         {
             Debug.LogError($"❌ WaitAndInit: 找不到 ID={UIManager.Instance.currentPlayerId} 的玩家狀態");
             yield break; // 中止，避免後面 Null
@@ -74,11 +74,11 @@ public class UIController_Status : MonoBehaviour
     #region SetActiveUIPlayer(int playerID)
     //每切換當前UI角色執行，將activePlayerUIDtny中的角色物件Active
     public void SetActiveUIPlayer(int playerID) {
-        foreach (var kvp in UIManager.Instance.activeUIPlayersDtny) // 遍歷所有角色 UI
+        foreach (var kvp in _playerSystem.PlayerStatsRuntimes) // 遍歷所有角色 UI
         {
             bool isActive = (kvp.Key == playerID); // 只有當前角色 UI 設為 true
-            kvp.Value.SetActive(isActive);
-            Animator animator = kvp.Value.GetComponent<Animator>();
+            kvp.Value.BattlePlayerObject.SetActive(isActive);
+            Animator animator = kvp.Value.BattlePlayerObject.GetComponent<Animator>();
             if (isActive) // 如果是當前選擇的角色，播放動畫
                 animator.Play(Animator.StringToHash($"Skill1")); // 播放指定動畫
         }

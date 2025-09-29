@@ -18,7 +18,7 @@ public class BattleHandler : IGameStateHandler
         _inputController = inputController;
 
         // 訂閱事件
-        GameEventSystem.Instance.Event_SceneLoaded+=OnSceneLoaded;
+        _sceneSystem.OnSceneLoaded += OnSceneLoaded;
     }
     public void Enter(string sceneKey = null) {
         // 只觸發場景載入，不在這裡直接初始化
@@ -26,7 +26,7 @@ public class BattleHandler : IGameStateHandler
     }
 
     public void Exit() {
-        GameEventSystem.Instance.Event_SceneLoaded -= OnSceneLoaded;
+        _sceneSystem.OnSceneLoaded -= OnSceneLoaded;
 
         TextPopupManager.Instance.TextPrefab_StageClear.SetActive(false);
         TextPopupManager.Instance.TextPrefab_StageDefeat.SetActive(false);
@@ -35,8 +35,8 @@ public class BattleHandler : IGameStateHandler
     private void OnSceneLoaded(string sceneKey) {
         if (SceneKeyUtility.IsBattle(sceneKey)) // 只要是戰鬥場景就會進來
         {
-            _playerSystem.ActivateAllPlayer();
-            _inputController.InitailPlayerList();
+            _inputController.SelectDefaultPlayer();
+            //發事件
             GameEventSystem.Instance.Event_BattleStart?.Invoke();
         }
     }

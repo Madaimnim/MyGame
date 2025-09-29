@@ -14,9 +14,11 @@ public class CharRespawnComponent
 
     public virtual void Respawn() {
         if (!CanRespawn) return;
+        {
+            //發事件
             OnRespawn.Invoke();
+        }
     }
-
     //延遲復活
     public void RespawnAfter(float delay) {
         if (!CanRespawn) return;

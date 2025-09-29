@@ -23,22 +23,26 @@ public class CharHealthComponent
         if (IsDead) return; // 死掉就不再處理
 
         _healthData.CurrentHp = Mathf.Clamp(_healthData.CurrentHp - dmg, 0, MaxHp);
+        //發事件
         OnHpChanged?.Invoke(_healthData.CurrentHp, MaxHp);
         if (_healthData.CurrentHp <= 0)
         {
             IsDead = true;
+            //發事件
             OnDie?.Invoke();
         }
     }
 
     public void Heal(int amount) {
         _healthData.CurrentHp = Mathf.Clamp(_healthData.CurrentHp + amount, 0, MaxHp);
+        //發事件
         OnHpChanged?.Invoke(_healthData.CurrentHp, MaxHp);
     }
 
     public void ResetCurrentHp() {
         IsDead = false;
         _healthData.CurrentHp = MaxHp;
+        //發事件
         OnHpChanged?.Invoke(_healthData.CurrentHp, MaxHp);
     }
 

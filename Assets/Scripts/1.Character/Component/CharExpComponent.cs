@@ -20,6 +20,7 @@ public class CharExpComponent
     public void AddExp(int amount) {
         if (amount <= 0) return;
         _expData.CurrentExp+= amount;
+        //發事件
         OnExpGained?.Invoke(amount);
 
         while (_expData.CurrentLevel < _expData.ExpTable.Length &&
@@ -27,12 +28,13 @@ public class CharExpComponent
         {
             _expData.CurrentExp -= _expData.ExpTable[_expData.CurrentLevel];
             _expData.CurrentLevel++;
+            //發事件
             OnLevelUp?.Invoke(_expData.CurrentLevel);
         }
 
-        // 更新事件通知（UI EXP 條）
         int expToNext = (_expData.CurrentLevel < _expData.ExpTable.Length)
             ? _expData.ExpTable[_expData.CurrentLevel] : int.MaxValue;
+        //發事件
         OnExpChanged?.Invoke(_expData.CurrentExp, expToNext);
     }
 
@@ -40,6 +42,7 @@ public class CharExpComponent
     public void ResetExp() {
         _expData.CurrentExp = 0;
         _expData.CurrentLevel = 1;
+        //發事件
         OnExpChanged?.Invoke(0, _expData.ExpTable[0]);
     }
 

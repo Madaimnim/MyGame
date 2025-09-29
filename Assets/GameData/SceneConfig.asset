@@ -21,3 +21,5 @@ MonoBehaviour:
     address: Battle1-1
   - key: Battle1-2
     address: Battle1-2
+  - key: Battle1-3
+    address: Battle1-3

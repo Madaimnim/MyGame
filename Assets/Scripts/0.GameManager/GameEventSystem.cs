@@ -19,6 +19,9 @@ public class GameEventSystem : MonoBehaviour
     public Action<int, int, PlayerSkillRuntime> Event_SkillEquipped;
     public Action<int, int> Event_SkillUnlocked;
 
+    //UI
+    public Action<PlayerStatsRuntime> Event_UICurrentPlayerChanged;
+
 
     //³õ´º
     public Action Event_BattleStart;

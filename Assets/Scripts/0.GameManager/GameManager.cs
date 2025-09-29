@@ -4,6 +4,7 @@ using UnityEngine;
 using UnityEngine.AddressableAssets;
 using UnityEngine.ResourceManagement.AsyncOperations;
 using System;
+using JetBrains.Annotations;
 
 [DefaultExecutionOrder(-50)]
 public class GameManager : MonoBehaviour
@@ -16,7 +17,6 @@ public class GameManager : MonoBehaviour
     [SerializeField] private SceneConfig _sceneConfig;
 
     public Transform PlayerBattleParent;
-    public Vector3 PlayerSpawnPosition;
 
     public Dictionary<GameStateSystem.GameState,IGameStateHandler> GameStateHandlers { get; private set; }
 
@@ -24,14 +24,13 @@ public class GameManager : MonoBehaviour
     public GameStateSystem GameStateSystem { get; private set; }
     public GameSceneSystem GameSceneSystem { get;private set; }
     public PlayerInputController PlayerInputController { get; private set; }
-    public PlayerSystem PlayerSystem { get; private set; }
+    public PlayerStateSystem PlayerStateSystem { get; private set; }
 
-    public bool IsAllDataLoaded => IsPlayerDataLoaded && IsEnemyDataLoaded;
-    public bool IsPlayerDataLoaded { get; private set; } = false;
-    public bool IsEnemyDataLoaded { get; private set; } = false;
+    public bool IsAllDataLoaded { get; private set;} = false;
 
     //事件
     public event Action OnAllSubSystemReady;
+    public event Action OnAllDataLoaded;
 
     private readonly List<SubSystemBase> _subSystems = new();
     private GameStateRouter _gameStateRouter;
@@ -51,16 +50,15 @@ public class GameManager : MonoBehaviour
         GameSceneSystem = new GameSceneSystem(this);
         PlayerInputController = new PlayerInputController(this);
         _gameStateRouter = new GameStateRouter(this);
-        PlayerSystem = new PlayerSystem(this);
+        PlayerStateSystem = new PlayerStateSystem(this);
 
         //建 Handler map並建構子給_gameStateRouter
         var runner = new CoroutineRunnerAdapter(this);
         GameStateHandlers = new Dictionary<GameStateSystem.GameState, IGameStateHandler>{
-            { GameStateSystem.GameState.GameStart, new GameStartHandler(runner,GameSceneSystem, UIController_Input.Instance,PlayerSystem) },
+            { GameStateSystem.GameState.GameStart, new GameStartHandler(runner,GameSceneSystem, PlayerStateSystem) },
             { GameStateSystem.GameState.Preparation, new PreparationHandler( GameSceneSystem) },
-            { GameStateSystem.GameState.Battle, new BattleHandler( GameSceneSystem, PlayerSystem, PlayerInputController) },
+            { GameStateSystem.GameState.Battle, new BattleHandler( GameSceneSystem, PlayerStateSystem, PlayerInputController) },
         };
-
 
         //所有子系統初始化
         foreach (var sub in _subSystems)  sub.Initialize();
@@ -68,11 +66,16 @@ public class GameManager : MonoBehaviour
         //發事件
         OnAllSubSystemReady?.Invoke();
     }
-    private void OnDisable() { }
+    private void OnEnable() {}
+    private void OnDisable() {}
+
     private IEnumerator Start() {
         yield return Addressables.InitializeAsync();
         yield return LoadPlayerStatsList();
         yield return LoadEnemyStatsList();
+        
+        IsAllDataLoaded = true;
+        OnAllDataLoaded?.Invoke();
 
         // 遊戲一開始 → 自動切到 StartScene
         GameSceneSystem.LoadSceneByKey("Start");
@@ -93,28 +96,14 @@ public class GameManager : MonoBehaviour
         AsyncOperationHandle<PlayerStatData> handle = Addressables.LoadAssetAsync<PlayerStatData>(address);
         yield return handle;
         if (handle.Status == AsyncOperationStatus.Succeeded)
-        {
-            PlayerSystem.SetPlayerStatsRuntimes(handle.Result);
-            IsPlayerDataLoaded = true;
-        }
+            PlayerStateSystem.SetPlayerStatsRuntimeDtny(handle.Result);
     }
     private IEnumerator LoadEnemyStatsList() {
         string address = "EnemyStatData";
         AsyncOperationHandle<EnemyStatData> handle = Addressables.LoadAssetAsync<EnemyStatData>(address);
         yield return handle;
         if (handle.Status == AsyncOperationStatus.Succeeded)
-        {
             EnemyStateManager.Instance.SetEnemyStatesDtny(handle.Result);
-            IsEnemyDataLoaded = true;
-        }
-
-    }
-    public IEnumerator WaitForDataReady() {
-        // 持續等待，直到所有資料載入完成
-        while (!IsAllDataLoaded)
-        {
-            yield return null; // 等待下一幀
-        }
     }
 
 }

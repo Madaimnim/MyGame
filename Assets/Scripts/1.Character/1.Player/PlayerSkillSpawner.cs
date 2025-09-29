@@ -34,7 +34,7 @@ public class PlayerSkillSpawner : MonoBehaviour
         SetSkillObjectProperties(currentSkillPrefab, directionVector, finalAttackPower, targetDetector.targetTransform, rotateAngle);
         currentSkillPrefab.SetActive(true);
 
-        player.Runtime.SkillSlots[slotIndex].TriggerCooldown();
+        player.Runtime.EquippedSkillSlots[slotIndex].TriggerCooldown(playerSkillRuntime.SkillCooldown);
 
         player.Runtime.OnSkillUsed(slotIndex, transform);
 

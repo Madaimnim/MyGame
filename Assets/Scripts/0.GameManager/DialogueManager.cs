@@ -2,7 +2,7 @@ using UnityEngine;
 using TMPro;
 using System.Collections;
 
-public class DialogueManager : MonoBehaviour
+public class DialogueManager : UI_PanelBase
 {
     public static DialogueManager Instance { get; private set; }
 
@@ -44,20 +44,14 @@ public class DialogueManager : MonoBehaviour
             return;
         }
         Instance = this;
-        //DontDestroyOnLoad(gameObject); 掛在主物件才需要
-    }
-
-    private void Start() {
-        dialoguePanel.SetActive(false);
     }
     private void Update() {
         if (!dialoguePanel.activeSelf) return;
         if (Input.anyKeyDown || Input.GetMouseButtonDown(0))
-        {
             ShowNextLine();
-        }
     }
     #endregion
+    public override void Refresh() { }
 
     public void StartDialogue() {
         if (dialogueLines.Length == 0) return;

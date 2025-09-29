@@ -156,7 +156,7 @@ public class Player:MonoBehaviour,IDamageable
     }
 
     public void UpdateSkillCooldowns() {
-        foreach (var slot in Runtime.SkillSlots)
+        foreach (var slot in Runtime.EquippedSkillSlots)
         {
             slot?.TickCooldown(Time.deltaTime);
         }
@@ -313,10 +313,10 @@ public class Player:MonoBehaviour,IDamageable
     //取得人物狀態API
     public int GetPlayerAttackPower() => Runtime.StatsData.AttackPower;
     public int GetSkillSlotsLength() => Runtime.StatsData.SkillSlotCount;
-    public void SetSkillSlot(int slotIndex, PlayerSkillRuntime skillData) {
+    public void SetSkillSlot(int slotIndex, int skillId) {
         if (slotIndex < 0 || slotIndex >= Runtime.StatsData.SkillSlotCount) return;
         // 綁定資料
-        Runtime.SkillSlots[slotIndex].BindSkill(skillData);
+        Runtime.EquippedSkillSlots[slotIndex].Equip(skillId);
 
         // 清理舊 Detector（只清理自己這個 Player 身上的，不影響別人）
         if (_detectors[slotIndex] != null)
@@ -324,13 +324,14 @@ public class Player:MonoBehaviour,IDamageable
             Destroy(_detectors[slotIndex]);
             _detectors[slotIndex] = null;
         }
-
+ 
         // 生成新 Detector
-        if (skillData != null && skillData.TargetDetectPrefab != null)
+        if (Runtime.PlayerSkillRuntimeDtny.TryGetValue(skillId, out var skillRuntime) 
+            && skillRuntime.TargetDetectPrefab != null)
         {
-            var detector = Instantiate(skillData.TargetDetectPrefab, transform);
+            var detector = Instantiate(skillRuntime.TargetDetectPrefab, transform);
             detector.transform.localPosition = Vector3.zero;
-            detector.name = $"TargetDetector_{skillData.SkillName}_ID:{skillData.SkillId}";
+            detector.name = $"TargetDetector_{skillRuntime.SkillName}_ID:{skillRuntime.SkillId}";
             _detectors[slotIndex] = detector;
         }
 

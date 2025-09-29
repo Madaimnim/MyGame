@@ -28,13 +28,13 @@ MonoBehaviour:
     NormalMaterial: {fileID: 2100000, guid: ce71ba01014fe3043971f56059a6c29d, type: 2}
     FlashMaterial: {fileID: 2100000, guid: 343628f4e759ecf46b917b0ca0685d23, type: 2}
   Exp: 1
-  SkillPoolList:
+  SkillTemplateList:
   - SkillId: 1
-    SkillName: "\u653B\u64CA"
+    SkillName: "\u5C16\u523A"
     SkillPower: 1
     SkillLevel: 1
     SkillCooldown: 1
-    KnockbackForce: 0
+    KnockbackForce: 1
     SkillPrefab: {fileID: 0}
     TargetDetectPrefab: {fileID: 0}
   MoveStrategyType: 0

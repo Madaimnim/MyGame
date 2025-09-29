@@ -52,7 +52,7 @@ public class PlayerAI : MonoBehaviour, IAttackable, IMoveable,IInputProvider
         if (detectorPrefab == null)  return false;                                          //沒有偵測器預製體
         var targetDetector = detectorPrefab.GetComponent<TargetDetector>();
 
-        return targetDetector != null && targetDetector.hasTarget && player.Runtime.SkillSlots[slotIndex].CooldownTimer <= 0;
+        return targetDetector != null && targetDetector.hasTarget && player.Runtime.EquippedSkillSlots[slotIndex].CooldownTimer <= 0;
     }
 
     //IInputProvider

@@ -4,16 +4,6 @@ using UnityEngine;
 
 public class PlayerSpawnPoint : MonoBehaviour
 {
-
-    private IEnumerator Start() {
-        yield return StartCoroutine(GameManager.Instance.WaitForDataReady());
-        if (GameManager.Instance.PlayerSystem != null)
-        {
-            GameManager.Instance.PlayerSpawnPosition = transform.position;
-            GameManager.Instance.PlayerSystem.ActivateAllPlayer();
-        }
-        else
-            Debug.LogWarning("PlayerStateManager不存在目前場景");
-    }
-
+    public static PlayerSpawnPoint Instance { get; private set; }
+    private void Awake() => Instance = this;
 }

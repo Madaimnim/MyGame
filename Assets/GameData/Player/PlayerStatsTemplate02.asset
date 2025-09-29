@@ -27,15 +27,23 @@ MonoBehaviour:
     DeathSFX: {fileID: 0}
     NormalMaterial: {fileID: 2100000, guid: ce71ba01014fe3043971f56059a6c29d, type: 2}
     FlashMaterial: {fileID: 2100000, guid: 343628f4e759ecf46b917b0ca0685d23, type: 2}
-  BeginLevel: 1
-  SkillPoolList:
+  SkillTemplateList:
   - SkillId: 1
-    SkillName: "\u666E\u901A\u5F13\u64CA"
+    SkillName: "\u666E\u901A\u653B\u64CA"
     SkillPower: 1
     SkillLevel: 1
     SkillCooldown: 0.1
-    KnockbackForce: 0
+    KnockbackForce: 1
     SkillPrefab: {fileID: 1868301516382297822, guid: e9482e1a632b9db42abfad2b78ec208a, type: 3}
     TargetDetectPrefab: {fileID: 2003774139042550798, guid: 95167d54ba66b37429c084cc1d1c6065, type: 3}
+  - SkillId: 2
+    SkillName: "\u6563\u5C04"
+    SkillPower: 1
+    SkillLevel: 1
+    SkillCooldown: 0.5
+    KnockbackForce: 1
+    SkillPrefab: {fileID: 0}
+    TargetDetectPrefab: {fileID: 0}
   UnlockedSkillIdList: 
+  BeginLevel: 1
   ExpTable: 0400000006000000090000000d0000001200000019000000220000002d0000003a000000490000005a0000006d0000008200000099000000b2000000cd000000ea000000090100002a0100004d0100007201000099010000c2010000ed0100001a020000490200007a020000ad020000e202000019030000

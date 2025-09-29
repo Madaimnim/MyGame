@@ -5,16 +5,16 @@ using System.Collections;
 public class BattleHandler : IGameStateHandler
 {
     private readonly GameSceneSystem _sceneSystem;
-    private readonly PlayerSystem _playerSystem;
+    private readonly PlayerStateSystem _playerStateSystem;
     private readonly PlayerInputController _inputController;
 
     public BattleHandler(
             GameSceneSystem sceneSystem,
-            PlayerSystem playerSystem,
+            PlayerStateSystem playerSystem,
             PlayerInputController inputController
         ) {
         _sceneSystem = sceneSystem;
-        _playerSystem = playerSystem;
+        _playerStateSystem = playerSystem;
         _inputController = inputController;
 
         // 訂閱事件
@@ -35,6 +35,7 @@ public class BattleHandler : IGameStateHandler
     private void OnSceneLoaded(string sceneKey) {
         if (SceneKeyUtility.IsBattle(sceneKey)) // 只要是戰鬥場景就會進來
         {
+            _playerStateSystem.ActivateAllPlayer();
             _inputController.SelectDefaultPlayer();
             //發事件
             GameEventSystem.Instance.Event_BattleStart?.Invoke();

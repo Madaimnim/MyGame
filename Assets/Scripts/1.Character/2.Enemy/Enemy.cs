@@ -76,20 +76,24 @@ public class Enemy :MonoBehaviour,IDamageable
         GameEventSystem.Instance.Event_OnWallBroken -= DisableAIRun;
     }
 
-    private IEnumerator Start() {
+    private void Start() {
         if (Runtime == null)
         {
-            yield return StartCoroutine(GameManager.Instance.WaitForDataReady());
-            SetEnemyData();
-            isEnemyDataReady = true;
-            MaxHp = Runtime.MaxHp;
-            CurrentHp = MaxHp;
-            if (StageLevelManager.Instance != null)
-                StageLevelManager.Instance.RegisterEnemy();
+            if (GameManager.Instance.IsAllDataLoaded)
+            {
+                SetEnemyData();
+                isEnemyDataReady = true;
+                MaxHp = Runtime.MaxHp;
+                CurrentHp = MaxHp;
+                if (StageLevelManager.Instance != null)
+                    StageLevelManager.Instance.RegisterEnemy();
+            }
+            else Debug.LogWarning("GameManager資料載入未完成");
         }
         //發事件
         GameEventSystem.Instance.Event_HpChanged?.Invoke(CurrentHp, MaxHp, this);// 觸發事件，通知 UI 初始血量
     }
+
     private void Update() {
         if (!GameManager.Instance.GameStateSystem.IsControlEnabled) return;
     }
@@ -194,7 +198,7 @@ public class Enemy :MonoBehaviour,IDamageable
     #region Die()方法
     public void Die() {
         StageLevelManager.Instance?.EnemyDefeated();
-        //GameManager.Instance.PlayerSystem.AddExpToAllPlayers(Runtime.Exp);
+        //GameManager.Instance.PlayerStateSystem.AddExpToAllPlayers(Runtime.Exp);
         TextPopupManager.Instance.ShowExpPopup(Runtime.Exp, transform.position);
         AudioManager.Instance.PlaySFX(deathSFX, 0.5f);
         EnemyStateManager.Instance.UnregisterEnemy(this);

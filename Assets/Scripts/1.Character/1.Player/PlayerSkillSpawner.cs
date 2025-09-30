@@ -11,7 +11,7 @@ public class PlayerSkillSpawner : MonoBehaviour
     }
 
     //生成技能
-    public void SpawnSkill(int slotIndex, PlayerSkillRuntime playerSkillRuntime, GameObject detector) {
+    public void SpawnSkill(int slotIndex, PlayerSkillRuntime playerSkill, GameObject detector) {
         TargetDetector targetDetector = detector.GetComponent<TargetDetector>();
         if (targetDetector == null || !targetDetector.hasTarget || targetDetector.targetTransform == null)
         {
@@ -21,7 +21,7 @@ public class PlayerSkillSpawner : MonoBehaviour
 
         // 攻擊力計算
         int playerAttackPower = player.GetPlayerAttackPower();
-        int skillAttackPower = playerSkillRuntime.SkillPower;
+        int skillAttackPower = playerSkill.StatsData.Power;
         int finalAttackPower = playerAttackPower + skillAttackPower;
 
         // 計算方向與旋轉角度
@@ -29,14 +29,14 @@ public class PlayerSkillSpawner : MonoBehaviour
         float rotateAngle = Mathf.Atan2(directionVector.y, directionVector.x) * Mathf.Rad2Deg;
 
         // 生成技能物件，設定屬性
-        GameObject currentSkillPrefab = Instantiate(playerSkillRuntime.SkillPrefab, transform.position, Quaternion.identity);
+        GameObject currentSkillPrefab = Instantiate(playerSkill.VisualData.Prefab, transform.position, Quaternion.identity);
         currentSkillPrefab.SetActive(false); // 先關閉避免出現異常
         SetSkillObjectProperties(currentSkillPrefab, directionVector, finalAttackPower, targetDetector.targetTransform, rotateAngle);
         currentSkillPrefab.SetActive(true);
 
-        player.Runtime.EquippedSkillSlots[slotIndex].TriggerCooldown(playerSkillRuntime.SkillCooldown);
+        player.Rt.SkillSlots[slotIndex].TriggerCooldown(playerSkill.Cooldown);
 
-        player.Runtime.OnSkillUsed(slotIndex, transform);
+        //Todo  技能被使用事件呼叫?
 
     }
 

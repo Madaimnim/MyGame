@@ -23,7 +23,6 @@ public class PlayerSpawnSystem
 
     public GameObject SpawnBattlePlayer(PlayerStatsRuntime rt) {
         var go = _factory.CreatPlayer(rt, _parent);
-        rt.BattlePlayerObject = go;
         _battleObjects[rt.StatsData.Id] = go;
         return go;
     }

@@ -1,15 +1,13 @@
 ﻿using System;
 using System.Collections;
 using TMPro.Examples;
-using Unity.VisualScripting.Antlr3.Runtime.Misc;
 using System.Collections.Generic;
 using UnityEngine;
-using Unity.VisualScripting;
-using System.Runtime.InteropServices.WindowsRuntime;
+
 
 public class Enemy :MonoBehaviour,IDamageable
 {
-    public EnemyStatsRuntime Runtime { get; private set; }
+    public EnemyStatsRuntime Rt { get; private set; }
     public CharHealthComponent CharHealthComponent { get; protected set; }
 
     //IHealData
@@ -21,7 +19,7 @@ public class Enemy :MonoBehaviour,IDamageable
 
 
 
-    [Header("場景內預製體：手動賦予enemyID，new一個StatRuntime")]
+    [Header("場景內預製體：手動賦予enemyID，new一個StatRt")]
     public int enemyID;
     public EnemyAI enemyAI;
 
@@ -77,13 +75,13 @@ public class Enemy :MonoBehaviour,IDamageable
     }
 
     private void Start() {
-        if (Runtime == null)
+        if (Rt == null)
         {
             if (GameManager.Instance.IsAllDataLoaded)
             {
                 SetEnemyData();
                 isEnemyDataReady = true;
-                MaxHp = Runtime.MaxHp;
+                MaxHp = Rt.MaxHp;
                 CurrentHp = MaxHp;
                 if (StageLevelManager.Instance != null)
                     StageLevelManager.Instance.RegisterEnemy();
@@ -100,11 +98,11 @@ public class Enemy :MonoBehaviour,IDamageable
 
     public virtual void Initialize(EnemyStatsRuntime runtime, IDamageable damageable) {
         //HealthComponent
-        CharHealthComponent = new CharHealthComponent(Runtime);
+        CharHealthComponent = new CharHealthComponent(Rt);
         CharHealthComponent.OnDie += OnEnemyDie;
         CharHealthComponent.OnHpChanged += OnEnemyHpChanged;
 
-        Runtime = runtime;
+        Rt = runtime;
         owner = damageable;
         Id = runtime.StatsData.Id;
     }
@@ -142,9 +140,9 @@ public class Enemy :MonoBehaviour,IDamageable
     protected virtual IEnumerator FlashWhite(float duration) {
         if (Spr != null)
         {
-            Spr.material = Runtime.VisualData.FlashMaterial;
+            Spr.material = Rt.VisualData.FlashMaterial;
             yield return new WaitForSeconds(duration);
-            Spr.material = Runtime.VisualData.NormalMaterial;
+            Spr.material = Rt.VisualData.NormalMaterial;
         }
     }
 
@@ -170,7 +168,7 @@ public class Enemy :MonoBehaviour,IDamageable
     }
     protected void ResetMaterial() {
         if (Spr != null)
-            Spr.material = Runtime.VisualData.NormalMaterial;
+            Spr.material = Rt.VisualData.NormalMaterial;
     }
 
 
@@ -180,10 +178,10 @@ public class Enemy :MonoBehaviour,IDamageable
     public void TakeDamage(DamageInfo info) {
         if (IsDead) return;
 
-        if (IsDead || Runtime == null) return;
-        Runtime.TakeDamage(info.damage);
+        if (IsDead || Rt == null) return;
+        Rt.TakeDamage(info.damage);
 
-        if (Runtime.CurrentHp <= 0 && !IsDead)
+        if (Rt.CurrentHp <= 0 && !IsDead)
             Die();
 
 
@@ -198,8 +196,8 @@ public class Enemy :MonoBehaviour,IDamageable
     #region Die()方法
     public void Die() {
         StageLevelManager.Instance?.EnemyDefeated();
-        //GameManager.Instance.PlayerStateSystem.AddExpToAllPlayers(Runtime.Exp);
-        TextPopupManager.Instance.ShowExpPopup(Runtime.Exp, transform.position);
+        //GameManager.Instance.PlayerStateSystem.AddExpToAllPlayers(Rt.Exp);
+        TextPopupManager.Instance.ShowExpPopup(Rt.Exp, transform.position);
         AudioManager.Instance.PlaySFX(deathSFX, 0.5f);
         EnemyStateManager.Instance.UnregisterEnemy(this);
 
@@ -209,25 +207,25 @@ public class Enemy :MonoBehaviour,IDamageable
 
 
     public void Initialize(EnemyStatsRuntime stats) {
-        Runtime = stats;
+        Rt = stats;
        
-        CurrentHp = Runtime.CurrentHp;
-        MaxHp = Runtime.MaxHp;
+        CurrentHp = Rt.CurrentHp;
+        MaxHp = Rt.MaxHp;
 
-        transform.name = $"Enemy_{Runtime.StatsData.Id} ({Runtime.StatsData.Name})";
-        Runtime.InitializeOwner(this);   // 保證血量初始化
+        transform.name = $"Enemy_{Rt.StatsData.Id} ({Rt.StatsData.Name})";
+        Rt.InitializeOwner(this);   // 保證血量初始化
 
         EnemyStateManager.Instance?.RegisterEnemy(this); // ← 統一註冊
         ResetMaterial();
     }
 
     //Todo
-    //初始化Runtime，來自enemyStatesDtny[enemyID]
+    //初始化Rt，來自enemyStatesDtny[enemyID]
     private void SetEnemyData() {
-        Runtime = EnemyStateManager.Instance.CreateRuntime(enemyID);
-        if (Runtime == null) return;
+        Rt = EnemyStateManager.Instance.CreateRuntime(enemyID);
+        if (Rt == null) return;
 
-        Id = Runtime.StatsData.Id;
+        Id = Rt.StatsData.Id;
         EnemyStateManager.Instance.RegisterEnemy(this);
         ResetMaterial();
     }

@@ -1,20 +1,17 @@
+using JetBrains.Annotations;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
 [System.Serializable]
-public class EnemySkillRuntime : SkillBase
+public class EnemySkillRuntime
 {
+    public StatsData StatsData;
+    public VisualData VisualData;
+    public float Cooldown;
+
     public EnemySkillRuntime(SkillTemplate template){
-        #region ▓`л■ий
-        //SkillDataBase
-        SkillId = template.SkillId;
-        SkillName = template.SkillName;
-        SkillPower = template.SkillPower;
-        SkillCooldown = template.SkillCooldown;
-        KnockbackForce = template.KnockbackForce;
-        SkillPrefab = template.SkillPrefab;
-        TargetDetectPrefab = template.TargetDetectPrefab;
-        #endregion
+        StatsData = template.StatsData;
+        Cooldown = template.Cooldown;
     }
 }

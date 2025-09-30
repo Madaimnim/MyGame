@@ -3,7 +3,7 @@ using UnityEngine;
 
 public interface IExpData
 {
-    int CurrentExp{get;set;}
-    int CurrentLevel { get; set; }
+    int Exp{get;set;}
+    int Level { get; set; }
     int[] ExpTable { get; }
 }

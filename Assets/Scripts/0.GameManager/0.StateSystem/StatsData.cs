@@ -7,22 +7,24 @@ public class StatsData
 {
     public int Id;
     public string Name;
-    public int MaxHp;
-    public int AttackPower;
+    public int Level;
+
+    public int Power;
     public float MoveSpeed;
+
     public float KnockbackPower;
     public float KnockbackResistance;
 
-    public int SkillSlotCount;
 
     public StatsData(StatsData other) {
         Id = other.Id;
         Name = other.Name;
-        MaxHp = other.MaxHp;
-        AttackPower = other.AttackPower;
+        Level = other.Level;
+
+        Power = other.Power;
         MoveSpeed = other.MoveSpeed;
+
         KnockbackPower = other.KnockbackPower;
         KnockbackResistance = other.KnockbackResistance;
-        SkillSlotCount = other.SkillSlotCount;
     }
 }

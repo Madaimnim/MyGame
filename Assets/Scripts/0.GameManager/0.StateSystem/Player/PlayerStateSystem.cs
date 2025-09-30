@@ -7,9 +7,9 @@ using System.Linq;
 
 public sealed class PlayerStateSystem : SubSystemBase
 {
-    public IReadOnlyDictionary<int, PlayerStatsRuntime> PlayerStatsRuntimeDtny => _playerStatsRuntimeDtny;
-    public IReadOnlyCollection<int> UnlockedIdList => _unlockedIdList.ToList();
-    public IReadOnlyDictionary<int, GameObject> BattleObjects => _spawnSystem.BattleObjects;
+    public IReadOnlyDictionary<int, PlayerStatsRuntime> PlayerStatsRuntimeDtny => _playerStatsRuntimeDtny;//不使用，只透過PlayerUtility
+    public IReadOnlyCollection<int> UnlockedIdList => _unlockedIdList.ToList();//不使用，只透過PlayerUtility
+    public IReadOnlyDictionary<int, GameObject> BattleObjects => _spawnSystem.BattleObjects;//不使用，只透過PlayerUtility
     public SkillSystem SkillSystem => _skillSystem;
 
     private readonly Dictionary<int, PlayerStatsRuntime> _playerStatsRuntimeDtny = new();
@@ -56,6 +56,7 @@ public sealed class PlayerStateSystem : SubSystemBase
     public GameObject SpawnBattlePlayer(int playerId) {
         if (!_playerStatsRuntimeDtny.TryGetValue(playerId, out var rt)) return null;
         var go = _spawnSystem.SpawnBattlePlayer(rt);
+        rt.SetBattleObject(go) ;
         //發事件
         OnPlayerSpawned?.Invoke(playerId, rt);
         return go;
@@ -64,8 +65,8 @@ public sealed class PlayerStateSystem : SubSystemBase
     public void InitialGameStartPlayerSpawn() {
         UnlockPlayer(1001);
         SpawnBattlePlayer(1001);
-        PlayerStatsRuntimeDtny[1001].AddUnlockSkillList(1);
-        PlayerStatsRuntimeDtny[1001].AddUnlockSkillList(2);
+        _playerStatsRuntimeDtny[1001].UnlockedSkillIdList.Add(1);
+        _playerStatsRuntimeDtny[1001].UnlockedSkillIdList.Add(2);
         SkillSystem.EquipSkill(1001, 0, 1);
 
         UnlockPlayer(1002);

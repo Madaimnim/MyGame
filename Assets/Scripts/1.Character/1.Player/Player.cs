@@ -6,7 +6,7 @@ using System.Collections.Generic;
 public class Player:MonoBehaviour,IDamageable
 {
     //封裝--------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-    public PlayerStatsRuntime Runtime { get; private set; }
+    public PlayerStatsRuntime Rt { get; private set; }
     public CharHealthComponent CharHealthComponent { get; protected set; }
     public CharRespawnComponent CharRespawnComponent { get; protected set; }
     public CharAnimationComponent CharAnimationComponent { get;protected set; }
@@ -15,6 +15,7 @@ public class Player:MonoBehaviour,IDamageable
     public CharBattleComponent CharBattleComponent { get; protected set; }
     public CharMovementComponent CharMovementComponent { get; protected set; }
     public CharAIComponent CharAIComponent { get; protected set; }
+    public CharSkillComponent CharSkillComponent { get; protected set; }
 
     //Unity元件--------------------------------------------------------------------------------------------------------------------------------------------------------------------------
     public Rigidbody2D Rb { get; protected set; }
@@ -22,13 +23,7 @@ public class Player:MonoBehaviour,IDamageable
     public Animator Ani{ get; protected set; }
     public Collider2D Col { get; protected set; }
     public ShadowController ShadowControl { get; protected set; }
-    //UI面向API--------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-    public int GetCurrentHp() => CharHealthComponent.CurrentHp;
-    public int GetMaxHp() => CharHealthComponent.MaxHp;
-    public int GetCurrentExp() => CharExpComponent.CurrentExp;
-    //public int GetExpToNextLevel() => Runtime.;
-    public int GetCurrentLevel() => CharExpComponent.CurrentLevel;
-
+ 
     //公開--------------------------------------------------------------------------------------------------------------------------------------------------------------------------
     public GameObject SelectIndicatorPoint;
     public PlayerAI PlayerAI;
@@ -36,7 +31,7 @@ public class Player:MonoBehaviour,IDamageable
     public bool IsKnockbacking => CharBattleComponent.IsKnockbacking;
     public IInputProvider InputProvider { get; private set; }
     //私有--------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-    private GameObject[] _detectors;             //玩家腳色自有一份Detector，不在Runtime上唯一取用
+    private GameObject[] _detectors;             //玩家腳色自有一份Detector，不在Rt上唯一取用
 
 
     #region 生命週期
@@ -61,7 +56,6 @@ public class Player:MonoBehaviour,IDamageable
             CharExpComponent.OnExpGained -= OnExpGained;
             CharExpComponent.OnExpChanged -= OnExpChanged;
         }
-
 
         if (UIManager_BattlePlayer.Instance != null)
         {
@@ -96,10 +90,10 @@ public class Player:MonoBehaviour,IDamageable
     #endregion
 
     public void Initialize(PlayerStatsRuntime stats) {
-        Runtime = stats;
+        Rt = stats;
 
         //初始化模組、訂閱模組事件-----------------------------------------------------------------------------------------------------------------------------------------------------------------------
-        CharHealthComponent = new CharHealthComponent(Runtime);
+        CharHealthComponent = new CharHealthComponent(Rt);
         CharHealthComponent.OnDie +=OnDie;
         CharHealthComponent.OnHpChanged +=OnHpChanged;
 
@@ -108,9 +102,9 @@ public class Player:MonoBehaviour,IDamageable
 
         CharAnimationComponent = new CharAnimationComponent(Ani);
 
-        CharEffectComponent = new CharEffectComponent(Runtime.VisualData,transform);
+        CharEffectComponent = new CharEffectComponent(Rt,transform);
 
-        CharExpComponent = new CharExpComponent(Runtime);
+        CharExpComponent = new CharExpComponent(Rt);
         CharExpComponent.OnLevelUp += OnLevelUp;
         CharExpComponent.OnExpGained += OnExpGained;
         CharExpComponent.OnExpChanged += OnExpChanged;
@@ -121,9 +115,11 @@ public class Player:MonoBehaviour,IDamageable
 
         CharAIComponent = new CharAIComponent();
 
+        CharSkillComponent = new CharSkillComponent(Rt,gameObject);
+
         //角色物件命名---------------------------------------------------------------------------------------------------------------------------------------------------------------------
-        transform.name = $"玩家ID_{Runtime.StatsData.Id}:({Runtime.StatsData.Name})";
-        _detectors = new GameObject[Runtime.StatsData.SkillSlotCount];
+        transform.name = $"玩家ID_{Rt.StatsData.Id}:({Rt.StatsData.Name})";
+        _detectors = new GameObject[Rt.SkillSlotCount];
 
         //訂閱外部事件---------------------------------------------------------------------------------------------------------------------------------------------------------------------
         if (GameEventSystem.Instance != null)
@@ -142,7 +138,7 @@ public class Player:MonoBehaviour,IDamageable
         }
         //初始化狀態--------------------------------------------------------------------------------------------------------------------------------------------------------------------
         ResetState();
-        Runtime.InitializeOwner(this);
+        Rt.InitializeOwner(this);
     }
 
     //設定控制來源
@@ -156,7 +152,7 @@ public class Player:MonoBehaviour,IDamageable
     }
 
     public void UpdateSkillCooldowns() {
-        foreach (var slot in Runtime.EquippedSkillSlots)
+        foreach (var slot in Rt.SkillSlots)
         {
             slot?.TickCooldown(Time.deltaTime);
         }
@@ -176,7 +172,7 @@ public class Player:MonoBehaviour,IDamageable
 
         //移動
         if (direction == Vector2.zero) CharMovementComponent.Stop();
-        else CharMovementComponent.Move(direction, Runtime.StatsData.MoveSpeed);
+        else CharMovementComponent.Move(direction, Rt.StatsData.MoveSpeed);
         
         //撥放移動動畫
         if (!CharAnimationComponent.IsPlayingAttackAnimation && CharMovementComponent.IsMoving)
@@ -196,7 +192,7 @@ public class Player:MonoBehaviour,IDamageable
     }
 
     public void TakeDamage(DamageInfo info) {
-        if (Runtime == null) return;
+        if (Rt == null) return;
         CharHealthComponent.TakeDamage(info.damage);
 
         StartCoroutine(FlashWhite(0.1f)); // 執行閃白協程
@@ -259,7 +255,6 @@ public class Player:MonoBehaviour,IDamageable
         //更新UI
     }
 
-
     protected virtual IEnumerator Knockback(float force, Vector2 knockbackDirection) {
         if (Rb != null)
         {
@@ -276,9 +271,9 @@ public class Player:MonoBehaviour,IDamageable
     protected virtual IEnumerator FlashWhite(float duration) {
         if (Spr != null)
         {
-            Spr.material = Runtime.VisualData.FlashMaterial;
+            Spr.material = Rt.VisualData.FlashMaterial;
             yield return new WaitForSeconds(duration);
-            Spr.material = Runtime.VisualData.NormalMaterial;
+            Spr.material = Rt.VisualData.NormalMaterial;
         }
     }
 
@@ -297,7 +292,7 @@ public class Player:MonoBehaviour,IDamageable
     }
     protected void ResetMaterial() {
         if (Spr != null)
-            Spr.material = Runtime.VisualData.NormalMaterial;
+            Spr.material = Rt.VisualData.NormalMaterial;
     }
 
 
@@ -311,12 +306,12 @@ public class Player:MonoBehaviour,IDamageable
 
 
     //取得人物狀態API
-    public int GetPlayerAttackPower() => Runtime.StatsData.AttackPower;
-    public int GetSkillSlotsLength() => Runtime.StatsData.SkillSlotCount;
+    public int GetPlayerAttackPower() => Rt.StatsData.Power;
+    public int GetSkillSlotsLength() => Rt.SkillSlotCount;
     public void SetSkillSlot(int slotIndex, int skillId) {
-        if (slotIndex < 0 || slotIndex >= Runtime.StatsData.SkillSlotCount) return;
+        if (slotIndex < 0 || slotIndex >= Rt.SkillSlotCount) return;
         // 綁定資料
-        Runtime.EquippedSkillSlots[slotIndex].Equip(skillId);
+        Rt.SkillSlots[slotIndex].SetId(skillId);
 
         // 清理舊 Detector（只清理自己這個 Player 身上的，不影響別人）
         if (_detectors[slotIndex] != null)
@@ -326,12 +321,12 @@ public class Player:MonoBehaviour,IDamageable
         }
  
         // 生成新 Detector
-        if (Runtime.PlayerSkillRuntimeDtny.TryGetValue(skillId, out var skillRuntime) 
-            && skillRuntime.TargetDetectPrefab != null)
+        if (Rt.PlayerSkillPool.TryGetValue(skillId, out var skillRt) 
+            && skillRt.VisualData.DetectPrefab != null)
         {
-            var detector = Instantiate(skillRuntime.TargetDetectPrefab, transform);
+            var detector = Instantiate(skillRt.VisualData.DetectPrefab, transform);
             detector.transform.localPosition = Vector3.zero;
-            detector.name = $"TargetDetector_{skillRuntime.SkillName}_ID:{skillRuntime.SkillId}";
+            detector.name = $"TargetDetector_{skillRt.StatsData.Name}_ID:{skillRt.StatsData.Id}";
             _detectors[slotIndex] = detector;
         }
 

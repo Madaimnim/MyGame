@@ -3,95 +3,69 @@ using System.Linq;
 using UnityEngine;
 
 [System.Serializable]
-public class PlayerStatsRuntime : IHealthData,IExpData
+public class PlayerStatsRuntime : IHealthData
 {
+    // Template Data---------------------------------------------------------------------------------------------
+    public StatsData StatsData;
+    public VisualData VisualData;
+    public int MaxHp { get; }
+    public int SkillSlotCount;
 
-    public IReadOnlyDictionary<int, PlayerSkillRuntime> PlayerSkillRuntimeDtny = new Dictionary<int, PlayerSkillRuntime>();
-    public IReadOnlyCollection<int> UnlockedSkillIdList => _unlockedSkillIdList;
-    public bool HasEquippedSkill(int skillId) => _equippedSkillSlots.Any(s => s.SkillId == skillId);
-    public EquippedSkillSlot[] EquippedSkillSlots => _equippedSkillSlots;
-    public StatsData StatsData => _statsData;
-    public VisualData VisualData => _visualData;
-    //Runtime Reference
+    public Dictionary<int, PlayerSkillRuntime> PlayerSkillPool = new Dictionary<int, PlayerSkillRuntime>();
+    public List<int> UnlockedSkillIdList= new List<int>();
+
+    public int[] ExpTable;
+    //Runtime-------------------------------------------------------------------------------------------------------
+    public int CurrentHp { get; set; }
+    public int Exp ;
+
+    public SkillSlot[] SkillSlots;
+    public SkillSystem SkillSystem;
+
     public GameObject BattlePlayerObject;
     public GameObject UiPlayerObject;
+    
     public IDamageable Owner;
-
-
-    // Template Data
-    private StatsData _statsData;
-    private VisualData _visualData;
-    private Dictionary<int, PlayerSkillRuntime> _playerSkillRuntimeDtny = new Dictionary<int, PlayerSkillRuntime>();
-    private List<int> _unlockedSkillIdList = new List<int>();
-    private int _beginLevle;
-    private int[] _expTable;
-    //IHealthData
-    public int CurrentHp { get; set; }    
-    public int MaxHp => StatsData.MaxHp;
-    //IExpData
-    public int CurrentLevel { get; set; }
-    public int CurrentExp { get; set; }
-    public int[] ExpTable => _expTable;
-
-    //SkillRelated
-    private EquippedSkillSlot[] _equippedSkillSlots;
-    public SkillSystem SkillSystem=>_skillSystem;
-
-    private SkillSystem _skillSystem;
-
-
-
-
+    //建構子---------------------------------------------------------------------------------------------------------
     public PlayerStatsRuntime(PlayerStatsTemplate template) {
-        // Template
-        _statsData = new StatsData(template.StatsData);
-        _visualData = new VisualData(template.VisualData);
+        StatsData = new StatsData(template.StatsData);
+        VisualData = new VisualData(template.VisualData);
+
+        MaxHp = template.MaxHp;
+        SkillSlotCount = template.SkillSlotCount;
+
         foreach (var skill in template.SkillTemplateList)
-            _playerSkillRuntimeDtny[skill.SkillId] = new PlayerSkillRuntime(skill);
-        _unlockedSkillIdList = new List<int>(template.UnlockedSkillIdList);
-        _expTable = template.ExpTable;
-        _beginLevle = template.BeginLevel;
-    }
+            PlayerSkillPool[skill.StatsData.Id] = new PlayerSkillRuntime(skill);
+        UnlockedSkillIdList = new List<int>(template.UnlockedSkillIdList);
 
+        ExpTable = template.ExpTable;
+
+    }
+    //方法---------------------------------------------------------------------------------------------------------
     public void Initialize(SkillSystem skillSystem) {
-        CurrentHp = StatsData.MaxHp;
-        CurrentExp = 0;
-        CurrentLevel = _beginLevle;
+        SkillSlots = new SkillSlot[SkillSlotCount];
+        for (int i = 0; i < SkillSlotCount; i++)
+            SkillSlots[i] = new SkillSlot();
 
-        _equippedSkillSlots = new EquippedSkillSlot[StatsData.SkillSlotCount];
-        for (int i = 0; i < StatsData.SkillSlotCount; i++)
-            _equippedSkillSlots[i] = new EquippedSkillSlot();
-
-        _skillSystem = skillSystem;
-    }
-  
+        SkillSystem = skillSystem;
+    } 
     public void InitializeOwner(IDamageable owner) {
         Owner = owner;
     }
 
-    public PlayerSkillRuntime GetSkillRuntimeAtSlot(int slotIndex) {
-        if (slotIndex < 0 || slotIndex >= StatsData.SkillSlotCount) return null;
-        int skillId = _equippedSkillSlots[slotIndex].SkillId;
-        return skillId != -1 ? GetSkillRuntime(skillId) : null;
+    public void SetBattleObject(GameObject ob) {
+        BattlePlayerObject = ob;
+    }
+    public bool IsInEquippedList(int skillId) => SkillSlots.Any(s => s.SkillId == skillId);
+    
+    //Skill
+    public PlayerSkillRuntime GetSkillAtSlot(int index) {
+        int skillId = SkillSlots[index].SkillId;
+        if (PlayerSkillPool.TryGetValue(skillId, out var skill)) return skill;
+        else return null;
     }
     public PlayerSkillRuntime GetSkillRuntime(int skillId) {
-        return _playerSkillRuntimeDtny.TryGetValue(skillId, out var skill) ? skill : null;
+        return PlayerSkillPool.TryGetValue(skillId, out var skill) ? skill : null;
     }
 
-
-    public void OnSkillUsed(int slotIndex, Transform ownerTransform) {
-        var playerSkillRuntime = GetSkillRuntimeAtSlot(slotIndex);
-        if (playerSkillRuntime == null) return;
-
-        bool leveledUp = playerSkillRuntime.AddSkillUsageCount();
-        if (leveledUp)
-        {
-            GameEventSystem.Instance.Event_SkillLevelUp?.Invoke(playerSkillRuntime, ownerTransform);
-            GameEventSystem.Instance.Event_SkillInfoChanged?.Invoke(slotIndex, ownerTransform.GetComponent<Player>());
-        }
-    }
-    public void AddUnlockSkillList(int skillId) => _unlockedSkillIdList.Add(skillId);
-    public void SetEquippedSkillIds(int slotIndex, int skillId) {
-        _equippedSkillSlots[slotIndex].Equip(skillId);
-    }
 }

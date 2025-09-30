@@ -34,7 +34,7 @@ public class UI_StatusPanelController : UI_PanelBase
         int index = ids.IndexOf(currentPlayerId);
         index = (index + 1) % ids.Count;
         currentPlayerId = ids[index];
-        _currentPlayerRuntime = PlayerUtility.All[currentPlayerId];
+        _currentPlayerRuntime = PlayerUtility.AllRt[currentPlayerId];
         Refresh();
         UIPlayerActive(currentPlayerId);
     }
@@ -44,7 +44,7 @@ public class UI_StatusPanelController : UI_PanelBase
         int index = ids.IndexOf(currentPlayerId);
         index = (index - 1 + ids.Count) % ids.Count;
         currentPlayerId = ids[index];
-        _currentPlayerRuntime = PlayerUtility.All[currentPlayerId];
+        _currentPlayerRuntime = PlayerUtility.AllRt[currentPlayerId];
         Refresh();
         UIPlayerActive(currentPlayerId);
     }
@@ -54,20 +54,20 @@ public class UI_StatusPanelController : UI_PanelBase
         if (!GameManager.Instance.IsAllDataLoaded) return;
         if (currentPlayerId == -1) {
             currentPlayerId = PlayerUtility.GetUnlockedIds().First();
-            _currentPlayerRuntime = PlayerUtility.All[currentPlayerId];
+            _currentPlayerRuntime = PlayerUtility.AllRt[currentPlayerId];
         }
 
-        statusTextsArray[0].text = $"等級: {_currentPlayerRuntime.CurrentLevel}";
+        statusTextsArray[0].text = $"等級: {_currentPlayerRuntime.StatsData.Level}";
         statusTextsArray[1].text = $"HP: {_currentPlayerRuntime.MaxHp}/{_currentPlayerRuntime.MaxHp}";
         statusTextsArray[2].text = $"名稱: {_currentPlayerRuntime.StatsData.Name}";
-        statusTextsArray[3].text = $"攻擊力: {_currentPlayerRuntime.StatsData.AttackPower}";
-        statusTextsArray[4].text = $"經驗值: {_currentPlayerRuntime.CurrentExp}/{_currentPlayerRuntime.CurrentExp}";
+        statusTextsArray[3].text = $"攻擊力: {_currentPlayerRuntime.StatsData.Power}";
+        statusTextsArray[4].text = $"經驗值: {_currentPlayerRuntime.Exp}/{_currentPlayerRuntime.Exp}";
         statusTextsArray[5].text = $"速度: {_currentPlayerRuntime.StatsData.MoveSpeed}";
     }
 
     //每切換當前UI角色執行，將activePlayerUIDtny中的角色物件Active
     public void UIPlayerActive(int playerID) {
-        foreach (var kvp in PlayerUtility.All) // 遍歷所有角色 UI
+        foreach (var kvp in PlayerUtility.AllRt) // 遍歷所有角色 UI
         {
             bool isActive = (kvp.Key == playerID); // 只有當前角色 UI 設為 true
             kvp.Value.BattlePlayerObject.SetActive(isActive);

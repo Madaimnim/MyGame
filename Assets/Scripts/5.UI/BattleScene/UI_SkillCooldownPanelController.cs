@@ -35,8 +35,8 @@ public class UI_SkillCooldownPanelController : MonoBehaviour
         boundPlayer = player;
         for (int slotIndex = 0; slotIndex < player.GetSkillSlotsLength(); slotIndex++)
         {
-            var slotData = player.Runtime.GetSkillRuntimeAtSlot(slotIndex);
-            if (slotData == null || string.IsNullOrEmpty(slotData.SkillName)) continue;
+            var slotData = player.Rt.GetSkillAtSlot(slotIndex);
+            if (slotData == null || string.IsNullOrEmpty(slotData.StatsData.Name)) continue;
             //¥Í¦¨Slider
             var cooldownSlot = Instantiate(skillCooldownSliderPrefab, skillSliderParent);
             cooldownSlot.Setup(slotIndex, player);

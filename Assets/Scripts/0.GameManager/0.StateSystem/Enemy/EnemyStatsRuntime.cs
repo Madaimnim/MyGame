@@ -5,17 +5,23 @@ using UnityEngine;
 [System.Serializable]
 public class EnemyStatsRuntime:IHealthData
 {
-
+    // Template Data-----------------------------------------
     public StatsData StatsData;
     public VisualData VisualData;
-    public int MaxHp { get;  }
+    public int MaxHp { get; }
+    public int SkillSlotCount;
+
+    public Dictionary<int, EnemySkillRuntime> EnemySkillPool;
+
     public int CurrentHp { get; set; }
 
-    public EquippedSkillSlot[] EquippedSkillSlots;
+    public SkillSlot[] SkillSlots;
     public int Exp { get; private set; }
+
     public MoveStrategyType MoveStrategyType { get; private set; }
-    public Dictionary<int, EnemySkillRuntime> SkillPoolDtny { get; private set; }
+
     public IDamageable Owner;
+
 
 
     public EnemyStatsRuntime(EnemyStatsTemplate template) {
@@ -25,18 +31,19 @@ public class EnemyStatsRuntime:IHealthData
 
         CurrentHp = MaxHp;
 
-        SkillPoolDtny = new Dictionary<int, EnemySkillRuntime>();
+        EnemySkillPool = new Dictionary<int, EnemySkillRuntime>();
         foreach (var skill in template.SkillTemplateList)
         {
-            SkillPoolDtny[skill.SkillId] = new EnemySkillRuntime(skill);
+            EnemySkillPool[skill.StatsData.Id] = new EnemySkillRuntime(skill);
         }
-        InitializeSkillSlots(StatsData.SkillSlotCount);
+        InitializeSkillSlots(SkillSlotCount);
+        SkillSlotCount = template.SkillSlotCount;
     }
 
     public void InitializeSkillSlots(int slotCount) {
-        EquippedSkillSlots = new EquippedSkillSlot[StatsData.SkillSlotCount];
-        for (int i = 0; i < StatsData.SkillSlotCount; i++)
-            EquippedSkillSlots[i] = new EquippedSkillSlot();
+        SkillSlots = new SkillSlot[SkillSlotCount];
+        for (int i = 0; i < SkillSlotCount; i++)
+            SkillSlots[i] = new SkillSlot();
 
     }
 
@@ -49,7 +56,7 @@ public class EnemyStatsRuntime:IHealthData
     }
 
     public EnemySkillRuntime GetSkill(int slotId) {
-        if (SkillPoolDtny.TryGetValue(slotId, out var skill))
+        if (EnemySkillPool.TryGetValue(slotId, out var skill))
         {
             return skill;
         }

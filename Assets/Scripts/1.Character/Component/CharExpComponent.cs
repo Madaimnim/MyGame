@@ -3,47 +3,47 @@ using UnityEngine;
 
 public class CharExpComponent
 {
-    private IExpData _expData;
+    private PlayerStatsRuntime _rt;
 
     public event Action<int, int> OnExpChanged;
     public event Action<int> OnLevelUp;
     public event Action<int> OnExpGained;
 
-    public int CurrentExp => _expData.CurrentExp;
-    public int CurrentLevel => _expData.CurrentLevel;
+    public int Exp => _rt.Exp;
+    public int Level => _rt.StatsData.Level;
 
-    public CharExpComponent(IExpData expData) {
-        _expData = expData ?? throw new ArgumentNullException(nameof(expData));
-        if (_expData.ExpTable == null || _expData.ExpTable.Length == 0) Debug.LogWarning("ExpTable尚未初始化");
+    public CharExpComponent(PlayerStatsRuntime expData) {
+        _rt = expData ?? throw new ArgumentNullException(nameof(expData));
+        if (_rt.ExpTable == null || _rt.ExpTable.Length == 0) Debug.LogWarning("ExpTable尚未初始化");
     }
 
     public void AddExp(int amount) {
         if (amount <= 0) return;
-        _expData.CurrentExp+= amount;
+        _rt.Exp+= amount;
         //發事件
         OnExpGained?.Invoke(amount);
 
-        while (_expData.CurrentLevel < _expData.ExpTable.Length &&
-               _expData.CurrentExp >= _expData.ExpTable[_expData.CurrentLevel])
+        while (_rt.StatsData.Level < _rt.ExpTable.Length &&
+               _rt.Exp >= _rt.ExpTable[_rt.StatsData.Level])
         {
-            _expData.CurrentExp -= _expData.ExpTable[_expData.CurrentLevel];
-            _expData.CurrentLevel++;
+            _rt.Exp -= _rt.ExpTable[_rt.StatsData.Level];
+            _rt.StatsData.Level++;
             //發事件
-            OnLevelUp?.Invoke(_expData.CurrentLevel);
+            OnLevelUp?.Invoke(_rt.StatsData.Level);
         }
 
-        int expToNext = (_expData.CurrentLevel < _expData.ExpTable.Length)
-            ? _expData.ExpTable[_expData.CurrentLevel] : int.MaxValue;
+        int expToNext = (_rt.StatsData.Level < _rt.ExpTable.Length)
+            ? _rt.ExpTable[_rt.StatsData.Level] : int.MaxValue;
         //發事件
-        OnExpChanged?.Invoke(_expData.CurrentExp, expToNext);
+        OnExpChanged?.Invoke(_rt.Exp, expToNext);
     }
 
 
     public void ResetExp() {
-        _expData.CurrentExp = 0;
-        _expData.CurrentLevel = 1;
+        _rt.Exp = 0;
+        _rt.StatsData.Level = 1;
         //發事件
-        OnExpChanged?.Invoke(0, _expData.ExpTable[0]);
+        OnExpChanged?.Invoke(0, _rt.ExpTable[0]);
     }
 
 }

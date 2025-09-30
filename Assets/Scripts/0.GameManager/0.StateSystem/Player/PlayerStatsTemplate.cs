@@ -7,10 +7,14 @@ public class PlayerStatsTemplate:ScriptableObject
 {
     public StatsData StatsData;
     public VisualData VisualData;
+
+    public int MaxHp;
+    public int SkillSlotCount;
+
     [FormerlySerializedAs("SkillTemplateList")]
     public List<SkillTemplate> SkillTemplateList = new List<SkillTemplate>();
     public List<int> UnlockedSkillIdList = new List<int>();
-    public int BeginLevel = 1;
+
     // ExpTable[Level i] = 從 Level i 升到 Level i+1 所需經驗值
     public int[] ExpTable = new int[] {
         4, 6, 9,13, 18, 25, 34, 45, 58, 73,                     // 1~10

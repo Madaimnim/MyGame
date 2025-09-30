@@ -3,8 +3,10 @@ using System.Collections.Generic;
 using UnityEngine;
 
 [System.Serializable]
-public class SkillTemplate:SkillBase
+public class SkillTemplate
 {
-    //與SkillDataBase一致，提供給PlayerStatsRuntime、
+    public StatsData StatsData;
+    public VisualData VisualData;
+    public float Cooldown;
 }
 

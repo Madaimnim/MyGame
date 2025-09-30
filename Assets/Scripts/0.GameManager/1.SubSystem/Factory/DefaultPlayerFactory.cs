@@ -5,8 +5,8 @@ using UnityEngine;
 public class DefaultPlayerFactory : IPlayerFactory
 {
     public GameObject CreatPlayer(PlayerStatsRuntime rt, Transform parent) {
-        if (rt.VisualData.CharPrefab == null) {Debug.LogError($"ID:{rt.StatsData.Id}無CharPrefab物件"); return null; }
-        var ob = Object.Instantiate(rt.VisualData.CharPrefab, parent);
+        if (rt.VisualData.Prefab == null) {Debug.LogError($"ID:{rt.StatsData.Id}無CharPrefab物件"); return null; }
+        var ob = Object.Instantiate(rt.VisualData.Prefab, parent);
         ob.SetActive(false);
         ob.transform.localPosition = Vector3.zero;
 

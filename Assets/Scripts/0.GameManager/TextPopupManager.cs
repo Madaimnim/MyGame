@@ -141,7 +141,7 @@ public class TextPopupManager : MonoBehaviour
     //顯示技能升級
     #region ShowSkillLevelUpPopup(string skillName, int level, Transform target)
     public void ShowSkillLevelUpPopup(PlayerSkillRuntime playerSkillDataRuntime, Transform ownerTransform) {
-        CreateLevelUpPopup(TextPrefab_LevelUp, $"{playerSkillDataRuntime.SkillName}Lv.{playerSkillDataRuntime.SkillLevel}", ownerTransform);
+        CreateLevelUpPopup(TextPrefab_LevelUp, $"{playerSkillDataRuntime.StatsData.Name}Lv.{playerSkillDataRuntime.SkillLevel}", ownerTransform);
     }
     #endregion
 

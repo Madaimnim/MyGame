@@ -11,17 +11,17 @@ public class UI_SkillCooldownSlider : MonoBehaviour
 
     private Player boundPlayer;
     private int boundSlotIndex;
-    private EquippedSkillSlot boundSlot; // 綁定 SkillSlot 直接讀取資訊
+    private SkillSlot boundSlot; // 綁定 SkillSlot 直接讀取資訊
 
     // 初始化
     #region Setup(string skillName, Player player, int slotIndex)
     public void Setup(int slotIndex, Player player ) {
         boundPlayer = player;
         boundSlotIndex = slotIndex;
-        boundSlot = player.Runtime.EquippedSkillSlots[slotIndex];
+        boundSlot = player.Rt.SkillSlots[slotIndex];
         
         //Todo
-        //skillNameText.text =$"{boundSlot.SkillData.SkillName} Lv.{boundSlot.SkillData.SkillLevel}" ;
+        //skillNameText.text =$"{boundSlot.SkillData.StatsData.Name} Lv.{boundSlot.SkillData.SkillLevel}" ;
     }
     #endregion
 
@@ -48,13 +48,13 @@ public class UI_SkillCooldownSlider : MonoBehaviour
     }
     #endregion
 
-    //更新SkillName、Level
+    //更新StatsData.Name、Level
     #region RefreshSkillInfo()
     public void RefreshSkillInfo() {
         //Todo
         //if (boundSlot != null && boundSlot.SkillData != null && skillNameText != null)
         //{
-        //    skillNameText.text = $"{boundSlot.SkillData.SkillName} Lv.{boundSlot.SkillData.SkillLevel}";
+        //    skillNameText.text = $"{boundSlot.SkillData.StatsData.Name} Lv.{boundSlot.SkillData.SkillLevel}";
         //}
     }
     #endregion

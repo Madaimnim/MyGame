@@ -8,6 +8,7 @@ public class EnemyStatsTemplate:ScriptableObject
     public StatsData StatsData;
     public VisualData VisualData;
     public int Exp;
+    public int SkillSlotCount;
     [FormerlySerializedAs("SkillTemplateList")]
     public List<SkillTemplate> SkillTemplateList = new List<SkillTemplate>();
     public MoveStrategyType MoveStrategyType;

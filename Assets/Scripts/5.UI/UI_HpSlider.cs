@@ -43,8 +43,8 @@ public class UI_HpSlider : MonoBehaviour
         //  綁定的當下強制刷新一次
         if (thisDamageable is Player player)
         {
-            int cur = player.Runtime.CurrentHp;
-            int max = player.Runtime.MaxHp;
+            int cur = player.Rt.CurrentHp;
+            int max = player.Rt.MaxHp;
             UpdateUIValue(cur, max, thisDamageable);
         }
     }

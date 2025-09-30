@@ -4,15 +4,15 @@ using UnityEngine;
 public class CharEffectComponent
 {
     private Transform _transform;
-    private VisualData _visualData;
+    private PlayerStatsRuntime _rt;
     
-    public CharEffectComponent(VisualData visualData,Transform transform) {
+    public CharEffectComponent(PlayerStatsRuntime rt,Transform transform) {
         _transform = transform;
-        _visualData = visualData;
+        _rt = rt;
     }
 
     public void PlayDeathEffect() {
         VFXManager.Instance.Play("PlayerDeath", _transform.position);
-        AudioManager.Instance.PlaySFX(_visualData.DeathSFX, 0.5f);
+        AudioManager.Instance.PlaySFX(_rt.VisualData.DeathSFX, 0.5f);
     }
 }

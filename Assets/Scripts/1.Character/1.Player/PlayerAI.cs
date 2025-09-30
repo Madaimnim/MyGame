@@ -2,7 +2,7 @@ using UnityEngine;
 using System.Collections;
 using System.Collections.Generic;
 
-public class PlayerAI : MonoBehaviour, IAttackable, IMoveable,IInputProvider
+public class PlayerAI : MonoBehaviour, IAttackable, IMoveable, IInputProvider
 {
     [Header("AI樹更新頻率")]
     public float updateInterval = 0.1f;
@@ -11,8 +11,7 @@ public class PlayerAI : MonoBehaviour, IAttackable, IMoveable,IInputProvider
     private Player player;
 
     private PendingSkillSlot currentPendingSkillSlot; // 當前暫存技能
-    private class PendingSkillSlot
-    {
+    private class PendingSkillSlot {
         public int slotIndex;
         public PlayerSkillRuntime skillData;
         public GameObject detector;
@@ -21,7 +20,7 @@ public class PlayerAI : MonoBehaviour, IAttackable, IMoveable,IInputProvider
     public PlayerSkillSpawner skillSpawner;
 
     #region 生命週期
-    private void Awake() {}
+    private void Awake() { }
     private void Start() {
         player = GetComponent<Player>();
         behaviorTree = GetComponent<BehaviorTree>();
@@ -47,12 +46,12 @@ public class PlayerAI : MonoBehaviour, IAttackable, IMoveable,IInputProvider
     //行為樹：判斷是否可使用技能
     public bool CanUseSkill(int slotIndex) {
         if (!IsIndexCorrect(slotIndex)) return false;                             //錯誤SlotIndex
-        
+
         var detectorPrefab = player.GetSkillSlotDetector(slotIndex);
-        if (detectorPrefab == null)  return false;                                          //沒有偵測器預製體
+        if (detectorPrefab == null) return false;                                          //沒有偵測器預製體
         var targetDetector = detectorPrefab.GetComponent<TargetDetector>();
 
-        return targetDetector != null && targetDetector.hasTarget && player.Runtime.EquippedSkillSlots[slotIndex].CooldownTimer <= 0;
+        return targetDetector != null && targetDetector.hasTarget && player.Rt.SkillSlots[slotIndex].CooldownTimer <= 0;
     }
 
     //IInputProvider
@@ -73,12 +72,12 @@ public class PlayerAI : MonoBehaviour, IAttackable, IMoveable,IInputProvider
     //行為樹：暫存技能資訊
     #region UseSkill(int slotIndex)
     public void UseSkill(int slotIndex) {
-        var skillData = player.Runtime.GetSkillRuntimeAtSlot(slotIndex);
+        var skillData = player.Rt.GetSkillAtSlot(slotIndex);
         if (skillData == null) return;
         var detector = player.GetSkillSlotDetector(slotIndex);
         if (detector == null) return;
         TargetDetector targetDetector = detector.GetComponent<TargetDetector>();
-        if (targetDetector == null)  return;
+        if (targetDetector == null) return;
         if (targetDetector.targetTransform == null) return;
 
         // 記錄當前要釋放的技能
@@ -97,7 +96,7 @@ public class PlayerAI : MonoBehaviour, IAttackable, IMoveable,IInputProvider
 
     //撥放攻擊動畫
     #region PlayAttackAnimation(int slotIndex,PlayerSkillRuntime skillData)
-    private void PlayAttackAnimation(int slotIndex,PlayerSkillRuntime skillData,TargetDetector targetDetector) {
+    private void PlayAttackAnimation(int slotIndex, PlayerSkillRuntime skill, TargetDetector targetDetector) {
         // 翻轉角色朝向
         bool isTargetOnLeft = targetDetector.targetTransform.position.x < transform.position.x;
         transform.localScale = new Vector3(
@@ -107,10 +106,10 @@ public class PlayerAI : MonoBehaviour, IAttackable, IMoveable,IInputProvider
         );
 
         // 播放動畫
-        if(player.CharMovementComponent.IsMoving)
-            player.CharAnimationComponent.Play($"MoveSkill{skillData.SkillId}");
+        if (player.CharMovementComponent.IsMoving)
+            player.CharAnimationComponent.Play($"MoveSkill{skill.StatsData.Id}");
         else
-            player.CharAnimationComponent.Play($"Skill{skillData.SkillId}");
+            player.CharAnimationComponent.Play($"Skill{skill.StatsData.Id}");
     }
     #endregion
 
@@ -123,14 +122,11 @@ public class PlayerAI : MonoBehaviour, IAttackable, IMoveable,IInputProvider
     #endregion
 
     //Todo:Move
-    #region  Move()
-    public void Move() { 
-    
+    public void Move() {
+
     }
-    #endregion
 
     //初始化行為樹
-    #region SetBehaviorTree()
     private void SetBehaviorTree() {
         behaviorTree.SetRoot(new Selector(new List<Node>
         {
@@ -142,12 +138,10 @@ public class PlayerAI : MonoBehaviour, IAttackable, IMoveable,IInputProvider
             new Action_Idle()
         }));
     }
-    #endregion
 
-    #region IsIndexCorrect(int slotIndex)
     private bool IsIndexCorrect(int slotIndex) {
         return slotIndex >= 0 && slotIndex < player.GetSkillSlotsLength();
     }
-    #endregion
+
 
 }

@@ -17,7 +17,7 @@ public class UI_BattlePlayerPanel : MonoBehaviour
         // ¸j©w¦å±ø
         if (hpSlider != null)
         {
-            hpSlider.title = boundPlayer.Runtime.StatsData.Name;
+            hpSlider.title = boundPlayer.Rt.StatsData.Name;
             hpSlider.Bind(player);
         }
 

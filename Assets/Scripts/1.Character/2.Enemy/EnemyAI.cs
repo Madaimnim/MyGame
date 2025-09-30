@@ -95,7 +95,7 @@ public class EnemyAI : MonoBehaviour, IAttackable, IMoveable
         for (int slot = 1; slot <= 4; slot++)
         {
             if (slotDetectPrefabs[slot - 1] != null)
-                slotCooldowns[slot - 1] = enemy.Runtime.GetSkill(slot).SkillCooldown;
+                slotCooldowns[slot - 1] = enemy.Rt.GetSkill(slot).Cooldown;
         }
     }
     #endregion
@@ -160,10 +160,10 @@ public class EnemyAI : MonoBehaviour, IAttackable, IMoveable
 
         currentAttackDamageable = damageable;
         currentAttackTarget = targetTransform;
-        currentAttackPower = enemy.Runtime.SkillPoolDtny[skillId].SkillPower;
-        currentKnockbackForce = enemy.Runtime.SkillPoolDtny[skillId].KnockbackForce;
+        currentAttackPower = enemy.Rt.EnemySkillPool[skillId].StatsData.Power;
+        currentKnockbackForce = enemy.Rt.EnemySkillPool[skillId].StatsData.KnockbackPower;
         currentKnockbackDirection = new Vector3(targetTransform.position.x - transform.position.x, targetTransform.position.y - transform.position.y, 0).normalized;
-        currentAttackPrefab = enemy.Runtime.SkillPoolDtny[skillId].SkillPrefab;
+        currentAttackPrefab = enemy.Rt.EnemySkillPool[skillId].VisualData.Prefab;
         bool isTargetOnRight = targetTransform.position.x > transform.position.x;
         transform.localScale = new Vector3(isTargetOnRight ? -Mathf.Abs(transform.localScale.x) : Mathf.Abs(transform.localScale.x),
                                      transform.localScale.y,
@@ -230,7 +230,7 @@ public class EnemyAI : MonoBehaviour, IAttackable, IMoveable
     //初始化MoveStrategy
     #region 私有SetMoveStrategy方法
     private void InitiallySetMoveStrategy() {
-        switch (enemy.Runtime.MoveStrategyType) // 根據 Enum 設置策略
+        switch (enemy.Rt.MoveStrategyType) // 根據 Enum 設置策略
         {
             case MoveStrategyType.Straight:
                 moveStrategy = new StraightMoveStrategy();
@@ -242,7 +242,7 @@ public class EnemyAI : MonoBehaviour, IAttackable, IMoveable
                 moveStrategy = new FollowPlayerMoveStrategy();
                 break;
             default:
-                Debug.LogError($"未定義的移動策略: {enemy.Runtime.MoveStrategyType}");
+                Debug.LogError($"未定義的移動策略: {enemy.Rt.MoveStrategyType}");
                 break;
         }
     }
@@ -289,7 +289,7 @@ public class EnemyAI : MonoBehaviour, IAttackable, IMoveable
         enemy.Rb.drag = 0;
         enemy.Rb.velocity = new Vector2(0, 0);
         Vector2 direction = moveStrategy.MoveDirection(this);
-        float speed = enemy.Runtime.StatsData.MoveSpeed;
+        float speed = enemy.Rt.StatsData.MoveSpeed;
         enemy.Rb.AddForce(new Vector2(direction.x * speed, direction.y * speed), ForceMode2D.Impulse);
         ClearMoveTarget();
     }

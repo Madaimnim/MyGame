@@ -45,7 +45,7 @@ public class EnemyStateManager : MonoBehaviour
 
     // 生成敵人
     public GameObject SpawnEnemy(int enemyID, Vector3 position, Quaternion rotation, GameObject parentObject) {
-        if (!enemyStatsTemplateDtny.TryGetValue(enemyID, out var template) || template.VisualData.CharPrefab == null)
+        if (!enemyStatsTemplateDtny.TryGetValue(enemyID, out var template) || template.VisualData.Prefab == null)
         {
             Debug.LogError($"[EnemyStateManager] 無法生成敵人 {enemyID}，Prefab 為 null");
             return null;
@@ -54,7 +54,7 @@ public class EnemyStateManager : MonoBehaviour
         // 為每個敵人創建一份 Runtime
         var runtime = new EnemyStatsRuntime(template);
 
-        GameObject enemyPrefab = Instantiate(template.VisualData.CharPrefab, position, rotation, parentObject.transform);
+        GameObject enemyPrefab = Instantiate(template.VisualData.Prefab, position, rotation, parentObject.transform);
         Enemy enemy = enemyPrefab.GetComponent<Enemy>();
         if (enemy != null)
         {
@@ -72,14 +72,14 @@ public class EnemyStateManager : MonoBehaviour
         if (!activeEnemies.Contains(enemy))
         {
             activeEnemies.Add(enemy);
-            activeEnemyStats.Add(enemy.Runtime);
+            activeEnemyStats.Add(enemy.Rt);
         }
     }
     public void UnregisterEnemy(Enemy enemy) {
         if (activeEnemies.Contains(enemy))
         {
             activeEnemies.Remove(enemy);
-            activeEnemyStats.Remove(enemy.Runtime);
+            activeEnemyStats.Remove(enemy.Rt);
         }
     }
     public EnemyStatsRuntime CreateRuntime(int enemyID) {

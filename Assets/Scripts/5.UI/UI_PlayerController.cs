@@ -20,7 +20,7 @@ public class UI_PlayerController : MonoBehaviour
     }
 
     public void InitialUIPlayer() {
-        var unlockedPlayerIDs = PlayerUtility.GetUnlockedIds();
+        var unlockedPlayerIDs = PlayerUtility.UnlockedIdList;
         if (unlockedPlayerIDs.Count == 0) return;
         if (!unlockedPlayerIDs.Contains(_currentPlayerId)) _currentPlayerId = unlockedPlayerIDs.First();
     } 
@@ -28,7 +28,7 @@ public class UI_PlayerController : MonoBehaviour
     //撥放角色動畫
     public void PlayUIAttackAnimation(string animationName) {
         var rt = PlayerUtility.Get(_currentPlayerId);
-        rt.UiPlayerObject?.GetComponent<Animator>()?.Play(Animator.StringToHash(animationName));
+        rt.UiObject?.GetComponent<Animator>()?.Play(Animator.StringToHash(animationName));
     }
 
     private void OnAllDataLoaded() {

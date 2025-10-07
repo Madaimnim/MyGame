@@ -2,12 +2,12 @@ using UnityEngine;
 
 public class PlayerAttackBehaviour : StateMachineBehaviour
 {
-    private CharAnimationComponent _charAni;
+    private AnimationComponent _charAni;
 
     // 進入攻擊動畫
     public override void OnStateEnter(Animator animator, AnimatorStateInfo stateInfo, int layerIndex) {
         if (_charAni == null)
-            _charAni = animator.GetComponent<Player>()?.CharAnimationComponent;
+            _charAni = animator.GetComponent<Player>()?.AnimationComponent;
 
         if (_charAni != null)
             _charAni.IsPlayingAttackAnimation = true;

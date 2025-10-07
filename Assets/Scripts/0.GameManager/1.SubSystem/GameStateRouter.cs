@@ -16,10 +16,6 @@ public sealed class GameStateRouter:SubSystemBase
         _gameStateSystem.Event_OnStateExited += OnStateExit;
     }
 
-    public override void Shutdown() {}
-
-    public override void Update(float deltaTime) {}
-
     private void OnStateEnter(GameStateSystem.GameState gameState, string sceneName) {
         if (_gameStateHandlers.TryGetValue(gameState, out var h)) h.Enter(sceneName);
         else Debug.LogWarning($"[StateRouter] No handler for {gameState}");

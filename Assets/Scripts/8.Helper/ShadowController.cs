@@ -118,11 +118,6 @@ public class ShadowController : MonoBehaviour
     #endregion
 
 
-    // 👉 給玩家死亡 / 復活用
-    // 死亡時，陰影位移到 offset 並保持
-    public void SetShadowOffset() {
-        transform.localPosition = originalPosition + (Vector3)offsetAmount;
-    }
 
     // 復活時，陰影回到原始位置和透明度
     public void ResetShadow() {

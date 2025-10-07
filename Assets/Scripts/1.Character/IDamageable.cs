@@ -3,9 +3,9 @@ using UnityEngine;
 
 public class DamageInfo
 {
-    public int damage;
-    public float knockbackForce;
-    public Vector2 knockbackDirection;
+    public int Damage;
+    public float KnockbackForce;
+    public Vector2 KnockbackDirection;
 
 }
 

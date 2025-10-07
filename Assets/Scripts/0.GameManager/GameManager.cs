@@ -17,6 +17,7 @@ public class GameManager : MonoBehaviour
     [SerializeField] private SceneConfig _sceneConfig;
 
     public Transform PlayerBattleParent;
+    public Transform EnemyBattleParent;
 
     public Dictionary<GameStateSystem.GameState,IGameStateHandler> GameStateHandlers { get; private set; }
 
@@ -25,6 +26,7 @@ public class GameManager : MonoBehaviour
     public GameSceneSystem GameSceneSystem { get;private set; }
     public PlayerInputController PlayerInputController { get; private set; }
     public PlayerStateSystem PlayerStateSystem { get; private set; }
+    public EnemyStateSystem EnemyStateSystem { get; private set; }
 
     public bool IsAllDataLoaded { get; private set;} = false;
 
@@ -51,6 +53,7 @@ public class GameManager : MonoBehaviour
         PlayerInputController = new PlayerInputController(this);
         _gameStateRouter = new GameStateRouter(this);
         PlayerStateSystem = new PlayerStateSystem(this);
+        EnemyStateSystem = new EnemyStateSystem(this);
 
         //建 Handler map並建構子給_gameStateRouter
         var runner = new CoroutineRunnerAdapter(this);
@@ -103,7 +106,7 @@ public class GameManager : MonoBehaviour
         AsyncOperationHandle<EnemyStatData> handle = Addressables.LoadAssetAsync<EnemyStatData>(address);
         yield return handle;
         if (handle.Status == AsyncOperationStatus.Succeeded)
-            EnemyStateManager.Instance.SetEnemyStatesDtny(handle.Result);
+            EnemyStateSystem.SetEnemyStatesTemplateDtny(handle.Result);
     }
 
 }

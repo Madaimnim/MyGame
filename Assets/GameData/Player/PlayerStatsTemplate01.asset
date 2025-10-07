@@ -15,35 +15,52 @@ MonoBehaviour:
   StatsData:
     Id: 1001
     Name: "\u528D\u5175"
-    MaxHp: 3
-    AttackPower: 1
+    Level: 1
+    Power: 1
     MoveSpeed: 3
     KnockbackPower: 1
     KnockbackResistance: 0
-    SkillSlotCount: 4
   VisualData:
-    CharPrefab: {fileID: 1901394458928384591, guid: c1a9c12d802fc0446a22a42d0c13403e, type: 3}
+    Prefab: {fileID: 1901394458928384591, guid: c1a9c12d802fc0446a22a42d0c13403e, type: 3}
+    DetectPrefab: {fileID: 0}
     SpriteIcon: {fileID: 0}
     DeathSFX: {fileID: 0}
     NormalMaterial: {fileID: 2100000, guid: ce71ba01014fe3043971f56059a6c29d, type: 2}
     FlashMaterial: {fileID: 2100000, guid: 343628f4e759ecf46b917b0ca0685d23, type: 2}
+  MaxHp: 5
+  SkillSlotCount: 4
   SkillTemplateList:
-  - SkillId: 1
-    SkillName: "\u666E\u901A\u653B\u64CA"
-    SkillPower: 1
-    SkillLevel: 1
-    SkillCooldown: 0.2
-    KnockbackForce: 1
-    SkillPrefab: {fileID: 1868301516382297822, guid: bee82ac91c521d24b938786f51b7c88d, type: 3}
-    TargetDetectPrefab: {fileID: 3457001140423233958, guid: 84b845aceaf3a27428687d6c246943ec, type: 3}
-  - SkillId: 2
-    SkillName: "\u91CD\u64CA"
-    SkillPower: 1
-    SkillLevel: 1
-    SkillCooldown: 0.2
-    KnockbackForce: 1
-    SkillPrefab: {fileID: 7327708947082931564, guid: ebc3332d416aec74cb1e857b78e74da3, type: 3}
-    TargetDetectPrefab: {fileID: 1240820100763929428, guid: 97300d7895f13084783945f8167006d2, type: 3}
+  - StatsData:
+      Id: 1
+      Name: "\u666E\u901A\u653B\u64CA"
+      Level: 1
+      Power: 1
+      MoveSpeed: 1
+      KnockbackPower: 1
+      KnockbackResistance: 0
+    VisualData:
+      Prefab: {fileID: 1868301516382297822, guid: bee82ac91c521d24b938786f51b7c88d, type: 3}
+      DetectPrefab: {fileID: 3457001140423233958, guid: 84b845aceaf3a27428687d6c246943ec, type: 3}
+      SpriteIcon: {fileID: 0}
+      DeathSFX: {fileID: 0}
+      NormalMaterial: {fileID: 0}
+      FlashMaterial: {fileID: 0}
+    Cooldown: 0.1
+  - StatsData:
+      Id: 2
+      Name: "\u91CD\u64CA"
+      Level: 1
+      Power: 1
+      MoveSpeed: 1
+      KnockbackPower: 1
+      KnockbackResistance: 0
+    VisualData:
+      Prefab: {fileID: 7327708947082931564, guid: ebc3332d416aec74cb1e857b78e74da3, type: 3}
+      DetectPrefab: {fileID: 1240820100763929428, guid: 97300d7895f13084783945f8167006d2, type: 3}
+      SpriteIcon: {fileID: 0}
+      DeathSFX: {fileID: 0}
+      NormalMaterial: {fileID: 0}
+      FlashMaterial: {fileID: 0}
+    Cooldown: 0.5
   UnlockedSkillIdList: 
-  BeginLevel: 1
   ExpTable: 0400000006000000090000000d0000001200000019000000220000002d0000003a000000490000005a0000006d0000008200000099000000b2000000cd000000ea000000090100002a0100004d0100007201000099010000c2010000ed0100001a020000490200007a020000ad020000e202000019030000

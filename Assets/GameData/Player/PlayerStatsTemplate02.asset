@@ -15,35 +15,36 @@ MonoBehaviour:
   StatsData:
     Id: 1002
     Name: "\u5F13\u624B"
-    MaxHp: 1
-    AttackPower: 1
+    Level: 1
+    Power: 1
     MoveSpeed: 4
-    KnockbackPower: 0
+    KnockbackPower: 1
     KnockbackResistance: 0
-    SkillSlotCount: 4
   VisualData:
-    CharPrefab: {fileID: 1901394458928384591, guid: 0d87d99a51500fd418339ea0f269bb01, type: 3}
+    Prefab: {fileID: 1901394458928384591, guid: 0d87d99a51500fd418339ea0f269bb01, type: 3}
+    DetectPrefab: {fileID: 0}
     SpriteIcon: {fileID: 0}
     DeathSFX: {fileID: 0}
     NormalMaterial: {fileID: 2100000, guid: ce71ba01014fe3043971f56059a6c29d, type: 2}
     FlashMaterial: {fileID: 2100000, guid: 343628f4e759ecf46b917b0ca0685d23, type: 2}
+  MaxHp: 1
+  SkillSlotCount: 4
   SkillTemplateList:
-  - SkillId: 1
-    SkillName: "\u666E\u901A\u653B\u64CA"
-    SkillPower: 1
-    SkillLevel: 1
-    SkillCooldown: 0.1
-    KnockbackForce: 1
-    SkillPrefab: {fileID: 1868301516382297822, guid: e9482e1a632b9db42abfad2b78ec208a, type: 3}
-    TargetDetectPrefab: {fileID: 2003774139042550798, guid: 95167d54ba66b37429c084cc1d1c6065, type: 3}
-  - SkillId: 2
-    SkillName: "\u6563\u5C04"
-    SkillPower: 1
-    SkillLevel: 1
-    SkillCooldown: 0.5
-    KnockbackForce: 1
-    SkillPrefab: {fileID: 0}
-    TargetDetectPrefab: {fileID: 0}
+  - StatsData:
+      Id: 1
+      Name: "\u666E\u901A\u653B\u64CA"
+      Level: 1
+      Power: 1
+      MoveSpeed: 2
+      KnockbackPower: 0.5
+      KnockbackResistance: 0
+    VisualData:
+      Prefab: {fileID: 1868301516382297822, guid: e9482e1a632b9db42abfad2b78ec208a, type: 3}
+      DetectPrefab: {fileID: 2003774139042550798, guid: 95167d54ba66b37429c084cc1d1c6065, type: 3}
+      SpriteIcon: {fileID: 0}
+      DeathSFX: {fileID: 0}
+      NormalMaterial: {fileID: 0}
+      FlashMaterial: {fileID: 0}
+    Cooldown: 0.1
   UnlockedSkillIdList: 
-  BeginLevel: 1
   ExpTable: 0400000006000000090000000d0000001200000019000000220000002d0000003a000000490000005a0000006d0000008200000099000000b2000000cd000000ea000000090100002a0100004d0100007201000099010000c2010000ed0100001a020000490200007a020000ad020000e202000019030000

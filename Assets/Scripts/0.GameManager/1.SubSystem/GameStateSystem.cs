@@ -27,6 +27,4 @@ public class GameStateSystem :SubSystemBase
     }
 
     public override void Initialize() {}
-    public override void Update(float deltaTime) {}
-    public override void Shutdown() {}
 }

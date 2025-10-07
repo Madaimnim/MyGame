@@ -7,8 +7,8 @@ public class TargetDetector : MonoBehaviour
 {
     public TargetPriorityType targetPriorityType = TargetPriorityType.Closest;
     public LayerMask targetLayers;
-    [HideInInspector] public bool hasTarget = false;
-    [HideInInspector] public Transform targetTransform;
+    public bool HasTarget => TargetTransform != null;
+    public Transform TargetTransform;
 
     private List<Transform> targetsList = new List<Transform>();
 
@@ -40,33 +40,18 @@ public class TargetDetector : MonoBehaviour
         {
             targetsList.Remove(collision.transform);
 
-            //如果當前targetTransform離開範圍，強制更新targetTransform = null，避免攻擊到範圍外目標
-            if (targetTransform == collision.transform)
+            if (TargetTransform == collision.transform)
             {
-                targetTransform = null;
+                TargetTransform = null;
                 UpdateTargetTransform();
             }
         }
     }
-
-    //
-    #region UpdateTargetInSecond(float targetUpdateInterval)
-    private void UpdateTargetInSecond(float targetUpdateInterval) {
-        targetUpdateCooldown -= Time.deltaTime;
-        if (targetUpdateCooldown <= 0f)
-        {
-            UpdateTargetTransform();
-            targetUpdateCooldown = targetUpdateInterval; //確保時間間隔穩定
-        }
-    }
-
     private void UpdateTargetTransform() {
         targetsList.RemoveAll(t => t == null); // 清除已銷毀的目標
-
         if (targetsList.Count == 0)
         {
-            hasTarget = false;
-            targetTransform = null;
+            TargetTransform = null;
             return;
         }
 
@@ -103,10 +88,19 @@ public class TargetDetector : MonoBehaviour
                 #endregion
         }
 
-        targetTransform = bestTarget;
-        hasTarget = (targetTransform != null);
+        TargetTransform = bestTarget;
     }
-    #endregion
+
+    private void UpdateTargetInSecond(float targetUpdateInterval) {
+        targetUpdateCooldown -= Time.deltaTime;
+        if (targetUpdateCooldown <= 0f)
+        {
+            UpdateTargetTransform();
+            targetUpdateCooldown = targetUpdateInterval; //確保時間間隔穩定
+        }
+    }
+
+
 
     //提供外部可執行方法，變更策略
     #region SetTargetPriority(TargetPriorityType newPriority)

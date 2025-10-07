@@ -8,7 +8,8 @@ public class GameEventSystem : MonoBehaviour
     public static GameEventSystem Instance { get; private set; }
     //戰鬥
     public Action<int, int, IDamageable> Event_HpChanged;
-    public Action<IDamageable> Event_OnPlayerDie;
+    public Action<Player> Event_OnPlayerDie;
+
     public Action Event_OnWallBroken;
     //playerStatsRuntime
     public Action<int, Player> Event_SkillInfoChanged;
@@ -16,7 +17,6 @@ public class GameEventSystem : MonoBehaviour
     //Todo 冷卻更新需呼叫，尚未實作
     public Action<int, float, float, Player> Event_SkillCooldownChanged;
     //SkillSystem
-    public Action<int, int, PlayerSkillRuntime> Event_SkillEquipped;
     public Action<int, int> Event_SkillUnlocked;
 
     //UI

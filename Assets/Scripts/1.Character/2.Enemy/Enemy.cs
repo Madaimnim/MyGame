@@ -7,47 +7,28 @@ using UnityEngine;
 
 public class Enemy :MonoBehaviour,IDamageable
 {
+    //封裝--------------------------------------------------------------------------------------------------------------------------------------------------------------------------
     public EnemyStatsRuntime Rt { get; private set; }
-    public CharHealthComponent CharHealthComponent { get; protected set; }
-
-    //IHealData
-    public int CurrentHp { get; private set; }
-    public int MaxHp { get; private set; }
-
-    //變數
-    #region 公開變數
-
-
-
-    [Header("場景內預製體：手動賦予enemyID，new一個StatRt")]
-    public int enemyID;
-    public EnemyAI enemyAI;
+    public HealthComponent HealthComponent { get; private set; }
+    public RespawnComponent RespawnComponent { get; private set; }
+    public AnimationComponent AnimationComponent { get; private set; }
+    public EffectComponent EffectComponent { get; private set; }
+    public MoveComponent MoveComponent { get; private set; }
+    public AIComponent AIComponent { get; private set; }
+    public SkillComponent SkillComponent { get; private set; }
+    public SpawnerComponent SpawnerComponent { get; private set; }
 
 
-    public BehaviorTree behaviorTree;
-    public AudioClip deathSFX;
-    public GameObject attackDetector01;
+    //Unity元件--------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+    public Rigidbody2D Rb { get; private set; }
+    public SpriteRenderer Spr { get; private set; }
+    public Animator Ani { get; private set; }
+    public Collider2D Col { get; private set; }
+    public ShadowController ShadowControl { get; private set; }
 
-
-
-    public bool isEnemyDataReady { private set; get; } = false;
-
-
-    [HideInInspector] public bool isPlayingActionAnimation = false;
-    #endregion
-    public int Id { get; protected set; }
-    public bool IsDead { get; protected set; } = false;
-    public bool IsKnockbacking { get; protected set; } = false;
-    public bool IsPlayingAttackAnimation { get; protected set; } = false;
-    public bool CanRunAI { get; protected set; } = false;
-    public bool CanMove { get; protected set; } = true;
-
-    public Rigidbody2D Rb { get; protected set; }
-    public SpriteRenderer Spr { get; protected set; }
-    public Animator Ani { get; protected set; }
-    public Collider2D Col { get; protected set; }
-    public ShadowController ShadowControl { get; protected set; }
-    public IDamageable owner { get; protected set; }
+    //公開--------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+    public GameObject SelectIndicatorPoint;
+    public IInputProvider InputProvider;
 
     private void Awake() {
         Rb = GetComponent<Rigidbody2D>();
@@ -58,176 +39,110 @@ public class Enemy :MonoBehaviour,IDamageable
     }
 
     private void OnEnable() {
-        GameEventSystem.Instance.Event_BattleStart += EnableAIRun;
-        GameEventSystem.Instance.Event_OnWallBroken += DisableAIRun;
-    }
-    private void OnDisable() {
-        if (CharHealthComponent != null)
-        {
-            CharHealthComponent.OnDie -= OnEnemyDie;
-            CharHealthComponent.OnHpChanged -= OnEnemyHpChanged;
-
-        }
-
-
-        GameEventSystem.Instance.Event_BattleStart -= EnableAIRun;
-        GameEventSystem.Instance.Event_OnWallBroken -= DisableAIRun;
-    }
-
-    private void Start() {
-        if (Rt == null)
-        {
-            if (GameManager.Instance.IsAllDataLoaded)
-            {
-                SetEnemyData();
-                isEnemyDataReady = true;
-                MaxHp = Rt.MaxHp;
-                CurrentHp = MaxHp;
-                if (StageLevelManager.Instance != null)
-                    StageLevelManager.Instance.RegisterEnemy();
-            }
-            else Debug.LogWarning("GameManager資料載入未完成");
-        }
-        //發事件
-        GameEventSystem.Instance.Event_HpChanged?.Invoke(CurrentHp, MaxHp, this);// 觸發事件，通知 UI 初始血量
+        //註冊UI:顯示血量、技能冷卻
+        if (GameManager.Instance!= null)
+            GameManager.Instance.EnemyStateSystem.RegisterEnemy(this);
     }
 
     private void Update() {
-        if (!GameManager.Instance.GameStateSystem.IsControlEnabled) return;
+        UpdateFacing(MoveComponent.IntentDirection);
+        MoveTickt();
+        AttackTick();       //Todo
+        SkillComponent.UpdateSkillSlotsCooldownTimer();
     }
-
-    public virtual void Initialize(EnemyStatsRuntime runtime, IDamageable damageable) {
-        //HealthComponent
-        CharHealthComponent = new CharHealthComponent(Rt);
-        CharHealthComponent.OnDie += OnEnemyDie;
-        CharHealthComponent.OnHpChanged += OnEnemyHpChanged;
-
-        Rt = runtime;
-        owner = damageable;
-        Id = runtime.StatsData.Id;
-    }
-
-
-    public void OnEnemyDie() {
-
-    }
-
-    public void OnEnemyHpChanged(int currentHp,int maxHp) {
-
-    }
-
-
-
-
-
-
-    //被擊退
-    protected virtual IEnumerator Knockback(float force, Vector2 knockbackDirection) {
-        if (Rb != null)
-        {
-            IsKnockbacking = true;
-
-            Rb.velocity = Vector2.zero; // 先清除當前速度，避免擊退力疊加
-            Rb.AddForce(force * knockbackDirection, ForceMode2D.Impulse); // 添加瞬間衝擊力
-            yield return new WaitForSeconds(0.2f);
-            Rb.velocity = Vector2.zero;
-
-            IsKnockbacking = false;
-        }
-    }
-
-    //閃白特效
-    protected virtual IEnumerator FlashWhite(float duration) {
-        if (Spr != null)
-        {
-            Spr.material = Rt.VisualData.FlashMaterial;
-            yield return new WaitForSeconds(duration);
-            Spr.material = Rt.VisualData.NormalMaterial;
-        }
-    }
-
-    //重置狀態參數
-    protected virtual void ResetState() {
-        IsPlayingAttackAnimation = false;
-        IsKnockbacking = false;
-        IsDead = false;
-    }
-
-    //啟用AI
-    protected virtual void EnableAIRun() {
-        CanRunAI = true;
-    }
-
-    //禁用AI
-    protected virtual void DisableAIRun() {
-        CanRunAI = false;
-    }
-
-    public virtual void PlayAnimation(string animationName) {
-        Ani?.Play(Animator.StringToHash(animationName));
-    }
-    protected void ResetMaterial() {
-        if (Spr != null)
-            Spr.material = Rt.VisualData.NormalMaterial;
-    }
-
-
-
-    //受傷
-    #region TakeDamage(DamageInfo info) 
-    public void TakeDamage(DamageInfo info) {
-        if (IsDead) return;
-
-        if (IsDead || Rt == null) return;
-        Rt.TakeDamage(info.damage);
-
-        if (Rt.CurrentHp <= 0 && !IsDead)
-            Die();
-
-
-        TextPopupManager.Instance.ShowDamagePopup(info.damage, transform); // 顯示傷害數字;
-
-        StartCoroutine(Knockback(info.knockbackForce, info.knockbackDirection));
-        StartCoroutine(FlashWhite(0.1f));//執行閃白協程，替換材質
-
-    }
-    #endregion
-    //死亡
-    #region Die()方法
-    public void Die() {
-        StageLevelManager.Instance?.EnemyDefeated();
-        //GameManager.Instance.PlayerStateSystem.AddExpToAllPlayers(Rt.Exp);
-        TextPopupManager.Instance.ShowExpPopup(Rt.Exp, transform.position);
-        AudioManager.Instance.PlaySFX(deathSFX, 0.5f);
-        EnemyStateManager.Instance.UnregisterEnemy(this);
-
-        Destroy(gameObject, 0.2f);
-    }
-    #endregion
-
 
     public void Initialize(EnemyStatsRuntime stats) {
         Rt = stats;
-       
-        CurrentHp = Rt.CurrentHp;
-        MaxHp = Rt.MaxHp;
+        var runner = new CoroutineRunnerAdapter(this);
 
-        transform.name = $"Enemy_{Rt.StatsData.Id} ({Rt.StatsData.Name})";
-        Rt.InitializeOwner(this);   // 保證血量初始化
+        //順序
+        AnimationComponent = new AnimationComponent(Ani, transform, Rb);
+        EffectComponent = new EffectComponent(Rt.VisualData, transform, runner, Spr);
+        HealthComponent = new HealthComponent(Rt);
+        RespawnComponent = new RespawnComponent(runner,Rt.CanRespawn);
+        MoveComponent = new MoveComponent(Rb,Rt.StatsData.MoveSpeed, runner);
+        SpawnerComponent = new SpawnerComponent();
+        SkillComponent = new SkillComponent(Rt.StatsData, Rt.SkillSlotCount,Rt.SkillPool, AnimationComponent, transform);
+        AIComponent = new AIComponent(SkillComponent, MoveComponent, Rt.SkillSlotCount);
 
-        EnemyStateManager.Instance?.RegisterEnemy(this); // ← 統一註冊
-        ResetMaterial();
+        //事件訂閱
+        HealthComponent.OnDie += OnDie;
+        HealthComponent.OnHpChanged += OnHpChanged;
+        RespawnComponent.OnRespawn += OnRespawn;
+        if (GameEventSystem.Instance != null)
+        {
+            GameEventSystem.Instance.Event_BattleStart += AIComponent.EnableAI;
+            GameEventSystem.Instance.Event_OnWallBroken += AIComponent.DisableAI;
+            GameEventSystem.Instance.Event_BattleStart += RespawnComponent.EnableRespawn;
+            GameEventSystem.Instance.Event_OnWallBroken += RespawnComponent.DisableRespawn;
+        }
+
+        //初始化狀態--------------------------------------------------------------------------------------------------------------------------------------------------------------------
+        transform.name = $"EnemyID_{Rt.StatsData.Id}:({Rt.StatsData.Name})";
+        InputProvider = AIComponent;
+        ResetState();
     }
 
-    //Todo
-    //初始化Rt，來自enemyStatesDtny[enemyID]
-    private void SetEnemyData() {
-        Rt = EnemyStateManager.Instance.CreateRuntime(enemyID);
-        if (Rt == null) return;
 
-        Id = Rt.StatsData.Id;
-        EnemyStateManager.Instance.RegisterEnemy(this);
-        ResetMaterial();
+
+    public void AttackTick() {
+        //Todo
     }
+    public void MoveTickt() {
+        MoveComponent.Move();
+        if (!AnimationComponent.IsPlayingAttackAnimation && MoveComponent.IsMoving)
+            AnimationComponent.Play("Move");
+    }
+    private void UpdateFacing(Vector2 direction) {
+        if (direction.sqrMagnitude < 0.01f) return;     //避免靜止時頻繁執行
 
+        if (Mathf.Abs(direction.x) > 0.01f)
+        {
+            var s = transform.localScale;
+            float mag = Mathf.Abs(s.x);
+            s.x = (direction.x < 0f) ? -mag : mag;
+            transform.localScale = s;
+        }
+    }
+    public void TakeDamage(DamageInfo info) {
+        HealthComponent.TakeDamage(info.Damage);
+        EffectComponent.TakeDamageEffect(info);
+        MoveComponent.Knockbacked(info.KnockbackForce, info.KnockbackDirection);
+    }
+    public void AnimationEvent_SpawnerSkill() {
+        SkillComponent.UseSkill();
+    }
+    //事件方法
+    public void OnHpChanged(int currentHp, int maxHp) { }     //Todo SliderChange
+    public void OnDie() {
+        AIComponent.DisableAI();
+        AnimationComponent.Play("Die");
+
+        if (RespawnComponent.CanRespawn)
+        {
+            foreach (var col in GetComponentsInChildren<Collider2D>())
+                col.enabled = true;
+            RespawnComponent.RespawnAfter(3f);
+        } 
+        else
+        {
+            Destroy(gameObject, 0.2f);
+            if (GameManager.Instance != null) GameManager.Instance.EnemyStateSystem.UnregisterEnemy(this);
+        }
+    }
+    public void OnRespawn() {
+        foreach (var col in GetComponentsInChildren<Collider2D>())
+            col.enabled = true;
+
+        ResetState();
+
+        AIComponent.EnableAI();
+    }
+    public void ResetState() {
+        AnimationComponent.IsPlayingAttackAnimation = false;
+        MoveComponent.Reset();
+        HealthComponent.ResetCurrentHp();
+        AnimationComponent.Play("Idle");
+        ShadowControl.ResetShadow();
+    }
 }

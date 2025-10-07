@@ -46,7 +46,7 @@ public class StageLevelManager : MonoBehaviour
 
         yield return new WaitForSeconds(respawnDelay);
 
-        player.CharRespawnComponent.Respawn();
+        player.RespawnComponent.Respawn();
     }
 
     #endregion

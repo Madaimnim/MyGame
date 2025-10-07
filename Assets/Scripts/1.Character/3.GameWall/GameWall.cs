@@ -46,8 +46,8 @@ public class GameWall : MonoBehaviour, IDamageable
     public void TakeDamage(DamageInfo info) {
         if (isDefeat) return;
 
-        currentHealth -= info.damage;
-        TextPopupManager.Instance.ShowTakeDamagePopup(info.damage, transform); // 顯示傷害數字
+        currentHealth -= info.Damage;
+        TextPopupManager.Instance.ShowTakeDamagePopup(info.Damage, transform); // 顯示傷害數字
 
         currentHealth = Mathf.Clamp(currentHealth, 0,maxHealth);
         GameEventSystem.Instance.Event_HpChanged?.Invoke(currentHealth, maxHealth,this); // 更新 UI 血量

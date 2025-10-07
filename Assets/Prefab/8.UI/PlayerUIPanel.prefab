@@ -149,8 +149,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a89db2c405a225e4dabdbb0dd03eaa0c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  skillCooldownSliderPrefab: {fileID: 5929828897718558857, guid: a438538cdabc43c468ce7d4f98f47e4c, type: 3}
-  skillSliderParent: {fileID: 4146497460660566959}
+  SliderPrefab: {fileID: 5929828897718558857, guid: a438538cdabc43c468ce7d4f98f47e4c, type: 3}
+  SlidersParent: {fileID: 4146497460660566959}
 --- !u!1 &4146497460660566952
 GameObject:
   m_ObjectHideFlags: 0

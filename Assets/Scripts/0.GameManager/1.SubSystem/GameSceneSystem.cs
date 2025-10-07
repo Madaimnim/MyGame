@@ -23,9 +23,6 @@ public class GameSceneSystem : SubSystemBase
     public override void Initialize() {
         _sceneConfig = GameManager.SceneConfig;
     }
-    public override void Update(float deltaTime) { }
-    public override void Shutdown() { }
-
     public void LoadSceneByKey(string key) {
         string address = _sceneConfig.GetAddress(key);
         if (!string.IsNullOrEmpty(address))

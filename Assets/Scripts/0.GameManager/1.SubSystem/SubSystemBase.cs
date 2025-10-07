@@ -10,6 +10,6 @@ public abstract class SubSystemBase : ISubSystem
         GameManager.RegisterSubsystem(this);
     }
     public abstract void Initialize();
-    public abstract void Update(float deltaTime);
-    public abstract void Shutdown();
+    public virtual void Update(float deltaTime) {}
+    public virtual void Shutdown() {}
 }

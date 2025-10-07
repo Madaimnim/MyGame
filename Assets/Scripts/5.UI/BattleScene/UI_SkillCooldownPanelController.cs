@@ -4,12 +4,12 @@ using System.Collections.Generic;
 public class UI_SkillCooldownPanelController : MonoBehaviour
 {
     [Header("技能冷卻UI Prefab")]
-    public UI_SkillCooldownSlider skillCooldownSliderPrefab;
+    public UI_SkillCooldownSlider SliderPrefab;
     [Header("技能UI父物件 (UI Panel)")]
-    public Transform skillSliderParent;
+    public Transform SlidersParent;
 
-    private Player boundPlayer;  // 綁定的角色
-    private List<UI_SkillCooldownSlider> activeCooldownSlotList = new List<UI_SkillCooldownSlider>();
+    private Player _player;  // 綁定的角色
+    private List<UI_SkillCooldownSlider> _cooldownSliderList = new List<UI_SkillCooldownSlider>();
 
 
     private void OnEnable() {
@@ -29,42 +29,35 @@ public class UI_SkillCooldownPanelController : MonoBehaviour
         }
     }
 
-    //註冊角色的技能槽（比如四個技能）
-    #region RegisterPlayerSkillSlider(Player player, Transform parent)
+    //註冊角色的技能槽
     public void RegisterPlayerSkillSliders(Player player) {
-        boundPlayer = player;
-        for (int slotIndex = 0; slotIndex < player.GetSkillSlotsLength(); slotIndex++)
+        _player = player;
+        for (int slotIndex = 0; slotIndex < player.Rt.SkillSlotCount; slotIndex++)
         {
-            var slotData = player.Rt.GetSkillAtSlot(slotIndex);
-            if (slotData == null || string.IsNullOrEmpty(slotData.StatsData.Name)) continue;
-            //生成Slider
-            var cooldownSlot = Instantiate(skillCooldownSliderPrefab, skillSliderParent);
-            cooldownSlot.Setup(slotIndex, player);
-            activeCooldownSlotList.Add(cooldownSlot);
+            if (!_player.SkillComponent.SkillSlots[slotIndex].HasSkill) continue;
+            
+            var cooldownSlider = Instantiate(SliderPrefab, SlidersParent);
+            cooldownSlider.Setup(slotIndex, player);
+            _cooldownSliderList.Add(cooldownSlider);
         }
     }
-    #endregion
-
 
     // 更新UISlot上的UI技能冷卻
-    #region
     public void UpdateSkillCooldown(int slotIndex, float current, float max, Player player) {
-        if (boundPlayer == null || player != boundPlayer.PlayerAI) return; // 過濾不是我的角色
+        if (_player == null || _player != player) return; // 過濾不是我的角色
 
-        foreach (var slider in activeCooldownSlotList)
+        foreach (var slider in _cooldownSliderList)
             if (slider.IsBoundTo(player, slotIndex))
                 slider.UpdateCooldownUI(current, max);
     }
-    #endregion
 
     // 更新UIController上的技能資訊
-    #region UpdateSkillInfo(int slotIndex, PlayerAI playerAI)
-    public void UpdateSkillInfo(int slotIndex, Player player) {
-        if (boundPlayer == null || player != boundPlayer.PlayerAI) return;
 
-        foreach (var slider in activeCooldownSlotList)
+    public void UpdateSkillInfo(int slotIndex, Player player) {
+        if (_player == null || _player != player) return;
+
+        foreach (var slider in _cooldownSliderList)
             if (slider.IsBoundTo(player, slotIndex))
                 slider.RefreshSkillInfo();
     }
-    #endregion
 }

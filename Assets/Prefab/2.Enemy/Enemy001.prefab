@@ -180,7 +180,6 @@ GameObject:
   - component: {fileID: 6620357324717576226}
   - component: {fileID: 3114699369502487180}
   - component: {fileID: 2934137200844612837}
-  - component: {fileID: 7197685115958151156}
   - component: {fileID: 7654367039081887352}
   m_Layer: 8
   m_Name: Enemy001
@@ -439,7 +438,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   enemyID: 2001
   enemyAI: {fileID: 2934137200844612837}
-  behaviorTree: {fileID: 7197685115958151156}
   deathSFX: {fileID: 8300000, guid: 9c00a392c4ee4434d85c2de632c499fc, type: 3}
   attackDetector01: {fileID: 7236361915574631382}
   isPlayingActionAnimation: 0
@@ -462,28 +460,12 @@ MonoBehaviour:
   - 0
   - 0
   - 0
-  slotDetectPrefabs:
-  - {fileID: 7236361915574631382}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
+  Detectors: []
   animationNames:
   - Attack01
   - 
   - 
   - 
---- !u!114 &7197685115958151156
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 6620357324717576252}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 032d1b645f3c07b49bfd6d8a7615c927, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
 --- !u!114 &7654367039081887352
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -511,7 +493,7 @@ GameObject:
   - component: {fileID: 3608381968667322635}
   - component: {fileID: 2714923091600757705}
   - component: {fileID: 1999513047}
-  m_Layer: 11
+  m_Layer: 0
   m_Name: Attack01Range
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -617,8 +599,7 @@ MonoBehaviour:
   targetLayers:
     serializedVersion: 2
     m_Bits: 576
-  hasTarget: 0
-  targetTransform: {fileID: 0}
+  TargetTransform: {fileID: 0}
 --- !u!1 &7880439843454285232
 GameObject:
   m_ObjectHideFlags: 0

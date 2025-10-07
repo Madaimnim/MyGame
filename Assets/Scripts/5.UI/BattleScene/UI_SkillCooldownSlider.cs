@@ -18,7 +18,7 @@ public class UI_SkillCooldownSlider : MonoBehaviour
     public void Setup(int slotIndex, Player player ) {
         boundPlayer = player;
         boundSlotIndex = slotIndex;
-        boundSlot = player.Rt.SkillSlots[slotIndex];
+        boundSlot = player.SkillComponent.SkillSlots[slotIndex];
         
         //Todo
         //skillNameText.text =$"{boundSlot.SkillData.StatsData.Name} Lv.{boundSlot.SkillData.SkillLevel}" ;

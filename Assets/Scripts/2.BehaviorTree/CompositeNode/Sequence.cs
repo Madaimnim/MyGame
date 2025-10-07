@@ -3,21 +3,21 @@
 public class Sequence : Node
 {
     private List<Node> children;
-    private Node runningNode = null; // ✅ 記錄 `Running` 的節點
+    private Node runningNode = null; 
 
     public Sequence(List<Node> children) {
         this.children = children;
     }
 
     public override NodeState Evaluate() {
-        //若有 `Running` 的節點，先執行它
+
         if (runningNode != null)
         {
             NodeState result = runningNode.Evaluate();
             if (result == NodeState.RUNNING)
                 return NodeState.RUNNING; // 仍然執行中
 
-            runningNode = null; // ✅ `Running` 結束，清除記錄
+            runningNode = null;
             if (result == NodeState.FAILURE)
                 return NodeState.FAILURE; // 直接失敗
         }
@@ -28,7 +28,7 @@ public class Sequence : Node
             NodeState result = child.Evaluate();
             if (result == NodeState.RUNNING)
             {
-                runningNode = child; // ✅ 記住這個 `Running` 的節點
+                runningNode = child; 
                 return NodeState.RUNNING;
             }
             else if (result == NodeState.FAILURE)

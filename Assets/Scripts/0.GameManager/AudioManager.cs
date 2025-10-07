@@ -7,19 +7,6 @@ public class AudioManager : MonoBehaviour
     private AudioSource sfxSource;
 
     private void Awake() {
-        //if (Instance == null)
-        //{
-        //    Instance = this;
-        //    DontDestroyOnLoad(gameObject);
-        //
-        //    sfxSource = gameObject.AddComponent<AudioSource>();
-        //    sfxSource.playOnAwake = false;
-        //}
-        //else
-        //{
-        //    Destroy(gameObject);
-        //}
-
         if (Instance != null && Instance != this)
         {
             Destroy(gameObject);

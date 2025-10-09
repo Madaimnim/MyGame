@@ -9,11 +9,13 @@ public class EnemySkillRuntime: ISkillRuntime
     public StatsData StatsData { get; private set; }
     public VisualData VisualData { get; private set; }
     public float Cooldown { get; private set; }
+    public SkillTargetType TargetType { get; private set; }
 
     public EnemySkillRuntime(SkillTemplate template){
         //²L«þ¨©
         StatsData = template.StatsData;
         VisualData = template.VisualData;
         Cooldown = template.Cooldown;
+        TargetType = template.TargetType;
     }
 }

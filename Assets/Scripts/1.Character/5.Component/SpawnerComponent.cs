@@ -12,7 +12,6 @@ public class SpawnerComponent {
             Debug.LogError("Spawner: Prefab 為空");
             return null;
         }
-
         GameObject obj = Object.Instantiate(prefab, position, rotation);
         return obj;
     }

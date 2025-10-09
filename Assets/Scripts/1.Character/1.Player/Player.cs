@@ -5,6 +5,8 @@ using System.Collections.Generic;
 
 public class Player: MonoBehaviour, IDamageable
 {
+    public TargetDetector MoveDetector;
+
     //封裝--------------------------------------------------------------------------------------------------------------------------------------------------------------------------
     public PlayerStatsRuntime Rt { get; private set; }
     public HealthComponent HealthComponent { get; private set; }
@@ -46,9 +48,13 @@ public class Player: MonoBehaviour, IDamageable
     }
     private void Update() {
         UpdateFacing(MoveComponent.IntentDirection);
-        MoveTickt();
-        AttackTick();       //Todo
-        SkillComponent.UpdateSkillSlotsCooldownTimer();
+        SkillComponent.Tick();
+        AnimationTick();
+
+        if(InputProvider==AIComponent) AIComponent.Tick();
+    }
+    private void FixedUpdate() {
+        MoveComponent.Tick();
     }
 
     public void Initialize(PlayerStatsRuntime stats) {
@@ -56,14 +62,14 @@ public class Player: MonoBehaviour, IDamageable
         var runner = new CoroutineRunnerAdapter(this);
 
         //順序
-        AnimationComponent = new AnimationComponent(Ani,transform,Rb);
         EffectComponent = new EffectComponent(Rt.VisualData, transform, runner, Spr);
         HealthComponent = new HealthComponent(Rt);
         RespawnComponent = new RespawnComponent(runner,Rt.CanRespawn);
-        MoveComponent = new MoveComponent(Rb,Rt.StatsData.MoveSpeed,runner);
+        MoveComponent = new MoveComponent(Rb,Rt.StatsData.MoveSpeed,runner, MoveDetector);
+        AnimationComponent = new AnimationComponent(Ani, transform, Rb,MoveComponent);
         SpawnerComponent = new SpawnerComponent();
         SkillComponent = new SkillComponent(Rt.StatsData,Rt.SkillSlotCount,Rt.SkillPool, AnimationComponent,transform);
-        AIComponent = new AIComponent(SkillComponent, MoveComponent, Rt.SkillSlotCount);
+        AIComponent = new AIComponent(SkillComponent, MoveComponent,transform,Rt.MoveStrategyType);
 
         GrowthComponent = new GrowthComponent(Rt);
 
@@ -87,14 +93,9 @@ public class Player: MonoBehaviour, IDamageable
         ResetState();
     }
 
-
-    public void AttackTick() {
-        //Todo
-    }
-    public void MoveTickt() {
-        MoveComponent.Move();
-        if (!AnimationComponent.IsPlayingAttackAnimation && MoveComponent.IsMoving)
-            AnimationComponent.Play("Move");
+    public void AnimationTick() {
+        if (!AnimationComponent.IsPlayingAttackAnimation && MoveComponent.IsMoving && SkillComponent.IntentSlotIndex!<0)
+            AnimationComponent.PlayMove();
     }
     private void UpdateFacing(Vector2 direction) {
         if (direction.sqrMagnitude < 0.01f) return;     //避免靜止時頻繁執行
@@ -127,7 +128,7 @@ public class Player: MonoBehaviour, IDamageable
         MoveComponent.DisableMove();
         AIComponent.DisableAI();
 
-        AnimationComponent.Play("Die");
+        AnimationComponent.PlayDie();
         EffectComponent.PlayerDeathEffect();
 
         RespawnComponent.RespawnAfter(3f);
@@ -147,7 +148,6 @@ public class Player: MonoBehaviour, IDamageable
         AnimationComponent.IsPlayingAttackAnimation = false;
         MoveComponent.Reset();
         HealthComponent.ResetCurrentHp();
-        AnimationComponent.Play("Idle");
         ShadowControl.ResetShadow();
 
     }

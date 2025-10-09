@@ -3,8 +3,8 @@
 public class Parallel : Node
 {
     private List<Node> children;
-    private int successThreshold; // ✅ 需要多少個成功才算成功
-    private int failureThreshold; // ✅ 多少個失敗就算失敗
+    private int successThreshold; // 需要多少個成功才算成功
+    private int failureThreshold; // 多少個失敗就算失敗
 
     public Parallel(List<Node> children, int successThreshold, int failureThreshold) {
         this.children = children;
@@ -12,14 +12,14 @@ public class Parallel : Node
         this.failureThreshold = failureThreshold;
     }
 
-    public override NodeState Evaluate() {
+    public override NodeState Evaluate(float updateInterval) {
         int successCount = 0;
         int failureCount = 0;
         bool anyRunning = false;
 
         foreach (var child in children)
         {
-            NodeState result = child.Evaluate();
+            NodeState result = child.Evaluate(updateInterval);
             if (result == NodeState.SUCCESS)
                 successCount++;
             else if (result == NodeState.FAILURE)

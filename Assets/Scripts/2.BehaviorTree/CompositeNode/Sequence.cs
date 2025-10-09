@@ -2,41 +2,35 @@
 
 public class Sequence : Node
 {
-    private List<Node> children;
-    private Node runningNode = null; 
+    private List<Node> _children;
+    private int _currentIndex = 0;
 
     public Sequence(List<Node> children) {
-        this.children = children;
+        _children = children;
     }
 
-    public override NodeState Evaluate() {
-
-        if (runningNode != null)
+    public override NodeState Evaluate(float updateInterval) {
+        while (_currentIndex < _children.Count)
         {
-            NodeState result = runningNode.Evaluate();
-            if (result == NodeState.RUNNING)
-                return NodeState.RUNNING; // 仍然執行中
+            NodeState result = _children[_currentIndex].Evaluate(updateInterval);
 
-            runningNode = null;
-            if (result == NodeState.FAILURE)
-                return NodeState.FAILURE; // 直接失敗
-        }
+            switch (result)
+            {
+                case NodeState.RUNNING:
+                    return NodeState.RUNNING;
 
-        // 持續從當前節點往後執行
-        foreach (var child in children)
-        {
-            NodeState result = child.Evaluate();
-            if (result == NodeState.RUNNING)
-            {
-                runningNode = child; 
-                return NodeState.RUNNING;
-            }
-            else if (result == NodeState.FAILURE)
-            {
-                return NodeState.FAILURE; // 只要有失敗，整個 Sequence 失敗
+                case NodeState.FAILURE:
+                    _currentIndex = 0; // 重設
+                    return NodeState.FAILURE;
+
+                case NodeState.SUCCESS:
+                    _currentIndex++;
+                    break;
             }
         }
 
-        return NodeState.SUCCESS; // 所有子節點執行完畢
+        // 全部執行完才算成功
+        _currentIndex = 0;
+        return NodeState.SUCCESS;
     }
 }

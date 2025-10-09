@@ -10,6 +10,7 @@ public class PlayerStatsTemplate:ScriptableObject
     public int MaxHp;
     public int SkillSlotCount;
     public bool CanRespawn=true;
+    public MoveStrategyType MoveStrategyType;
     [FormerlySerializedAs("SkillTemplateList")]
     public List<SkillTemplate> SkillTemplateList = new List<SkillTemplate>();
     public List<int> UnlockedSkillIdList = new List<int>();

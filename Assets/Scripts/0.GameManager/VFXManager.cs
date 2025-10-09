@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.Serialization;
 
 public class VFXManager : MonoBehaviour
 {
@@ -13,8 +14,9 @@ public class VFXManager : MonoBehaviour
         public GameObject prefab;
     }
 
-    public List<VFXPair> effectsList;
-    private Dictionary<string, GameObject> effectDict = new();
+    [FormerlySerializedAs("EffectList")]
+    public List<VFXPair> EffectList;
+    private Dictionary<string, GameObject> _effectDtny = new();
 
     private void Awake() {
         if (Instance != null && Instance != this)
@@ -25,20 +27,20 @@ public class VFXManager : MonoBehaviour
         Instance = this;
         DontDestroyOnLoad(gameObject);
 
-        foreach (var vfxPair in effectsList)
+        foreach (var vfxPair in EffectList)
         {
-            effectDict[vfxPair.key] = vfxPair.prefab;
+            _effectDtny[vfxPair.key] = vfxPair.prefab;
         }
     }
 
     public void Play(string key, Vector3 position,SpriteRenderer targetRenderer=null) {
-        if (!effectDict.ContainsKey(key))
+        if (!_effectDtny.ContainsKey(key))
         {
             Debug.LogWarning($"VFX {key} not found!");
             return;
         }
 
-        GameObject vfx = Instantiate(effectDict[key], position, Quaternion.identity);
+        GameObject vfx = Instantiate(_effectDtny[key], position, Quaternion.identity);
 
         // 如果有指定目標，把特效放在角色上層
         if (targetRenderer != null)

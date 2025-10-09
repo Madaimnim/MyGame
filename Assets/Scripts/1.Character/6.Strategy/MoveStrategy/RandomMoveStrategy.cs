@@ -4,28 +4,26 @@ using UnityEngine;
 
 public class RandomMoveStrategy : MoveStrategyBase
 {
-    public override void MoveMethod() {
+    private float _minDistance = 3f;
+    private float _maxDistance = 3f;
 
+    public override Vector2? GetTargetPosition(AIComponent ai) {
+        Vector2 origin = ai.SelfTransform.position;
+
+        // 隨機方向（單位向量）
+        Vector2 dir = Random.insideUnitCircle.normalized;
+
+        // 隨機距離（在 min-max 範圍）
+        float distance = Random.Range(_minDistance, _maxDistance);
+
+        // 最終目標
+        Vector2 target = origin + dir * distance;
+
+        return target;
     }
-    public override Vector2 MoveDirection() {
-        float rand = Random.value; // 取得 0~1 之間的隨機數
-        Vector2 direction;
 
-        if (rand < 0.25f) // 25% 機率
-        {
-            direction = new Vector2(-1, 1).normalized*0.5f;
-        }
-        else if (rand < 0.5f) // 25% 機率
-        {
-            direction = new Vector2(1, 1).normalized * 0.5f;
-        }
-        else if(rand<0.75f)// 25% 機率
-        {
-            direction = new Vector2(-1, -1).normalized * 0.5f;
-        }
-        else
-            direction = new Vector2(1, -1).normalized * 0.5f;
-
-        return direction;
+    public override Vector2? GetMoveDirection(AIComponent ai) {
+        return null;
     }
+
 }

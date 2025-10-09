@@ -655,10 +655,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 6adbd78d6aaf789469ea51708aa06e1c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  effectsList:
+  EffectList:
+  - key: DamageEffect01
+    prefab: {fileID: 4330482110771560656, guid: 4e9923191be5c4044a653f3f7921d83f, type: 3}
+  - key: ClickGround01
+    prefab: {fileID: 2859339633543531509, guid: e5b9ac96d9da5344294c1758aab68df4, type: 3}
   - key: PlayerDeath
-    prefab: {fileID: 819901967095721701, guid: 7bba21adc03ce69488e109d2b01b2b8c, type: 3}
-  - key: EnemyDeath
     prefab: {fileID: 819901967095721701, guid: 7bba21adc03ce69488e109d2b01b2b8c, type: 3}
 --- !u!114 &164891986
 MonoBehaviour:

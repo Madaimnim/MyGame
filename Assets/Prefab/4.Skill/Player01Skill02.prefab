@@ -200,18 +200,15 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a4dfaaf66ef49214aae722a3f87c09a6, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  attackAnimationType: 1
-  attackSpawnDelayTime: 0.3
+  MoveType: 4
+  OnHitType: 0
+  DestroyDelay: 0
+  OnHitDestroyDelay: 0
+  MoveSpeed: 0
+  TargetLayers:
+    serializedVersion: 2
+    m_Bits: 256
+  SkillOffset: {x: 0, y: 0}
   canRotate: 0
   rotatePivot: {fileID: 0}
   spawnPivot: {fileID: 9197505400726502922}
-  moveType: 4
-  onHitType: 0
-  destroyDelay: 0.5
-  onHitDestroyDelay: 0
-  moveSpeed: 0
-  targetLayers:
-    serializedVersion: 2
-    m_Bits: 256
-  skillOffset: {x: 0, y: 0}
-  knockbackForce: 1

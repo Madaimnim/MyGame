@@ -17,7 +17,7 @@ public class PlayerInputController : SubSystemBase, IInputProvider
     public PlayerInputController(GameManager gm) : base(gm) {}
 
     public override void Initialize() {
-        _selectionIndicator = UnityEngine.Object.Instantiate(GameManager.PrefabConfig.SelectionIndicatorPrefab);
+        _selectionIndicator = UnityEngine.Object.Instantiate(GameManager.PrefabConfig.SelectionIndicatorPrefab,GameManager.Instance.PlayerBattleParent);
         _selectionIndicator.SetActive(false);
         GameManager.GameStateSystem.OnPlayerCanControlChanged += OnPlayerCanControlChanged;
     }
@@ -27,8 +27,9 @@ public class PlayerInputController : SubSystemBase, IInputProvider
 
         if (_currentPlayer == null) return;
         if (_currentPlayer.InputProvider != this) return;
-        SetIntentMoveDirection();
-        SetIntentSkillSlot();
+
+        HandleMoveInput();    
+        HandleSkillInput();    
     }
 
     public void OnPlayerCanControlChanged(bool canControl) => _canControl = canControl;
@@ -48,6 +49,8 @@ public class PlayerInputController : SubSystemBase, IInputProvider
     public void SelectPlayer(Player selectedPlayer) {
         _currentPlayer = selectedPlayer;
         selectedPlayer.SetInputProvider(this);
+        ResetIntent(selectedPlayer.MoveComponent, selectedPlayer.SkillComponent);
+
         foreach (var kvp in PlayerUtility.AllPlayers)
         {
             var player = kvp.Value;
@@ -56,6 +59,7 @@ public class PlayerInputController : SubSystemBase, IInputProvider
         }
 
         SetSelectionIndicatorParent(selectedPlayer);
+        CameraManager.Instance.Follow(_currentPlayer.transform);
         if (selectedPlayer != null) OnBattlePlayerSelected?.Invoke(selectedPlayer.transform);
     }
     private void SetSelectionIndicatorParent(Player player) {
@@ -63,40 +67,60 @@ public class PlayerInputController : SubSystemBase, IInputProvider
         _selectionIndicator.transform.SetParent(player.SelectIndicatorPoint.transform);
         _selectionIndicator.transform.localPosition = Vector3.zero;
     }
-    
-    //-------------------------------Intent設定--------------------------------------------------------------------------------
-    public void SetIntentMoveDirection() {
+    //-------------------------------Input輸入--------------------------------------------------------------------------------
+    private void HandleMoveInput() {
         float moveX = Input.GetAxisRaw("Horizontal");
         float moveY = Input.GetAxisRaw("Vertical");
+
+        // 有方向鍵輸入 → 優先使用方向移動
         if (moveX != 0 || moveY != 0)
         {
-            _currentPlayer.MoveComponent.IntentTargetPosition = null; // 取消自動移動
-            _currentPlayer.MoveComponent.IntentDirection = new Vector2(moveX, moveY).normalized;
+            Vector2 dir = new Vector2(moveX, moveY).normalized;
+            SetIntentMove(_currentPlayer.MoveComponent,direction: dir);                     
             return;
         }
-
-        // 滑鼠右鍵點地板：設定新目標位置
+        // 若方向鍵放開，且沒有地板移動目標 → 停止移動
+        if (!_currentPlayer.MoveComponent.IntentTargetPosition.HasValue)
+            SetIntentMove(_currentPlayer.MoveComponent, direction: Vector2.zero);            
+        // 滑鼠右鍵：點擊地板移動
         if (Input.GetMouseButtonDown(1))
         {
             Vector2 mouseWorldPos = Camera.main.ScreenToWorldPoint(Input.mousePosition);
-            _currentPlayer.MoveComponent.IntentTargetPosition = mouseWorldPos;
-            
+            SetIntentMove(_currentPlayer.MoveComponent, targetPosition: mouseWorldPos);      
             VFXManager.Instance.Play("ClickGround01", mouseWorldPos);
         }
     }
-    public void SetIntentSkillSlot() {
+    private void HandleSkillInput() {
         for (int i = 0; i < _currentPlayer.SkillComponent.SkillSlots.Length; i++)
         {
             if (Input.GetKeyDown(KeyCode.Alpha1 + i))
             {
-                _currentPlayer.SkillComponent.IntentSkillSlot = i;
-
                 Vector2 mouseWorldPos = Camera.main.ScreenToWorldPoint(Input.mousePosition);
-                _currentPlayer.SkillComponent.IntentTargetPosition = mouseWorldPos;
+                Collider2D hit = Physics2D.OverlapPoint(mouseWorldPos, LayerMask.GetMask("Enemy"));
 
+                Transform targetTransform = null;
+                if (hit != null && hit.TryGetComponent(out Enemy enemy))
+                    targetTransform = enemy.transform;
+
+                SetIntentSkill(_currentPlayer.SkillComponent, i, targetPosition: mouseWorldPos, targetTransform: targetTransform);
                 break;
             }
         }
     }
-    public void SetIntentTargetPosition() {}
+
+    //-------------------------------Intent設定--------------------------------------------------------------------------------
+    public void ResetIntent(MoveComponent moveComponent,SkillComponent skillComponent) {
+        SetIntentMove(moveComponent);
+        SetIntentSkill(skillComponent, -1);
+    }
+    public void SetIntentMove(MoveComponent moveComponent,Vector2? direction = null, Vector2? targetPosition = null, Transform targetTransform = null) {
+        moveComponent.IntentTargetTransform = targetTransform;
+        moveComponent.IntentTargetPosition = targetPosition;
+        moveComponent.IntentDirection = direction ?? Vector2.zero;
+    }
+    public void SetIntentSkill(SkillComponent skillComponent,int slotIndex, Vector2? targetPosition = null, Transform targetTransform = null) {
+        skillComponent.IntentSlotIndex = slotIndex;
+        skillComponent.IntentTargetTransform = targetTransform;
+        skillComponent.IntentTargetPosition = targetPosition ?? Vector2.zero;
+    }
 }

@@ -11,9 +11,9 @@ GameObject:
   - component: {fileID: 1868301516382297823}
   - component: {fileID: 1868301516382297792}
   - component: {fileID: 1868301516382297794}
-  - component: {fileID: 4914222443453691826}
   - component: {fileID: 268990338}
   - component: {fileID: 2814835871479070097}
+  - component: {fileID: 333524630577352720}
   m_Layer: 10
   m_Name: Player02Skill01
   m_TagString: Untagged
@@ -112,32 +112,6 @@ Rigidbody2D:
   m_SleepingMode: 1
   m_CollisionDetection: 0
   m_Constraints: 7
---- !u!61 &4914222443453691826
-BoxCollider2D:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1868301516382297822}
-  m_Enabled: 1
-  m_Density: 1
-  m_Material: {fileID: 0}
-  m_IsTrigger: 1
-  m_UsedByEffector: 0
-  m_UsedByComposite: 0
-  m_Offset: {x: -0.011321664, y: 0.4534177}
-  m_SpriteTilingProperty:
-    border: {x: 0, y: 0, z: 0, w: 0}
-    pivot: {x: 0.5, y: 0}
-    oldSize: {x: 1.125, y: 1.125}
-    newSize: {x: 1.125, y: 1.125}
-    adaptiveTilingThreshold: 0.5
-    drawMode: 0
-    adaptiveTiling: 0
-  m_AutoTiling: 0
-  serializedVersion: 2
-  m_Size: {x: 1.0117831, y: 0.21816462}
-  m_EdgeRadius: 0
 --- !u!95 &268990338
 Animator:
   serializedVersion: 5
@@ -171,21 +145,52 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a4dfaaf66ef49214aae722a3f87c09a6, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  attackAnimationType: 0
-  attackSpawnDelayTime: 0.1
+  MoveType: 2
+  OnHitType: 1
+  DestroyDelay: 1
+  OnHitDestroyDelay: 0
+  MoveSpeed: 10
+  TargetLayers:
+    serializedVersion: 2
+    m_Bits: 256
+  SkillOffset: {x: 0, y: 0}
   canRotate: 1
   rotatePivot: {fileID: 2332059069913300446}
   spawnPivot: {fileID: 4282812402017703822}
-  moveType: 2
-  onHitType: 1
-  destroyDelay: 2
-  onHitDestroyDelay: 0.02
-  moveSpeed: 12
-  targetLayers:
-    serializedVersion: 2
-    m_Bits: 256
-  skillOffset: {x: 1, y: 0}
-  knockbackForce: 0
+--- !u!60 &333524630577352720
+PolygonCollider2D:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1868301516382297822}
+  m_Enabled: 1
+  m_Density: 1
+  m_Material: {fileID: 0}
+  m_IsTrigger: 1
+  m_UsedByEffector: 0
+  m_UsedByComposite: 0
+  m_Offset: {x: 0, y: 0}
+  m_SpriteTilingProperty:
+    border: {x: 0, y: 0, z: 0, w: 0}
+    pivot: {x: 0.5, y: 0}
+    oldSize: {x: 1.125, y: 1.125}
+    newSize: {x: 1.125, y: 1.125}
+    adaptiveTilingThreshold: 0.5
+    drawMode: 0
+    adaptiveTiling: 0
+  m_AutoTiling: 0
+  m_Points:
+    m_Paths:
+    - - {x: 0.17598009, y: 0.56250113}
+      - {x: 0.21709299, y: 0.50493574}
+      - {x: 0.108541206, y: 0.4950664}
+      - {x: 0.105251715, y: 0.42269602}
+      - {x: 0.21545309, y: 0.39966905}
+      - {x: 0.19572836, y: 0.3569066}
+      - {x: 0.34046376, y: 0.34539524}
+      - {x: 0.46546167, y: 0.44736928}
+      - {x: 0.34704047, y: 0.5592117}
 --- !u!1 &5514077828225755135
 GameObject:
   m_ObjectHideFlags: 0

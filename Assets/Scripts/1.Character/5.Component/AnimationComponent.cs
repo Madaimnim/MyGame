@@ -5,33 +5,44 @@ using UnityEngine;
 public class AnimationComponent
 {
     public bool IsPlayingAttackAnimation;
-    public bool IsMoving => _rb.velocity != Vector2.zero;
+    public bool IsMoving => _moveComponent.IsMoving;
 
     private Animator _ani;
     private Transform _transform;
     private Rigidbody2D _rb;
+    private MoveComponent _moveComponent;
 
-    public AnimationComponent(Animator ani,Transform transform,Rigidbody2D rb) {
+    public AnimationComponent(Animator ani,Transform transform,Rigidbody2D rb, MoveComponent moveComponent) {
         _ani = ani ?? throw new ArgumentNullException(nameof(ani), "Animator missing on prefab");
         _transform = transform;
         _rb = rb;
+        _moveComponent = moveComponent;
     }
 
 
-    public void PlayAttackAnimation(ISkillRuntime skill, Vector3 targetPosition) {
-        // 翻轉角色朝向
-        bool isTargetOnLeft = targetPosition.x < _transform.position.x;
+    public void PlayAttackAnimation(int skillId) {
+        if (IsMoving)
+        {
+            //Debug.Log($"6");
+            Play($"MoveSkill{skillId}");
+        }
+        else
+        {
+            //Debug.Log($"7");
+            Play($"Skill{skillId}");
+        }
+
+    }
+
+    public void FaceDirection(Vector2 direction) {
+        if (direction.x == 0) return; 
+
+        float absScaleX = Mathf.Abs(_transform.localScale.x);
         _transform.localScale = new Vector3(
-            isTargetOnLeft ? -Mathf.Abs(_transform.localScale.x) : Mathf.Abs(_transform.localScale.x),
+            direction.x < 0 ? -absScaleX : absScaleX,
             _transform.localScale.y,
             _transform.localScale.z
         );
-
-        // 播放動畫
-        if (IsMoving)
-            Play($"MoveSkill{skill.StatsData.Id}");
-        else
-            Play($"Skill{skill.StatsData.Id}");
     }
 
 

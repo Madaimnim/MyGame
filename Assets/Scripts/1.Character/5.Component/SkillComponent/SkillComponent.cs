@@ -3,11 +3,13 @@ using System.Collections.Generic;
 using System.Runtime.CompilerServices;
 using TMPro;
 using UnityEngine;
+using System.Linq;
 
 public class SkillComponent
 {
-    public int IntentSkillSlot;
-    public Vector2 IntentTargetPosition;
+    public Transform IntentTargetTransform;
+    public Vector2? IntentTargetPosition;
+    public int IntentSlotIndex = -1;
 
     public int SkillSlotCount { get; private set; }
     private StatsData _statsData;
@@ -22,6 +24,8 @@ public class SkillComponent
     private Vector3 _pendingPosition;
 
     public SkillSlot[] SkillSlots;
+    public bool HasAnyTarget =>
+        SkillSlots.Any(slot => slot.HasSkill && slot.Detector != null && slot.Detector.HasTarget);
 
     public event Action OnSkillsChanged; // (slot, skillId, runtime)
     public event Action<int, ISkillRuntime> OnSkillUsed;         // (slot, runtime)
@@ -40,23 +44,47 @@ public class SkillComponent
             SkillSlots[i] = new SkillSlot();
     }
 
-
-    public bool CanUseSkill(int index) {
-        var slot = SkillSlots[index];
-        return slot.Detector.HasTarget &&slot.IsReady&& !_animationComponent.IsPlayingAttackAnimation;
+    public void Tick() {
+        TryPlaySkillAnimation();
+        TickCooldownTimer();
     }
 
-    public void PlaySkillAnimation(int slotIndex) {
-        var slot = SkillSlots[slotIndex];
+    private void TryPlaySkillAnimation() {
+        if (_animationComponent.IsPlayingAttackAnimation) return;                             // 正在施放中，不能再播放
+        if (IntentSlotIndex < 0) return;
+        var slot = SkillSlots[IntentSlotIndex];
         if (!_skillPool.TryGetValue(slot.SkillId, out var skill)) return;
-        _pendingSlotIndex = slotIndex;
-        _pendingTransform = slot.Detector.TargetTransform;
-        _pendingPosition = _pendingTransform.position;
+        Vector3 targetPos = Vector3.zero; //統一變數方便後續處理
+        switch (skill.TargetType)
+        {
+            case SkillTargetType.Target:
+                if (IntentTargetTransform == null)
+                {
+                    Debug.Log("指定技能沒有目標，無法施放");
+                    return;
+                }
+                _pendingTransform = IntentTargetTransform;
+                targetPos = IntentTargetTransform.position;
+                break;
 
-        _animationComponent.PlayAttackAnimation(skill, _pendingPosition);
+            case SkillTargetType.Point:
+                if (!IntentTargetPosition.HasValue)
+                {
+                    return;
+                }
+                _pendingTransform = null;
+                targetPos = IntentTargetPosition.Value;
+                break;
+        }
+        Vector2 direction = (targetPos - _transform.position).normalized;
+        _pendingPosition = targetPos;
+        _pendingSlotIndex = IntentSlotIndex;
+
+        _animationComponent.FaceDirection(direction);
+        _animationComponent.PlayAttackAnimation(skill.StatsData.Id);
     }
+
     public void UseSkill() {
-        if (_pendingSlotIndex == -1) return;
         var slot = SkillSlots[_pendingSlotIndex];
         if (!_skillPool.TryGetValue(slot.SkillId, out var skill)) return;
 
@@ -65,16 +93,26 @@ public class SkillComponent
         Vector2 direction = (_pendingPosition - _transform.position).normalized;
 
         //呼叫Spawner
-        GameObject obj = _spawner.Spawn(skill.VisualData.Prefab, _transform.position, Quaternion.identity);
-        if (obj != null)
+        if (skill.VisualData.Prefab != null)
         {
+            GameObject obj = _spawner.Spawn(skill.VisualData.Prefab, _transform.position, Quaternion.identity);
             var skillObj = obj.GetComponent<SkillObject>();
-            skillObj.SetSkillProperties( finalAttackPower, _statsData.KnockbackPower + skill.StatsData.KnockbackPower, _pendingTransform,_pendingPosition);
+            skillObj.Initial(
+                finalAttackPower,
+                _statsData.KnockbackPower + skill.StatsData.KnockbackPower,
+                _pendingPosition,
+                _pendingTransform
+                );
+
             slot.TriggerCooldown(skill.Cooldown);
 
             // 發事件
             OnSkillUsed?.Invoke(_pendingSlotIndex, skill);
         }
+
+        // 技能施放結束 → 解鎖狀態與Intent重置
+        IntentSlotIndex = -1;
+        _pendingSlotIndex = -1;
     }
 
     public void EquipSkill(int slotIndex, int skillId,GameObject detectorPrefab) {
@@ -90,8 +128,7 @@ public class SkillComponent
         }       
     }
 
-
-    public void UpdateSkillSlotsCooldownTimer() {
+    private void TickCooldownTimer() {
         foreach (var slot in SkillSlots)
             slot?.TickCooldown(Time.deltaTime);
     }

@@ -14,6 +14,7 @@ public class PlayerStatsRuntime : IHealthData
     public Dictionary<int, ISkillRuntime> SkillPool = new Dictionary<int, ISkillRuntime>();
     public List<int> UnlockedSkillIdList= new List<int>();
     public int[] ExpTable;
+    public MoveStrategyType MoveStrategyType;
     //Runtime-------------------------------------------------------------------------------------------------------
     public int CurrentHp { get; set; }
     public int Exp ;
@@ -31,5 +32,6 @@ public class PlayerStatsRuntime : IHealthData
             SkillPool[skill.StatsData.Id] = new PlayerSkillRuntime(skill);
         UnlockedSkillIdList = new List<int>(template.UnlockedSkillIdList);
         ExpTable = template.ExpTable;
-    }
+        MoveStrategyType=template.MoveStrategyType;
+}
 }

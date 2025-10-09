@@ -12,24 +12,21 @@ public class Selector : Node
         this.children = children;
     }
 
-    public override NodeState Evaluate() {
-        // 如果上一幀有 Running的節點，優先執行它
+    public override NodeState Evaluate(float updateInterval) {
         if (runningNode != null)
         {
-            NodeState result = runningNode.Evaluate();
-            if (result == NodeState.RUNNING)
-                // 仍然 Running，停留在該節點
-                return NodeState.RUNNING; 
+            NodeState result = runningNode.Evaluate(updateInterval);
 
+            if (result == NodeState.RUNNING)
+                return NodeState.RUNNING; 
             else
-                // Running結束，清除記錄
                 runningNode = null; 
         }
 
-        // 從頭遍歷子節點
         foreach (var child in children)
         {
-            NodeState result = child.Evaluate();
+            NodeState result = child.Evaluate(updateInterval);
+
             if (result == NodeState.RUNNING)
             {
                 runningNode = child;  // 記住這個 `Running` 的節點

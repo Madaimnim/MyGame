@@ -29,6 +29,8 @@ MonoBehaviour:
     FlashMaterial: {fileID: 2100000, guid: 343628f4e759ecf46b917b0ca0685d23, type: 2}
   MaxHp: 1
   SkillSlotCount: 4
+  CanRespawn: 1
+  MoveStrategyType: 1
   SkillTemplateList:
   - StatsData:
       Id: 1
@@ -46,5 +48,6 @@ MonoBehaviour:
       NormalMaterial: {fileID: 0}
       FlashMaterial: {fileID: 0}
     Cooldown: 0.1
+    TargetType: 0
   UnlockedSkillIdList: 
   ExpTable: 0400000006000000090000000d0000001200000019000000220000002d0000003a000000490000005a0000006d0000008200000099000000b2000000cd000000ea000000090100002a0100004d0100007201000099010000c2010000ed0100001a020000490200007a020000ad020000e202000019030000

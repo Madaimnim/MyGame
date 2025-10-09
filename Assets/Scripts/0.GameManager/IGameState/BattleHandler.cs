@@ -1,6 +1,7 @@
 using UnityEngine.UI;
 using UnityEngine;
 using System.Collections;
+using System.Linq;
 
 public class BattleHandler : IGameStateHandler
 {
@@ -36,6 +37,7 @@ public class BattleHandler : IGameStateHandler
         if (SceneKeyUtility.IsBattle(sceneKey)) // 只要是戰鬥場景就會進來
         {
             _playerStateSystem.SpawnSystem.SpawnAllPlayer(PlayerSpawnPoint.Instance.transform.position);
+            CameraManager.Instance.Follow(PlayerUtility.AllPlayers.Values.FirstOrDefault().transform);
             //發事件
             GameEventSystem.Instance.Event_BattleStart?.Invoke();
         }

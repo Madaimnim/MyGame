@@ -8,7 +8,7 @@ public class BehaviorTree
         rootNode = root;
     }
 
-    public void Tick() {
-        rootNode?.Evaluate();
+    public void Tick(float updateInterval) {
+        rootNode?.Evaluate(updateInterval);
     }
 }

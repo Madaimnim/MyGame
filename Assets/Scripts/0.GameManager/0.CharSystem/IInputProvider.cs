@@ -4,7 +4,6 @@ using UnityEngine;
 
 public interface IInputProvider
 {
-    void SetIntentMoveDirection();
-    void SetIntentSkillSlot();
-    void SetIntentTargetPosition();
+    void SetIntentMove(MoveComponent moveComponent,Vector2? direction = null, Vector2? targetPosition = null, Transform targetTransform = null);
+    void SetIntentSkill(SkillComponent skillComponent,int slotIndex, Vector2? targetPosition = null, Transform targetTransform = null);
 }

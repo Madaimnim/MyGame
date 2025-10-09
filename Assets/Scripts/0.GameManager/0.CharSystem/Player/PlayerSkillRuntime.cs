@@ -8,6 +8,7 @@ public class PlayerSkillRuntime: ISkillRuntime
     public StatsData StatsData { get; set; }
     public VisualData VisualData { get; set; }
     public float Cooldown { get; set; }
+    public SkillTargetType TargetType { get; set; }
 
     //Player¿W¦³
     public int SkillLevel;
@@ -19,6 +20,7 @@ public class PlayerSkillRuntime: ISkillRuntime
         StatsData = new StatsData(template.StatsData);
         VisualData = new VisualData(template.VisualData);
         Cooldown = template.Cooldown;
+        TargetType = template.TargetType;
 
         //Runtime
         SkillLevel = 1;

@@ -15,12 +15,12 @@ public class GameStateSystem :SubSystemBase
         if (CurrentState == newState) return; 
         var prev = CurrentState;
         
-        Debug.Log($"退出{prev}");
+        //Debug.Log($"退出{prev}");
 
         Event_OnStateExited?.Invoke(prev);
 
         CurrentState = newState;
-        Debug.Log($"進入{CurrentState}");
+        //Debug.Log($"進入{CurrentState}");
 
         Event_OnStateEntered?.Invoke(newState,sceneKey);
         OnPlayerCanControlChanged?.Invoke(IsControlEnabled);

@@ -10,11 +10,11 @@ public class RandomSelector : Node
         this.children = children;
     }
 
-    public override NodeState Evaluate() {
-        // ✅ 若有正在執行的節點，繼續執行它
+    public override NodeState Evaluate(float updateInterval) {
+        //  若有正在執行的節點，繼續執行它
         if (runningNode != null)
         {
-            NodeState result = runningNode.Evaluate();
+            NodeState result = runningNode.Evaluate(updateInterval);
             if (result == NodeState.RUNNING)
                 return NodeState.RUNNING;
 
@@ -27,6 +27,6 @@ public class RandomSelector : Node
 
         int index = Random.Range(1,children.Count+1);
         runningNode = children[index];
-        return runningNode.Evaluate();
+        return runningNode.Evaluate(updateInterval);
     }
 }

@@ -2,6 +2,21 @@
 using System;
 using System.Collections.Generic;
 using System.Collections;
+using Mono.Cecil.Cil;
+public enum SkillMoveType
+{
+    [InspectorName("原地生成")] Station,
+    [InspectorName("追蹤目標")] Homing,
+    [InspectorName("朝目標發射")] Toward,
+    [InspectorName("直線飛行")] Straight,
+    [InspectorName("生成於目標位置")] SpawnAtTarget
+}
+public enum OnHitType
+{
+    [InspectorName("沒反應")] Nothing,                      //沒反應
+    [InspectorName("命中消失")] Disappear,                  //命中即消失
+    [InspectorName("命中後停留爆炸")] Explode,              //命中後停留爆炸
+}
 
 public class SkillObject : MonoBehaviour
 {
@@ -22,7 +37,7 @@ public class SkillObject : MonoBehaviour
 
     [Header("基本參數")]
     public SkillMoveType MoveType;                                      //移動方法
-    public OnHitType _OnHitType;
+    public OnHitType OnHitType;
     public float DestroyDelay = 0f;                                     //自毀時間
     public float OnHitDestroyDelay = 0f;                                //碰撞自毀時間
     public float MoveSpeed = 0f;                                        //移動速度
@@ -39,26 +54,68 @@ public class SkillObject : MonoBehaviour
         InitialSkillMoveTypeDtny();
         InitialOnHitTypeDtny();
     }
-    private void Start() {
-        Initial();
-        UpdateRotation(); 
-        StartDestroyTimer(DestroyDelay);                         
-    }
 
     private void Update() {
         _skillMoveTypeDtny[MoveType]?.Invoke();
-        if (MoveType == SkillMoveType.Homing && canRotate) UpdateRotation();  // 每一幀檢查是否需要旋轉
+        UpdateRotation();  // 每一幀檢查是否需要旋轉
     }
 
-    // SkillMoveType、OnHit字典初始化，並綁定方法
-    public enum SkillMoveType
-    {
-        [InspectorName("原地生成")] Station,
-        [InspectorName("追蹤目標")] Homing,
-        [InspectorName("朝目標發射")] Toward,
-        [InspectorName("直線飛行")] Straight,
-        [InspectorName("生成於目標位置")] SpawnAtTarget
+
+    public void Initial(float power, float knockbackPower,  Vector3 targetPosition,Transform targetTransform = null) {
+        _power = power;
+        _knockbackPower = knockbackPower;
+        _targetPosition = targetPosition;
+        _targetTransform = targetTransform;
+
+        Vector3 referencePos = _targetTransform ? _targetTransform.position : _targetPosition;
+
+        bool isTargetOnLeft = referencePos.x < transform.position.x;
+        // 鏡像處理localScale
+        transform.localScale = new Vector3(isTargetOnLeft ? -Mathf.Abs(transform.localScale.x) : Mathf.Abs(transform.localScale.x),
+                                   transform.localScale.y,
+                                   transform.localScale.z);
+
+        transform.position = (Vector2)transform.position + new Vector2(isTargetOnLeft ? -SkillOffset.x : SkillOffset.x, SkillOffset.y);
+        _initialDirection = (referencePos - transform.position).normalized;
+        _moveDirection = _initialDirection;
+        UpdateRotation();
+
+
+
+       
+        switch (MoveType)
+        {
+            case SkillMoveType.Station:
+                break;
+
+            case SkillMoveType.Toward:
+                _moveDirection = (referencePos - transform.position).normalized;
+                break;
+
+            case SkillMoveType.Straight:
+                _moveDirection = isTargetOnLeft ? Vector2.left : Vector2.right;
+                break;
+
+            case SkillMoveType.Homing:
+                break;
+
+            case SkillMoveType.SpawnAtTarget:
+                transform.position =
+                    (Vector2)referencePos
+                    + new Vector2(isTargetOnLeft ? -SkillOffset.x : SkillOffset.x, SkillOffset.y)
+                    - ((Vector2)spawnPivot.position - (Vector2)transform.position);
+                break;
+
+            default:
+                Debug.LogWarning($"未處理的 SkillMoveType: {MoveType}");
+                break;
+        }
+
+  
+        StartDestroyTimer(DestroyDelay);
     }
+
+
     private void InitialSkillMoveTypeDtny() {
         _skillMoveTypeDtny = new Dictionary<SkillMoveType, Action> {
             { SkillMoveType.Station, StationTick },
@@ -68,12 +125,6 @@ public class SkillObject : MonoBehaviour
             { SkillMoveType.SpawnAtTarget, SpawnAtTargetTick }
         };
     }
-    public enum OnHitType
-    {
-        [InspectorName("沒反應")] Nothing,                      //沒反應
-        [InspectorName("命中消失")] Disappear,                  //命中即消失
-        [InspectorName("命中後停留爆炸")] Explode,              //命中後停留爆炸
-    }
     private void InitialOnHitTypeDtny() {
         _onHitTypeDtny = new Dictionary<OnHitType,Action> {
             { OnHitType.Nothing, OnHitNothing},
@@ -82,59 +133,32 @@ public class SkillObject : MonoBehaviour
         };
     }
 
-
-    //調整生成位置與方向
-    private void Initial() {
-        if (_targetTransform == null) return;
-
-        bool isTargetOnLeft = _targetTransform.position.x < transform.position.x;
-        // 鏡像處理localScale
-        transform.localScale = new Vector3(isTargetOnLeft ? -Mathf.Abs(transform.localScale.x) : Mathf.Abs(transform.localScale.x),
-                                           transform.localScale.y,
-                                           transform.localScale.z);
-
-        // 處理Offset位置
-        transform.position = (Vector2)transform.position + new Vector2(isTargetOnLeft ? -SkillOffset.x : SkillOffset.x, SkillOffset.y);
-        switch (MoveType)
-        {
-            case SkillMoveType.Station:
-                break;
-
-            case SkillMoveType.Toward:
-                _moveDirection = (_targetTransform.position - transform.position).normalized;
-                break;
-
-            case SkillMoveType.Straight:
-                _moveDirection = isTargetOnLeft ? Vector2.left : Vector2.right;
-                break;
-
-            case SkillMoveType.Homing:
-                break; 
-
-            case SkillMoveType.SpawnAtTarget:
-                transform.position = 
-                    (Vector2)_targetPosition
-                    + new Vector2(isTargetOnLeft ? -SkillOffset.x : SkillOffset.x, SkillOffset.y) 
-                    - ((Vector2)spawnPivot.position - (Vector2)transform.position);
-                break;
-
-            default:
-                Debug.LogWarning($"未處理的 SkillMoveType: {MoveType}");
-                break;
-        }
-    }
     private void UpdateRotation() {
-        if (!canRotate || _moveDirection == Vector2.zero) return;
+        if (!canRotate || _moveDirection == Vector2.zero)
+            return;
 
         float angle = Mathf.Atan2(_moveDirection.y, _moveDirection.x) * Mathf.Rad2Deg;
-        transform.rotation = Quaternion.Euler(0, 0, angle);
+
+        var newScale = new Vector3(1,1,1);
+
+        float displayAngle = angle;
+        if (angle > 90)          
+            displayAngle = -180+angle;   
+        else if(angle < -90)                   // 左下象限 (-180°~-90°)
+            displayAngle = 180f + angle;  // 例如 -135° → -45°
+
+
+        transform.rotation = Quaternion.Euler(0f, 0f, displayAngle);
     }
 
 
     //移動方法
     private void StationTick() {}
     private void HomingTick() {
-        if (_targetTransform != null) _moveDirection = (_targetTransform.position - transform.position).normalized;
+        if (_targetTransform != null)
+            _moveDirection = (_targetTransform.position - transform.position).normalized;
+        else 
+            _moveDirection = _initialDirection; // 沒目標時沿原方向飛行
         transform.position += (Vector3)(_moveDirection * MoveSpeed * Time.deltaTime);
     }
     private void StraightTick() {
@@ -154,18 +178,8 @@ public class SkillObject : MonoBehaviour
         StartDestroyTimer(OnHitDestroyDelay);                       //命中後重設自毀計時
     }
 
-    public void SetSkillProperties(float power,float knockbackPower,Transform targetTransform,Vector3 targetPosition) {
-        _initialDirection = (targetPosition-transform.position).normalized;
-        _moveDirection = _initialDirection;
-        _knockbackPower = knockbackPower;
-        _power = power;
-        _targetTransform = targetTransform;
-        _targetPosition = targetPosition;
-    }
 
-    //觸發TriggerEnter2D
     private void OnTriggerEnter2D(Collider2D collision) {
-        // 使用 LayerMask 來檢查是否在攻擊目標內
         if (((1 << collision.gameObject.layer) & TargetLayers) != 0)
         {
             IDamageable damageable = collision.GetComponent<IDamageable>();
@@ -182,19 +196,19 @@ public class SkillObject : MonoBehaviour
                 damageable.TakeDamage( info);
             }
 
-            _onHitTypeDtny[_OnHitType]?.Invoke();
+            _onHitTypeDtny[OnHitType]?.Invoke();
 
-            Vector2 hitPoint = collision.ClosestPoint(transform.position);
+            Vector2 hitA = collision.ClosestPoint(transform.position);
+            Vector2 hitB = GetComponent<Collider2D>().ClosestPoint(collision.transform.position);
+            Vector2 hitPoint = (hitA + hitB) / 2f;
+
             SpriteRenderer targetRenderer = collision.GetComponent<SpriteRenderer>();
             VFXManager.Instance.Play("DamageEffect01", hitPoint, targetRenderer);
         }
     }
-
-    //自毀時間
     public void StartDestroyTimer(float delay) {
         if (_destroyCoroutine != null)
         {
-            Debug.Log($"就銷毀倒數刪除");
             StopCoroutine(_destroyCoroutine);
         }
 

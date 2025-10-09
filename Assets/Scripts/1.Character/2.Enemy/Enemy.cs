@@ -3,10 +3,11 @@ using System.Collections;
 using TMPro.Examples;
 using System.Collections.Generic;
 using UnityEngine;
-
+using System.Security.Cryptography;
 
 public class Enemy :MonoBehaviour,IDamageable
 {
+    public TargetDetector MoveDetector;
     //封裝--------------------------------------------------------------------------------------------------------------------------------------------------------------------------
     public EnemyStatsRuntime Rt { get; private set; }
     public HealthComponent HealthComponent { get; private set; }
@@ -46,9 +47,11 @@ public class Enemy :MonoBehaviour,IDamageable
 
     private void Update() {
         UpdateFacing(MoveComponent.IntentDirection);
-        MoveTickt();
-        AttackTick();       //Todo
-        SkillComponent.UpdateSkillSlotsCooldownTimer();
+        AnimationTick();
+        SkillComponent.Tick();      
+    }
+    private void FixedUpdate() {
+        MoveComponent.Tick();
     }
 
     public void Initialize(EnemyStatsRuntime stats) {
@@ -56,14 +59,15 @@ public class Enemy :MonoBehaviour,IDamageable
         var runner = new CoroutineRunnerAdapter(this);
 
         //順序
-        AnimationComponent = new AnimationComponent(Ani, transform, Rb);
+
         EffectComponent = new EffectComponent(Rt.VisualData, transform, runner, Spr);
         HealthComponent = new HealthComponent(Rt);
         RespawnComponent = new RespawnComponent(runner,Rt.CanRespawn);
-        MoveComponent = new MoveComponent(Rb,Rt.StatsData.MoveSpeed, runner);
+        MoveComponent = new MoveComponent(Rb,Rt.StatsData.MoveSpeed, runner, MoveDetector);
+        AnimationComponent = new AnimationComponent(Ani, transform, Rb,MoveComponent);
         SpawnerComponent = new SpawnerComponent();
         SkillComponent = new SkillComponent(Rt.StatsData, Rt.SkillSlotCount,Rt.SkillPool, AnimationComponent, transform);
-        AIComponent = new AIComponent(SkillComponent, MoveComponent, Rt.SkillSlotCount);
+        AIComponent = new AIComponent(SkillComponent, MoveComponent, transform,Rt.MoveStrategyType);
 
         //事件訂閱
         HealthComponent.OnDie += OnDie;
@@ -82,17 +86,11 @@ public class Enemy :MonoBehaviour,IDamageable
         InputProvider = AIComponent;
         ResetState();
     }
-
-
-
-    public void AttackTick() {
-        //Todo
+    public void AnimationTick() {
+        if (!AnimationComponent.IsPlayingAttackAnimation && MoveComponent.IsMoving && SkillComponent.IntentSlotIndex! < 0)
+            AnimationComponent.PlayMove();
     }
-    public void MoveTickt() {
-        MoveComponent.Move();
-        if (!AnimationComponent.IsPlayingAttackAnimation && MoveComponent.IsMoving)
-            AnimationComponent.Play("Move");
-    }
+
     private void UpdateFacing(Vector2 direction) {
         if (direction.sqrMagnitude < 0.01f) return;     //避免靜止時頻繁執行
 
@@ -116,7 +114,7 @@ public class Enemy :MonoBehaviour,IDamageable
     public void OnHpChanged(int currentHp, int maxHp) { }     //Todo SliderChange
     public void OnDie() {
         AIComponent.DisableAI();
-        AnimationComponent.Play("Die");
+        AnimationComponent.PlayDie();
 
         if (RespawnComponent.CanRespawn)
         {
@@ -142,7 +140,7 @@ public class Enemy :MonoBehaviour,IDamageable
         AnimationComponent.IsPlayingAttackAnimation = false;
         MoveComponent.Reset();
         HealthComponent.ResetCurrentHp();
-        AnimationComponent.Play("Idle");
+        AnimationComponent.PlayIdle();
         ShadowControl.ResetShadow();
     }
 }

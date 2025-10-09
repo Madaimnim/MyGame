@@ -22,36 +22,16 @@ public class EnemyMoveDetector : MonoBehaviour
     }
 
     private void Update() {
-        //if (targetTransforms.Count == 0) {
-        //    if (enemy != null && enemy.attackDetector01 != null)
-        //    {
-        //        enemy.attackDetector01.SetActive(false);
-        //    }
-        //    return;
-        //}
-
-
-        // 簡單示範：選擇 HashSet 中的第一個目標
         foreach (var target in targetTransforms)
         {
             if (target == null) continue;
-
-
-
             break; // 一次只處理一個
         }
     }
 
     private void OnTriggerEnter2D(Collider2D col) {
         if (((1 << col.gameObject.layer) & targetLayers.value) == 0) return;
-
         var playerClass = col.GetComponent<IDamageable>();
-        //if (playerClass != null)
-        //{
-        //    enemy.attackDetector01.SetActive(true);
-        //    targetTransforms.Add(((MonoBehaviour)playerClass).transform);
-        //}
-
     }
 
     private void OnTriggerExit2D(Collider2D col) {

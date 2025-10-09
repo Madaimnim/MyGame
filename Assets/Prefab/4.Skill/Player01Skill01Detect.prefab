@@ -46,9 +46,9 @@ CircleCollider2D:
   m_IsTrigger: 1
   m_UsedByEffector: 0
   m_UsedByComposite: 0
-  m_Offset: {x: -0.12759519, y: 0.3251797}
+  m_Offset: {x: 0, y: 0.5}
   serializedVersion: 2
-  m_Radius: 1
+  m_Radius: 3
 --- !u!114 &5163130874402246039
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -65,5 +65,4 @@ MonoBehaviour:
   targetLayers:
     serializedVersion: 2
     m_Bits: 256
-  hasTarget: 0
-  targetTransform: {fileID: 0}
+  TargetTransform: {fileID: 0}

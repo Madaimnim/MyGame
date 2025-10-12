@@ -1,13 +1,16 @@
 #!/bin/bash
-cd /d/Practice/TowerDefenseGame
+set -e  # 若有任何指令出錯立即停止
 
-# 取得當前日期與時間（格式：YYYY-MM-DD HH:MM:SS）
+# 🔍 自動切換到這個腳本所在資料夾（確保無論在哪台電腦都能正確執行）
+cd "$(dirname "$0")"
+
+# 🕓 取得當前日期與時間
 current_time=$(date +"%Y-%m-%d %H:%M:%S")
 
-# 分支名稱（這是你指定的）
+# 分支名稱
 branch_name="EditorVersion2021.3.20f1"
 
-# 檢查並切換到目標分支
+# 檢查並切換分支
 echo "🔄 檢查分支狀態..."
 git fetch origin
 if git show-ref --verify --quiet "refs/heads/$branch_name"; then
@@ -18,10 +21,7 @@ else
 fi
 
 echo "🔄 從遠端同步最新版本 ($branch_name)..."
-git pull origin $branch_name
-
-# 檢查 pull 是否成功
-if [ $? -ne 0 ]; then
+if ! git pull origin $branch_name; then
     echo "⚠️ 下載最新版本失敗，請先解決衝突或檢查網路。"
     read -n 1 -s -r -p "按下任意鍵關閉..."
     exit 1
@@ -34,9 +34,9 @@ git add -A
 if git diff --quiet && git diff --cached --quiet; then
     echo "沒有檔案變更，不會建立 commit。"
 else
-    read -p "請輸入 commit 訊息（預設：更新 EditorVersion2021.3.20f1 分支）：" user_msg
+    read -p "請輸入 commit 訊息（預設：更新 $branch_name 分支）：" user_msg
     if [[ -z "${user_msg// }" ]]; then
-        user_msg="更新 EditorVersion2021.3.20f1 分支"
+        user_msg="更新 $branch_name 分支"
     fi
 
     git commit -m "$user_msg - $current_time"

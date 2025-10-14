@@ -1,5 +1,5 @@
 fileFormatVersion: 2
-guid: 34b58438c0dc2714196faba04171d16e
+guid: cf5479f0f87009e4e9ccfd57cbaab349
 TextureImporter:
   internalIDToNameTable: []
   externalObjects: {}
@@ -47,12 +47,12 @@ TextureImporter:
   spriteMeshType: 1
   alignment: 0
   spritePivot: {x: 0.5, y: 0.5}
-  spritePixelsToUnits: 8
-  spriteBorder: {x: 8, y: 0, z: 0, w: 0}
+  spritePixelsToUnits: 16
+  spriteBorder: {x: 0, y: 0, z: 0, w: 0}
   spriteGenerateFallbackPhysicsShape: 1
   alphaUsage: 1
   alphaIsTransparency: 1
-  spriteTessellationDetail: 0
+  spriteTessellationDetail: -1
   textureType: 8
   textureShape: 1
   singleChannelComponent: 0
@@ -90,31 +90,7 @@ TextureImporter:
     androidETC2FallbackOverride: 0
     forceMaximumCompressionQuality_BC6H_BC7: 0
   - serializedVersion: 3
-    buildTarget: Server
-    maxTextureSize: 2048
-    resizeAlgorithm: 0
-    textureFormat: -1
-    textureCompression: 1
-    compressionQuality: 50
-    crunchedCompression: 0
-    allowsAlphaSplitting: 0
-    overridden: 0
-    androidETC2FallbackOverride: 0
-    forceMaximumCompressionQuality_BC6H_BC7: 0
-  - serializedVersion: 3
     buildTarget: Android
-    maxTextureSize: 2048
-    resizeAlgorithm: 0
-    textureFormat: -1
-    textureCompression: 1
-    compressionQuality: 50
-    crunchedCompression: 0
-    allowsAlphaSplitting: 0
-    overridden: 0
-    androidETC2FallbackOverride: 0
-    forceMaximumCompressionQuality_BC6H_BC7: 0
-  - serializedVersion: 3
-    buildTarget: iPhone
     maxTextureSize: 2048
     resizeAlgorithm: 0
     textureFormat: -1
@@ -129,138 +105,148 @@ TextureImporter:
     serializedVersion: 2
     sprites:
     - serializedVersion: 2
-      name: Char001-Sheet_0
+      name: Player01_Skill2-Sheet_0
       rect:
         serializedVersion: 2
         x: 0
         y: 0
-        width: 8
-        height: 12
-      alignment: 0
-      pivot: {x: 0, y: 0}
+        width: 36
+        height: 36
+      alignment: 7
+      pivot: {x: 0.5, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
       outline: []
       physicsShape: []
       tessellationDetail: 0
       bones: []
-      spriteID: 708c71b88d0f9924caa446a4c6e1795d
-      internalID: 1762823011
+      spriteID: a85830b0fea4c60479e3b1cd6290c7da
+      internalID: -587414112
       vertices: []
       indices: 
       edges: []
       weights: []
     - serializedVersion: 2
-      name: Char001-Sheet_1
+      name: Player01_Skill2-Sheet_1
       rect:
         serializedVersion: 2
-        x: 8
+        x: 36
         y: 0
-        width: 8
-        height: 12
-      alignment: 0
-      pivot: {x: 0, y: 0}
+        width: 36
+        height: 36
+      alignment: 7
+      pivot: {x: 0.5, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
       outline: []
       physicsShape: []
       tessellationDetail: 0
       bones: []
-      spriteID: bca114b394faecd47a8e1907e275ee67
-      internalID: 1501487099
+      spriteID: 2821cba68c3b4a94ab65dceadba8afa8
+      internalID: -1222115603
       vertices: []
       indices: 
       edges: []
       weights: []
     - serializedVersion: 2
-      name: Char001-Sheet_2
+      name: Player01_Skill2-Sheet_2
       rect:
         serializedVersion: 2
-        x: 16
+        x: 72
         y: 0
-        width: 8
-        height: 12
-      alignment: 0
-      pivot: {x: 0, y: 0}
+        width: 36
+        height: 36
+      alignment: 7
+      pivot: {x: 0.5, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
       outline: []
       physicsShape: []
       tessellationDetail: 0
       bones: []
-      spriteID: 8d6ad3e15d19f1443b10fd28c067ae34
-      internalID: 999519806
+      spriteID: b66013553ab259648918aa055bd15090
+      internalID: -1167099711
       vertices: []
       indices: 
       edges: []
       weights: []
     - serializedVersion: 2
-      name: Char001-Sheet_3
+      name: Player01_Skill2-Sheet_3
       rect:
         serializedVersion: 2
-        x: 24
+        x: 108
         y: 0
-        width: 8
-        height: 12
-      alignment: 0
-      pivot: {x: 0, y: 0}
+        width: 36
+        height: 36
+      alignment: 7
+      pivot: {x: 0.5, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
       outline: []
       physicsShape: []
       tessellationDetail: 0
       bones: []
-      spriteID: 518f19e66a6f45b4b99c242e9486dcd7
-      internalID: -1947477500
+      spriteID: 24ee1a8733166c14a9823a089d62a285
+      internalID: -1378994342
       vertices: []
       indices: 
       edges: []
       weights: []
-    outline:
-    - - {x: 22, y: 12}
-      - {x: 22, y: -12}
-      - {x: 31, y: -12}
-      - {x: 32, y: -11}
-      - {x: 32, y: 12}
-    - - {x: -31, y: 6}
-      - {x: -32, y: 5}
-      - {x: -32, y: -5}
-      - {x: -30, y: -6}
-      - {x: -24, y: -6}
-      - {x: -22, y: -3}
-      - {x: -22, y: 5}
-      - {x: -23, y: 6}
-    - - {x: -15, y: 9}
-      - {x: -17, y: 9}
-      - {x: -18, y: 8}
-      - {x: -18, y: -5}
-      - {x: -16, y: -6}
-      - {x: -10, y: -6}
-      - {x: -9, y: -4}
-      - {x: -9, y: 5}
-    - - {x: -1, y: -6}
-      - {x: 7, y: -6}
-      - {x: 13, y: 4}
-      - {x: 13, y: 12}
-      - {x: -1, y: 12}
-    - - {x: 21, y: 6}
-      - {x: 16, y: 6}
-      - {x: 15, y: 4}
-      - {x: 15, y: -1}
-      - {x: 17, y: -6}
-      - {x: 22, y: -6}
-      - {x: 26, y: -1}
-      - {x: 26, y: 4}
+    - serializedVersion: 2
+      name: Player01_Skill2-Sheet_4
+      rect:
+        serializedVersion: 2
+        x: 144
+        y: 0
+        width: 36
+        height: 36
+      alignment: 7
+      pivot: {x: 0.5, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: f651b7a62a0607446930e7c3fc5ca757
+      internalID: -1930571888
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Player01_Skill2-Sheet_5
+      rect:
+        serializedVersion: 2
+        x: 180
+        y: 0
+        width: 36
+        height: 36
+      alignment: 7
+      pivot: {x: 0.5, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 678bc1075464ffd47bf763830c0a9f90
+      internalID: -109310616
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    outline: []
     physicsShape: []
     bones: []
     spriteID: 5e97eb03825dee720800000000000000
-    internalID: 1537655665
+    internalID: 0
     vertices: []
     indices: 
     edges: []
     weights: []
     secondaryTextures: []
     nameFileIdTable:
-      Char001-Sheet_0: 1762823011
-      Char001-Sheet_1: 1501487099
-      Char001-Sheet_2: 999519806
-      Char001-Sheet_3: -1947477500
+      Player01_Skill2-Sheet_0: -587414112
+      Player01_Skill2-Sheet_1: -1222115603
+      Player01_Skill2-Sheet_2: -1167099711
+      Player01_Skill2-Sheet_3: -1378994342
+      Player01_Skill2-Sheet_4: -1930571888
+      Player01_Skill2-Sheet_5: -109310616
   spritePackingTag: 
   pSDRemoveMatte: 0
   pSDShowRemoveMatteOption: 0

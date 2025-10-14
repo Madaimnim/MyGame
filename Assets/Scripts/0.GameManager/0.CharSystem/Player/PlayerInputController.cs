@@ -8,7 +8,6 @@ using System.Linq;
 public class PlayerInputController : SubSystemBase, IInputProvider
 {
     private GameObject _selectionIndicator;          //選框箭頭
-    private GameObject _moveMarkerInstance;          //點擊地板特效
 
     private Player _currentPlayer;
     private bool _canControl = false;
@@ -65,7 +64,7 @@ public class PlayerInputController : SubSystemBase, IInputProvider
     private void SetSelectionIndicatorParent(Player player) {
         _selectionIndicator.SetActive(true);
         _selectionIndicator.transform.SetParent(player.SelectIndicatorPoint.transform);
-        _selectionIndicator.transform.localPosition = Vector3.zero;
+        _selectionIndicator.transform.localPosition = Vector2.zero;
     }
     //-------------------------------Input輸入--------------------------------------------------------------------------------
     private void HandleMoveInput() {
@@ -95,14 +94,33 @@ public class PlayerInputController : SubSystemBase, IInputProvider
         {
             if (Input.GetKeyDown(KeyCode.Alpha1 + i))
             {
+                var slot = _currentPlayer.SkillComponent.SkillSlots[i];
+                if (!slot.HasSkill) { Debug.LogWarning($"技能槽 {i} 無技能，忽略輸入。"); return; }
+                var col = slot.Detector.GetDetectorCollider();
+                if(col==null) { Debug.LogWarning($"技能槽 {i} 缺少 DetectorCollider。"); return;}
+
+
+                //取滑鼠座標
                 Vector2 mouseWorldPos = Camera.main.ScreenToWorldPoint(Input.mousePosition);
-                Collider2D hit = Physics2D.OverlapPoint(mouseWorldPos, LayerMask.GetMask("Enemy"));
-
+                Vector2 targetPosition;
                 Transform targetTransform = null;
-                if (hit != null && hit.TryGetComponent(out Enemy enemy))
-                    targetTransform = enemy.transform;
 
-                SetIntentSkill(_currentPlayer.SkillComponent, i, targetPosition: mouseWorldPos, targetTransform: targetTransform);
+                //  如果滑鼠點擊在 collider 範圍內
+                if (col.OverlapPoint(mouseWorldPos))
+                {
+                    Collider2D hit = Physics2D.OverlapPoint(mouseWorldPos, LayerMask.GetMask("Enemy"));
+                    if (hit != null)
+                    {
+                        targetTransform = hit.transform;
+                        targetPosition = hit.transform.position;
+                    }
+                    else targetPosition = mouseWorldPos;
+                }
+                // 滑鼠不在範圍內 → 取最近點
+                else targetPosition = col.ClosestPoint(mouseWorldPos);
+
+
+                SetIntentSkill(_currentPlayer.SkillComponent, i, targetPosition: targetPosition, targetTransform: targetTransform);
                 break;
             }
         }

@@ -527,6 +527,69 @@ TextureImporter:
       indices: 
       edges: []
       weights: []
+    - serializedVersion: 2
+      name: Player01-Sheet_19
+      rect:
+        serializedVersion: 2
+        x: 684
+        y: 0
+        width: 36
+        height: 36
+      alignment: 7
+      pivot: {x: 0.5, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: fb3bd910a39fe934ca385e7d5ce7a1d8
+      internalID: 108772544
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Player01-Sheet_20
+      rect:
+        serializedVersion: 2
+        x: 720
+        y: 0
+        width: 36
+        height: 36
+      alignment: 7
+      pivot: {x: 0.5, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: f683dba1393945840a149e484804d686
+      internalID: -645108076
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Player01-Sheet_21
+      rect:
+        serializedVersion: 2
+        x: 756
+        y: 0
+        width: 36
+        height: 36
+      alignment: 7
+      pivot: {x: 0.5, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: bcb5d3d6b2e1dd34288b3a3d80b0b185
+      internalID: 1926307094
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
     outline: []
     physicsShape: []
     bones: []
@@ -549,7 +612,10 @@ TextureImporter:
       Player01-Sheet_16: 1142603061
       Player01-Sheet_17: 1484994114
       Player01-Sheet_18: -389851262
+      Player01-Sheet_19: 108772544
       Player01-Sheet_2: -251500954
+      Player01-Sheet_20: -645108076
+      Player01-Sheet_21: 1926307094
       Player01-Sheet_3: 1075855333
       Player01-Sheet_4: 246890612
       Player01-Sheet_5: 636572779

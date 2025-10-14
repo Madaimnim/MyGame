@@ -20,8 +20,8 @@ public class SkillComponent
 
     //技能暫存狀態
     private int _pendingSlotIndex=-1;
+    private Vector2 _pendingPosition;
     private Transform _pendingTransform;
-    private Vector3 _pendingPosition;
 
     public SkillSlot[] SkillSlots;
     public bool HasAnyTarget =>
@@ -55,12 +55,16 @@ public class SkillComponent
         var slot = SkillSlots[IntentSlotIndex];
         if (!_skillPool.TryGetValue(slot.SkillId, out var skill)) return;
         Vector3 targetPos = Vector3.zero; //統一變數方便後續處理
+
         switch (skill.TargetType)
         {
             case SkillTargetType.Target:
                 if (IntentTargetTransform == null)
                 {
                     Debug.Log("指定技能沒有目標，無法施放");
+                    IntentSlotIndex = -1;
+                    IntentTargetPosition = null;
+                    IntentTargetTransform = null;
                     return;
                 }
                 _pendingTransform = IntentTargetTransform;
@@ -77,11 +81,12 @@ public class SkillComponent
                 break;
         }
         Vector2 direction = (targetPos - _transform.position).normalized;
+
         _pendingPosition = targetPos;
         _pendingSlotIndex = IntentSlotIndex;
 
-        _animationComponent.FaceDirection(direction);
         _animationComponent.PlayAttackAnimation(skill.StatsData.Id);
+        _animationComponent.FaceDirection(direction);
     }
 
     public void UseSkill() {
@@ -90,7 +95,7 @@ public class SkillComponent
 
         //數值計算
         int finalAttackPower = _statsData.Power + skill.StatsData.Power;
-        Vector2 direction = (_pendingPosition - _transform.position).normalized;
+        Vector2 direction = (_pendingPosition - (Vector2)_transform.position).normalized;
 
         //呼叫Spawner
         if (skill.VisualData.Prefab != null)
@@ -110,8 +115,12 @@ public class SkillComponent
             OnSkillUsed?.Invoke(_pendingSlotIndex, skill);
         }
 
+
         // 技能施放結束 → 解鎖狀態與Intent重置
         IntentSlotIndex = -1;
+        IntentTargetPosition = null;
+        IntentTargetTransform = null;
+
         _pendingSlotIndex = -1;
     }
 

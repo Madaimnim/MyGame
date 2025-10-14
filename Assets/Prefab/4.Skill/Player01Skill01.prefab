@@ -89,7 +89,7 @@ SpriteRenderer:
   m_SpriteTileMode: 0
   m_WasSpriteAssigned: 1
   m_MaskInteraction: 0
-  m_SpriteSortPoint: 0
+  m_SpriteSortPoint: 1
 --- !u!50 &1868301516382297794
 Rigidbody2D:
   serializedVersion: 4
@@ -192,9 +192,8 @@ MonoBehaviour:
     serializedVersion: 2
     m_Bits: 256
   SkillOffset: {x: 0, y: 0.5}
+  HitEffectPositionType: 0
   canRotate: 1
-  rotatePivot: {fileID: 2130180057660526491}
-  spawnPivot: {fileID: 4237132543364788592}
 --- !u!1 &1913024244329165672
 GameObject:
   m_ObjectHideFlags: 0

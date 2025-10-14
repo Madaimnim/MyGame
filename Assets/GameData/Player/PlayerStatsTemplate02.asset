@@ -37,7 +37,7 @@ MonoBehaviour:
       Name: "\u666E\u901A\u653B\u64CA"
       Level: 1
       Power: 1
-      MoveSpeed: 2
+      MoveSpeed: 3
       KnockbackPower: 0.5
       KnockbackResistance: 0
     VisualData:

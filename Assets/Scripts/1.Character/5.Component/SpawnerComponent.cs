@@ -13,6 +13,7 @@ public class SpawnerComponent {
             return null;
         }
         GameObject obj = Object.Instantiate(prefab, position, rotation);
+        Debug.Log($"生成初始位置{position}");
         return obj;
     }
 }

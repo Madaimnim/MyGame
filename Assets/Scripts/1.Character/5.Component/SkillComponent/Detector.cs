@@ -7,7 +7,7 @@ public class Detector
 {
     public bool HasTarget => _targetDetector.HasTarget;
     public Transform TargetTransform => _targetDetector?.TargetTransform;
-
+    public Collider2D GetDetectorCollider() => _detectorObj.GetComponent<Collider2D>();
 
     private GameObject _detectorObj;
     private TargetDetector _targetDetector;
@@ -17,7 +17,7 @@ public class Detector
 
         _detectorObj = UnityEngine.Object.Instantiate(prefab, parent);
         _detectorObj.name = name;
-        _detectorObj.transform.localPosition = Vector3.zero;
+        _detectorObj.transform.localPosition = Vector2.zero;
 
         _targetDetector = _detectorObj.GetComponent<TargetDetector>();
     }

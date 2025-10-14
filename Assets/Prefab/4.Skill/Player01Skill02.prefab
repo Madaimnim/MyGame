@@ -109,17 +109,17 @@ SpriteRenderer:
   m_SortingLayerID: 0
   m_SortingLayer: 0
   m_SortingOrder: 0
-  m_Sprite: {fileID: 798118834, guid: 99e5ae9561c49cf4f9da612b52e14c81, type: 3}
+  m_Sprite: {fileID: 605211623, guid: 81a6f28d442b8d74d975e23b10e4636a, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_FlipX: 0
   m_FlipY: 0
   m_DrawMode: 0
-  m_Size: {x: 2.25, y: 2.25}
+  m_Size: {x: 2, y: 2.125}
   m_AdaptiveModeThreshold: 0.5
   m_SpriteTileMode: 0
-  m_WasSpriteAssigned: 0
+  m_WasSpriteAssigned: 1
   m_MaskInteraction: 0
-  m_SpriteSortPoint: 0
+  m_SpriteSortPoint: 1
 --- !u!50 &7327708947082931568
 Rigidbody2D:
   serializedVersion: 4
@@ -158,8 +158,8 @@ BoxCollider2D:
   m_SpriteTilingProperty:
     border: {x: 0, y: 0, z: 0, w: 0}
     pivot: {x: 0.5, y: 0}
-    oldSize: {x: 2.25, y: 2.25}
-    newSize: {x: 2.25, y: 2.25}
+    oldSize: {x: 2, y: 2.125}
+    newSize: {x: 2, y: 2.125}
     adaptiveTilingThreshold: 0.5
     drawMode: 0
     adaptiveTiling: 0
@@ -202,13 +202,12 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   MoveType: 4
   OnHitType: 0
-  DestroyDelay: 0
+  DestroyDelay: 1
   OnHitDestroyDelay: 0
-  MoveSpeed: 0
+  MoveSpeed: 1
   TargetLayers:
     serializedVersion: 2
     m_Bits: 256
-  SkillOffset: {x: 0, y: 0}
+  SkillOffset: {x: 0, y: -0.1}
+  HitEffectPositionType: 1
   canRotate: 0
-  rotatePivot: {fileID: 0}
-  spawnPivot: {fileID: 9197505400726502922}

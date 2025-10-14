@@ -59,15 +59,16 @@ public class Enemy :MonoBehaviour,IDamageable
         var runner = new CoroutineRunnerAdapter(this);
 
         //順序
-
+        AnimationComponent = new AnimationComponent(Ani, transform, Rb);
         EffectComponent = new EffectComponent(Rt.VisualData, transform, runner, Spr);
         HealthComponent = new HealthComponent(Rt);
         RespawnComponent = new RespawnComponent(runner,Rt.CanRespawn);
-        MoveComponent = new MoveComponent(Rb,Rt.StatsData.MoveSpeed, runner, MoveDetector);
-        AnimationComponent = new AnimationComponent(Ani, transform, Rb,MoveComponent);
+        MoveComponent = new MoveComponent(Rb,Rt.StatsData.MoveSpeed, runner, MoveDetector, AnimationComponent);
         SpawnerComponent = new SpawnerComponent();
         SkillComponent = new SkillComponent(Rt.StatsData, Rt.SkillSlotCount,Rt.SkillPool, AnimationComponent, transform);
         AIComponent = new AIComponent(SkillComponent, MoveComponent, transform,Rt.MoveStrategyType);
+        //額外初始化設定
+        AnimationComponent.Initial(MoveComponent);
 
         //事件訂閱
         HealthComponent.OnDie += OnDie;

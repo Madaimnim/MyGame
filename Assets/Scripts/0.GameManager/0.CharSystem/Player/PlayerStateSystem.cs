@@ -50,6 +50,7 @@ public sealed class PlayerStateSystem : SubSystemBase
     public void InitialGameStartPlayerSpawn() {
         UnlockPlayer(1001);
         _playerStatsRuntimeDtny[1001].UnlockedSkillIdList.Add(2);
+        SkillSystem.EquipPlayerSkill(1001, 0, 2);
 
         UnlockPlayer(1002);
 

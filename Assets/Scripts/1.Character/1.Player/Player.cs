@@ -62,16 +62,19 @@ public class Player: MonoBehaviour, IDamageable
         var runner = new CoroutineRunnerAdapter(this);
 
         //順序
+        AnimationComponent = new AnimationComponent(Ani, transform, Rb);
         EffectComponent = new EffectComponent(Rt.VisualData, transform, runner, Spr);
         HealthComponent = new HealthComponent(Rt);
         RespawnComponent = new RespawnComponent(runner,Rt.CanRespawn);
-        MoveComponent = new MoveComponent(Rb,Rt.StatsData.MoveSpeed,runner, MoveDetector);
-        AnimationComponent = new AnimationComponent(Ani, transform, Rb,MoveComponent);
+        MoveComponent = new MoveComponent(Rb,Rt.StatsData.MoveSpeed,runner, MoveDetector,AnimationComponent);
         SpawnerComponent = new SpawnerComponent();
         SkillComponent = new SkillComponent(Rt.StatsData,Rt.SkillSlotCount,Rt.SkillPool, AnimationComponent,transform);
         AIComponent = new AIComponent(SkillComponent, MoveComponent,transform,Rt.MoveStrategyType);
 
         GrowthComponent = new GrowthComponent(Rt);
+        //額外初始化設定
+        AnimationComponent.Initial(MoveComponent);
+
 
         //事件訂閱
         HealthComponent.OnDie += OnDie;
@@ -87,17 +90,25 @@ public class Player: MonoBehaviour, IDamageable
             GameEventSystem.Instance.Event_OnWallBroken += RespawnComponent.DisableRespawn;
         }
 
+
+
         //初始化狀態--------------------------------------------------------------------------------------------------------------------------------------------------------------------
         transform.name = $"玩家ID_{Rt.StatsData.Id}:({Rt.StatsData.Name})";
         InputProvider = AIComponent;
+
+
         ResetState();
     }
 
     public void AnimationTick() {
-        if (!AnimationComponent.IsPlayingAttackAnimation && MoveComponent.IsMoving && SkillComponent.IntentSlotIndex!<0)
+        if (!AnimationComponent.IsPlayingAttackAnimation &&
+            MoveComponent.IsMoving &&
+            SkillComponent.IntentSlotIndex<0)
+
             AnimationComponent.PlayMove();
     }
     private void UpdateFacing(Vector2 direction) {
+        if (AnimationComponent.IsPlayingAttackAnimation) return;  //確保攻擊時面相正確
         if (direction.sqrMagnitude < 0.01f) return;     //避免靜止時頻繁執行
         
         if (Mathf.Abs(direction.x) > 0.01f)

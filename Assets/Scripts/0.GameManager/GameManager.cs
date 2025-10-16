@@ -18,6 +18,7 @@ public class GameManager : MonoBehaviour
 
     public Transform PlayerBattleParent;
     public Transform EnemyBattleParent;
+    public LineRenderer LineRenderer;
 
     public Dictionary<GameStateSystem.GameState,IGameStateHandler> GameStateHandlers { get; private set; }
 

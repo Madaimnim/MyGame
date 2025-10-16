@@ -27,7 +27,8 @@ public class Player: MonoBehaviour, IDamageable
     public ShadowController ShadowControl { get; private set; }
 
     //公開--------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-    public GameObject SelectIndicatorPoint;
+    public GameObject SelectIndicator;
+    public Transform SelectIndicatorParent;
     public IInputProvider InputProvider;
 
     private void Awake() {
@@ -46,15 +47,20 @@ public class Player: MonoBehaviour, IDamageable
         if (UIManager_BattlePlayer.Instance != null)
             UIManager_BattlePlayer.Instance.UnregisterPlayer(this);
     }
+    private void Start() {
+        if (GameManager.Instance!= null) SelectIndicator = Instantiate(GameManager.Instance.PrefabConfig.SelectionIndicatorPrefab, SelectIndicatorParent);
+        SelectIndicator.SetActive(false);
+    }
     private void Update() {
-        UpdateFacing(MoveComponent.IntentDirection);
-        SkillComponent.Tick();
-        AnimationTick();
+        if(MoveComponent!=null) UpdateFacing(MoveComponent.IntentDirection);
+        if(SkillComponent!=null) SkillComponent.Tick();
+        if(AnimationComponent!=null)AnimationTick();
 
-        if(InputProvider==AIComponent) AIComponent.Tick();
+        if(InputProvider!=GameManager.Instance.PlayerInputController) 
+            if(AIComponent!=null)AIComponent.Tick();
     }
     private void FixedUpdate() {
-        MoveComponent.Tick();
+        if (MoveComponent != null) MoveComponent.Tick();
     }
 
     public void Initialize(PlayerStatsRuntime stats) {

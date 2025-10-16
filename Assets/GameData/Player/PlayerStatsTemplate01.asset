@@ -41,7 +41,7 @@ MonoBehaviour:
       KnockbackPower: 1
       KnockbackResistance: 0
     VisualData:
-      Prefab: {fileID: 1868301516382297822, guid: bee82ac91c521d24b938786f51b7c88d, type: 3}
+      Prefab: {fileID: 6644035455482526802, guid: a158b2d525771b946b249c808818d1df, type: 3}
       DetectPrefab: {fileID: 3457001140423233958, guid: 84b845aceaf3a27428687d6c246943ec, type: 3}
       SpriteIcon: {fileID: 0}
       DeathSFX: {fileID: 0}

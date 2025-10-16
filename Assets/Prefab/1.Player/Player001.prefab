@@ -219,7 +219,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 91cb9264c08bde6498cf7fd38d8b11aa, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  SelectIndicatorPoint: {fileID: 3680016166740253231}
+  MoveDetector: {fileID: 0}
+  SelectIndicator: {fileID: 0}
+  SelectIndicatorParent: {fileID: 1843384522109208559}
 --- !u!1 &3680016166740253231
 GameObject:
   m_ObjectHideFlags: 0

@@ -49,14 +49,8 @@ public class SkillObject : MonoBehaviour
     public float MoveSpeed = 0f;                                        //移動速度
     public LayerMask TargetLayers;                                      //目標layer
     public Vector2 SkillOffset = Vector2.zero;                          //生成的偏移量
-    public HitEffectPositionType HitEffectPositionType;
-
-    // --------------------------------------移動角度限制 ----------------------------------------------------------
-    [Header("角度限制設定")]
-    [SerializeField] private bool useAngleLimit = false; //是否啟用角度限制
-    [SerializeField, Range(1f, 180f)]
-    private float maxAngle = 45f;                        //最大角度（僅在啟用時顯示）
-    // ----------------------------------------------------------------------------
+    public HitEffectPositionType HitEffectPositionType;                 //特效生成的位置
+    public Collider2D BottomCollider;                                   
 
     [Header("**生成圖片設定**")]
     public bool canRotate = true;                                       //是否允許旋轉
@@ -86,7 +80,6 @@ public class SkillObject : MonoBehaviour
                                    transform.localScale.z);
 
         transform.position = (Vector2)transform.position + new Vector2(isTargetOnLeft ? -SkillOffset.x : SkillOffset.x, SkillOffset.y);
-        Debug.Log($"設定後Position{transform.position}");
 
         _initialDirection = (referencePos - transform.position).normalized;
         _moveDirection = _initialDirection;
@@ -154,34 +147,7 @@ public class SkillObject : MonoBehaviour
 
         transform.rotation = Quaternion.Euler(0f, 0f, displayAngle);
     }
-    public Vector2 ClampDirection(Vector2 inputDir) {
-        if (!useAngleLimit)
-            return inputDir.normalized;
-
-        //  根據角色面向設定基準方向
-        Vector2 baseDir = transform.localScale.x > 0 ? Vector2.right : Vector2.left;
-
-        // 計算角度差（帶正負號，正：上方，負：下方）
-        float signedAngle = Vector2.SignedAngle(baseDir, inputDir);
-
-        // 當面向左時，SignedAngle 會反向，需要反轉角度方向
-        if (transform.localScale.x < 0)
-            signedAngle = -signedAngle;
-
-        //  限制在允許角度範圍內
-        float limitedAngle = Mathf.Clamp(signedAngle, -maxAngle, maxAngle);
-
-        // 根據面向，從正確基準方向旋轉出新方向
-        Quaternion rot = Quaternion.AngleAxis(
-            transform.localScale.x > 0 ? limitedAngle : -limitedAngle,
-            Vector3.forward
-        );
-
-        Vector2 limitedDir = (rot * baseDir).normalized;
-
-        return limitedDir;
-    }
-
+  
     //移動方法
     private void StationTick() {}
     private void HomingTick() {
@@ -195,8 +161,6 @@ public class SkillObject : MonoBehaviour
         transform.position += (Vector3)(_moveDirection * MoveSpeed * Time.deltaTime);
     }
     private void TowardTick() {
-        if (useAngleLimit)
-            _moveDirection = ClampDirection(_moveDirection);
         transform.position += (Vector3)(_moveDirection * MoveSpeed * Time.deltaTime);
     }
     private void SpawnAtTargetTick() {
@@ -297,31 +261,4 @@ public class SkillObject : MonoBehaviour
         yield return new WaitForSeconds(delay);
         Destroy(gameObject);
     }
-
-    #region Editor
-
-#if UNITY_EDITOR
-    // 讓 maxAngle 僅在 useAngleLimit = true 時顯示
-    [UnityEditor.CustomEditor(typeof(SkillObject))]
-    public class SkillObjectEditor : UnityEditor.Editor
-    {
-        public override void OnInspectorGUI() {
-            serializedObject.Update();
-
-            // 預設顯示所有欄位
-            DrawPropertiesExcluding(serializedObject, new string[] { "maxAngle" });
-
-            // 僅在 useAngleLimit = true 時顯示角度欄位
-            var useAngleProp = serializedObject.FindProperty("useAngleLimit");
-            if (useAngleProp.boolValue)
-            {
-                UnityEditor.EditorGUILayout.PropertyField(serializedObject.FindProperty("maxAngle"));
-            }
-
-            serializedObject.ApplyModifiedProperties();
-        }
-    }
-#endif
-
-    #endregion
 }

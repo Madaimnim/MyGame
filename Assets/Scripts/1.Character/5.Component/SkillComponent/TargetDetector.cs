@@ -22,6 +22,8 @@ public class TargetDetector : MonoBehaviour
     }
 
     private void Update() {
+        targetsList.RemoveAll(t => t == null);
+
         UpdateTargetInSecond(targetUpdateInterval);
     }
 
@@ -48,7 +50,6 @@ public class TargetDetector : MonoBehaviour
         }
     }
     private void UpdateTargetTransform() {
-        targetsList.RemoveAll(t => t == null); // 清除已銷毀的目標
         if (targetsList.Count == 0)
         {
             TargetTransform = null;

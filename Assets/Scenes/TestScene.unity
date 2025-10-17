@@ -432,7 +432,7 @@ GameObject:
   m_Component:
   - component: {fileID: 99646379929064819}
   - component: {fileID: 4780328278446092258}
-  m_Layer: 14
+  m_Layer: 13
   m_Name: MoveCollider
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -605,7 +605,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 2040876481082754365}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -4.62, y: 0.19, z: 0}
+  m_LocalPosition: {x: -4.54, y: 0.08, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
@@ -1094,7 +1094,7 @@ CapsuleCollider2D:
   m_Enabled: 1
   m_Density: 1
   m_Material: {fileID: 0}
-  m_IsTrigger: 1
+  m_IsTrigger: 0
   m_UsedByEffector: 0
   m_UsedByComposite: 0
   m_Offset: {x: -0.0713788, y: -0.030590707}
@@ -1125,7 +1125,7 @@ GameObject:
   m_Component:
   - component: {fileID: 8205180160437184794}
   - component: {fileID: 8205180160437184793}
-  m_Layer: 14
+  m_Layer: 13
   m_Name: MoveCollider
   m_TagString: Untagged
   m_Icon: {fileID: 0}

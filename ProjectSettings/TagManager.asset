@@ -18,8 +18,8 @@ TagManager:
   - PlayerAttack
   - EnemyAttack
   - Bound
-  - EnemyMove
-  - PlayerMove
+  - Move
+  - 
   - 
   - 
   - 

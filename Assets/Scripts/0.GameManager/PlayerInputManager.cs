@@ -2,26 +2,36 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using System;
+using UnityEngine.EventSystems;
+using System.Linq;
 
-public class PlayerInputManager : MonoBehaviour
+public class PlayerInputManager : MonoBehaviour, IInputProvider
 {
     public static PlayerInputManager Instance { get; private set; }
-
+    //-------------------------------事件--------------------------------------------------------------------------------
+    public event Action<Transform> OnBattlePlayerSelected;
 
     private readonly List<Player> _selectedPlayerList = new List<Player>();
     private bool _canControl = false;
 
     //框選
-    private LineRenderer _lineRenderer;
+    public LineRenderer LineRenderer;
     private Vector2 _dragStartPos;
     private bool _isDragging;
 
-    public event Action<Transform> OnBattlePlayerSelected;
+    public void OnPlayerCanControlChanged(bool canControl) => _canControl = canControl;
 
     public void Awake() {
-        _lineRenderer = GameManager.Instance.LineRenderer;
-        _lineRenderer.enabled = false;
+        //單例
+        if (Instance != null && Instance != this)
+        {
+            Destroy(gameObject);
+            return;
+        }
+        Instance = this;
+        DontDestroyOnLoad(gameObject);
 
+        LineRenderer.enabled = false;
         GameManager.Instance.GameStateSystem.OnPlayerCanControlChanged += OnPlayerCanControlChanged;
     }
 
@@ -34,7 +44,6 @@ public class PlayerInputManager : MonoBehaviour
         HandleSkillInput();
     }
 
-    public void OnPlayerCanControlChanged(bool canControl) => _canControl = canControl;
     //-------------------------------選取腳色--------------------------------------------------------------------------------
     private void ClickPlayer() {
         if (!Input.GetMouseButtonDown(0)) return;
@@ -54,7 +63,7 @@ public class PlayerInputManager : MonoBehaviour
         {
             _isDragging = true;
             _dragStartPos = Camera.main.ScreenToWorldPoint(Input.mousePosition);
-            _lineRenderer.enabled = true;
+            LineRenderer.enabled = true;
         }
         if (_isDragging)
         {
@@ -67,7 +76,7 @@ public class PlayerInputManager : MonoBehaviour
             if (_isDragging)
             {
                 _isDragging = false;
-                _lineRenderer.enabled = false;
+                LineRenderer.enabled = false;
                 Vector2 end = Camera.main.ScreenToWorldPoint(Input.mousePosition);
                 SelectPlayersInBox(_dragStartPos, end);
             }
@@ -80,8 +89,8 @@ public class PlayerInputManager : MonoBehaviour
         corners[2] = new Vector3(end.x, end.y, 0);
         corners[3] = new Vector3(end.x, start.y, 0);
 
-        _lineRenderer.positionCount = 4;
-        _lineRenderer.SetPositions(corners);
+        LineRenderer.positionCount = 4;
+        LineRenderer.SetPositions(corners);
     }
     private void SelectPlayersInBox(Vector2 start, Vector2 end) {
         ResetAllBattlePlayerIntent();
@@ -108,7 +117,7 @@ public class PlayerInputManager : MonoBehaviour
                 .OrderBy(p => Vector2.Distance(mouseReleasePos, p.transform.position))
                 .First();
 
-            CameraManager.Instance.Follow(nearest.transform);
+            CameraManager.Instance?.Follow(nearest.transform);
         }
     }
     #endregion
@@ -203,7 +212,7 @@ public class PlayerInputManager : MonoBehaviour
     }
 
     //-------------------------------Intent設定--------------------------------------------------------------------------------
-    private void ResetAllBattlePlayerIntent() {
+    private void ResetAllBattlePlayerIntent(){
         foreach (var kvp in PlayerUtility.AllPlayers)
         {
             var p = kvp.Value;

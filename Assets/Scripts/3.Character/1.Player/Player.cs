@@ -56,8 +56,7 @@ public class Player: MonoBehaviour, IDamageable
         if(SkillComponent!=null) SkillComponent.Tick();
         if(AnimationComponent!=null)AnimationTick();
 
-        if(InputProvider!=GameManager.Instance.PlayerInputController) 
-            if(AIComponent!=null)AIComponent.Tick();
+        if(InputProvider==null && AIComponent != null) AIComponent.Tick();
     }
     private void FixedUpdate() {
         if (MoveComponent != null) MoveComponent.Tick();

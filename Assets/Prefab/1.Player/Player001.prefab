@@ -220,7 +220,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   MoveDetector: {fileID: 0}
-  SelectIndicator: {fileID: 0}
+  SelectIndicator: {fileID: 4167029791549883717, guid: f83ade4c18471fb429dc1ccc80f42329, type: 3}
   SelectIndicatorParent: {fileID: 1843384522109208559}
 --- !u!1 &3680016166740253231
 GameObject:

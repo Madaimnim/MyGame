@@ -73,8 +73,6 @@ GameObject:
   - component: {fileID: 9133101953091821923}
   - component: {fileID: 4738781730734430232}
   - component: {fileID: 3538159816217148086}
-  - component: {fileID: 3646672376741047519}
-  - component: {fileID: 8077897858865708610}
   m_Layer: 8
   m_Name: Enemy002
   m_TagString: Untagged
@@ -329,35 +327,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 0c0d73ebd28277448a0b50dedb6d8486, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  MoveDetector: {fileID: 0}
   SelectIndicatorPoint: {fileID: 0}
---- !u!114 &3646672376741047519
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 4738781730734430214}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: e913b5dce5e47584992e0849dc6fc1f0, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  stopMoveDragPower: 20
---- !u!114 &8077897858865708610
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 4738781730734430214}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 9d585e859a9da814c89e1288406ae86f, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  slider: {fileID: 8610672759278807100}
-  text: {fileID: 0}
-  title: HP
 --- !u!1 &5564922117540404137
 GameObject:
   m_ObjectHideFlags: 0
@@ -521,6 +492,7 @@ Canvas:
   m_OverrideSorting: 0
   m_OverridePixelPerfect: 0
   m_SortingBucketNormalizedSize: 0
+  m_VertexColorAlwaysGammaSpace: 0
   m_AdditionalShaderChannelsFlag: 25
   m_SortingLayerID: 0
   m_SortingOrder: 0

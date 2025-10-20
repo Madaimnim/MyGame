@@ -6,7 +6,7 @@ public class EnemyMoveDetector : MonoBehaviour
 {
     [Header("敵人本體")]
     public Enemy enemy;
-    public EnemyAI enemyAI;
+
 
     [Header("偵測目標")]
     public LayerMask targetLayers;
@@ -31,18 +31,18 @@ public class EnemyMoveDetector : MonoBehaviour
 
     private void OnTriggerEnter2D(Collider2D col) {
         if (((1 << col.gameObject.layer) & targetLayers.value) == 0) return;
-        var playerClass = col.GetComponent<IDamageable>();
+        var playerClass = col.GetComponent<IInteractable>();
     }
 
     private void OnTriggerExit2D(Collider2D col) {
         if (((1 << col.gameObject.layer) & targetLayers.value) == 0) return;
 
-        var playerClass = col.GetComponent<IDamageable>();
+        var playerClass = col.GetComponent<IInteractable>();
         if (playerClass != null)
             targetTransforms.Remove(((MonoBehaviour)playerClass).transform);
     }
 
-    private void HandlePlayerDie(IDamageable player) {
+    private void HandlePlayerDie(IInteractable player) {
         if (player != null)
             targetTransforms.Remove(((MonoBehaviour)player).transform);
     }

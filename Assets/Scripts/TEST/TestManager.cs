@@ -7,17 +7,4 @@ using UnityEngine;
 public class TestManager : MonoBehaviour
 {
 
-    void Awake() {
-
-
-    }
-
-    void Start()
-    {
-    }
-
-    void Update()
-    {
-
-    }
 }

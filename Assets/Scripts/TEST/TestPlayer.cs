@@ -52,7 +52,6 @@ public class TestPlayer : MonoBehaviour
     }
 
     private void OnTriggerEnter2D(Collider2D other) {
-        Debug.Log($"{other.name}");
         if (((1 << other.gameObject.layer) & targetLayers) == 0)
             return;
 
@@ -60,9 +59,6 @@ public class TestPlayer : MonoBehaviour
         if (testPlayer == null) return;
 
         TestPlayerList.Add(testPlayer);
-
-        Debug.Log($"目標進入{testPlayer.name}");
-        Debug.Log($"List中有{TestPlayerList.Count}個");
     }
 
     private void OnTriggerExit2D(Collider2D other) {

@@ -11,7 +11,7 @@ public class TestSkill : MonoBehaviour
         if (((1 << collision.gameObject.layer) & TargetLayers) != 0)
         {
 
-            IDamageable damageable = collision.GetComponent<IDamageable>();
+            IInteractable damageable = collision.GetComponent<IInteractable>();
             
 
    

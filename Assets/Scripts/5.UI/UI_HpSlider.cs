@@ -16,19 +16,18 @@ public class UI_HpSlider : MonoBehaviour
     #endregion
 
     #region 私有變數
-    private IDamageable thisDamageable; //取得玩家腳本
+    private IInteractable thisInteractable; //取得玩家腳本
     #endregion
 
     //生命週期
     #region 生命週期
     private void Awake() {
-        thisDamageable = GetComponent<IDamageable>();
+        thisInteractable = GetComponent<IInteractable>();
     }
     #endregion
 
     private void OnEnable() {
         GameEventSystem.Instance.Event_HpChanged += UpdateUIValue;            //監聽Enemy的血量變化
-
     }
 
     private void OnDisable() {
@@ -37,23 +36,23 @@ public class UI_HpSlider : MonoBehaviour
 
     // UI_BattlePlayerPanel綁定血條使用
     #region Bind(IDamageable damageable)
-    public void Bind(IDamageable damageable) {
-        thisDamageable = damageable;
+    public void Bind(IInteractable damageable) {
+        thisInteractable = damageable;
 
         //  綁定的當下強制刷新一次
-        if (thisDamageable is Player player)
+        if (thisInteractable is Player player)
         {
             int cur = player.Rt.CurrentHp;
             int max = player.Rt.MaxHp;
-            UpdateUIValue(cur, max, thisDamageable);
+            UpdateUIValue(cur, max, thisInteractable);
         }
     }
     #endregion
 
     //Slidere更新text、Value方法
     #region UpdateUIValue(int currentValue, int maxValue,IDamageable damageable)
-    private void UpdateUIValue(int currentValue, int maxValue, IDamageable damageable) {    //監聽Enemy上的ValueChanged事件，更新UISlider上的數值
-        if (damageable != thisDamageable) return;
+    private void UpdateUIValue(int currentValue, int maxValue, IInteractable damageable) {    //監聽Enemy上的ValueChanged事件，更新UISlider上的數值
+        if (damageable != thisInteractable) return;
 
         if (slider != null)
         {

@@ -104,7 +104,7 @@ public class SkillComponent
             var skillObj = obj.GetComponent<SkillObject>();
             skillObj.Initial(
                 finalAttackPower,
-                _statsData.KnockbackPower + skill.StatsData.KnockbackPower,
+                skill.StatsData.KnockbackForce + skill.StatsData.KnockbackForce,
                 _pendingPosition,
                 _pendingTransform
                 );

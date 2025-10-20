@@ -10,7 +10,6 @@ public class PlayerInputController : SubSystemBase, IInputProvider
 
     private readonly List<Player> _selectedPlayerList = new List<Player>();
     private bool _canControl = false;
-    public bool isUi;
 
     //框選
     private LineRenderer _lineRenderer;

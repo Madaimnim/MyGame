@@ -34,9 +34,9 @@ public class EffectComponent
         TextPopupManager.Instance.ShowLevelUpPopup(newLevel, _transform);
     }
 
-    public void TakeDamageEffect(DamageInfo info) {
+    public void TakeDamageEffect(int damage) {
         _runner.StartCoroutine(FlashWhite(1f));
-        TextPopupManager.Instance.ShowTakeDamagePopup(info.Damage, _transform); 
+        TextPopupManager.Instance.ShowTakeDamagePopup(damage, _transform); 
     }
     protected virtual IEnumerator FlashWhite(float duration) {
         if (_spr != null)

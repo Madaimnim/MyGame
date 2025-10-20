@@ -70,7 +70,7 @@ public class Action_Move : Node
 
             if (ratio < STUCK_RATIO_THRESHOLD)
             {
-                Debug.Log($"Move偵測到卡住");
+                //Debug.Log($"Move偵測到卡住");
                 ResetTimerAndIntent();
                 return NodeState.SUCCESS;
             }

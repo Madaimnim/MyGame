@@ -1,11 +1,11 @@
-using System.Collections;
+ï»¿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
 public enum SkillTargetType
 {
-    [InspectorName("«ü¦V§Ş")] Point,   // ¨Ò¦p¡G¦aµõ±Ù¡B©ñ¤õ²y¨ì¦aªO
-    [InspectorName("«ü©w§Ş")] Target   // ¨Ò¦p¡GÂê©w¼Ä¤H®gÀ»
+    [InspectorName("æŒ‡å‘æŠ€")] Point,   // ä¾‹å¦‚ï¼šåœ°è£‚æ–¬ã€æ”¾ç«çƒåˆ°åœ°æ¿
+    [InspectorName("æŒ‡å®šæŠ€")] Target   // ä¾‹å¦‚ï¼šé–å®šæ•µäººå°„æ“Š
 }
 
 [System.Serializable]

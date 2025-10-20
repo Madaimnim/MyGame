@@ -32,7 +32,7 @@ public class StageLevelManager : MonoBehaviour
 
     //·íª±®a¦º¤`
     #region
-    private void RespawnPlayer(IDamageable player) {
+    private void RespawnPlayer(IInteractable player) {
         //LevelDefeat();
         StartCoroutine(RespawnPlayerCoroutine(player as Player,3));
     }

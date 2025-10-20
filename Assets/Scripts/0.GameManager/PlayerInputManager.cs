@@ -19,6 +19,10 @@ public class PlayerInputManager : MonoBehaviour, IInputProvider
     private Vector2 _dragStartPos;
     private bool _isDragging;
 
+    [Header("測試控制開關")]
+    [SerializeField] private bool allowManualControl = false;
+    public bool IsTestingController => _canControl==true;
+
     public void OnPlayerCanControlChanged(bool canControl) => _canControl = canControl;
 
     public void Awake() {
@@ -32,10 +36,12 @@ public class PlayerInputManager : MonoBehaviour, IInputProvider
         DontDestroyOnLoad(gameObject);
 
         LineRenderer.enabled = false;
-        GameManager.Instance.GameStateSystem.OnPlayerCanControlChanged += OnPlayerCanControlChanged;
+        if(GameManager.Instance!=null)GameManager.Instance.GameStateSystem.OnPlayerCanControlChanged += OnPlayerCanControlChanged;
     }
 
     public void Update() {
+        if (allowManualControl) _canControl = true;
+
         if (!_canControl) return;
         ClickPlayer();
         HandleSelectionBox();
@@ -213,6 +219,9 @@ public class PlayerInputManager : MonoBehaviour, IInputProvider
 
     //-------------------------------Intent設定--------------------------------------------------------------------------------
     private void ResetAllBattlePlayerIntent(){
+        //For測試用
+        if (GameManager.Instance == null) { Debug.Log("沒GameManager，不ResetAllBattlePlayerIntent"); return; }
+
         foreach (var kvp in PlayerUtility.AllPlayers)
         {
             var p = kvp.Value;

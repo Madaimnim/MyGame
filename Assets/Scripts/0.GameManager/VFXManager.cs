@@ -7,15 +7,7 @@ public class VFXManager : MonoBehaviour
 {
     public static VFXManager Instance { get; private set; }
 
-    [System.Serializable]
-    public class VFXPair
-    {
-        public string key;       
-        public GameObject prefab;
-    }
-
-    [FormerlySerializedAs("EffectList")]
-    public List<VFXPair> EffectList;
+    [SerializeField] private VFXData _vfxData;
     private Dictionary<string, GameObject> _effectDtny = new();
 
     private void Awake() {
@@ -27,7 +19,7 @@ public class VFXManager : MonoBehaviour
         Instance = this;
         DontDestroyOnLoad(gameObject);
 
-        foreach (var vfxPair in EffectList)
+        foreach (var vfxPair in _vfxData.EffectList)
         {
             _effectDtny[vfxPair.key] = vfxPair.prefab;
         }

@@ -13,6 +13,7 @@ public class CameraBound : MonoBehaviour
     private void Start()
     {
         CameraManager.Instance.SetConfiner(col);
+
     }
 
 }

@@ -2,9 +2,8 @@
 using System.Collections;
 using UnityEngine;
 
-public class GameWall : MonoBehaviour, IDamageable
+public class GameWall : MonoBehaviour, IInteractable
 {
-    #region 公開變數
     public int gameWallID=1;     
     public string gameWallName ="CommonWall";
     public int maxHealth = 10;
@@ -13,8 +12,7 @@ public class GameWall : MonoBehaviour, IDamageable
     public float flashWhiteTime =0.1f;
     public Material NormalMaterial;
     public Material FlashMaterial;
-
-    #endregion
+    public Collider2D BottomCollider { get; private set; }
 
     #region 私有變數
     private Animator animator;
@@ -43,7 +41,7 @@ public class GameWall : MonoBehaviour, IDamageable
 
     //受傷
     #region 公開方法 TakeDamage()
-    public void TakeDamage(DamageInfo info) {
+    public void Interact(InteractInfo info) {
         if (isDefeat) return;
 
         currentHealth -= info.Damage;
@@ -70,7 +68,7 @@ public class GameWall : MonoBehaviour, IDamageable
     }
 
     //受傷特效
-    #region 閃白受擊
+
     private IEnumerator FlashWhite(float duration) {
         if (spriteRenderer != null)
         {
@@ -79,5 +77,4 @@ public class GameWall : MonoBehaviour, IDamageable
             spriteRenderer.material = NormalMaterial;
         }
     }
-    #endregion
 }

@@ -1,58 +1,32 @@
 ﻿using System;
 using System.Collections;
-using TMPro.Examples;
 using System.Collections.Generic;
 using UnityEngine;
-using System.Security.Cryptography;
 
-public class Enemy :MonoBehaviour,IDamageable
+public class Enemy :MonoBehaviour,IInteractable
 {
+    //公開--------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+    public Collider2D BottomCollider => _bottomCollider;
+    [SerializeField] private Collider2D _bottomCollider;
+
     public TargetDetector MoveDetector;
-    //封裝--------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+    public IInputProvider InputProvider;
+    //組件--------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+    public Rigidbody2D Rb;
+    public Animator Ani;
+    public SpriteRenderer Spr;
+    public Collider2D Col;
+    public ShadowController ShadowControl;
+    //模組化 --------------------------------------------------------------------------------------------------------------------------------------------------------------------------
     public EnemyStatsRuntime Rt { get; private set; }
     public HealthComponent HealthComponent { get; private set; }
     public RespawnComponent RespawnComponent { get; private set; }
     public AnimationComponent AnimationComponent { get; private set; }
     public EffectComponent EffectComponent { get; private set; }
-    public MoveComponent MoveComponent { get; private set; }
     public AIComponent AIComponent { get; private set; }
+    public MoveComponent MoveComponent { get; private set; }
     public SkillComponent SkillComponent { get; private set; }
     public SpawnerComponent SpawnerComponent { get; private set; }
-
-
-    //Unity元件--------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-    public Rigidbody2D Rb { get; private set; }
-    public SpriteRenderer Spr { get; private set; }
-    public Animator Ani { get; private set; }
-    public Collider2D Col { get; private set; }
-    public ShadowController ShadowControl { get; private set; }
-
-    //公開--------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-    public GameObject SelectIndicatorPoint;
-    public IInputProvider InputProvider;
-
-    private void Awake() {
-        Rb = GetComponent<Rigidbody2D>();
-        Spr = GetComponent<SpriteRenderer>();
-        Ani = GetComponent<Animator>();
-        Col = GetComponent<Collider2D>();
-        ShadowControl = GetComponentInChildren<ShadowController>();
-    }
-
-    private void OnEnable() {
-        //註冊UI:顯示血量、技能冷卻
-        if (GameManager.Instance!= null)
-            GameManager.Instance.EnemyStateSystem.RegisterEnemy(this);
-    }
-
-    private void Update() {
-        UpdateFacing(MoveComponent.IntentDirection);
-        AnimationTick();
-        SkillComponent.Tick();      
-    }
-    private void FixedUpdate() {
-        MoveComponent.Tick();
-    }
 
     public void Initialize(EnemyStatsRuntime stats) {
         Rt = stats;
@@ -63,7 +37,7 @@ public class Enemy :MonoBehaviour,IDamageable
         EffectComponent = new EffectComponent(Rt.VisualData, transform, runner, Spr);
         HealthComponent = new HealthComponent(Rt);
         RespawnComponent = new RespawnComponent(runner,Rt.CanRespawn);
-        MoveComponent = new MoveComponent(Rb,Rt.StatsData.MoveSpeed, runner, MoveDetector, AnimationComponent);
+        MoveComponent = new MoveComponent(Rb,Rt.StatsData.MoveSpeed, runner, MoveDetector, AnimationComponent,BottomCollider);
         SpawnerComponent = new SpawnerComponent();
         SkillComponent = new SkillComponent(Rt.StatsData, Rt.SkillSlotCount,Rt.SkillPool, AnimationComponent, transform);
         AIComponent = new AIComponent(SkillComponent, MoveComponent, transform,Rt.MoveStrategyType);
@@ -103,10 +77,11 @@ public class Enemy :MonoBehaviour,IDamageable
             transform.localScale = s;
         }
     }
-    public void TakeDamage(DamageInfo info) {
+    public void Interact(InteractInfo info)
+    {
         HealthComponent.TakeDamage(info.Damage);
-        EffectComponent.TakeDamageEffect(info);
-        MoveComponent.Knockbacked(info.KnockbackForce, info.KnockbackDirection);
+        EffectComponent.TakeDamageEffect(info.Damage);
+        MoveComponent.Knockbacked(info.KnockbackForce, info.Source);
     }
     public void AnimationEvent_SpawnerSkill() {
         SkillComponent.UseSkill();
@@ -114,13 +89,18 @@ public class Enemy :MonoBehaviour,IDamageable
     //事件方法
     public void OnHpChanged(int currentHp, int maxHp) { }     //Todo SliderChange
     public void OnDie() {
+        foreach (var col in GetComponentsInChildren<Collider2D>())
+            col.enabled = false;
+
+        MoveComponent.DisableMove();
         AIComponent.DisableAI();
+
         AnimationComponent.PlayDie();
 
         if (RespawnComponent.CanRespawn)
         {
             foreach (var col in GetComponentsInChildren<Collider2D>())
-                col.enabled = true;
+                col.enabled = false;
             RespawnComponent.RespawnAfter(3f);
         } 
         else
@@ -132,16 +112,43 @@ public class Enemy :MonoBehaviour,IDamageable
     public void OnRespawn() {
         foreach (var col in GetComponentsInChildren<Collider2D>())
             col.enabled = true;
-
         ResetState();
-
         AIComponent.EnableAI();
     }
     public void ResetState() {
         AnimationComponent.IsPlayingAttackAnimation = false;
         MoveComponent.Reset();
         HealthComponent.ResetCurrentHp();
-        AnimationComponent.PlayIdle();
         ShadowControl.ResetShadow();
+    }
+
+    private void Awake()
+    {
+        Rb = GetComponent<Rigidbody2D>();
+        Spr = GetComponent<SpriteRenderer>();
+        Ani = GetComponent<Animator>();
+        Col = GetComponent<Collider2D>();
+        ShadowControl = GetComponentInChildren<ShadowController>();
+    }
+    private void OnEnable()
+    {
+        //註冊UI:顯示血量、技能冷卻
+        if (GameManager.Instance != null)
+            GameManager.Instance.EnemyStateSystem.RegisterEnemy(this);
+    }
+    private void Start()
+    {
+        InputProvider = AIComponent;
+    }
+    private void Update()
+    {
+        if (MoveComponent != null) UpdateFacing(MoveComponent.IntentDirection);
+        if (SkillComponent != null) SkillComponent.Tick();
+        if (AnimationComponent != null) AnimationTick();
+        if (AIComponent != null) AIComponent.Tick();
+    }
+    private void FixedUpdate()
+    {
+        MoveComponent.Tick();
     }
 }

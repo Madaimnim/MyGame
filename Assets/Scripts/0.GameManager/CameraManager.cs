@@ -1,5 +1,6 @@
 ﻿using UnityEngine;
 using Cinemachine;
+using System.Collections;
 
 public class CameraManager : MonoBehaviour
 {
@@ -20,9 +21,17 @@ public class CameraManager : MonoBehaviour
         virtualCam = GetComponentInChildren<CinemachineVirtualCamera>();
         if (virtualCam == null) Debug.LogError("CameraManager 找不到 CinemachineVirtualCamera！");
 
-        GameManager.Instance.OnAllSubSystemReady += OnAllSubSystemInitialReady;
+   
     }
 
+
+
+    private IEnumerator Start()
+    {
+        // 等待 PlayerInputManager 初始化完成
+        yield return new WaitUntil(() => PlayerInputManager.Instance != null);
+        PlayerInputManager.Instance.OnBattlePlayerSelected += Follow;
+    }
     //CM相機的Follow跟隨方法
     public void Follow(Transform target) {
         if (virtualCam != null) virtualCam.Follow = target;
@@ -64,7 +73,4 @@ public class CameraManager : MonoBehaviour
     }
     #endregion
 
-    private void OnAllSubSystemInitialReady() {
-        GameManager.Instance.PlayerInputController.OnBattlePlayerSelected += Follow;
-    }
 }

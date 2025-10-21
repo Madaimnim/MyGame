@@ -27,17 +27,19 @@ public class Enemy :MonoBehaviour,IInteractable
     public MoveComponent MoveComponent { get; private set; }
     public SkillComponent SkillComponent { get; private set; }
     public SpawnerComponent SpawnerComponent { get; private set; }
+    public bool IsDead => HealthComponent.IsDead;
+    private Transform _lastInteractSource;
 
     public void Initialize(EnemyStatsRuntime stats) {
         Rt = stats;
-        var runner = new CoroutineRunnerAdapter(this);
 
         //順序
-        AnimationComponent = new AnimationComponent(Ani, transform, Rb);
-        EffectComponent = new EffectComponent(Rt.VisualData, transform, runner, Spr);
         HealthComponent = new HealthComponent(Rt);
-        RespawnComponent = new RespawnComponent(runner,Rt.CanRespawn);
-        MoveComponent = new MoveComponent(Rb,Rt.StatsData.MoveSpeed, runner, MoveDetector, AnimationComponent,BottomCollider);
+        AnimationComponent = new AnimationComponent(Ani, transform, Rb);
+        EffectComponent = new EffectComponent(Rt.VisualData, transform, this, Spr, HealthComponent);
+
+        RespawnComponent = new RespawnComponent(this, Rt.CanRespawn);
+        MoveComponent = new MoveComponent(Rb,Rt.StatsData.MoveSpeed, this, MoveDetector, AnimationComponent,BottomCollider);
         SpawnerComponent = new SpawnerComponent();
         SkillComponent = new SkillComponent(Rt.StatsData, Rt.SkillSlotCount,Rt.SkillPool, AnimationComponent, transform);
         AIComponent = new AIComponent(SkillComponent, MoveComponent, transform,Rt.MoveStrategyType);
@@ -62,23 +64,16 @@ public class Enemy :MonoBehaviour,IInteractable
         ResetState();
     }
     public void AnimationTick() {
-        if (!AnimationComponent.IsPlayingAttackAnimation && MoveComponent.IsMoving && SkillComponent.IntentSlotIndex! < 0)
-            AnimationComponent.PlayMove();
+        if (AnimationComponent.IsPlayingAttackAnimation) return;
+        if (SkillComponent.IntentSlotIndex >= 0) return;
+        if (HealthComponent.IsDead) return;
+
+        if (MoveComponent.IsMoving ) AnimationComponent.PlayMove();
     }
 
-    private void UpdateFacing(Vector2 direction) {
-        if (direction.sqrMagnitude < 0.01f) return;     //避免靜止時頻繁執行
-
-        if (Mathf.Abs(direction.x) > 0.01f)
-        {
-            var s = transform.localScale;
-            float mag = Mathf.Abs(s.x);
-            s.x = (direction.x < 0f) ? -mag : mag;
-            transform.localScale = s;
-        }
-    }
     public void Interact(InteractInfo info)
     {
+        _lastInteractSource= info.Source;
         HealthComponent.TakeDamage(info.Damage);
         EffectComponent.TakeDamageEffect(info.Damage);
         MoveComponent.Knockbacked(info.KnockbackForce, info.Source);
@@ -89,26 +84,37 @@ public class Enemy :MonoBehaviour,IInteractable
     //事件方法
     public void OnHpChanged(int currentHp, int maxHp) { }     //Todo SliderChange
     public void OnDie() {
+        AnimationComponent.PlayDie();
+        StartCoroutine(Die());
+    }
+    private IEnumerator Die()
+    {
+        AIComponent.DisableAI();
+        MoveComponent.DisableMove();
+
+        if (_lastInteractSource != null)
+        {
+            Vector2 dir = _lastInteractSource.position - transform.position;
+            Debug.Log($"敵人死亡面相更新來源:{dir}");
+            SetFacingLeft(dir); // 重用你現有的方向翻轉方法
+        }
+
         foreach (var col in GetComponentsInChildren<Collider2D>())
             col.enabled = false;
 
-        MoveComponent.DisableMove();
-        AIComponent.DisableAI();
+        yield return null; //等一幀，讓Animator確實切到Die動畫
+        AnimatorStateInfo state = Ani.GetCurrentAnimatorStateInfo(0);
+        yield return new WaitForSeconds(state.length / Ani.speed);
 
-        AnimationComponent.PlayDie();
-
-        if (RespawnComponent.CanRespawn)
-        {
-            foreach (var col in GetComponentsInChildren<Collider2D>())
-                col.enabled = false;
-            RespawnComponent.RespawnAfter(3f);
-        } 
+        if (RespawnComponent.CanRespawn) RespawnComponent.RespawnAfter(3f);
         else
         {
-            Destroy(gameObject, 0.2f);
-            if (GameManager.Instance != null) GameManager.Instance.EnemyStateSystem.UnregisterEnemy(this);
+            Destroy(gameObject);
+            if (GameManager.Instance != null)
+                GameManager.Instance.EnemyStateSystem.UnregisterEnemy(this);
         }
     }
+
     public void OnRespawn() {
         foreach (var col in GetComponentsInChildren<Collider2D>())
             col.enabled = true;
@@ -142,7 +148,7 @@ public class Enemy :MonoBehaviour,IInteractable
     }
     private void Update()
     {
-        if (MoveComponent != null) UpdateFacing(MoveComponent.IntentDirection);
+        if (MoveComponent != null && !IsDead) SetFacingLeft(MoveComponent.IntentDirection);
         if (SkillComponent != null) SkillComponent.Tick();
         if (AnimationComponent != null) AnimationTick();
         if (AIComponent != null) AIComponent.Tick();
@@ -150,5 +156,21 @@ public class Enemy :MonoBehaviour,IInteractable
     private void FixedUpdate()
     {
         MoveComponent.Tick();
+    }
+
+    private void SetFacingLeft(Vector2 direction)
+    {
+        if (AnimationComponent.IsPlayingAttackAnimation) return;  //確保攻擊時面相正確
+        if (direction.sqrMagnitude < 0.01f) return;     //避免靜止時頻繁執行
+
+        if (Mathf.Abs(direction.x) > 0.01f)
+        {
+            var s = transform.localScale;
+            float mag = Mathf.Abs(s.x);
+            s.x = (direction.x < 0f) ? mag : -mag;
+            transform.localScale = s;
+
+            if (IsDead) Debug.Log($"更新敵人死亡面相:{transform.localScale}，");
+        }
     }
 }

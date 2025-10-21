@@ -117,8 +117,6 @@ public class ShadowController : MonoBehaviour
     }
     #endregion
 
-
-
     // 復活時，陰影回到原始位置和透明度
     public void ResetShadow() {
         transform.localScale = originalScale;

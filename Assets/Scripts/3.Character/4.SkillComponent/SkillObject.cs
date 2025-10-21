@@ -47,7 +47,7 @@ public class SkillObject : MonoBehaviour
     public float DestroyDelay = 0f;
     public float OnHitDestroyDelay = 0f;
 
-    private float _power = 0f;
+    private int _damage = 0;
     private Vector2 _knockbackForce;
     private Vector2 _moveDirection;
     private Vector2 _initialDirection;
@@ -55,11 +55,12 @@ public class SkillObject : MonoBehaviour
     private Transform _targetTransform;
 
     private Coroutine _destroyCoroutine;
-    private HashSet<IInteractable> _targetHash = new HashSet<IInteractable>();
+    // 改用 Dictionary 來保存：目標與對應 Collider
+    private readonly Dictionary<IInteractable, Collider2D> _targetDict = new Dictionary<IInteractable, Collider2D>();
 
-    public void Initial(float power, Vector2 knockbackForce, Vector3 targetPosition, Transform targetTransform = null)
+    public void Initial(int power, Vector2 knockbackForce, Vector3 targetPosition, Transform targetTransform = null)
     {
-        _power = power;
+        _damage = power;
         _knockbackForce = knockbackForce;
         _targetPosition = targetPosition;
         _targetTransform = targetTransform;
@@ -104,17 +105,82 @@ public class SkillObject : MonoBehaviour
 
         StartDestroyTimer(DestroyDelay);
     }
-
-    private void Awake()
+    private void InitialOnHitTypeDtny()
     {
-        InitialSkillMoveTypeDtny();
-        InitialOnHitTypeDtny();
+        _onHitTypeDtny = new Dictionary<OnHitType, Action> {
+            { OnHitType.Nothing, OnHitNothing},
+            { OnHitType.Disappear, OnHitDisappear},
+            { OnHitType.Explode, OnHitExplode}
+        };
+    }
+    private void InitialSkillMoveTypeDtny()
+    {
+        _skillMoveTypeDtny = new Dictionary<SkillMoveType, Action> {
+            { SkillMoveType.Station, StationTick },
+            { SkillMoveType.Homing, HomingTick },
+            { SkillMoveType.Toward, TowardTick },
+            { SkillMoveType.Straight, StraightTick },
+            { SkillMoveType.SpawnAtTarget, SpawnAtTargetTick }
+        };
     }
 
-    private IEnumerator DestroyAfterDelay(float delay)
+    private void OnTriggerEnter2D(Collider2D collision)
     {
-        yield return new WaitForSeconds(delay);
-        Destroy(gameObject);
+        if (((1 << collision.gameObject.layer) & TargetLayers) == 0) return;
+        
+        IInteractable target = collision.GetComponent<IInteractable>();
+        if (target == null) return;
+        if (_targetDict.ContainsKey(target)) return;
+
+        _targetDict.Add(target, collision);  // 同時記錄對應的 Collider
+    }
+
+    private void CheckBottomCollider()
+    {
+        // 清除無效對象
+        List<IInteractable> waitToRemove = new List<IInteractable>();
+
+        foreach (var kvp in _targetDict)
+        {
+            var target = kvp.Key;
+            var col = kvp.Value;
+            if (target == null || col == null)
+            {
+                waitToRemove.Add(target);
+                continue;
+            }
+
+            // 實際檢查 BottomCollider 是否相互接觸
+            bool isTouch = BottomCollider.IsTouching(target.BottomCollider);
+            if (isTouch)
+            {
+                waitToRemove.Add(target);
+
+                //傷害判定
+                var interactInfo = new InteractInfo()
+                {
+                    Source = transform,
+                    Damage = _damage,
+                    KnockbackForce = _knockbackForce,
+                };
+                target.Interact(interactInfo);
+
+                //重新計算自毀計時
+                StartDestroyTimer(OnHitDestroyDelay);
+
+                //播放特效
+                var hitPoint = GetHitEffectPosition(col);
+                SpriteRenderer targetRenderer = col.GetComponent<SpriteRenderer>();
+                VFXManager.Instance.Play("DamageEffect01", hitPoint, targetRenderer);
+            }
+        }
+
+        // 移除已命中或失效對象
+        foreach (var t in waitToRemove)
+            _targetDict.Remove(t);
+
+        // 觸發命中類型對應的行為
+        _onHitTypeDtny[OnHitType]?.Invoke();
     }
 
     private Vector2 GetHitEffectPosition(Collider2D col)
@@ -144,7 +210,6 @@ public class SkillObject : MonoBehaviour
                 return b.center;
         }
     }
-
     private Vector2 GetRandomPointNear(Collider2D col, Vector2 refCenter, Vector2 extents, float sizeRatio = 0.3f)
     {
         Vector2 point;
@@ -164,6 +229,12 @@ public class SkillObject : MonoBehaviour
         return point;
     }
 
+
+    //移動方法
+    private void TowardTick()
+    {
+        transform.position += (Vector3)(_moveDirection * MoveSpeed * Time.deltaTime);
+    }
     private void HomingTick()
     {
         if (_targetTransform != null)
@@ -172,25 +243,14 @@ public class SkillObject : MonoBehaviour
             _moveDirection = _initialDirection; // 沒目標時沿原方向飛行
         transform.position += (Vector3)(_moveDirection * MoveSpeed * Time.deltaTime);
     }
-
-    private void InitialOnHitTypeDtny()
+    private void StationTick()
+    { }
+    private void StraightTick()
     {
-        _onHitTypeDtny = new Dictionary<OnHitType, Action> {
-            { OnHitType.Nothing, OnHitNothing},
-            { OnHitType.Disappear, OnHitDisappear},
-            { OnHitType.Explode, OnHitExplode}
-        };
+        transform.position += (Vector3)(_moveDirection * MoveSpeed * Time.deltaTime);
     }
-
-    private void InitialSkillMoveTypeDtny()
+    private void SpawnAtTargetTick()
     {
-        _skillMoveTypeDtny = new Dictionary<SkillMoveType, Action> {
-            { SkillMoveType.Station, StationTick },
-            { SkillMoveType.Homing, HomingTick },
-            { SkillMoveType.Toward, TowardTick },
-            { SkillMoveType.Straight, StraightTick },
-            { SkillMoveType.SpawnAtTarget, SpawnAtTargetTick }
-        };
     }
 
     //碰撞方法
@@ -198,50 +258,12 @@ public class SkillObject : MonoBehaviour
     {
         StartDestroyTimer(OnHitDestroyDelay);                       //命中後重設自毀計時
     }
-
     private void OnHitExplode()
     {
         StartDestroyTimer(OnHitDestroyDelay);                       //命中後重設自毀計時
     }
-
     private void OnHitNothing()
     { }
-
-    private void OnTriggerEnter2D(Collider2D collision)
-    {
-        if (((1 << collision.gameObject.layer) & TargetLayers) != 0)
-        {
-
-            IInteractable damageable = collision.GetComponent<IInteractable>();
-            if (damageable == null) return;
-            if(!damageable.BottomCollider.IsTouching(BottomCollider)) return;
-
-            if (!_targetHash.Contains(damageable))
-            {
-                int integerPower = Mathf.CeilToInt(_power);
-                _targetHash.Add(damageable);
-                InteractInfo info = new InteractInfo()
-                {
-                    Source = transform,
-                    Damage = integerPower,
-                    KnockbackForce = _knockbackForce,
-                };
-                damageable.Interact(info);
-            }
-
-            _onHitTypeDtny[OnHitType]?.Invoke();
-
-            var hitPoint = GetHitEffectPosition(collision);
-
-            SpriteRenderer targetRenderer = collision.GetComponent<SpriteRenderer>();
-            VFXManager.Instance.Play("DamageEffect01", hitPoint, targetRenderer);
-        }
-    }
-
-    private void SpawnAtTargetTick()
-    {
-    }
-
     private void StartDestroyTimer(float delay)
     {
         if (_destroyCoroutine != null)
@@ -251,26 +273,21 @@ public class SkillObject : MonoBehaviour
 
         _destroyCoroutine = StartCoroutine(DestroyAfterDelay(delay));
     }
-
-    //移動方法
-    private void StationTick()
-    { }
-
-    private void StraightTick()
+    private IEnumerator DestroyAfterDelay(float delay)
     {
-        transform.position += (Vector3)(_moveDirection * MoveSpeed * Time.deltaTime);
+        yield return new WaitForSeconds(delay);
+        Destroy(gameObject);
     }
 
-    private void TowardTick()
+    private void Awake()
     {
-        transform.position += (Vector3)(_moveDirection * MoveSpeed * Time.deltaTime);
+        InitialSkillMoveTypeDtny();
+        InitialOnHitTypeDtny();
     }
-
     private void Update()
     {
         _skillMoveTypeDtny[MoveType]?.Invoke();
-
-        _targetHash.RemoveWhere(t => t == null);
+        CheckBottomCollider();
         UpdateRotation();
     }
 

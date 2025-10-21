@@ -26,11 +26,11 @@ public class MoveComponent
     //組件
     private Rigidbody2D _rb;
     private AnimationComponent _animationComponent;
-    private ICoroutineRunner _runner;
+    private MonoBehaviour _runner;
 
     public MoveComponent(Rigidbody2D rb,
-        float moveSpeed , 
-        ICoroutineRunner runner, 
+        float moveSpeed ,
+        MonoBehaviour runner, 
         TargetDetector moveDetector,
         AnimationComponent animationComponent,
         Collider2D bottomCollider) {
@@ -95,11 +95,9 @@ public class MoveComponent
 
         if (_knockbackCoroutine != null)
         {
-            Debug.Log("暫停了協程");
             _runner.StopCoroutine(_knockbackCoroutine);
             _knockbackCoroutine = null;
         }
-        Debug.Log("啟動協程");
         _knockbackCoroutine = _runner.StartCoroutine(KnockbackCoroutine(force, dir));
     }
 

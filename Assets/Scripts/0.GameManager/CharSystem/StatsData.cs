@@ -24,6 +24,7 @@ public class StatsData
         Power = other.Power;
         MoveSpeed = other.MoveSpeed;
 
+        KnockbackForce= other.KnockbackForce;
         Weight = other.Weight;
     }
 }

@@ -7,14 +7,16 @@ public class EffectComponent
 {
     private Transform _transform;
     private VisualData _visualData;
-    private ICoroutineRunner _runner;
+    private MonoBehaviour _runner;
     private SpriteRenderer _spr;
-    
-    public EffectComponent(VisualData visualData,Transform transform,ICoroutineRunner runner,SpriteRenderer spr) {
+    private HealthComponent _healthComponent;
+
+    public EffectComponent(VisualData visualData,Transform transform, MonoBehaviour runner,SpriteRenderer spr, HealthComponent healthComponent) {
         _transform = transform;
         _visualData = visualData;
         _runner = runner;
         _spr = spr;
+        _healthComponent=healthComponent;
     }
 
     public void GainedExpEffect(int exp) {
@@ -35,7 +37,7 @@ public class EffectComponent
     }
 
     public void TakeDamageEffect(int damage) {
-        _runner.StartCoroutine(FlashWhite(1f));
+        if(!_healthComponent.IsDead) _runner.StartCoroutine(FlashWhite(1f));
         TextPopupManager.Instance.ShowTakeDamagePopup(damage, _transform); 
     }
     protected virtual IEnumerator FlashWhite(float duration) {

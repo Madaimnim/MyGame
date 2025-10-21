@@ -102,9 +102,10 @@ public class SkillComponent
         {
             GameObject obj = _spawner.Spawn(skill.VisualData.Prefab, _transform.position, Quaternion.identity);
             var skillObj = obj.GetComponent<SkillObject>();
+
             skillObj.Initial(
                 finalAttackPower,
-                skill.StatsData.KnockbackForce + skill.StatsData.KnockbackForce,
+                _statsData.KnockbackForce + skill.StatsData.KnockbackForce,
                 _pendingPosition,
                 _pendingTransform
                 );

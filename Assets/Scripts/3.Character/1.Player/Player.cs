@@ -32,18 +32,19 @@ public class Player : MonoBehaviour, IInteractable
     public SkillComponent SkillComponent { get; private set; }
     public SpawnerComponent SpawnerComponent { get; private set; }
     public GrowthComponent GrowthComponent { get; private set; }
+    public bool IsDead => HealthComponent.IsDead;
+    private Transform _lastInteractSource;
 
     public void Initialize(PlayerStatsRuntime stats)
     {
         Rt = stats;
-        var runner = new CoroutineRunnerAdapter(this);
 
         //順序
-        AnimationComponent = new AnimationComponent(Ani, transform, Rb);
-        EffectComponent = new EffectComponent(Rt.VisualData, transform, runner, Spr);
         HealthComponent = new HealthComponent(Rt);
-        RespawnComponent = new RespawnComponent(runner, Rt.CanRespawn);
-        MoveComponent = new MoveComponent(Rb, Rt.StatsData.MoveSpeed, runner, MoveDetector, AnimationComponent, BottomCollider);
+        AnimationComponent = new AnimationComponent(Ani, transform, Rb);
+        EffectComponent = new EffectComponent(Rt.VisualData, transform, this, Spr, HealthComponent);
+        RespawnComponent = new RespawnComponent(this, Rt.CanRespawn);
+        MoveComponent = new MoveComponent(Rb, Rt.StatsData.MoveSpeed, this, MoveDetector, AnimationComponent, BottomCollider);
         SpawnerComponent = new SpawnerComponent();
         SkillComponent = new SkillComponent(Rt.StatsData, Rt.SkillSlotCount, Rt.SkillPool, AnimationComponent, transform);
         AIComponent = new AIComponent(SkillComponent, MoveComponent, transform, Rt.MoveStrategyType);
@@ -65,6 +66,7 @@ public class Player : MonoBehaviour, IInteractable
             GameEventSystem.Instance.Event_OnWallBroken += RespawnComponent.DisableRespawn;
         }
 
+
         //初始化狀態--------------------------------------------------------------------------------------------------------------------------------------------------------------------
         transform.name = $"玩家ID_{Rt.StatsData.Id}:({Rt.StatsData.Name})";
 
@@ -72,6 +74,7 @@ public class Player : MonoBehaviour, IInteractable
     }
     public void Interact(InteractInfo info)
     {
+        _lastInteractSource = info.Source;
         HealthComponent.TakeDamage(info.Damage);
         EffectComponent.TakeDamageEffect(info.Damage);
         MoveComponent.Knockbacked(info.KnockbackForce, info.Source);
@@ -93,20 +96,36 @@ public class Player : MonoBehaviour, IInteractable
     //事件方法
     public void OnDie()
     {
+        AnimationComponent.PlayDie();
+        StartCoroutine(Die());
+    }
+    private IEnumerator Die()
+    {
+        AIComponent.DisableAI();
+        MoveComponent.DisableMove();
+        EffectComponent.PlayerDeathEffect();
+
+        if (_lastInteractSource != null)
+        {
+            Vector2 dir = _lastInteractSource.position - transform.position;
+            SetFacingRight(dir); // 重用你現有的方向翻轉方法
+        }
+
         foreach (var col in GetComponentsInChildren<Collider2D>())
             col.enabled = false;
 
-        MoveComponent.DisableMove();
-        AIComponent.DisableAI();
-
-        AnimationComponent.PlayDie();
-        EffectComponent.PlayerDeathEffect();
+        yield return null; //等一幀，讓Animator確實切到Die動畫
+        AnimatorStateInfo state = Ani.GetCurrentAnimatorStateInfo(0);
+        yield return new WaitForSeconds(state.length / Ani.speed);
 
         RespawnComponent.RespawnAfter(3f);
 
         //發事件
         GameEventSystem.Instance.Event_OnPlayerDie?.Invoke(this);
+
     }
+
+
     public void OnHpChanged(int currentHp, int maxHp) { }    //Todo SliderChange
     public void OnRespawn()
     {
@@ -129,19 +148,7 @@ public class Player : MonoBehaviour, IInteractable
     {
         InputProvider = inputProvider;
     }
-    private void UpdateFacing(Vector2 direction)
-    {
-        if (AnimationComponent.IsPlayingAttackAnimation) return;  //確保攻擊時面相正確
-        if (direction.sqrMagnitude < 0.01f) return;     //避免靜止時頻繁執行
 
-        if (Mathf.Abs(direction.x) > 0.01f)
-        {
-            var s = transform.localScale;
-            float mag = Mathf.Abs(s.x);
-            s.x = (direction.x < 0f) ? -mag : mag;
-            transform.localScale = s;
-        }
-    }
 
     private void Awake(){
         Rb = GetComponent<Rigidbody2D>();
@@ -164,13 +171,26 @@ public class Player : MonoBehaviour, IInteractable
         SelectIndicator.SetActive(false);
     }
     private void Update(){
-        if (MoveComponent != null) UpdateFacing(MoveComponent.IntentDirection);
+        if (MoveComponent != null&&!IsDead) SetFacingRight(MoveComponent.IntentDirection);
         if (SkillComponent != null) SkillComponent.Tick();
         if (AnimationComponent != null) AnimationTick();
-        Debug.Log($"InputProvider:{InputProvider== PlayerInputManager.Instance},AIComponent{AIComponent!=null}");
+    
         if (InputProvider != PlayerInputManager.Instance && AIComponent != null) AIComponent.Tick();
     }
     private void FixedUpdate(){
         if (MoveComponent != null) MoveComponent.Tick();
+    }
+    private void SetFacingRight(Vector2 direction)
+    {
+        if (AnimationComponent.IsPlayingAttackAnimation) return;  //確保攻擊時面相正確
+        if (direction.sqrMagnitude < 0.01f) return;     //避免靜止時頻繁執行
+
+        if (Mathf.Abs(direction.x) > 0.01f)
+        {
+            var s = transform.localScale;
+            float mag = Mathf.Abs(s.x);
+            s.x = (direction.x < 0f) ? -mag : mag;
+            transform.localScale = s;
+        }
     }
 }

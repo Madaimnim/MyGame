@@ -4,11 +4,11 @@ using UnityEngine;
 
 public class RespawnComponent 
 {
-    private ICoroutineRunner _runner;
+    private MonoBehaviour _runner;
     public bool CanRespawn { get; private set; }
     public event Action OnRespawn;
 
-    public RespawnComponent(ICoroutineRunner runner,bool canRespawn) {
+    public RespawnComponent(MonoBehaviour runner,bool canRespawn) {
         _runner = runner ?? throw new ArgumentNullException(nameof(runner));
         CanRespawn = canRespawn;
     }

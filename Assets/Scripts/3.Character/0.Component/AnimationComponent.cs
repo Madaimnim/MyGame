@@ -59,9 +59,8 @@ public class AnimationComponent
 
     public void PlayIdle() =>_ani.Play(Animator.StringToHash("Idle"));
     public void PlayMove() =>_ani.Play(Animator.StringToHash("Move"));
-    public void PlayDie()=>_ani.Play(Animator.StringToHash("Die"));
+    public void PlayDie() => _ani.Play(Animator.StringToHash("Die"));
     public void Play(string name) => _ani.Play(Animator.StringToHash(name));
 
-    
 
 }

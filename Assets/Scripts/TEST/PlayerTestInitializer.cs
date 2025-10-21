@@ -22,7 +22,10 @@ public class PlayerTestInitializer : MonoBehaviour
             //裝配測試技能
             var skillId = 1;
             if (Rt.SkillPool.TryGetValue(skillId, out var skill))
+            {
                 p.SkillComponent.EquipSkill(0, skillId, skill.VisualData.DetectPrefab);
+            }
+
         }
     }
 

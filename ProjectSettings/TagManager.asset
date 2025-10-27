@@ -15,11 +15,11 @@ TagManager:
   - Object
   - Enemy
   - GameWall
-  - PlayerAttack
-  - EnemyAttack
+  - PlayerSkillHitBox
+  - EnemySkillHitBox
   - Bound
   - Move
-  - 
+  - Bottom
   - 
   - 
   - 

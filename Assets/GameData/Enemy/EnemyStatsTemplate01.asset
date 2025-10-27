@@ -18,7 +18,8 @@ MonoBehaviour:
     Level: 1
     Power: 1
     MoveSpeed: 3
-    KnockbackForce: {x: 0, y: 0}
+    KnockbackPower: 0
+    FloatPower: 0
     Weight: 0
   VisualData:
     Prefab: {fileID: 6620357324717576252, guid: aa87e46c63625174d84e532f142c761b, type: 3}
@@ -27,7 +28,7 @@ MonoBehaviour:
     DeathSFX: {fileID: 0}
     NormalMaterial: {fileID: 2100000, guid: ce71ba01014fe3043971f56059a6c29d, type: 2}
     FlashMaterial: {fileID: 2100000, guid: 343628f4e759ecf46b917b0ca0685d23, type: 2}
-  MaxHp: 0
+  MaxHp: 10
   SkillSlotCount: 2
   Exp: 1
   CanRespawn: 0
@@ -38,7 +39,8 @@ MonoBehaviour:
       Level: 1
       Power: 1
       MoveSpeed: 1
-      KnockbackForce: {x: 0, y: 0}
+      KnockbackPower: 0
+      FloatPower: 0
       Weight: 0
     VisualData:
       Prefab: {fileID: 0}
@@ -49,4 +51,4 @@ MonoBehaviour:
       FlashMaterial: {fileID: 0}
     Cooldown: 1
     TargetType: 0
-  MoveStrategyType: 1
+  MoveStrategyType: 0

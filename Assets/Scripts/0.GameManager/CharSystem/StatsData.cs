@@ -12,7 +12,8 @@ public class StatsData
     public int Power;
     public float MoveSpeed;
 
-    public Vector2 KnockbackForce;
+    public float KnockbackPower = 1f;
+    public float FloatPower = 0f;
     public float Weight;
 
 
@@ -24,7 +25,8 @@ public class StatsData
         Power = other.Power;
         MoveSpeed = other.MoveSpeed;
 
-        KnockbackForce= other.KnockbackForce;
+        KnockbackPower = other.KnockbackPower;
+        FloatPower = other.FloatPower;
         Weight = other.Weight;
     }
 }

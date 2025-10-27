@@ -63,7 +63,7 @@ public sealed class PlayerStateSystem : SubSystemBase
         {
             if (!IDValidator.IsPlayerID(stat.StatsData.Id)) continue;
             _playerStatsRuntimeDtny[stat.StatsData.Id] = new PlayerStatsRuntime(stat);
-            var Runtime = _playerStatsRuntimeDtny[stat.StatsData.Id];
+            //var Runtime = _playerStatsRuntimeDtny[stat.StatsData.Id];
         }
     }
     public void SpawnAllPlayer(Vector3 spawnPoint) => SpawnAllPlayer(spawnPoint);

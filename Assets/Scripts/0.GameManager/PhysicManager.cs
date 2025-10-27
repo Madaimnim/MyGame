@@ -4,8 +4,9 @@ using UnityEngine;
 
 public class PhysicManager : MonoBehaviour
 {
-    public PhysicConfig PhysicConfig;
     public static PhysicManager Instance { get; private set; }
+
+    public PhysicConfig PhysicConfig;
 
     private void Awake()
     {

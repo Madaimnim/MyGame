@@ -13,7 +13,7 @@ public class EnemyStatsRuntime:IHealthData
     public int Exp;
     public bool CanRespawn;
     public Dictionary<int, ISkillRuntime> SkillPool = new Dictionary<int, ISkillRuntime>();
-    public MoveStrategyType MoveStrategyType;
+    public MoveStrategyBase MoveStrategy;   //直接持有策略實例
     //Runtime-------------------------------------------------------------------------------------------------------
     public int CurrentHp { get; set; }
 
@@ -29,6 +29,13 @@ public class EnemyStatsRuntime:IHealthData
         Exp = template.Exp;
         foreach (var skill in template.SkillTemplateList)
             SkillPool[skill.StatsData.Id] = new EnemySkillRuntime(skill);
-        MoveStrategyType = template.MoveStrategyType;
+        MoveStrategy = template.MoveStrategyType switch {
+            MoveStrategyType.Follow => new FollowMoveStrategy(),
+            MoveStrategyType.Random => new RandomMoveStrategy(),
+            MoveStrategyType.Straight => new StraightMoveStrategy(),
+            MoveStrategyType.Stay => new StayMoveStrategy(),
+            MoveStrategyType.Flee => new FleeMoveStrategy(),
+            _ => new StayMoveStrategy()
+        };
     }
 }

@@ -53,7 +53,7 @@ public class PlayerInputManager : MonoBehaviour, IInputProvider
     //-------------------------------選取腳色--------------------------------------------------------------------------------
     private void ClickPlayer() {
         if (!Input.GetMouseButtonDown(0)) return;
-        if (EventSystem.current.IsPointerOverGameObject()) Debug.Log("點擊到 UI");
+        //if (EventSystem.current.IsPointerOverGameObject()) Debug.Log("點擊到 UI");
 
         Vector2 mouseWorldPos = Camera.main.ScreenToWorldPoint(Input.mousePosition);
         int layerMask = LayerMask.GetMask("Player");

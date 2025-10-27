@@ -18,7 +18,8 @@ MonoBehaviour:
     Level: 1
     Power: 1
     MoveSpeed: 3
-    KnockbackForce: {x: 1, y: 1}
+    KnockbackPower: 0
+    FloatPower: 0
     Weight: 0
   VisualData:
     Prefab: {fileID: 1901394458928384591, guid: c1a9c12d802fc0446a22a42d0c13403e, type: 3}
@@ -38,10 +39,11 @@ MonoBehaviour:
       Level: 1
       Power: 1
       MoveSpeed: 1
-      KnockbackForce: {x: 5, y: 5}
+      KnockbackPower: 3
+      FloatPower: 1
       Weight: 0
     VisualData:
-      Prefab: {fileID: 6644035455482526802, guid: a158b2d525771b946b249c808818d1df, type: 3}
+      Prefab: {fileID: 1868301516382297822, guid: bee82ac91c521d24b938786f51b7c88d, type: 3}
       DetectPrefab: {fileID: 3457001140423233958, guid: 84b845aceaf3a27428687d6c246943ec, type: 3}
       SpriteIcon: {fileID: 0}
       DeathSFX: {fileID: 0}
@@ -55,7 +57,8 @@ MonoBehaviour:
       Level: 1
       Power: 1
       MoveSpeed: 1
-      KnockbackForce: {x: 5, y: 5}
+      KnockbackPower: 0
+      FloatPower: 5
       Weight: 0
     VisualData:
       Prefab: {fileID: 7327708947082931564, guid: ebc3332d416aec74cb1e857b78e74da3, type: 3}

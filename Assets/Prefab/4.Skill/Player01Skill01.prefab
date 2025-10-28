@@ -67,7 +67,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a4dfaaf66ef49214aae722a3f87c09a6, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  SprCol: {fileID: 6331502057228322067}
+  sprCol: {fileID: 6331502057228322067}
   canRotate: 1
   MoveType: 2
   OnHitType: 1

@@ -7,16 +7,13 @@ public class BattleHandler : IGameStateHandler
 {
     private readonly GameSceneSystem _sceneSystem;
     private readonly PlayerStateSystem _playerStateSystem;
-    private readonly PlayerInputController _inputController;
 
     public BattleHandler(
             GameSceneSystem sceneSystem,
-            PlayerStateSystem playerSystem,
-            PlayerInputController inputController
+            PlayerStateSystem playerSystem
         ) {
         _sceneSystem = sceneSystem;
         _playerStateSystem = playerSystem;
-        _inputController = inputController;
 
         // ­q¾\¨Æ¥ó
         _sceneSystem.OnSceneLoaded += OnSceneLoaded;

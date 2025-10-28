@@ -19,7 +19,8 @@ MonoBehaviour:
     Power: 1
     MoveSpeed: 4
     KnockbackPower: 1
-    KnockbackResistance: 0
+    FloatPower: 0
+    Weight: 0
   VisualData:
     Prefab: {fileID: 1901394458928384591, guid: 0d87d99a51500fd418339ea0f269bb01, type: 3}
     DetectPrefab: {fileID: 0}
@@ -39,7 +40,8 @@ MonoBehaviour:
       Power: 1
       MoveSpeed: 3
       KnockbackPower: 0.5
-      KnockbackResistance: 0
+      FloatPower: 0
+      Weight: 0
     VisualData:
       Prefab: {fileID: 1868301516382297822, guid: e9482e1a632b9db42abfad2b78ec208a, type: 3}
       DetectPrefab: {fileID: 2003774139042550798, guid: 95167d54ba66b37429c084cc1d1c6065, type: 3}
@@ -49,5 +51,9 @@ MonoBehaviour:
       FlashMaterial: {fileID: 0}
     Cooldown: 0.1
     TargetType: 0
+    DetectType: 0
+    DetectRadius: 10
+    ConeRadius: 0
+    DetectAngle: 0
   UnlockedSkillIdList: 
   ExpTable: 0400000006000000090000000d0000001200000019000000220000002d0000003a000000490000005a0000006d0000008200000099000000b2000000cd000000ea000000090100002a0100004d0100007201000099010000c2010000ed0100001a020000490200007a020000ad020000e202000019030000

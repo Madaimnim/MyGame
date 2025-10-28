@@ -29,7 +29,7 @@ public class SkillHitComponent {
                 continue;
             }
 
-            float bottomYDiff = Mathf.Abs(_owner.transform.position.y - target.BottomY);
+            float bottomYDiff = Mathf.Abs(_owner.transform.position.y - target.BottomTransform.position.y);
             if (bottomYDiff > PhysicManager.Instance.PhysicConfig.BottomYThreshold) continue;
 
             Hit(target, col);

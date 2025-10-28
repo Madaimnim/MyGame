@@ -34,7 +34,6 @@ public class GameManager : MonoBehaviour
 
     public bool IsAllDataLoaded { get; private set; } = false;
 
-    public PlayerInputController PlayerInputController { get; private set; }
 
     public PlayerStateSystem PlayerStateSystem { get; private set; }
 
@@ -64,7 +63,6 @@ public class GameManager : MonoBehaviour
         //建子系統
         GameStateSystem = new GameStateSystem(this);
         GameSceneSystem = new GameSceneSystem(this);
-        PlayerInputController = new PlayerInputController(this);
         _gameStateRouter = new GameStateRouter(this);
         PlayerStateSystem = new PlayerStateSystem(this);
         EnemyStateSystem = new EnemyStateSystem(this);
@@ -74,7 +72,7 @@ public class GameManager : MonoBehaviour
         GameStateHandlers = new Dictionary<GameStateSystem.GameState, IGameStateHandler>{
             { GameStateSystem.GameState.GameStart, new GameStartHandler(runner,GameSceneSystem, PlayerStateSystem) },
             { GameStateSystem.GameState.Preparation, new PreparationHandler( GameSceneSystem) },
-            { GameStateSystem.GameState.Battle, new BattleHandler( GameSceneSystem, PlayerStateSystem, PlayerInputController) },
+            { GameStateSystem.GameState.Battle, new BattleHandler( GameSceneSystem, PlayerStateSystem) },
         };
 
         //所有子系統初始化

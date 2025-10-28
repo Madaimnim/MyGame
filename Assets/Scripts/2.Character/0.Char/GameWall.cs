@@ -5,6 +5,10 @@ using UnityEngine;
 
 public class GameWall : MonoBehaviour, IInteractable
 {
+    [SerializeField] private Collider2D sprCol;
+    public Collider2D SprCol => sprCol;
+    public Transform BottomTransform => transform;
+
     public int gameWallID=1;     
     public string gameWallName ="CommonWall";
     public int maxHealth = 10;
@@ -13,8 +17,7 @@ public class GameWall : MonoBehaviour, IInteractable
     public float flashWhiteTime =0.1f;
     public Material NormalMaterial;
     public Material FlashMaterial;
-    public float BottomY=> transform.position.y;
-    public float HeightY => 0f;
+
     public Vector2 MoveVelocity => Vector2.zero;
 
     #region 私有變數
@@ -27,6 +30,9 @@ public class GameWall : MonoBehaviour, IInteractable
 
     #region Awake()方法
     private void Awake() {
+        animator = GetComponent<Animator>();
+        rb = GetComponent<Rigidbody2D>();
+        spriteRenderer = GetComponent<SpriteRenderer>();
     }
     #endregion
 
@@ -34,9 +40,7 @@ public class GameWall : MonoBehaviour, IInteractable
     private void Start() {
         isDefeat=false;
 
-        animator = GetComponent<Animator>();
-        rb = GetComponent<Rigidbody2D>();
-        spriteRenderer = GetComponent<SpriteRenderer>();
+    
         currentHealth = maxHealth;
         GameEventSystem.Instance.Event_HpChanged?.Invoke(currentHealth, maxHealth,this);// 觸發事件，通知 UI 初始血量
     }

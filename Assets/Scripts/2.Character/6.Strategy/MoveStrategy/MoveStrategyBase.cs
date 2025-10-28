@@ -1,13 +1,5 @@
 using UnityEditor.Build.Pipeline;
 using UnityEngine;
-public enum MoveStrategyType
-{
-    Straight,
-    Random,
-    Follow,
-    Stay,
-    Flee
-}
 
 public abstract class MoveStrategyBase
 {

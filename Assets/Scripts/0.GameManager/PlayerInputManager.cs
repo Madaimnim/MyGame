@@ -181,8 +181,8 @@ public class PlayerInputManager : MonoBehaviour, IInputProvider
                 {
                     var slot = player.SkillComponent.SkillSlots[i];
                     if (!slot.HasSkill) { Debug.LogWarning($"技能槽 {i} 無技能，忽略輸入。"); return; }
-                    var col = slot.Detector.GetDetectorCollider();
-                    if (col == null) { Debug.LogWarning($"技能槽 {i} 缺少 DetectorCollider。"); return; }
+                    var DetectStrategy = slot.DetectStrategy;
+                    if (DetectStrategy == null) { Debug.LogWarning($"技能槽 {i} 無DetectStrategy。"); return; }
 
 
                     //取滑鼠座標
@@ -190,26 +190,21 @@ public class PlayerInputManager : MonoBehaviour, IInputProvider
                     Vector2 targetPosition;
                     Transform targetTransform = null;
 
-                    //  如果滑鼠點擊在 collider 範圍內
-                    if (col.OverlapPoint(mouseWorldPos))
-                    {
+                    if (DetectStrategy.IsInRange(mouseWorldPos)) {
                         Collider2D hit = Physics2D.OverlapPoint(mouseWorldPos, LayerMask.GetMask("Enemy"));
-                        if (hit != null)
-                        {
+                        if (hit != null) {
                             targetTransform = hit.transform;
                             targetPosition = hit.transform.position;
                         }
                         else targetPosition = mouseWorldPos;
                         Debug.Log($"Collider內部，targetPosition:{targetPosition}");
                     }
-                    // 滑鼠不在範圍內 → 取最近點
-                    else
-                    {
-                        targetPosition = col.ClosestPoint(mouseWorldPos);
+                    else {
+                        targetPosition = DetectStrategy.GetClosestPoint(mouseWorldPos);
                         Debug.Log($"Collider外部，targetPosition:{targetPosition}");
                     }
 
-
+ 
 
                     SetIntentSkill(player.SkillComponent, i, targetPosition: targetPosition, targetTransform: targetTransform);
                     break;

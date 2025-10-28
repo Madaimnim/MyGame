@@ -6,7 +6,9 @@ using UnityEngine;
 public class Enemy :MonoBehaviour,IInteractable, IAnimationEventOwner
 {
     //公開--------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-    public Collider2D SprCol;
+    [SerializeField] private Collider2D sprCol;
+    public Collider2D SprCol => sprCol;
+    public Transform BottomTransform => transform;
     public TargetDetector MoveDetector;
     public IInputProvider InputProvider;
     //組件--------------------------------------------------------------------------------------------------------------------------------------------------------------------------
@@ -25,8 +27,6 @@ public class Enemy :MonoBehaviour,IInteractable, IAnimationEventOwner
     public SpawnerComponent SpawnerComponent { get; private set; }
     public HeightComponent HeightComponent { get; private set; }
     public bool IsDead => HealthComponent.IsDead;
-    public float BottomY => transform.position.y;
-    public float HeightY => Spr.transform.localPosition.y;
     public Vector2 MoveVelocity => MoveComponent.IntentDirection * MoveComponent.MoveSpeed;
     private Transform _lastInteractSource;
     private void Awake()
@@ -38,10 +38,12 @@ public class Enemy :MonoBehaviour,IInteractable, IAnimationEventOwner
     private void OnEnable()
     {
         //註冊UI:顯示血量、技能冷卻
-        if (GameManager.Instance != null)
-            GameManager.Instance.EnemyStateSystem.RegisterEnemy(this);
+        if (GameManager.Instance != null)GameManager.Instance.EnemyStateSystem.RegisterEnemy(this);
+        if (EnemyListManager.Instance != null) {
+            Debug.Log($"註冊目標至TargetListManager: {this}");
+            EnemyListManager.Instance.Register(this);
+        }
 
-        EnemyListManager.Instance.Register(this);
     }
     private void Start()
     {
@@ -71,7 +73,7 @@ public class Enemy :MonoBehaviour,IInteractable, IAnimationEventOwner
         RespawnComponent = new RespawnComponent(this, Rt.CanRespawn);
         MoveComponent = new MoveComponent(Rb,Rt.StatsData.MoveSpeed, this, MoveDetector, AnimationComponent, HeightComponent);
         SpawnerComponent = new SpawnerComponent();
-        SkillComponent = new SkillComponent(Rt.StatsData, Rt.SkillSlotCount,Rt.SkillPool, AnimationComponent, transform);
+        SkillComponent = new SkillComponent(Rt.StatsData, Rt.SkillSlotCount,Rt.SkillPool, AnimationComponent, transform,PlayerListManager.Instance.TargetList);
         AIComponent = new AIComponent(SkillComponent, MoveComponent, transform,Rt.MoveStrategy);
 
         //額外初始化設定

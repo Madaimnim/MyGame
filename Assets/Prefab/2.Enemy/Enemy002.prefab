@@ -349,7 +349,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 0c0d73ebd28277448a0b50dedb6d8486, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  SprCol: {fileID: 8689422368267745707}
+  sprCol: {fileID: 8689422368267745707}
   MoveDetector: {fileID: 0}
   Rb: {fileID: 0}
   Ani: {fileID: 0}

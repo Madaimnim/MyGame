@@ -21,7 +21,7 @@ public static class ParabolaHelper
         verticalSpeed = 0f;
 
         // --- 水平距離與方向 ---
-        Vector3 planarDir = new Vector3(targetPosition.x - position.x, 0, targetPosition.z - position.z);
+        Vector3 planarDir = new Vector3(targetPosition.x - position.x, targetPosition.y - position.y);
         float distance = planarDir.magnitude;
         if (distance < 0.001f) return false;
 
@@ -31,7 +31,7 @@ public static class ParabolaHelper
 
         // ---計算相對水平速度（拋物線速度 vs 目標速度）---
         Vector3 projVelocity = dir * v;
-        Vector3 relativeVel = projVelocity - new Vector3(targetVelocity.x, 0, targetVelocity.z);
+        Vector3 relativeVel = projVelocity - new Vector3(targetVelocity.x, targetVelocity.y);
         float relSpeed = relativeVel.magnitude;
         if (relSpeed < 0.01f) return false; // 幾乎無法追上
 

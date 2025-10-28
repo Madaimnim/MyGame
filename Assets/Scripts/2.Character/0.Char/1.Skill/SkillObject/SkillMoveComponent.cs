@@ -34,7 +34,7 @@ public class SkillMoveComponent {
         InitailPosition(referencePos);
 
         var target = targetTransform ? targetTransform.GetComponentInParent<IInteractable>():null;
-        float targetHeight = target!=null ? target.HeightY : 0f;
+        float targetHeight = target!=null ? target.SprCol.transform.localPosition.y : 0f;
         Vector2 targetVelocity= target != null ? target.MoveVelocity: Vector2.zero;
 
         ParabolaHelper.TryGetVerticalSpeed(

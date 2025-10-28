@@ -17,7 +17,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!4 &1901394458928384585
 Transform:
   m_ObjectHideFlags: 0
@@ -70,7 +70,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 91cb9264c08bde6498cf7fd38d8b11aa, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  SprCol: {fileID: 1318891592001077654}
+  sprCol: {fileID: 1318891592001077654}
   MoveDetector: {fileID: 0}
   SelectIndicator: {fileID: 4167029791549883717, guid: f83ade4c18471fb429dc1ccc80f42329, type: 3}
   SelectIndicatorParent: {fileID: 9191419462193891982}

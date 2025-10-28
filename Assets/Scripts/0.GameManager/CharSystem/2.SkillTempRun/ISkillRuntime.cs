@@ -7,5 +7,6 @@ public interface ISkillRuntime
     StatsData StatsData { get; }
     VisualData VisualData { get; }
     float Cooldown { get; }
-    SkillTargetType TargetType { get; }
+    SkillTargetType SkillTargetType { get; }
+    SkillDetectStrategyBase DetectStrategy { get; }
 }

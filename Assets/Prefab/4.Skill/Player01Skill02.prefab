@@ -215,11 +215,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a4dfaaf66ef49214aae722a3f87c09a6, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  SprCol: {fileID: 2656586561630439181}
+  sprCol: {fileID: 2656586561630439181}
   canRotate: 0
-  HitEffectPositionType: 1
   MoveType: 5
   OnHitType: 0
+  HitEffectPositionType: 1
   TargetLayers:
     serializedVersion: 2
     m_Bits: 256

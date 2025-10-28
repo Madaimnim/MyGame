@@ -644,17 +644,21 @@ PrefabInstance:
       propertyPath: m_Name
       value: Enemy001 (1)
       objectReference: {fileID: 0}
+    - target: {fileID: 6620357324717576252, guid: aa87e46c63625174d84e532f142c761b, type: 3}
+      propertyPath: m_Layer
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 6620357324717576255, guid: aa87e46c63625174d84e532f142c761b, type: 3}
       propertyPath: m_RootOrder
       value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 6620357324717576255, guid: aa87e46c63625174d84e532f142c761b, type: 3}
       propertyPath: m_LocalPosition.x
-      value: 10.08
+      value: 7.51
       objectReference: {fileID: 0}
     - target: {fileID: 6620357324717576255, guid: aa87e46c63625174d84e532f142c761b, type: 3}
       propertyPath: m_LocalPosition.y
-      value: 3.02
+      value: 3.08
       objectReference: {fileID: 0}
     - target: {fileID: 6620357324717576255, guid: aa87e46c63625174d84e532f142c761b, type: 3}
       propertyPath: m_LocalPosition.z
@@ -1427,11 +1431,11 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 1901394458928384585, guid: 0d87d99a51500fd418339ea0f269bb01, type: 3}
       propertyPath: m_LocalPosition.x
-      value: -5
+      value: 0.25
       objectReference: {fileID: 0}
     - target: {fileID: 1901394458928384585, guid: 0d87d99a51500fd418339ea0f269bb01, type: 3}
       propertyPath: m_LocalPosition.y
-      value: 2.59
+      value: 6.68
       objectReference: {fileID: 0}
     - target: {fileID: 1901394458928384585, guid: 0d87d99a51500fd418339ea0f269bb01, type: 3}
       propertyPath: m_LocalPosition.z
@@ -1468,10 +1472,6 @@ PrefabInstance:
     - target: {fileID: 1901394458928384591, guid: 0d87d99a51500fd418339ea0f269bb01, type: 3}
       propertyPath: m_Name
       value: Player002
-      objectReference: {fileID: 0}
-    - target: {fileID: 1901394458928384591, guid: 0d87d99a51500fd418339ea0f269bb01, type: 3}
-      propertyPath: m_IsActive
-      value: 1
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 0d87d99a51500fd418339ea0f269bb01, type: 3}
@@ -1676,8 +1676,16 @@ PrefabInstance:
       value: Player001
       objectReference: {fileID: 0}
     - target: {fileID: 1901394458928384591, guid: c1a9c12d802fc0446a22a42d0c13403e, type: 3}
+      propertyPath: m_Layer
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 1901394458928384591, guid: c1a9c12d802fc0446a22a42d0c13403e, type: 3}
       propertyPath: m_IsActive
       value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 9003091752546316705, guid: c1a9c12d802fc0446a22a42d0c13403e, type: 3}
+      propertyPath: m_IsActive
+      value: 1
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: c1a9c12d802fc0446a22a42d0c13403e, type: 3}
@@ -1925,6 +1933,7 @@ GameObject:
   - component: {fileID: 1905619105}
   - component: {fileID: 1905619106}
   - component: {fileID: 1905619107}
+  - component: {fileID: 1905619108}
   m_Layer: 0
   m_Name: TestManager
   m_TagString: Untagged
@@ -2004,9 +2013,10 @@ MonoBehaviour:
     Exp: 0
     BattleObject: {fileID: 0}
     UiObject: {fileID: 0}
+  CurrentPlayer: {fileID: 0}
   SkillId: 1
   Trigger_SetPlayers: 0
-  IsMonitorEnabled: 0
+  IsMonitorEnabled: 1
   OutputText: {fileID: 1496548874}
   refreshInterval: 0.2
   currentPage: 0
@@ -2113,7 +2123,22 @@ MonoBehaviour:
   m_GameObject: {fileID: 1905619098}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 3c821290f46fece4cb566cf5744091ab, type: 3}
+  m_Script: {fileID: 11500000, guid: 46827bbd3cdfc4e4bace267ff9bed77d, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  updateInterval: 0.1
+  GUIfontSize: 40
+  GUISize: {x: 500, y: 200}
+--- !u!114 &1905619108
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1905619098}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b8093ea0e38edd64cb4154a68bd497f3, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   updateInterval: 0.1

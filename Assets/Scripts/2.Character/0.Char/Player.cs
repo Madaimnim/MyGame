@@ -8,7 +8,10 @@ using UnityEngine.UIElements;
 public class Player : MonoBehaviour, IInteractable, IAnimationEventOwner
 {
     //公開--------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-    public Collider2D SprCol;
+    [SerializeField] private Collider2D sprCol;
+    public Collider2D SprCol => sprCol;
+    public Transform BottomTransform => transform;
+
     public TargetDetector MoveDetector;
     public GameObject SelectIndicator;
     public Transform SelectIndicatorParent;
@@ -30,8 +33,6 @@ public class Player : MonoBehaviour, IInteractable, IAnimationEventOwner
     public GrowthComponent GrowthComponent { get; private set; }
     public HeightComponent HeightComponent { get; private set; }
     public bool IsDead => HealthComponent.IsDead;
-    public float BottomY => transform.position.y;
-    public float HeightY => SprCol.transform.localPosition.y;
     public Vector2 MoveVelocity=>MoveComponent.IntentDirection * MoveComponent.MoveSpeed;
     private Transform _lastInteractSource;
 
@@ -81,7 +82,7 @@ public class Player : MonoBehaviour, IInteractable, IAnimationEventOwner
         RespawnComponent = new RespawnComponent(this, Rt.CanRespawn);
         MoveComponent = new MoveComponent(Rb, Rt.StatsData.MoveSpeed, this, MoveDetector, AnimationComponent,HeightComponent);
         SpawnerComponent = new SpawnerComponent();
-        SkillComponent = new SkillComponent(Rt.StatsData, Rt.SkillSlotCount, Rt.SkillPool, AnimationComponent, transform);
+        SkillComponent = new SkillComponent(Rt.StatsData, Rt.SkillSlotCount, Rt.SkillPool, AnimationComponent, transform,EnemyListManager.Instance.TargetList);
         AIComponent = new AIComponent(SkillComponent, MoveComponent, transform, Rt.MoveStrategy);
         GrowthComponent = new GrowthComponent(Rt);
         //額外初始化設定
@@ -196,4 +197,15 @@ public class Player : MonoBehaviour, IInteractable, IAnimationEventOwner
             transform.localScale = s;
         }
     }
+
+#if UNITY_EDITOR
+    private void OnDrawGizmos() {
+        if (SkillComponent == null) return;
+
+        foreach (var slot in SkillComponent.SkillSlots) {
+            if (slot.DetectStrategy is Circle_DetectStrategy circle)
+                circle.DrawDebugGizmo();
+        }
+    }
+#endif
 }

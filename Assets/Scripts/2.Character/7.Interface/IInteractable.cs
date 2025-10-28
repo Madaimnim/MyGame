@@ -4,8 +4,8 @@ using UnityEngine;
 
 public interface IInteractable
 {
-    float BottomY { get; }
-    float HeightY { get; }
+    Transform BottomTransform { get; }
+    Collider2D SprCol { get; }
     Vector2 MoveVelocity { get; }
 
     void Interact(InteractInfo info);

@@ -24,7 +24,7 @@ public class EnemyTestInitializer : MonoBehaviour
             //裝配測試技能
             var skillId = 1;
             if (Rt.SkillPool.TryGetValue(skillId, out var skill))
-                e.SkillComponent.EquipSkill(0, skillId, skill.VisualData.DetectPrefab);
+                e.SkillComponent.EquipSkill(0, skillId);
         }
     }
 

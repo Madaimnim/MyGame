@@ -2,6 +2,14 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Serialization;
 
+public enum MoveStrategyType {
+    Straight,
+    Random,
+    Follow,
+    Stay,
+    Flee
+}
+
 [CreateAssetMenu(fileName ="PlayerStatsTemplate",menuName="GameData/PlayerStatsTemplate")]
 public class PlayerStatsTemplate:ScriptableObject
 {

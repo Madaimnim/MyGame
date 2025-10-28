@@ -25,12 +25,19 @@ public class SkillComponent
 
     public SkillSlot[] SkillSlots;
     public bool HasAnyTarget =>
-        SkillSlots.Any(slot => slot.HasSkill && slot.Detector != null && slot.Detector.HasTarget);
+        SkillSlots.Any(slot => slot.HasSkill && slot.DetectStrategy != null && slot.DetectStrategy.HasTarget);
 
     public event Action OnSkillsChanged; // (slot, skillId, runtime)
     public event Action<int, ISkillRuntime> OnSkillUsed;         // (slot, runtime)
 
-    public SkillComponent(StatsData statsData, int skillSlotCount, Dictionary<int, ISkillRuntime> skillPool, AnimationComponent animationComponent, Transform transform) {
+    public SkillComponent
+        (StatsData statsData,
+        int skillSlotCount,
+        Dictionary<int, ISkillRuntime> skillPool,
+        AnimationComponent animationComponent,
+        Transform transform,
+        IReadOnlyList<IInteractable> targetList
+        ) {
         _statsData = statsData;
         SkillSlotCount = skillSlotCount;
         _skillPool = skillPool;
@@ -41,7 +48,7 @@ public class SkillComponent
 
         SkillSlots = new SkillSlot[SkillSlotCount];
         for (int i = 0; i < SkillSlotCount; i++)
-            SkillSlots[i] = new SkillSlot();
+            SkillSlots[i] = new SkillSlot(_transform, targetList);
     }
 
     public void Tick() {
@@ -56,7 +63,7 @@ public class SkillComponent
         if (!_skillPool.TryGetValue(slot.SkillId, out var skill)) return;
         Vector3 targetPos = Vector3.zero; //統一變數方便後續處理
 
-        switch (skill.TargetType)
+        switch (skill.SkillTargetType)
         {
             case SkillTargetType.Target:
                 if (IntentTargetTransform == null)
@@ -118,21 +125,16 @@ public class SkillComponent
         _pendingSlotIndex = -1;
     }
 
-    public void EquipSkill(int slotIndex, int skillId,GameObject detectorPrefab) {
+    public void EquipSkill(int slotIndex, int skillId) {
         SkillSlots[slotIndex].Uninstall();
+        SkillSlots[slotIndex].SetSlot(skillId, _skillPool[skillId].DetectStrategy);
 
-        if (detectorPrefab != null)
-        {
-            var detector = new Detector(detectorPrefab, _transform, $"Detector_{skillId}");
-            SkillSlots[slotIndex].SetSlot(skillId, detector);
-
-            //發事件
-            OnSkillsChanged?.Invoke();
-        }       
+        //發事件
+        OnSkillsChanged?.Invoke();
     }
 
     private void TickCooldownTimer() {
         foreach (var slot in SkillSlots)
-            slot?.TickCooldown(Time.deltaTime);
+            slot?.Tick();
     }
 }

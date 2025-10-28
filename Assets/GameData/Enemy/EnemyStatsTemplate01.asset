@@ -51,4 +51,8 @@ MonoBehaviour:
       FlashMaterial: {fileID: 0}
     Cooldown: 1
     TargetType: 0
+    DetectType: 0
+    DetectRadius: 2
+    ConeRadius: 0
+    DetectAngle: 0
   MoveStrategyType: 0

@@ -10,7 +10,9 @@ public class PlayerTestInitializer : MonoBehaviour
     [Header("測試腳色設定")]
     public PlayerStatsTemplate PlayerStatsTemplate;
     public PlayerStatsRuntime Rt;
-    public int SkillId=1;
+    public Player CurrentPlayer;
+
+    public int SkillId;
     public bool Trigger_SetPlayers; // 點這個會觸發
     //public Button ResetPlayersButton;
 
@@ -54,19 +56,13 @@ public class PlayerTestInitializer : MonoBehaviour
     //[Button("執行 SetPlayers")]
     public void SetPlayers()
     {
-        var players = FindObjectsOfType<Player>();
-        foreach (var p in players)
-        {
-            var runner = new CoroutineRunnerAdapter(p);
+        CurrentPlayer = FindObjectOfType<Player>();
+        var runner = new CoroutineRunnerAdapter(CurrentPlayer);
+        CurrentPlayer.Initialize(Rt);
 
-            p.Initialize(Rt);
-
-            //裝配測試技能
-            if (Rt.SkillPool.TryGetValue(SkillId, out var skill))
-            {
-                p.SkillComponent.EquipSkill(0, SkillId, skill.VisualData.DetectPrefab);
-            }
-
+        //裝配測試技能
+        if (Rt.SkillPool.TryGetValue(SkillId, out var skill)) {
+            CurrentPlayer.SkillComponent.EquipSkill(0, SkillId);
         }
     }
 
@@ -117,18 +113,21 @@ public class PlayerTestInitializer : MonoBehaviour
         var s = Rt.StatsData;
         sb.AppendLine($"ID: {s.Id}");
         sb.AppendLine($"Name: {s.Name}");
-        sb.AppendLine($"Level: {s.Level}");
-        sb.AppendLine($"Power: {s.Power}");
-        sb.AppendLine($"MoveSpeed: {s.MoveSpeed}");
-        sb.AppendLine($"KnockbackPower: {s.KnockbackPower}");
-        sb.AppendLine($"FloatPower: {s.FloatPower}");
-        sb.AppendLine($"Weight: {s.Weight}");
-        sb.AppendLine($"HP: {Rt.CurrentHp}/{Rt.MaxHp}");
-        sb.AppendLine($"Exp: {Rt.Exp}");
+        //sb.AppendLine($"Level: {s.Level}");
+        //sb.AppendLine($"Power: {s.Power}");
+        //sb.AppendLine($"MoveSpeed: {s.MoveSpeed}");
+        //sb.AppendLine($"KnockbackPower: {s.KnockbackPower}");
+        //sb.AppendLine($"FloatPower: {s.FloatPower}");
+        //sb.AppendLine($"Weight: {s.Weight}");
+        //sb.AppendLine($"HP: {Rt.CurrentHp}/{Rt.MaxHp}");
+        //sb.AppendLine($"Exp: {Rt.Exp}");
         sb.AppendLine($"SkillSlotCount: {Rt.SkillSlotCount}");
-        sb.AppendLine($"CanRespawn: {Rt.CanRespawn}");
-        sb.AppendLine($"MoveStrategy: {Rt.MoveStrategy}");
-        sb.AppendLine($"Unlocked Skills: {string.Join(" , ", Rt.UnlockedSkillIdList)}");
+        sb.AppendLine($"技能槽1 ID:{CurrentPlayer.SkillComponent.SkillSlots[0].SkillId}");
+        sb.AppendLine($"技能槽1 HasSkill:{CurrentPlayer.SkillComponent.SkillSlots[0].HasSkill}");
+        sb.AppendLine($"技能槽1 DetectStrategy:{CurrentPlayer.SkillComponent.SkillSlots[0].DetectStrategy!=null}");
+        //sb.AppendLine($"CanRespawn: {Rt.CanRespawn}");
+        //sb.AppendLine($"MoveStrategy: {Rt.MoveStrategy}");
+        //sb.AppendLine($"Unlocked Skills: {string.Join(" , ", Rt.UnlockedSkillIdList)}");
     }
 
     private void DisplaySkillData(StringBuilder sb)

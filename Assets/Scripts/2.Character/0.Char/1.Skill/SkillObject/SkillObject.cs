@@ -23,7 +23,9 @@ public enum HitEffectPositionType {
 }
 
 public class SkillObject : MonoBehaviour, IInteractable {
-    public Collider2D SprCol;
+    [SerializeField] private Collider2D sprCol;
+    public Collider2D SprCol => sprCol;
+    public Transform BottomTransform => transform;
 
     [Header("可否旋轉")]
     public bool canRotate = true;
@@ -40,8 +42,6 @@ public class SkillObject : MonoBehaviour, IInteractable {
     public float DestroyDelay = 0f;
     public float OnHitDestroyDelay = 0f;
     // 碰撞用底部Y座標
-    public float BottomY => transform.position.y;
-    public float HeightY => SprCol.transform.localPosition.y;
     public Vector2 MoveVelocity => _skillMoveComponent.MoveDirection * _skillMoveComponent.MoveSpeed;
 
     private StatsData _pStatsData;

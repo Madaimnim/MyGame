@@ -11,7 +11,7 @@ public class PlayerSkillSystem
         var rt = PlayerUtility.Get(playerId);
         if(rt.SkillPool.TryGetValue(skillId,out var skill))
         {
-            rt.BattleObject.GetComponent<Player>()?.SkillComponent.EquipSkill(slotIndex, skillId, skill.VisualData.DetectPrefab);
+            rt.BattleObject.GetComponent<Player>()?.SkillComponent.EquipSkill(slotIndex, skillId);
         }
  
     }

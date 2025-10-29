@@ -25,7 +25,7 @@ public class PlayerSkillRuntime: ISkillRuntime
 
         DetectStrategy = template.DetectType switch {
             SkillDetectType.Circle => new Circle_DetectStrategy(template.DetectRadius),
-            //SkillDetectType.Cone => new SkillDetectStrategy_Cone(self, template.ConeRadius, template.DetectAngle),
+            SkillDetectType.Box => new Box_DetectStrategy(template.RangeX, template.RangeY),
             //SkillDetectType.GlobalClosest => new SkillDetectStrategy_GlobalClosest(self),
             _ => null
         };

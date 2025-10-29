@@ -9,7 +9,7 @@ public enum SkillTargetType
 }
 public enum SkillDetectType {
     [InspectorName("圓形範圍")] Circle,
-    [InspectorName("錐形範圍")] Cone,
+    [InspectorName("矩形範圍")] Box,
     [InspectorName("全場最近敵人")] GlobalClosest,
 }
 
@@ -26,10 +26,9 @@ public class SkillTemplate
     [ShowIfDetectType(SkillDetectType.Circle)]
     public float DetectRadius;
 
-    [ShowIfDetectType(SkillDetectType.Cone)]
-    public float ConeRadius;
-
-    [ShowIfDetectType(SkillDetectType.Cone)]
-    public float DetectAngle;
+    [ShowIfDetectType(SkillDetectType.Box)]
+    public float RangeX;
+    [ShowIfDetectType(SkillDetectType.Box)]
+    public float RangeY;
 }
 

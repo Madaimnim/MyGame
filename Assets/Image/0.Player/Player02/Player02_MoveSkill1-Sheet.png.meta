@@ -1,5 +1,5 @@
 fileFormatVersion: 2
-guid: cf5479f0f87009e4e9ccfd57cbaab349
+guid: 78e53a8c517a7424f8048816def6c4c1
 TextureImporter:
   internalIDToNameTable: []
   externalObjects: {}
@@ -90,6 +90,18 @@ TextureImporter:
     androidETC2FallbackOverride: 0
     forceMaximumCompressionQuality_BC6H_BC7: 0
   - serializedVersion: 3
+    buildTarget: iPhone
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  - serializedVersion: 3
     buildTarget: Android
     maxTextureSize: 2048
     resizeAlgorithm: 0
@@ -105,7 +117,7 @@ TextureImporter:
     serializedVersion: 2
     sprites:
     - serializedVersion: 2
-      name: Player01_Skill2-Sheet_0
+      name: Player02_MoveSkill1-Sheet_0
       rect:
         serializedVersion: 2
         x: 0
@@ -119,14 +131,14 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: 0
       bones: []
-      spriteID: a85830b0fea4c60479e3b1cd6290c7da
-      internalID: -587414112
+      spriteID: 4a3a17a88590b38459debb825b710f95
+      internalID: -1000004800
       vertices: []
       indices: 
       edges: []
       weights: []
     - serializedVersion: 2
-      name: Player01_Skill2-Sheet_1
+      name: Player02_MoveSkill1-Sheet_1
       rect:
         serializedVersion: 2
         x: 36
@@ -140,14 +152,14 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: 0
       bones: []
-      spriteID: 2821cba68c3b4a94ab65dceadba8afa8
-      internalID: -1222115603
+      spriteID: 48c72bdfbe99d384383d64ff1bd083c1
+      internalID: -1131703263
       vertices: []
       indices: 
       edges: []
       weights: []
     - serializedVersion: 2
-      name: Player01_Skill2-Sheet_2
+      name: Player02_MoveSkill1-Sheet_2
       rect:
         serializedVersion: 2
         x: 72
@@ -161,14 +173,14 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: 0
       bones: []
-      spriteID: b66013553ab259648918aa055bd15090
-      internalID: -1167099711
+      spriteID: a2ed8fb460a0def4fb9ded9c9d4f300c
+      internalID: -914227658
       vertices: []
       indices: 
       edges: []
       weights: []
     - serializedVersion: 2
-      name: Player01_Skill2-Sheet_3
+      name: Player02_MoveSkill1-Sheet_3
       rect:
         serializedVersion: 2
         x: 108
@@ -182,50 +194,8 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: 0
       bones: []
-      spriteID: 24ee1a8733166c14a9823a089d62a285
-      internalID: -1378994342
-      vertices: []
-      indices: 
-      edges: []
-      weights: []
-    - serializedVersion: 2
-      name: Player01_Skill2-Sheet_4
-      rect:
-        serializedVersion: 2
-        x: 144
-        y: 0
-        width: 36
-        height: 36
-      alignment: 7
-      pivot: {x: 0.5, y: 0}
-      border: {x: 0, y: 0, z: 0, w: 0}
-      outline: []
-      physicsShape: []
-      tessellationDetail: 0
-      bones: []
-      spriteID: f651b7a62a0607446930e7c3fc5ca757
-      internalID: -1930571888
-      vertices: []
-      indices: 
-      edges: []
-      weights: []
-    - serializedVersion: 2
-      name: Player01_Skill2-Sheet_5
-      rect:
-        serializedVersion: 2
-        x: 180
-        y: 0
-        width: 36
-        height: 36
-      alignment: 7
-      pivot: {x: 0.5, y: 0}
-      border: {x: 0, y: 0, z: 0, w: 0}
-      outline: []
-      physicsShape: []
-      tessellationDetail: 0
-      bones: []
-      spriteID: 678bc1075464ffd47bf763830c0a9f90
-      internalID: -109310616
+      spriteID: 7c4446f56a718df4f9b3f2f8ab890171
+      internalID: -1459866636
       vertices: []
       indices: 
       edges: []
@@ -241,12 +211,10 @@ TextureImporter:
     weights: []
     secondaryTextures: []
     nameFileIdTable:
-      Player01_Skill2-Sheet_0: -587414112
-      Player01_Skill2-Sheet_1: -1222115603
-      Player01_Skill2-Sheet_2: -1167099711
-      Player01_Skill2-Sheet_3: -1378994342
-      Player01_Skill2-Sheet_4: -1930571888
-      Player01_Skill2-Sheet_5: -109310616
+      Player02_MoveSkill1-Sheet_0: -1000004800
+      Player02_MoveSkill1-Sheet_1: -1131703263
+      Player02_MoveSkill1-Sheet_2: -914227658
+      Player02_MoveSkill1-Sheet_3: -1459866636
   spritePackingTag: 
   pSDRemoveMatte: 0
   pSDShowRemoveMatteOption: 0

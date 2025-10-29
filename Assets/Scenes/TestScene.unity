@@ -696,7 +696,8 @@ PrefabInstance:
       propertyPath: m_AnchorMax.y
       value: 0
       objectReference: {fileID: 0}
-    m_RemovedComponents: []
+    m_RemovedComponents:
+    - {fileID: 5829053645458936790, guid: aa87e46c63625174d84e532f142c761b, type: 3}
   m_SourcePrefab: {fileID: 100100000, guid: aa87e46c63625174d84e532f142c761b, type: 3}
 --- !u!4 &592883879 stripped
 Transform:
@@ -1431,11 +1432,11 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 1901394458928384585, guid: 0d87d99a51500fd418339ea0f269bb01, type: 3}
       propertyPath: m_LocalPosition.x
-      value: 0.25
+      value: 0.04
       objectReference: {fileID: 0}
     - target: {fileID: 1901394458928384585, guid: 0d87d99a51500fd418339ea0f269bb01, type: 3}
       propertyPath: m_LocalPosition.y
-      value: 6.68
+      value: 2.44
       objectReference: {fileID: 0}
     - target: {fileID: 1901394458928384585, guid: 0d87d99a51500fd418339ea0f269bb01, type: 3}
       propertyPath: m_LocalPosition.z
@@ -1633,11 +1634,11 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 1901394458928384585, guid: c1a9c12d802fc0446a22a42d0c13403e, type: 3}
       propertyPath: m_LocalPosition.x
-      value: -0.48
+      value: -0.08
       objectReference: {fileID: 0}
     - target: {fileID: 1901394458928384585, guid: c1a9c12d802fc0446a22a42d0c13403e, type: 3}
       propertyPath: m_LocalPosition.y
-      value: 2.67
+      value: 2.89
       objectReference: {fileID: 0}
     - target: {fileID: 1901394458928384585, guid: c1a9c12d802fc0446a22a42d0c13403e, type: 3}
       propertyPath: m_LocalPosition.z
@@ -1676,18 +1677,11 @@ PrefabInstance:
       value: Player001
       objectReference: {fileID: 0}
     - target: {fileID: 1901394458928384591, guid: c1a9c12d802fc0446a22a42d0c13403e, type: 3}
-      propertyPath: m_Layer
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 1901394458928384591, guid: c1a9c12d802fc0446a22a42d0c13403e, type: 3}
       propertyPath: m_IsActive
       value: 0
       objectReference: {fileID: 0}
-    - target: {fileID: 9003091752546316705, guid: c1a9c12d802fc0446a22a42d0c13403e, type: 3}
-      propertyPath: m_IsActive
-      value: 1
-      objectReference: {fileID: 0}
-    m_RemovedComponents: []
+    m_RemovedComponents:
+    - {fileID: 4312596811227215113, guid: c1a9c12d802fc0446a22a42d0c13403e, type: 3}
   m_SourcePrefab: {fileID: 100100000, guid: c1a9c12d802fc0446a22a42d0c13403e, type: 3}
 --- !u!1 &1583262407
 GameObject:
@@ -1934,6 +1928,7 @@ GameObject:
   - component: {fileID: 1905619106}
   - component: {fileID: 1905619107}
   - component: {fileID: 1905619108}
+  - component: {fileID: 1905619109}
   m_Layer: 0
   m_Name: TestManager
   m_TagString: Untagged
@@ -2144,6 +2139,25 @@ MonoBehaviour:
   updateInterval: 0.1
   GUIfontSize: 40
   GUISize: {x: 500, y: 200}
+--- !u!114 &1905619109
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1905619098}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 9e388416b27dcf24fa93bd9d1cdf15a0, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  ShapeType: 0
+  targetTransform: {fileID: 698480861}
+  rectangleSprite: {fileID: 0}
+  rangeX: 20
+  rangeY: 1
+  circleSprite: {fileID: 21300000, guid: 80e3d73afa68b1c4787bd9efb1dfdada, type: 3}
+  radius: 3
 --- !u!1 &2034258884
 GameObject:
   m_ObjectHideFlags: 0

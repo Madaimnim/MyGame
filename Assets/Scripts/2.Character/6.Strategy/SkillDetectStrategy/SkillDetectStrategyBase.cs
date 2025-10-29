@@ -13,4 +13,5 @@ public abstract class SkillDetectStrategyBase {
     public abstract void DetectTargetsTick(IReadOnlyList<IInteractable> detectedTargets);
     public abstract bool IsInRange(Vector2 mouseWorldPos);
     public abstract Vector2 GetClosestPoint(Vector2 mouseWorldPos);
+    public abstract void DrawDebugGizmo();
 }

@@ -1,5 +1,5 @@
 fileFormatVersion: 2
-guid: 1b6e3b1d4c1e6b34ba2dd2ba703fe23b
+guid: 8808a8677361c0a47b82d570b4c62854
 TextureImporter:
   internalIDToNameTable: []
   externalObjects: {}
@@ -101,11 +101,23 @@ TextureImporter:
     overridden: 0
     androidETC2FallbackOverride: 0
     forceMaximumCompressionQuality_BC6H_BC7: 0
+  - serializedVersion: 3
+    buildTarget: iPhone
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 0
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
   spriteSheet:
     serializedVersion: 2
     sprites:
     - serializedVersion: 2
-      name: Player01_Die-Sheet_0
+      name: Player01_Idle-Sheet_0
       rect:
         serializedVersion: 2
         x: 0
@@ -119,14 +131,14 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: 0
       bones: []
-      spriteID: d133fb7dbd4aa9143937e20ea1f15f07
-      internalID: -236014449
+      spriteID: 6cac2e124f643b142a0e42333e669a9e
+      internalID: 1521036339
       vertices: []
       indices: 
       edges: []
       weights: []
     - serializedVersion: 2
-      name: Player01_Die-Sheet_1
+      name: Player01_Idle-Sheet_1
       rect:
         serializedVersion: 2
         x: 36
@@ -140,29 +152,8 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: 0
       bones: []
-      spriteID: d35035f29676f204f9111bba7a22779d
-      internalID: -468604220
-      vertices: []
-      indices: 
-      edges: []
-      weights: []
-    - serializedVersion: 2
-      name: Player01_Die-Sheet_2
-      rect:
-        serializedVersion: 2
-        x: 72
-        y: 0
-        width: 36
-        height: 36
-      alignment: 7
-      pivot: {x: 0.5, y: 0}
-      border: {x: 0, y: 0, z: 0, w: 0}
-      outline: []
-      physicsShape: []
-      tessellationDetail: 0
-      bones: []
-      spriteID: ec9355e39cc28d147a7d486e4464008b
-      internalID: -989346112
+      spriteID: 27245dde623f155439c3d3879f92eb10
+      internalID: 361868250
       vertices: []
       indices: 
       edges: []
@@ -178,9 +169,8 @@ TextureImporter:
     weights: []
     secondaryTextures: []
     nameFileIdTable:
-      Player01_Die-Sheet_0: -236014449
-      Player01_Die-Sheet_1: -468604220
-      Player01_Die-Sheet_2: -989346112
+      Player01_Idle-Sheet_0: 1521036339
+      Player01_Idle-Sheet_1: 361868250
   spritePackingTag: 
   pSDRemoveMatte: 0
   pSDShowRemoveMatteOption: 0

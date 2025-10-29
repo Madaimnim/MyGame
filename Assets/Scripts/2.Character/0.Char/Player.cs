@@ -203,8 +203,7 @@ public class Player : MonoBehaviour, IInteractable, IAnimationEventOwner
         if (SkillComponent == null) return;
 
         foreach (var slot in SkillComponent.SkillSlots) {
-            if (slot.DetectStrategy is Circle_DetectStrategy circle)
-                circle.DrawDebugGizmo();
+            if(slot.DetectStrategy!=null) slot.DetectStrategy.DrawDebugGizmo();
         }
     }
 #endif

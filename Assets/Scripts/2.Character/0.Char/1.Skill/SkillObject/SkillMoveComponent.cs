@@ -47,7 +47,7 @@ public class SkillMoveComponent {
             targetVelocity,
 
             out VerticalSpeed);
-        Debug.Log($"目標的 MoveSpeed:{targetVelocity}");
+        //Debug.Log($"目標的 MoveSpeed:{targetVelocity}");
     }
 
 
@@ -95,7 +95,7 @@ public class SkillMoveComponent {
         _transform.position += (Vector3)(MoveDirection * MoveSpeed * Time.deltaTime);
 
         if (_sprCol.transform.localPosition.y < 0) {
-            Debug.Log("localPosition 小於0, reset為 0");
+            //Debug.Log("localPosition 小於0, reset為 0");
             _sprCol.transform.localPosition = new Vector3(0, 0, 0);
             _owner.StartDestroyTimer(_owner.OnHitDestroyDelay);
             return;

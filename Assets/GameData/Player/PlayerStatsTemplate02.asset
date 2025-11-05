@@ -31,7 +31,7 @@ MonoBehaviour:
   MaxHp: 1
   SkillSlotCount: 4
   CanRespawn: 1
-  MoveStrategyType: 1
+  MoveStrategyType: 3
   SkillTemplateList:
   - StatsData:
       Id: 1

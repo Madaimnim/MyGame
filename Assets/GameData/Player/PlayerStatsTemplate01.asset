@@ -31,7 +31,7 @@ MonoBehaviour:
   MaxHp: 5
   SkillSlotCount: 4
   CanRespawn: 1
-  MoveStrategyType: 1
+  MoveStrategyType: 3
   SkillTemplateList:
   - StatsData:
       Id: 1
@@ -53,8 +53,8 @@ MonoBehaviour:
     TargetType: 0
     DetectType: 0
     DetectRadius: 3
-    ConeRadius: 0
-    DetectAngle: 0
+    RangeX: 0
+    RangeY: 0
   - StatsData:
       Id: 2
       Name: "\u91CD\u64CA"
@@ -75,7 +75,7 @@ MonoBehaviour:
     TargetType: 1
     DetectType: 0
     DetectRadius: 3
-    ConeRadius: 0
-    DetectAngle: 0
+    RangeX: 0
+    RangeY: 0
   UnlockedSkillIdList: 
   ExpTable: 0400000006000000090000000d0000001200000019000000220000002d0000003a000000490000005a0000006d0000008200000099000000b2000000cd000000ea000000090100002a0100004d0100007201000099010000c2010000ed0100001a020000490200007a020000ad020000e202000019030000

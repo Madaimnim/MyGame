@@ -134,10 +134,10 @@ TextureImporter:
         serializedVersion: 2
         x: 0
         y: 0
-        width: 42
-        height: 52
-      alignment: 0
-      pivot: {x: 0, y: 0}
+        width: 32
+        height: 32
+      alignment: 7
+      pivot: {x: 0.5, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
       outline: []
       physicsShape: []
@@ -153,12 +153,12 @@ TextureImporter:
       name: Player01Skill01-Sheet_1
       rect:
         serializedVersion: 2
-        x: 42
+        x: 32
         y: 0
-        width: 42
-        height: 52
-      alignment: 0
-      pivot: {x: 0, y: 0}
+        width: 32
+        height: 32
+      alignment: 7
+      pivot: {x: 0.5, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
       outline: []
       physicsShape: []
@@ -174,12 +174,12 @@ TextureImporter:
       name: Player01Skill01-Sheet_2
       rect:
         serializedVersion: 2
-        x: 84
+        x: 64
         y: 0
-        width: 42
-        height: 52
-      alignment: 0
-      pivot: {x: 0, y: 0}
+        width: 32
+        height: 32
+      alignment: 7
+      pivot: {x: 0.5, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
       outline: []
       physicsShape: []

@@ -37,13 +37,13 @@ MonoBehaviour:
       Id: 1
       Name: "\u666E\u901A\u653B\u64CA"
       Level: 1
-      Power: 1
+      Power: 0
       MoveSpeed: 1
-      KnockbackPower: 0
-      FloatPower: 0
+      KnockbackPower: 3
+      FloatPower: 1
       Weight: 0
     VisualData:
-      Prefab: {fileID: 0}
+      Prefab: {fileID: 7821809457673803968, guid: 34fc74616982aab439aab09dfc6d8c41, type: 3}
       DetectPrefab: {fileID: 0}
       SpriteIcon: {fileID: 0}
       DeathSFX: {fileID: 0}
@@ -51,8 +51,8 @@ MonoBehaviour:
       FlashMaterial: {fileID: 0}
     Cooldown: 1
     TargetType: 0
-    DetectType: 0
+    DetectorType: 0
     DetectRadius: 2
-    ConeRadius: 0
-    DetectAngle: 0
+    RangeX: 0
+    RangeY: 0
   MoveStrategyType: 0

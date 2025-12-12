@@ -159,7 +159,7 @@ MonoBehaviour:
   HitEffectPositionType: 0
   TargetLayers:
     serializedVersion: 2
-    m_Bits: 256
+    m_Bits: 320
   MoveSpeed: 10
   SkillOffset: {x: 0, y: 0.5}
   DestroyDelay: 1

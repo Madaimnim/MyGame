@@ -5,30 +5,29 @@ using System;
 using UnityEngine.EventSystems;
 using System.Linq;
 
-public class PlayerInputManager : MonoBehaviour, IInputProvider
-{
+public class PlayerInputManager : MonoBehaviour, IInputProvider {
     public static PlayerInputManager Instance { get; private set; }
-    //-------------------------------¨Æ¥ó--------------------------------------------------------------------------------
+
+    //-------------------------------äº‹ä»¶--------------------------------------------------------------
     public event Action<Transform> OnBattlePlayerSelected;
 
     private readonly List<Player> _selectedPlayerList = new List<Player>();
     private bool _canControl = false;
 
-    //®Ø¿ï
+    // æ‹–æ›³æ¡†é¸
     public LineRenderer LineRenderer;
     private Vector2 _dragStartPos;
     private bool _isDragging;
 
-    [Header("´ú¸Õ±±¨î¶}Ãö")]
+    [Header("æ˜¯å¦å¼·åˆ¶é–‹å•Ÿæ‰‹å‹•æ§åˆ¶ï¼ˆæ¸¬è©¦ç”¨ï¼‰")]
     [SerializeField] private bool allowManualControl = false;
-    public bool IsTestingController => _canControl==true;
+    public bool IsTestingController => _canControl == true;
 
     public void OnPlayerCanControlChanged(bool canControl) => _canControl = canControl;
 
     public void Awake() {
-        //³æ¨Ò
-        if (Instance != null && Instance != this)
-        {
+        // å–®ä¾‹
+        if (Instance != null && Instance != this) {
             Destroy(gameObject);
             return;
         }
@@ -36,7 +35,8 @@ public class PlayerInputManager : MonoBehaviour, IInputProvider
         DontDestroyOnLoad(gameObject);
 
         LineRenderer.enabled = false;
-        if(GameManager.Instance!=null)GameManager.Instance.GameStateSystem.OnPlayerCanControlChanged += OnPlayerCanControlChanged;
+        if (GameManager.Instance != null)
+            GameManager.Instance.GameStateSystem.OnPlayerCanControlChanged += OnPlayerCanControlChanged;
     }
 
     public void Update() {
@@ -50,10 +50,9 @@ public class PlayerInputManager : MonoBehaviour, IInputProvider
         HandleSkillInput();
     }
 
-    //-------------------------------¿ï¨ú¸}¦â--------------------------------------------------------------------------------
+    //-------------------------------ç©å®¶é»æ“Šé¸å–------------------------------------------------------
     private void ClickPlayer() {
         if (!Input.GetMouseButtonDown(0)) return;
-        //if (EventSystem.current.IsPointerOverGameObject()) Debug.Log("ÂIÀ»¨ì UI");
 
         Vector2 mouseWorldPos = Camera.main.ScreenToWorldPoint(Input.mousePosition);
         int layerMask = LayerMask.GetMask("Player");
@@ -63,31 +62,31 @@ public class PlayerInputManager : MonoBehaviour, IInputProvider
         var player = hit.GetComponent<Player>();
         SelectPlayer(player);
     }
-    #region ®Ø¿ï¨¤¦â
+
+    #region æ‹–æ›³æ¡†é¸åŠŸèƒ½
     private void HandleSelectionBox() {
-        if (Input.GetMouseButtonDown(0))
-        {
+        if (Input.GetMouseButtonDown(0)) {
             _isDragging = true;
             _dragStartPos = Camera.main.ScreenToWorldPoint(Input.mousePosition);
             LineRenderer.enabled = true;
         }
-        if (_isDragging)
-        {
+
+        if (_isDragging) {
             Vector2 current = Camera.main.ScreenToWorldPoint(Input.mousePosition);
             StretchSelectionBox(_dragStartPos, current);
         }
 
-        if (Input.GetMouseButtonUp(0))
-        {
-            if (_isDragging)
-            {
+        if (Input.GetMouseButtonUp(0)) {
+            if (_isDragging) {
                 _isDragging = false;
                 LineRenderer.enabled = false;
                 Vector2 end = Camera.main.ScreenToWorldPoint(Input.mousePosition);
+
                 SelectPlayersInBox(_dragStartPos, end);
             }
         }
     }
+
     private void StretchSelectionBox(Vector2 start, Vector2 end) {
         Vector3[] corners = new Vector3[4];
         corners[0] = new Vector3(start.x, start.y, 0);
@@ -98,6 +97,7 @@ public class PlayerInputManager : MonoBehaviour, IInputProvider
         LineRenderer.positionCount = 4;
         LineRenderer.SetPositions(corners);
     }
+
     private void SelectPlayersInBox(Vector2 start, Vector2 end) {
         ResetAllBattlePlayerIntent();
         _selectedPlayerList.Clear();
@@ -105,18 +105,20 @@ public class PlayerInputManager : MonoBehaviour, IInputProvider
         Vector2 min = Vector2.Min(start, end);
         Vector2 max = Vector2.Max(start, end);
         Collider2D[] hits = Physics2D.OverlapAreaAll(min, max, LayerMask.GetMask("Player"));
-        foreach (var hit in hits)
-            _selectedPlayerList.Add(hit.GetComponent<Player>());
 
-        foreach (var p in _selectedPlayerList)
-        {
+        foreach (var hit in hits) {
+            var p = hit.GetComponent<Player>();
+            if (p != null)
+                _selectedPlayerList.Add(p);
+        }
+
+        foreach (var p in _selectedPlayerList) {
             p.SetInputProvider(this);
             p.SelectIndicator.SetActive(true);
         }
 
-        //  §ä¥X³Ì¾aªñ·Æ¹«©ñ¶}¦ì¸mªº¨¤¦â
-        if (_selectedPlayerList.Count > 0)
-        {
+        // æ¡†é¸å¾Œï¼Œé¡é ­è·Ÿéš¨æœ€æ¥è¿‘æ»‘é¼ çš„è§’è‰²
+        if (_selectedPlayerList.Count > 0) {
             Vector2 mouseReleasePos = Camera.main.ScreenToWorldPoint(Input.mousePosition);
 
             Player nearest = _selectedPlayerList
@@ -136,93 +138,104 @@ public class PlayerInputManager : MonoBehaviour, IInputProvider
 
         selectedPlayer.SetInputProvider(this);
         selectedPlayer.SelectIndicator.SetActive(true);
-
-        selectedPlayer.SelectIndicator.SetActive(true);
         CameraManager.Instance.Follow(selectedPlayer.transform);
-        if (selectedPlayer != null) OnBattlePlayerSelected?.Invoke(selectedPlayer.transform);
+
+        OnBattlePlayerSelected?.Invoke(selectedPlayer.transform);
     }
 
-    //-------------------------------Input¿é¤J--------------------------------------------------------------------------------
+    //-------------------------------Input è¼¸å…¥è™•ç†-----------------------------------------------------
     private void HandleMoveInput() {
         if (_selectedPlayerList.Count == 0) return;
 
         float moveX = Input.GetAxisRaw("Horizontal");
         float moveY = Input.GetAxisRaw("Vertical");
 
-        // ¦³¤è¦VÁä¿é¤J¡AÀu¥ı¨Ï¥Î¤è¦V²¾°Ê
-        if (moveX != 0 || moveY != 0)
-        {
+        // WASD ç§»å‹•ï¼ˆæ–¹å‘è¼¸å…¥ï¼‰
+        if (moveX != 0 || moveY != 0) {
             Vector2 dir = new Vector2(moveX, moveY).normalized;
+
             foreach (var player in _selectedPlayerList)
                 SetIntentMove(player.MoveComponent, direction: dir);
+
             return;
         }
-        // ­Y¤è¦VÁä©ñ¶}¡A¥B¨S¦³¦aªO²¾°Ê¥Ø¼Ğ ¡÷ °±¤î²¾°Ê
+
+        // è‹¥æ²’æœ‰æ–¹å‘è¼¸å…¥ï¼Œå‰‡æ¸…ç©ºç§»å‹•æ„åœ–ï¼ˆé™¤éæœ‰ç›®æ ‡ä½ç½®ï¼‰
         foreach (var player in _selectedPlayerList)
             if (!player.MoveComponent.IntentTargetPosition.HasValue)
                 SetIntentMove(player.MoveComponent, direction: Vector2.zero);
 
-        // ·Æ¹«¥kÁä¡GÂIÀ»¦aªO²¾°Ê
-        if (Input.GetMouseButtonDown(1))
-        {
+        // æ»‘é¼ å³éµ â†’ è¨­å®šç§»å‹•ç›®æ¨™ä½ç½®
+        if (Input.GetMouseButtonDown(1)) {
             Vector2 mouseWorldPos = Camera.main.ScreenToWorldPoint(Input.mousePosition);
+
             foreach (var player in _selectedPlayerList)
                 SetIntentMove(player.MoveComponent, targetPosition: mouseWorldPos);
 
             VFXManager.Instance.Play("ClickGround01", mouseWorldPos);
         }
     }
+
     private void HandleSkillInput() {
         if (_selectedPlayerList.Count == 0) return;
-        foreach (var player in _selectedPlayerList)
-            for (int i = 0; i < player.SkillComponent.SkillSlots.Length; i++)
-            {
-                if (Input.GetKeyDown(KeyCode.Alpha1 + i))
-                {
+
+        foreach (var player in _selectedPlayerList) {
+            for (int i = 0; i < player.SkillComponent.SkillSlots.Length; i++) {
+                if (Input.GetKeyDown(KeyCode.Alpha1 + i)) {
                     var slot = player.SkillComponent.SkillSlots[i];
-                    if (!slot.HasSkill) { Debug.LogWarning($"§Ş¯à¼Ñ {i} µL§Ş¯à¡A©¿²¤¿é¤J¡C"); return; }
-                    var DetectStrategy = slot.DetectStrategy;
-                    if (DetectStrategy == null) { Debug.LogWarning($"§Ş¯à¼Ñ {i} µLDetectStrategy¡C"); return; }
+                    if (!slot.HasSkill) {
+                        Debug.LogWarning($"æŠ€èƒ½æ§½ {i} æ²’æœ‰æŠ€èƒ½ï¼Œç„¡æ³•æ–½æ”¾ã€‚");
+                        return;
+                    }
 
+                    var detector = slot.Detector;
+                    if (detector == null) {
+                        Debug.LogWarning($"æŠ€èƒ½æ§½ {i} ç„¡ DetectStrategyã€‚");
+                        return;
+                    }
 
-                    //¨ú·Æ¹«®y¼Ğ
+                    // æŠ€èƒ½ç›®æ¨™æ±ºå®š
                     Vector2 mouseWorldPos = Camera.main.ScreenToWorldPoint(Input.mousePosition);
                     Vector2 targetPosition;
                     Transform targetTransform = null;
 
-                    if (DetectStrategy.IsInRange(mouseWorldPos)) {
+                    if (detector.IsInRange(mouseWorldPos)) {
                         Collider2D hit = Physics2D.OverlapPoint(mouseWorldPos, LayerMask.GetMask("Enemy"));
+
                         if (hit != null) {
                             targetTransform = hit.transform;
                             targetPosition = hit.transform.position;
                         }
-                        else targetPosition = mouseWorldPos;
-                        Debug.Log($"Collider¤º³¡¡AtargetPosition:{targetPosition}");
+                        else {
+                            targetPosition = mouseWorldPos;
+                        }
+
+                        Debug.Log($"Collider å…§ï¼š targetPosition = {targetPosition}");
                     }
                     else {
-                        targetPosition = DetectStrategy.GetClosestPoint(mouseWorldPos);
-                        Debug.Log($"Collider¥~³¡¡AtargetPosition:{targetPosition}");
+                        targetPosition = detector.GetClosestPoint(mouseWorldPos);
+                        Debug.Log($"Collider å¤–ï¼š targetPosition = {targetPosition}");
                     }
-
- 
 
                     SetIntentSkill(player.SkillComponent, i, targetPosition: targetPosition, targetTransform: targetTransform);
                     break;
                 }
             }
+        }
     }
 
-    //-------------------------------Intent³]©w--------------------------------------------------------------------------------
-    private void ResetAllBattlePlayerIntent(){
-        //For´ú¸Õ¥Î
-        if (GameManager.Instance == null) { Debug.Log("¨SGameManager¡A¤£ResetAllBattlePlayerIntent"); return; }
+    //-------------------------------Intent é‚è¼¯---------------------------------------------------------
+    private void ResetAllBattlePlayerIntent() {
+        if (GameManager.Instance == null) {
+            Debug.Log("æ²’æœ‰ GameManagerï¼Œç„¡æ³• ResetAllBattlePlayerIntent");
+            return;
+        }
 
-        foreach (var kvp in PlayerUtility.AllPlayers)
-        {
+        foreach (var kvp in PlayerUtility.AllPlayers) {
             var p = kvp.Value;
             p.SetInputProvider(null);
             p.SelectIndicator.SetActive(false);
-            SetIntentMove(p.MoveComponent);
+
             SetIntentMove(p.MoveComponent);
             SetIntentSkill(p.SkillComponent, -1);
         }
@@ -233,6 +246,7 @@ public class PlayerInputManager : MonoBehaviour, IInputProvider
         moveComponent.IntentTargetPosition = targetPosition;
         moveComponent.IntentDirection = direction ?? Vector2.zero;
     }
+
     public void SetIntentSkill(SkillComponent skillComponent, int slotIndex, Vector2? targetPosition = null, Transform targetTransform = null) {
         skillComponent.IntentSlotIndex = slotIndex;
         skillComponent.IntentTargetTransform = targetTransform;

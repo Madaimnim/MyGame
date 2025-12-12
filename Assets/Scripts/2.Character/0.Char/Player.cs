@@ -45,13 +45,13 @@ public class Player : MonoBehaviour, IInteractable, IAnimationEventOwner
     private void OnEnable()
     {
         //註冊UI:顯示血量、技能冷卻
-        if (UIManager_BattlePlayer.Instance != null)
-            UIManager_BattlePlayer.Instance.RegisterPlayerPanelUI(this);
+        if (UIManager_BattlePlayer.Instance != null)UIManager_BattlePlayer.Instance.RegisterPlayerPanelUI(this);
+        if (PlayerListManager.Instance != null) PlayerListManager.Instance.Register(this);
     }
     private void OnDisable()
     {
-        if (UIManager_BattlePlayer.Instance != null)
-            UIManager_BattlePlayer.Instance.UnregisterPlayer(this);
+        if (UIManager_BattlePlayer.Instance != null)UIManager_BattlePlayer.Instance.UnregisterPlayer(this);
+        if (PlayerListManager.Instance != null) PlayerListManager.Instance.Unregister(this);
     }
     private void Start()
     {
@@ -82,6 +82,7 @@ public class Player : MonoBehaviour, IInteractable, IAnimationEventOwner
         RespawnComponent = new RespawnComponent(this, Rt.CanRespawn);
         MoveComponent = new MoveComponent(Rb, Rt.StatsData.MoveSpeed, this, MoveDetector, AnimationComponent,HeightComponent);
         SpawnerComponent = new SpawnerComponent();
+        if (EnemyListManager.Instance.TargetList == null) Debug.Log("EnemyListManager未初始化");
         SkillComponent = new SkillComponent(Rt.StatsData, Rt.SkillSlotCount, Rt.SkillPool, AnimationComponent, transform,EnemyListManager.Instance.TargetList);
         AIComponent = new AIComponent(SkillComponent, MoveComponent, transform, Rt.MoveStrategy);
         GrowthComponent = new GrowthComponent(Rt);
@@ -129,7 +130,6 @@ public class Player : MonoBehaviour, IInteractable, IAnimationEventOwner
             AnimationComponent.PlayMove();
     }
 
-
     //事件方法
     public void OnDie()
     {
@@ -159,7 +159,7 @@ public class Player : MonoBehaviour, IInteractable, IAnimationEventOwner
 
         //發事件
         GameEventSystem.Instance.Event_OnPlayerDie?.Invoke(this);
-
+        if (PlayerListManager.Instance != null) PlayerListManager.Instance.Unregister(this);
     }
 
 
@@ -172,6 +172,7 @@ public class Player : MonoBehaviour, IInteractable, IAnimationEventOwner
         ResetState();
 
         AIComponent.EnableAI();
+        if (PlayerListManager.Instance != null) PlayerListManager.Instance.Register(this);
     }
     public void ResetState()
     {
@@ -197,14 +198,4 @@ public class Player : MonoBehaviour, IInteractable, IAnimationEventOwner
             transform.localScale = s;
         }
     }
-
-#if UNITY_EDITOR
-    private void OnDrawGizmos() {
-        if (SkillComponent == null) return;
-
-        foreach (var slot in SkillComponent.SkillSlots) {
-            if(slot.DetectStrategy!=null) slot.DetectStrategy.DrawDebugGizmo();
-        }
-    }
-#endif
 }

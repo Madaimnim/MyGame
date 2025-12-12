@@ -9,7 +9,7 @@ public class EnemySkillRuntime: ISkillRuntime
     public VisualData VisualData { get; private set; }
     public float Cooldown { get; private set; }
     public SkillTargetType SkillTargetType { get; private set; }
-    public SkillDetectStrategyBase DetectStrategy { get; set; }
+    public SkillDetectorBase Detector { get; set; }
 
     public EnemySkillRuntime(SkillTemplate template){
         //²L«þ¨©
@@ -17,8 +17,8 @@ public class EnemySkillRuntime: ISkillRuntime
         VisualData = template.VisualData;
         Cooldown = template.Cooldown;
         SkillTargetType = template.TargetType;
-        DetectStrategy = template.DetectType switch {
-            SkillDetectType.Circle => new Circle_DetectStrategy(template.DetectRadius),
+        Detector = template.DetectorType switch {
+            SkillDetectorType.Circle => new Circle_Detector(template.DetectRadius),
             //SkillDetectType.Cone => new SkillDetectStrategy_Cone(self, template.ConeRadius, template.DetectAngle),
             //SkillDetectType.GlobalClosest => new SkillDetectStrategy_GlobalClosest(self),
             _ => null

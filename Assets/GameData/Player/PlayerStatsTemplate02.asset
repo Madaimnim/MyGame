@@ -28,7 +28,7 @@ MonoBehaviour:
     DeathSFX: {fileID: 0}
     NormalMaterial: {fileID: 2100000, guid: ce71ba01014fe3043971f56059a6c29d, type: 2}
     FlashMaterial: {fileID: 2100000, guid: 343628f4e759ecf46b917b0ca0685d23, type: 2}
-  MaxHp: 1
+  MaxHp: 5
   SkillSlotCount: 4
   CanRespawn: 1
   MoveStrategyType: 3
@@ -51,7 +51,7 @@ MonoBehaviour:
       FlashMaterial: {fileID: 0}
     Cooldown: 0.1
     TargetType: 0
-    DetectType: 1
+    DetectorType: 1
     DetectRadius: 10
     RangeX: 20
     RangeY: 1

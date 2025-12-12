@@ -1,6 +1,5 @@
 using System;
 using System.Collections.Generic;
-using System.Runtime.CompilerServices;
 using TMPro;
 using UnityEngine;
 using System.Linq;
@@ -17,6 +16,7 @@ public class SkillComponent
     private AnimationComponent _animationComponent;
     private SpawnerComponent _spawner;
     private Transform _transform;
+    private DetectorSpriteSpawner _detectorSpriteSpawner;
 
     //技能暫存狀態
     private int _pendingSlotIndex=-1;
@@ -25,7 +25,7 @@ public class SkillComponent
 
     public SkillSlot[] SkillSlots;
     public bool HasAnyTarget =>
-        SkillSlots.Any(slot => slot.HasSkill && slot.DetectStrategy != null && slot.DetectStrategy.HasTarget);
+        SkillSlots.Any(slot => slot.HasSkill && slot.Detector != null && slot.Detector.HasTarget);
 
     public event Action OnSkillsChanged; // (slot, skillId, runtime)
     public event Action<int, ISkillRuntime> OnSkillUsed;         // (slot, runtime)
@@ -45,6 +45,9 @@ public class SkillComponent
         _animationComponent = animationComponent;
         _spawner = new SpawnerComponent();
         _transform = transform;
+
+
+        _detectorSpriteSpawner = new DetectorSpriteSpawner();
 
         SkillSlots = new SkillSlot[SkillSlotCount];
         for (int i = 0; i < SkillSlotCount; i++)
@@ -127,7 +130,7 @@ public class SkillComponent
 
     public void EquipSkill(int slotIndex, int skillId) {
         SkillSlots[slotIndex].Uninstall();
-        SkillSlots[slotIndex].SetSlot(skillId, _skillPool[skillId].DetectStrategy);
+        SkillSlots[slotIndex].SetSlot(skillId, _skillPool[skillId].Detector);
 
         //發事件
         OnSkillsChanged?.Invoke();

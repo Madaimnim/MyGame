@@ -48,7 +48,8 @@ public class SkillHitComponent {
 
     private void Hit(IInteractable target, Collider2D targetCol) {
         Vector2 hitPoint = GetHitEffectPosition(targetCol);
-        VFXManager.Instance.Play("DamageEffect01", hitPoint, targetCol.GetComponent<SpriteRenderer>());
+        if(target as Enemy)
+            VFXManager.Instance.Play("DamageEffect01", hitPoint, targetCol.GetComponent<SpriteRenderer>());
         target.Interact(new InteractInfo {
             Source = _owner.transform,
             Damage = _damage,

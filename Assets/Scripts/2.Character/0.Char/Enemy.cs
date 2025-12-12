@@ -39,11 +39,7 @@ public class Enemy :MonoBehaviour,IInteractable, IAnimationEventOwner
     {
         //註冊UI:顯示血量、技能冷卻
         if (GameManager.Instance != null)GameManager.Instance.EnemyStateSystem.RegisterEnemy(this);
-        if (EnemyListManager.Instance != null) {
-            Debug.Log($"註冊目標至TargetListManager: {this}");
-            EnemyListManager.Instance.Register(this);
-        }
-
+        if (EnemyListManager.Instance != null)EnemyListManager.Instance.Register(this);
     }
     private void Start()
     {

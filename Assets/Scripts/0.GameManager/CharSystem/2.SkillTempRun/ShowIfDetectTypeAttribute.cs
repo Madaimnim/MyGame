@@ -1,9 +1,9 @@
 using UnityEngine;
 
 public class ShowIfDetectTypeAttribute : PropertyAttribute {
-    public SkillDetectType ExpectedType;
+    public SkillDetectorType ExpectedType;
 
-    public ShowIfDetectTypeAttribute(SkillDetectType type) {
+    public ShowIfDetectTypeAttribute(SkillDetectorType type) {
         ExpectedType = type;
     }
 }

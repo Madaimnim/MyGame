@@ -636,6 +636,8 @@ GameObject:
   - component: {fileID: 164891986}
   - component: {fileID: 164891985}
   - component: {fileID: 164891996}
+  - component: {fileID: 164891998}
+  - component: {fileID: 164891997}
   m_Layer: 0
   m_Name: "\u5168\u57DFGameManager"
   m_TagString: Untagged
@@ -775,6 +777,36 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   LineRenderer: {fileID: 362815880}
   allowManualControl: 0
+--- !u!114 &164891997
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 164891984}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b8093ea0e38edd64cb4154a68bd497f3, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  updateInterval: 0.1
+  GUIfontSize: 40
+  GUISize: {x: 500, y: 200}
+--- !u!114 &164891998
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 164891984}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 46827bbd3cdfc4e4bace267ff9bed77d, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  updateInterval: 0.1
+  GUIfontSize: 40
+  GUISize: {x: 500, y: 200}
 --- !u!1 &218569378
 GameObject:
   m_ObjectHideFlags: 0

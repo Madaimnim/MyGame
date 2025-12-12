@@ -121,10 +121,10 @@ MonoBehaviour:
   material: {fileID: -1850032780081935836}
   materialHashCode: -592683161
   m_Version: 1.1.0
-  m_SourceFontFileGUID: 997a43b767814dd0a7642ec9b78cba41
-  m_SourceFontFile_EditorRef: {fileID: 12800000, guid: 997a43b767814dd0a7642ec9b78cba41, type: 3}
-  m_SourceFontFile: {fileID: 0}
-  m_AtlasPopulationMode: 0
+  m_SourceFontFileGUID: b9556539d0429894199d9f2bbb87c221
+  m_SourceFontFile_EditorRef: {fileID: 12800000, guid: b9556539d0429894199d9f2bbb87c221, type: 3}
+  m_SourceFontFile: {fileID: 12800000, guid: 997a43b767814dd0a7642ec9b78cba41, type: 3}
+  m_AtlasPopulationMode: 1
   m_FaceInfo:
     m_FaceIndex: 0
     m_FamilyName: Anton
@@ -2681,7 +2681,7 @@ Texture2D:
   m_MipsStripped: 0
   m_TextureFormat: 1
   m_MipCount: 1
-  m_IsReadable: 0
+  m_IsReadable: 1
   m_IsPreProcessed: 0
   m_IgnoreMasterTextureLimit: 0
   m_StreamingMipmaps: 0

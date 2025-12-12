@@ -15,9 +15,9 @@ public class Action_AttackAllSlots : Node
         {
             var slot = _skillComponent.SkillSlots[i];
             if (slot == null || slot.SkillId ==-1) continue;
-            if (!slot.IsReady || slot.DetectStrategy == null || !slot.DetectStrategy.HasTarget) continue;
+            if (!slot.IsReady || slot.Detector == null || !slot.Detector.HasTarget) continue;
      
-            _aiComponent.SetIntentSkill(_skillComponent,i, slot.DetectStrategy.TargetTransform.position, slot.DetectStrategy.TargetTransform);
+            _aiComponent.SetIntentSkill(_skillComponent,i, slot.Detector.TargetTransform.position, slot.Detector.TargetTransform);
             return NodeState.SUCCESS;
         }
 

@@ -6,7 +6,8 @@ public class SkillSlot
 {
     public int SkillId { get; private set; } = -1;
     public float CooldownTimer { get; private set; }
-    public SkillDetectStrategyBase DetectStrategy { get; private set; }
+    public SkillDetectorBase Detector { get; private set; }
+    public GameObject RangeObject;
 
     public bool HasSkill => SkillId  != -1;   //-1 代表無技能;
     public bool IsReady => SkillId != -1 && CooldownTimer <= 0f;
@@ -17,21 +18,27 @@ public class SkillSlot
     public SkillSlot(Transform owner, IReadOnlyList<IInteractable> targetList) {
         SkillId = -1;
         CooldownTimer = 0f;
-        DetectStrategy = null;
-        _owner= owner;
+        Detector = null;
+
+        _owner = owner;
         _targetList= targetList;
     }
 
     public void Tick() {
-        if(DetectStrategy!=null) DetectStrategy.DetectTargetsTick(_targetList);
+        if(Detector != null) Detector.DetectTargetsTick(_targetList);
         TickCooldown();
     }
 
-    public void SetSlot(int skillId,SkillDetectStrategyBase detectStrategy = null) {
+    public void SetSlot(int skillId,SkillDetectorBase detectStrategy = null) {
         SkillId = skillId;
-        DetectStrategy = detectStrategy;
-        DetectStrategy.Initialize(_owner);
+        Detector = detectStrategy;
         CooldownTimer = 0f;
+        Detector.Initialize(_owner);
+
+        if (RangeObject != null) GameObject.Destroy(RangeObject);
+        RangeObject = Detector.SpawnRangeObject(_owner);
+        RangeObject.transform.SetParent(_owner);
+        RangeObject.transform.localPosition = Vector3.zero;
     }
     public void TriggerCooldown(float cd) {
         if (SkillId == -1) return;
@@ -43,7 +50,7 @@ public class SkillSlot
     public void Uninstall() {
         SkillId = -1;
         CooldownTimer = 0f;
-        DetectStrategy = null;
+        Detector = null;
     }
 
 }

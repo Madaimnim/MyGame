@@ -19,7 +19,7 @@ public class ShowIfDetectTypeDrawer : PropertyDrawer {
 
         //3取出屬性標籤與當前類型
         var showIf = (ShowIfDetectTypeAttribute)attribute;
-        SkillDetectType currentType = (SkillDetectType)detectTypeProp.enumValueIndex;
+        SkillDetectorType currentType = (SkillDetectorType)detectTypeProp.enumValueIndex;
 
         //3條件符合才畫
         if (currentType == showIf.ExpectedType) {
@@ -34,7 +34,7 @@ public class ShowIfDetectTypeDrawer : PropertyDrawer {
             return EditorGUI.GetPropertyHeight(property, label, true);
 
         var showIf = (ShowIfDetectTypeAttribute)attribute;
-        SkillDetectType currentType = (SkillDetectType)detectTypeProp.enumValueIndex;
+        SkillDetectorType currentType = (SkillDetectorType)detectTypeProp.enumValueIndex;
 
         return currentType == showIf.ExpectedType
             ? EditorGUI.GetPropertyHeight(property, label, true)

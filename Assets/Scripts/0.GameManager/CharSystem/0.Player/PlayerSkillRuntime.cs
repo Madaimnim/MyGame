@@ -9,7 +9,7 @@ public class PlayerSkillRuntime: ISkillRuntime
     public VisualData VisualData { get; set; }
     public float Cooldown { get; set; }
     public SkillTargetType SkillTargetType { get; set; }
-    public SkillDetectStrategyBase DetectStrategy { get; set; }
+    public SkillDetectorBase Detector { get; set; }
 
     //Player¿W¦³
     public int SkillLevel;
@@ -23,9 +23,9 @@ public class PlayerSkillRuntime: ISkillRuntime
         Cooldown = template.Cooldown;
         SkillTargetType = template.TargetType;
 
-        DetectStrategy = template.DetectType switch {
-            SkillDetectType.Circle => new Circle_DetectStrategy(template.DetectRadius),
-            SkillDetectType.Box => new Box_DetectStrategy(template.RangeX, template.RangeY),
+        Detector = template.DetectorType switch {
+            SkillDetectorType.Circle => new Circle_Detector(template.DetectRadius),
+            SkillDetectorType.Box => new Box_Detector(template.RangeX, template.RangeY),
             //SkillDetectType.GlobalClosest => new SkillDetectStrategy_GlobalClosest(self),
             _ => null
         };

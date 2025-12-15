@@ -105,7 +105,8 @@ public class SkillObject : MonoBehaviour, IInteractable {
         else if (angle < -90)                   // 左下象限 (-180°~-90°)
             displayAngle = 180f + angle;  // 例如 -135° → -45°
 
-        transform.rotation = Quaternion.Euler(0f, 0f, displayAngle);
+        sprCol.transform.RotateAround(sprCol.bounds.center, Vector3.forward, displayAngle - sprCol.transform.eulerAngles.z);
+        //sprCol.transform.rotation = Quaternion.Euler(0f, 0f, displayAngle);
     }
     //Todo
     public void Interact(InteractInfo info) {

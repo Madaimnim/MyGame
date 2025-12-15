@@ -41,10 +41,6 @@ MonoBehaviour:
     m_Address: Start
     m_ReadOnly: 0
     m_SerializedLabels: []
-  - m_GUID: 18ccb24373b677048b052799ccb9e5fc
-    m_Address: Battle1-3
-    m_ReadOnly: 0
-    m_SerializedLabels: []
   m_ReadOnly: 0
   m_Settings: {fileID: 11400000, guid: 5bcd75c2e1e39cb4ba0251a218d21fad, type: 2}
   m_SchemaSet:

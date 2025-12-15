@@ -7,15 +7,20 @@ public class HeightComponent
 {
     public bool IsGrounded { get; private set; }
 
+    float _initialHeightY;
+    float _recoverSpeed ;
     Transform _sprTransform;
     MonoBehaviour _runner;
-    Coroutine _floatCoroutine;
-    float _groundY = float.NaN;
 
-    public HeightComponent(Transform transform, MonoBehaviour runner)
+    Coroutine _floatCoroutine;
+    Coroutine _recoverHeightCoroutine;
+
+    public HeightComponent(Transform transform, MonoBehaviour runner,float initialHeightY,float recoverSpeed)
     {
         _sprTransform = transform;
         _runner = runner;
+        _initialHeightY= initialHeightY;
+        _recoverSpeed = recoverSpeed;
     }
 
     public void FloatUp(float floatPower)
@@ -30,10 +35,6 @@ public class HeightComponent
     private IEnumerator FloatCoroutine(float floatPower)
     {
         IsGrounded = false;
-        // 若是第一次被擊飛，記錄地面高度
-        if (float.IsNaN(_groundY)) _groundY = _sprTransform.localPosition.y;
-
-        float baseY = _groundY;
 
         // ======= 物理參數 =======
         float gravity = PhysicManager.Instance.PhysicConfig.GravityScale;                 //重力加速度
@@ -43,21 +44,40 @@ public class HeightComponent
         while (true)
         {
             var deltaTime = Time.deltaTime;
-            // 垂直速度逐漸被重力拉低
             verticalVelocity -= gravity * deltaTime;
-
             _sprTransform.localPosition += new Vector3(0,verticalVelocity * deltaTime);
 
-            // 偵測是否回到地面以下（表示落地）
-            if (_sprTransform.localPosition.y <= baseY ) break;
-           
+            if(_sprTransform.localPosition.y <= 0 ) break;
             yield return null;
         }
 
-        // ======= 落地校正 =======
-        _sprTransform.localPosition = new Vector3(_sprTransform.localPosition.x, _groundY);
-
+        RecoverHeight(_recoverSpeed);
         IsGrounded = true;
-        _groundY = float.NaN;
     }
+
+    public void RecoverHeight(float speed) {
+        if (_recoverHeightCoroutine != null) {
+            _runner.StopCoroutine(_recoverHeightCoroutine);
+            _recoverHeightCoroutine = null;
+        }
+
+        _recoverHeightCoroutine = _runner.StartCoroutine(RecoverHeightCoroutine(speed)
+        );
+    }
+    private IEnumerator RecoverHeightCoroutine(float speed) {
+        while (true) {
+            float currentY = _sprTransform.localPosition.y;
+
+            if (Mathf.Approximately(currentY, _initialHeightY))break;
+
+            float newY = Mathf.MoveTowards(currentY,_initialHeightY,speed * Time.deltaTime);
+            _sprTransform.localPosition = new Vector3(_sprTransform.localPosition.x,newY,_sprTransform.localPosition.z);
+
+            yield return null;
+        }
+
+        _recoverHeightCoroutine = null;
+        IsGrounded = true;
+    }
+
 }

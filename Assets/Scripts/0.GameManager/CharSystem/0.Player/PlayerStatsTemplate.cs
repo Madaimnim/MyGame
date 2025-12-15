@@ -10,6 +10,11 @@ public enum MoveStrategyType {
     Flee
 }
 
+public enum PlayerBehaviourTreeType {
+    NearTargetAttackFirst,
+    DefensiveAttack
+}
+
 [CreateAssetMenu(fileName ="PlayerStatsTemplate",menuName="GameData/PlayerStatsTemplate")]
 public class PlayerStatsTemplate:ScriptableObject
 {
@@ -18,6 +23,7 @@ public class PlayerStatsTemplate:ScriptableObject
     public int MaxHp;
     public int SkillSlotCount;
     public bool CanRespawn=true;
+    public PlayerBehaviourTreeType PlayerBehaviourTreeType;
     public MoveStrategyType MoveStrategyType;
     [FormerlySerializedAs("SkillTemplateList")]
     public List<SkillTemplate> SkillTemplateList = new List<SkillTemplate>();

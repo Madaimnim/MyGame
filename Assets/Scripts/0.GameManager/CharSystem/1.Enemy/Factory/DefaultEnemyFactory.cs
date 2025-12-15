@@ -11,7 +11,6 @@ public class DefaultEnemyFactory
         ob.transform.localPosition = Vector3.zero;
 
         enemy.Initialize(new EnemyStatsRuntime(tp));
-
         return enemy;
     }
 }

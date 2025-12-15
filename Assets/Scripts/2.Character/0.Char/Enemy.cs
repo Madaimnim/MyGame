@@ -17,6 +17,7 @@ public class Enemy :MonoBehaviour,IInteractable, IAnimationEventOwner
     [HideInInspector] public SpriteRenderer Spr;
     //模組化 --------------------------------------------------------------------------------------------------------------------------------------------------------------------------
     public EnemyStatsRuntime Rt { get; private set; }
+    public ActionLockComponent ActionLockComponent { get; private set; }
     public HealthComponent HealthComponent { get; private set; }
     public RespawnComponent RespawnComponent { get; private set; }
     public AnimationComponent AnimationComponent { get; private set; }
@@ -28,12 +29,20 @@ public class Enemy :MonoBehaviour,IInteractable, IAnimationEventOwner
     public HeightComponent HeightComponent { get; private set; }
     public bool IsDead => HealthComponent.IsDead;
     public Vector2 MoveVelocity => MoveComponent.IntentDirection * MoveComponent.MoveSpeed;
+    
     private Transform _lastInteractSource;
+    private float _initialHeightY ;
+
+    //識別ID--------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+    [Header("手動ID初始化")]public int id; //在Inspector設定敵人ID以載入數據
+    private bool _initialized = false;       //確保初始化一次
+
     private void Awake()
     {
         Rb = GetComponent<Rigidbody2D>();
         Spr = GetComponentInChildren<SpriteRenderer>();
         Ani = GetComponentInChildren<Animator>();
+        _initialHeightY = Spr.transform.localPosition.y;
     }
     private void OnEnable()
     {
@@ -48,21 +57,27 @@ public class Enemy :MonoBehaviour,IInteractable, IAnimationEventOwner
     private void Update()
     {
         if (MoveComponent != null && !IsDead) SetFacingLeft(MoveComponent.IntentDirection);
-        if (SkillComponent != null) SkillComponent.Tick();
         if (AnimationComponent != null) AnimationTick();
+        if (SkillComponent != null) SkillComponent.Tick();
         if (AIComponent != null) AIComponent.Tick();
+
+        SkillComponent.TickCooldownTimer();
     }
     private void FixedUpdate()
     {
-        MoveComponent.Tick();
+        if (!ActionLockComponent.IsLocked) MoveComponent.Tick();
     }
     public void Initialize(EnemyStatsRuntime stats) {
+        if (_initialized) return;
+        _initialized = true;
+  
         Rt = stats;
 
         //注意依賴順序
+        ActionLockComponent = new ActionLockComponent(this);
         HealthComponent = new HealthComponent(Rt);
         AnimationComponent = new AnimationComponent(Ani, transform, Rb);
-        HeightComponent = new HeightComponent(Spr.transform, this);
+        HeightComponent = new HeightComponent(Spr.transform, this,_initialHeightY,Rt.StatsData.MoveSpeed);
 
         EffectComponent = new EffectComponent(Rt.VisualData, transform, this, Spr, HealthComponent);
 
@@ -72,7 +87,10 @@ public class Enemy :MonoBehaviour,IInteractable, IAnimationEventOwner
         SkillComponent = new SkillComponent(Rt.StatsData, Rt.SkillSlotCount,Rt.SkillPool, AnimationComponent, transform,PlayerListManager.Instance.TargetList);
         AIComponent = new AIComponent(SkillComponent, MoveComponent, transform,Rt.MoveStrategy);
 
+
         //額外初始化設定
+        BehaviorTree behaviourTree =EnemyBehaviourTreeFactory.Create(Rt.EnemyBehaviourTreeType, AIComponent, MoveComponent, SkillComponent, Rt.MoveStrategy);
+        AIComponent.SetBehaviorTree(behaviourTree);
         AnimationComponent.Initial(MoveComponent);
 
         //事件訂閱
@@ -83,7 +101,6 @@ public class Enemy :MonoBehaviour,IInteractable, IAnimationEventOwner
         {
             GameEventSystem.Instance.Event_BattleStart += AIComponent.EnableAI;
             GameEventSystem.Instance.Event_OnWallBroken += AIComponent.DisableAI;
-            GameEventSystem.Instance.Event_BattleStart += RespawnComponent.EnableRespawn;
             GameEventSystem.Instance.Event_OnWallBroken += RespawnComponent.DisableRespawn;
         }
 
@@ -97,6 +114,7 @@ public class Enemy :MonoBehaviour,IInteractable, IAnimationEventOwner
         if (SkillComponent.IntentSlotIndex >= 0) return;
         if (HealthComponent.IsDead) return;
 
+        if (ActionLockComponent.IsLocked) return;
         if (MoveComponent.IsMoving ) AnimationComponent.PlayMove();
     }
 
@@ -107,6 +125,9 @@ public class Enemy :MonoBehaviour,IInteractable, IAnimationEventOwner
         EffectComponent.TakeDamageEffect(info.Damage);
         MoveComponent.Knockbacked(info.KnockbackForce, info.Source);
         HeightComponent.FloatUp(info.FloatPower);
+        ActionLockComponent.LockAction(0.5f);
+        AnimationComponent.PlayHurt();
+
     }
     public void AnimationEvent_SpawnerSkill() {
         SkillComponent.UseSkill();
@@ -125,8 +146,8 @@ public class Enemy :MonoBehaviour,IInteractable, IAnimationEventOwner
         if (_lastInteractSource != null)
         {
             Vector2 dir = _lastInteractSource.position - transform.position;
-            Debug.Log($"敵人死亡面相更新來源:{dir}");
             SetFacingLeft(dir); // 重用你現有的方向翻轉方法
+            //Debug.Log($"敵人死亡面相更新來源:{dir}");
         }
 
         foreach (var col in GetComponentsInChildren<Collider2D>())
@@ -169,7 +190,7 @@ public class Enemy :MonoBehaviour,IInteractable, IAnimationEventOwner
             s.x = (direction.x < 0f) ? mag : -mag;
             transform.localScale = s;
 
-            if (IsDead) Debug.Log($"更新敵人死亡面相:{transform.localScale}，");
+            //if (IsDead) Debug.Log($"更新敵人死亡面相:{transform.localScale}，");
         }
     }
 }

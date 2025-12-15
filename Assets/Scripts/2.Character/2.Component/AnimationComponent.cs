@@ -45,6 +45,15 @@ public class AnimationComponent
         }
     }
 
+
+    public void PlayIdle() =>PlayAnimationIfExists("Idle");
+    public void PlayMove() =>PlayAnimationIfExists("Move");
+    public void PlayDie() => PlayAnimationIfExists("Die");
+    public void PlayHurt() => PlayAnimationIfExists("Hurt");
+    public void PlayRecover() => PlayAnimationIfExists("Recover");
+
+    public void Play(string name) => _ani.Play(Animator.StringToHash(name));
+
     public void FaceDirection(Vector2 direction) {
         if (direction.x == 0) return;
 
@@ -56,17 +65,13 @@ public class AnimationComponent
         );
     }
 
+    //確認動畫是否存在
+    public void PlayAnimationIfExists(string stateName, int layer = 0) {
+        int hash = Animator.StringToHash(stateName);
 
-    public void PlayIdle() =>_ani.Play(Animator.StringToHash("Idle"));
-    public void PlayMove() =>_ani.Play(Animator.StringToHash("Move"));
-    //public void PlayDie() => _ani.Play(Animator.StringToHash("Die"));
+        if (!_ani.HasState(layer, hash))
+            return;
 
-    public void PlayDie() { 
-        Debug.Log("播放死亡動畫");
-        _ani.Play(Animator.StringToHash("Die")); 
+        _ani.Play(hash, layer);
     }
-    
-    public void Play(string name) => _ani.Play(Animator.StringToHash(name));
-
-
 }

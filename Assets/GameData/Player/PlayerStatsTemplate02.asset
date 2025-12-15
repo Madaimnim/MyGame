@@ -31,6 +31,7 @@ MonoBehaviour:
   MaxHp: 5
   SkillSlotCount: 4
   CanRespawn: 1
+  PlayerBehaviourTreeType: 0
   MoveStrategyType: 3
   SkillTemplateList:
   - StatsData:
@@ -40,7 +41,7 @@ MonoBehaviour:
       Power: 1
       MoveSpeed: 3
       KnockbackPower: 0.5
-      FloatPower: 0
+      FloatPower: 3
       Weight: 0
     VisualData:
       Prefab: {fileID: 1868301516382297822, guid: e9482e1a632b9db42abfad2b78ec208a, type: 3}

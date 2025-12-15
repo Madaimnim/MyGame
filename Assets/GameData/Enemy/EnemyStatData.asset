@@ -15,3 +15,5 @@ MonoBehaviour:
   enemyStatsTemplateList:
   - {fileID: 11400000, guid: e47930c6131e52a4fb220b522d4a4c62, type: 2}
   - {fileID: 11400000, guid: 3a20a4ae3e565f249904032c2b0abb5a, type: 2}
+  - {fileID: 11400000, guid: 499a4ee40b9df91449bd90e6b8832e27, type: 2}
+  - {fileID: 11400000, guid: d0c88dc47c5c44d4880aa784362041e8, type: 2}

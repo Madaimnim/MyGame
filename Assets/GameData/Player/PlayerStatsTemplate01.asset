@@ -31,6 +31,7 @@ MonoBehaviour:
   MaxHp: 5
   SkillSlotCount: 4
   CanRespawn: 1
+  PlayerBehaviourTreeType: 0
   MoveStrategyType: 3
   SkillTemplateList:
   - StatsData:
@@ -51,8 +52,8 @@ MonoBehaviour:
       FlashMaterial: {fileID: 0}
     Cooldown: 0.1
     TargetType: 0
-    DetectType: 0
-    DetectRadius: 3
+    DetectorType: 0
+    DetectRadius: 5
     RangeX: 0
     RangeY: 0
   - StatsData:
@@ -73,7 +74,7 @@ MonoBehaviour:
       FlashMaterial: {fileID: 0}
     Cooldown: 0.5
     TargetType: 1
-    DetectType: 0
+    DetectorType: 0
     DetectRadius: 3
     RangeX: 0
     RangeY: 0

@@ -92,6 +92,11 @@ public class SkillMoveComponent {
         _transform.position += (Vector3)(MoveDirection * MoveSpeed * Time.deltaTime);
     }
     private void ParabolaTowardTick() {
+        if (_sprCol == null) {
+            Debug.LogError("[SkillMove] sprCol destroyed during Tick");
+            return;
+        }
+
         _transform.position += (Vector3)(MoveDirection * MoveSpeed * Time.deltaTime);
 
         if (_sprCol.transform.localPosition.y < 0) {

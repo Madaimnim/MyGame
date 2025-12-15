@@ -25,11 +25,7 @@ public class EnemyStateSystem :SubSystemBase
     public EnemyStateSystem(GameManager gm) : base(gm) { }
 
     public override void Initialize() {
-        SpawnSystem = new EnemySpawnSystem(
-               new DefaultEnemyFactory(),
-               new DropBounceSpawnEffect(),
-               new CoroutineRunnerAdapter(GameManager)
-           );
+        SpawnSystem = new EnemySpawnSystem(new DefaultEnemyFactory(),new DropBounceSpawnEffect(),new CoroutineRunnerAdapter(GameManager));
         SkillSystem = new EnemySkillSystem();
     }
 

@@ -7,8 +7,6 @@ public class StageLevelManager : MonoBehaviour
     public static StageLevelManager Instance { get; private set; }
     private int enemyCount; //當前關卡敵人的數量
 
-    //生命週期
-    #region
     private void Awake() {
         if (Instance != null && Instance != this)
         {
@@ -18,7 +16,6 @@ public class StageLevelManager : MonoBehaviour
         Instance = this;
         enemyCount = 0;
     }
-
     private void OnEnable() {
         GameEventSystem.Instance.Event_OnPlayerDie += RespawnPlayer;
         GameEventSystem.Instance.Event_OnWallBroken += WallBroken;
@@ -28,10 +25,10 @@ public class StageLevelManager : MonoBehaviour
         GameEventSystem.Instance.Event_OnPlayerDie -= RespawnPlayer;
         GameEventSystem.Instance.Event_OnWallBroken -= WallBroken;
     }
-    #endregion
 
-    //當玩家死亡
-    #region
+
+
+    #region  玩家死亡
     private void RespawnPlayer(IInteractable player) {
         //LevelDefeat();
         StartCoroutine(RespawnPlayerCoroutine(player as Player,3));
@@ -51,9 +48,7 @@ public class StageLevelManager : MonoBehaviour
 
     #endregion
 
-
-    //當城牆毀壞
-    #region
+    #region 當城牆毀壞
     private void WallBroken() {
         LevelDefeat();
     }
@@ -66,7 +61,6 @@ public class StageLevelManager : MonoBehaviour
     }
     #endregion
 
-    //註冊敵人死亡
     #region 註冊敵人死亡
     public void EnemyDefeated() {
         enemyCount--;
@@ -78,7 +72,6 @@ public class StageLevelManager : MonoBehaviour
     }
     #endregion
 
-    //通關成功
     #region LevelClear()
     private void LevelClear() {
         TextPopupManager.Instance.ShowStageClearPopup();
@@ -88,7 +81,6 @@ public class StageLevelManager : MonoBehaviour
     }
     #endregion
 
-    //通關失敗
     #region  LevelDefeat()
     private void LevelDefeat() {
         Debug.Log("觸發Defeat跳躍字體");

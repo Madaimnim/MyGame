@@ -22,6 +22,7 @@ public class Player : MonoBehaviour, IInteractable, IAnimationEventOwner
     [HideInInspector] public SpriteRenderer Spr;
     //模組化 --------------------------------------------------------------------------------------------------------------------------------------------------------------------------
     public PlayerStatsRuntime Rt { get; private set; }
+    public ActionLockComponent ActionLockComponent { get; private set; }
     public HealthComponent HealthComponent { get; private set; }
     public RespawnComponent RespawnComponent { get; private set; }
     public AnimationComponent AnimationComponent { get; private set; }
@@ -35,12 +36,14 @@ public class Player : MonoBehaviour, IInteractable, IAnimationEventOwner
     public bool IsDead => HealthComponent.IsDead;
     public Vector2 MoveVelocity=>MoveComponent.IntentDirection * MoveComponent.MoveSpeed;
     private Transform _lastInteractSource;
+    private float _initialHeightY;
 
     private void Awake()
     {
         Rb = GetComponent<Rigidbody2D>();
         Spr = GetComponentInChildren<SpriteRenderer>();
         Ani = GetComponentInChildren<Animator>();
+        _initialHeightY = Spr.transform.localPosition.y;
     }
     private void OnEnable()
     {
@@ -65,6 +68,7 @@ public class Player : MonoBehaviour, IInteractable, IAnimationEventOwner
         if (AnimationComponent != null) AnimationTick();
 
         if (InputProvider != PlayerInputManager.Instance && AIComponent != null) AIComponent.Tick();
+        SkillComponent.TickCooldownTimer();
     }
     private void FixedUpdate()
     {
@@ -75,9 +79,10 @@ public class Player : MonoBehaviour, IInteractable, IAnimationEventOwner
         Rt = stats;
 
         //注意依賴順序
+        ActionLockComponent = new ActionLockComponent(this);
         HealthComponent = new HealthComponent(Rt);
         AnimationComponent = new AnimationComponent(Ani, transform, Rb);
-        HeightComponent = new HeightComponent(Spr.transform, this);
+        HeightComponent = new HeightComponent(Spr.transform, this, _initialHeightY,Rt.StatsData.MoveSpeed);
         EffectComponent = new EffectComponent(Rt.VisualData, transform, this, Spr, HealthComponent);
         RespawnComponent = new RespawnComponent(this, Rt.CanRespawn);
         MoveComponent = new MoveComponent(Rb, Rt.StatsData.MoveSpeed, this, MoveDetector, AnimationComponent,HeightComponent);
@@ -87,6 +92,8 @@ public class Player : MonoBehaviour, IInteractable, IAnimationEventOwner
         AIComponent = new AIComponent(SkillComponent, MoveComponent, transform, Rt.MoveStrategy);
         GrowthComponent = new GrowthComponent(Rt);
         //額外初始化設定
+        BehaviorTree behaviourTree = PlayerBehaviourTreeFactory.Create(Rt.PlayerBehaviourTreeType, AIComponent, MoveComponent, SkillComponent, Rt.MoveStrategy);
+        AIComponent.SetBehaviorTree(behaviourTree);
         AnimationComponent.Initial(MoveComponent);
 
         //事件訂閱
@@ -123,10 +130,9 @@ public class Player : MonoBehaviour, IInteractable, IAnimationEventOwner
     }
     public void AnimationTick()
     {
-        if (!AnimationComponent.IsPlayingAttackAnimation &&
-            MoveComponent.IsMoving &&
-            SkillComponent.IntentSlotIndex < 0)
+        if (ActionLockComponent.IsLocked) return;
 
+        if (!AnimationComponent.IsPlayingAttackAnimation && MoveComponent.IsMoving && SkillComponent.IntentSlotIndex < 0)
             AnimationComponent.PlayMove();
     }
 

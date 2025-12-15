@@ -19,7 +19,8 @@ MonoBehaviour:
     Power: 1
     MoveSpeed: 2
     KnockbackPower: 1
-    KnockbackResistance: 0
+    FloatPower: 0
+    Weight: 0
   VisualData:
     Prefab: {fileID: 4738781730734430214, guid: 6561cd463a9afda43a6d7c34ef0a5e52, type: 3}
     DetectPrefab: {fileID: 0}
@@ -27,8 +28,10 @@ MonoBehaviour:
     DeathSFX: {fileID: 0}
     NormalMaterial: {fileID: 2100000, guid: ce71ba01014fe3043971f56059a6c29d, type: 2}
     FlashMaterial: {fileID: 2100000, guid: 343628f4e759ecf46b917b0ca0685d23, type: 2}
-  Exp: 1
+  MaxHp: 0
   SkillSlotCount: 0
+  Exp: 1
+  CanRespawn: 0
   SkillTemplateList:
   - StatsData:
       Id: 1
@@ -37,7 +40,8 @@ MonoBehaviour:
       Power: 1
       MoveSpeed: 1
       KnockbackPower: 1
-      KnockbackResistance: 0
+      FloatPower: 0
+      Weight: 0
     VisualData:
       Prefab: {fileID: 0}
       DetectPrefab: {fileID: 0}
@@ -46,4 +50,10 @@ MonoBehaviour:
       NormalMaterial: {fileID: 0}
       FlashMaterial: {fileID: 0}
     Cooldown: 1
+    TargetType: 0
+    DetectorType: 0
+    DetectRadius: 0
+    RangeX: 0
+    RangeY: 0
+  EnemyBehaviourTreeType: 1
   MoveStrategyType: 0

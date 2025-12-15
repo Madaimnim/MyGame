@@ -59,7 +59,7 @@ public class PlayerInputManager : MonoBehaviour, IInputProvider {
         Collider2D hit = Physics2D.OverlapPoint(mouseWorldPos, layerMask);
 
         if (hit == null) return;
-        var player = hit.GetComponent<Player>();
+        var player = hit.GetComponentInParent<Player>();
         SelectPlayer(player);
     }
 
@@ -107,7 +107,7 @@ public class PlayerInputManager : MonoBehaviour, IInputProvider {
         Collider2D[] hits = Physics2D.OverlapAreaAll(min, max, LayerMask.GetMask("Player"));
 
         foreach (var hit in hits) {
-            var p = hit.GetComponent<Player>();
+            var p = hit.GetComponentInParent<Player>();
             if (p != null)
                 _selectedPlayerList.Add(p);
         }

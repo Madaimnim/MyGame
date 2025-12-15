@@ -2,7 +2,7 @@ using System.Threading;
 using UnityEditor.PackageManager.Requests;
 using UnityEngine;
 
-public class Action_Move : Node
+public class Action_MoveAttempt : Node
 {
     private AIComponent _ai;
     private MoveComponent _moveComp;
@@ -31,7 +31,7 @@ public class Action_Move : Node
     private const float STUCK_INTERVAL = 0.2f ;         // 每 0.2 秒檢查一次
     private const float STUCK_RATIO_THRESHOLD = 0.5f; // 實際移動量低於50%算卡住
 
-    public Action_Move(AIComponent ai, MoveStrategyBase strategy,MoveComponent moveComponent, SkillComponent skillComponent, float moveTime) {
+    public Action_MoveAttempt(AIComponent ai, MoveStrategyBase strategy,MoveComponent moveComponent, SkillComponent skillComponent, float moveTime) {
         _ai = ai;
         _moveComp = moveComponent;
         _skillComponent = skillComponent;

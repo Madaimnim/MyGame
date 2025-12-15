@@ -80,6 +80,8 @@ public class GameManager : MonoBehaviour
 
         //發事件
         OnAllSubSystemReady?.Invoke();
+
+        UnityEngine.Random.InitState((int)System.DateTime.Now.Ticks);
     }
 
     private IEnumerator LoadEnemyStatsList()

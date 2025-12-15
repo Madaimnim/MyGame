@@ -52,7 +52,7 @@ public class TargetListManager:MonoBehaviour
     }
 
     public void Register(IInteractable interactable){
-        Debug.Log($"註冊目標: {interactable}");
+        //Debug.Log($"註冊目標: {interactable}");
         if (!_targetList.Contains(interactable)) _targetList.Add(interactable);
     }
     public void Unregister(IInteractable interactable)=> _targetList.Remove(interactable); 

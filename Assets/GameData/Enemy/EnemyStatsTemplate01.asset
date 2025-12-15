@@ -17,7 +17,7 @@ MonoBehaviour:
     Name: "\u7DA0\u8272\u679C\u51CD"
     Level: 1
     Power: 1
-    MoveSpeed: 3
+    MoveSpeed: 1
     KnockbackPower: 0
     FloatPower: 0
     Weight: 0
@@ -55,4 +55,5 @@ MonoBehaviour:
     DetectRadius: 2
     RangeX: 0
     RangeY: 0
+  EnemyBehaviourTreeType: 1
   MoveStrategyType: 0

@@ -23,10 +23,7 @@ public class AIComponent : IInputProvider
         _moveComponent = charMoveComponent;
         SelfTransform = self;
 
-        _behaviorTree = new BehaviorTree();
         _moveStrategy= movestrategy;
-
-        SetBehaviorTree();
     }
 
     public void Tick() {
@@ -41,19 +38,8 @@ public class AIComponent : IInputProvider
         }
         _updateTimer -= Time.deltaTime;
     }
-    private void SetBehaviorTree() {
-        // 第一層：移動流程 (先等待再移動)
-        var moveSequenceNodes = new List<Node>();
-        moveSequenceNodes.Add(new Action_Wait(0.5f));
-        moveSequenceNodes.Add(new Action_Move(this, _moveStrategy, _moveComponent, _skillComponent, 2f));
-        var moveSequence = new Sequence(moveSequenceNodes) ;
-        
-        // 第二層：整體選擇（先攻擊，否則執行移動流程）
-        var rootNodes = new List<Node>();
-        rootNodes.Add(new Action_AttackAllSlots(_skillComponent, this));
-        rootNodes.Add(moveSequence);
-
-        _behaviorTree.SetRoot(new Selector(rootNodes));
+    public void SetBehaviorTree(BehaviorTree behaviourTree) {
+        _behaviorTree = behaviourTree;
     }
 
     public void EnableAI() => CanRunAI = true;

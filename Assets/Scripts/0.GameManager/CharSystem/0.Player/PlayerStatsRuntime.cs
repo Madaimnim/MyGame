@@ -14,7 +14,9 @@ public class PlayerStatsRuntime : IHealthData
     public Dictionary<int, ISkillRuntime> SkillPool = new Dictionary<int, ISkillRuntime>();
     public List<int> UnlockedSkillIdList= new List<int>();
     public int[] ExpTable;
+    public PlayerBehaviourTreeType PlayerBehaviourTreeType;
     public MoveStrategyBase MoveStrategy;   //直接持有策略實例
+
     //Runtime-------------------------------------------------------------------------------------------------------
     public int CurrentHp { get; set; }
     public int Exp ;
@@ -32,7 +34,7 @@ public class PlayerStatsRuntime : IHealthData
             SkillPool[skill.StatsData.Id] = new PlayerSkillRuntime(skill);
         UnlockedSkillIdList = new List<int>(template.UnlockedSkillIdList);
         ExpTable = template.ExpTable;
-
+        PlayerBehaviourTreeType= template.PlayerBehaviourTreeType;
         MoveStrategy = template.MoveStrategyType switch {
             MoveStrategyType.Follow => new FollowMoveStrategy(),
             MoveStrategyType.Random => new RandomMoveStrategy(),

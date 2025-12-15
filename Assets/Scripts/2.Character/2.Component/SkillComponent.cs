@@ -56,7 +56,6 @@ public class SkillComponent
 
     public void Tick() {
         TryPlaySkillAnimation();
-        TickCooldownTimer();
     }
 
     private void TryPlaySkillAnimation() {
@@ -136,8 +135,7 @@ public class SkillComponent
         OnSkillsChanged?.Invoke();
     }
 
-    private void TickCooldownTimer() {
-        foreach (var slot in SkillSlots)
-            slot?.Tick();
+    public void TickCooldownTimer() {
+        foreach (var slot in SkillSlots) slot?.Tick();
     }
 }

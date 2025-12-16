@@ -22,6 +22,7 @@ public class Player : MonoBehaviour, IInteractable, IAnimationEventOwner
     [HideInInspector] public SpriteRenderer Spr;
     //模組化 --------------------------------------------------------------------------------------------------------------------------------------------------------------------------
     public PlayerStatsRuntime Rt { get; private set; }
+    public StateComponent StateComponent { get; private set; }
     public ActionLockComponent ActionLockComponent { get; private set; }
     public HealthComponent HealthComponent { get; private set; }
     public RespawnComponent RespawnComponent { get; private set; }
@@ -33,7 +34,6 @@ public class Player : MonoBehaviour, IInteractable, IAnimationEventOwner
     public SpawnerComponent SpawnerComponent { get; private set; }
     public GrowthComponent GrowthComponent { get; private set; }
     public HeightComponent HeightComponent { get; private set; }
-    public bool IsDead => HealthComponent.IsDead;
     public Vector2 MoveVelocity=>MoveComponent.IntentDirection * MoveComponent.MoveSpeed;
     private Transform _lastInteractSource;
     private float _initialHeightY;
@@ -63,9 +63,9 @@ public class Player : MonoBehaviour, IInteractable, IAnimationEventOwner
     }
     private void Update()
     {
-        if (MoveComponent != null && !IsDead) SetFacingRight(MoveComponent.IntentDirection);
+        if (MoveComponent != null && !StateComponent.IsDead)SetFacingRight(MoveComponent.IntentDirection); 
         if (SkillComponent != null) SkillComponent.Tick();
-        if (AnimationComponent != null) AnimationTick();
+        if (ActionLockComponent != null) ActionLockComponent.Tick();
 
         if (InputProvider != PlayerInputManager.Instance && AIComponent != null) AIComponent.Tick();
         SkillComponent.TickCooldownTimer();
@@ -79,22 +79,22 @@ public class Player : MonoBehaviour, IInteractable, IAnimationEventOwner
         Rt = stats;
 
         //注意依賴順序
-        ActionLockComponent = new ActionLockComponent(this);
-        HealthComponent = new HealthComponent(Rt);
-        AnimationComponent = new AnimationComponent(Ani, transform, Rb);
-        HeightComponent = new HeightComponent(Spr.transform, this, _initialHeightY,Rt.StatsData.MoveSpeed);
-        EffectComponent = new EffectComponent(Rt.VisualData, transform, this, Spr, HealthComponent);
+        StateComponent = new StateComponent();
+        ActionLockComponent = new ActionLockComponent(this,StateComponent);
+        HealthComponent = new HealthComponent(Rt, StateComponent);
+        AnimationComponent = new AnimationComponent(Ani, transform, Rb, StateComponent);
+        HeightComponent = new HeightComponent(Spr.transform, this, _initialHeightY,Rt.StatsData.MoveSpeed,StateComponent);
+        EffectComponent = new EffectComponent(Rt.VisualData, transform, this, Spr, StateComponent);
         RespawnComponent = new RespawnComponent(this, Rt.CanRespawn);
-        MoveComponent = new MoveComponent(Rb, Rt.StatsData.MoveSpeed, this, MoveDetector, AnimationComponent,HeightComponent);
+        MoveComponent = new MoveComponent(Rb, Rt.StatsData.MoveSpeed, this, MoveDetector, AnimationComponent,HeightComponent, StateComponent);
         SpawnerComponent = new SpawnerComponent();
         if (EnemyListManager.Instance.TargetList == null) Debug.Log("EnemyListManager未初始化");
-        SkillComponent = new SkillComponent(Rt.StatsData, Rt.SkillSlotCount, Rt.SkillPool, AnimationComponent, transform,EnemyListManager.Instance.TargetList);
+        SkillComponent = new SkillComponent(Rt.StatsData, Rt.SkillSlotCount, Rt.SkillPool, AnimationComponent, StateComponent,transform,EnemyListManager.Instance.TargetList);
         AIComponent = new AIComponent(SkillComponent, MoveComponent, transform, Rt.MoveStrategy);
         GrowthComponent = new GrowthComponent(Rt);
         //額外初始化設定
         BehaviorTree behaviourTree = PlayerBehaviourTreeFactory.Create(Rt.PlayerBehaviourTreeType, AIComponent, MoveComponent, SkillComponent, Rt.MoveStrategy);
         AIComponent.SetBehaviorTree(behaviourTree);
-        AnimationComponent.Initial(MoveComponent);
 
         //事件訂閱
         HealthComponent.OnDie += OnDie;
@@ -128,13 +128,7 @@ public class Player : MonoBehaviour, IInteractable, IAnimationEventOwner
     {
         SkillComponent.UseSkill();
     }
-    public void AnimationTick()
-    {
-        if (ActionLockComponent.IsLocked) return;
 
-        if (!AnimationComponent.IsPlayingAttackAnimation && MoveComponent.IsMoving && SkillComponent.IntentSlotIndex < 0)
-            AnimationComponent.PlayMove();
-    }
 
     //事件方法
     public void OnDie()
@@ -145,7 +139,6 @@ public class Player : MonoBehaviour, IInteractable, IAnimationEventOwner
     private IEnumerator Die()
     {
         AIComponent.DisableAI();
-        MoveComponent.DisableMove();
         EffectComponent.PlayerDeathEffect();
 
         if (_lastInteractSource != null)
@@ -182,8 +175,8 @@ public class Player : MonoBehaviour, IInteractable, IAnimationEventOwner
     }
     public void ResetState()
     {
-        AnimationComponent.IsPlayingAttackAnimation = false;
-        MoveComponent.Reset();
+        StateComponent.SetIsPlayingAttackAnimation( false);
+        MoveComponent.ResetVelocity();
         HealthComponent.ResetCurrentHp();
     }
 
@@ -193,7 +186,7 @@ public class Player : MonoBehaviour, IInteractable, IAnimationEventOwner
     }
     private void SetFacingRight(Vector2 direction)
     {
-        if (AnimationComponent.IsPlayingAttackAnimation) return;  //確保攻擊時面相正確
+        if (StateComponent.IsPlayingAttackAnimation) return;  //確保攻擊時面相正確
         if (direction.sqrMagnitude < 0.01f) return;     //避免靜止時頻繁執行
 
         if (Mathf.Abs(direction.x) > 0.01f)

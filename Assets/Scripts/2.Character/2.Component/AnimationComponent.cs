@@ -4,53 +4,34 @@ using UnityEngine;
 
 public class AnimationComponent
 {
-    public bool IsPlayingAttackAnimation;
-    public bool IsMoving => _moveComponent.IsMoving;
-
+    private StateComponent _stateComponent;
     private Animator _ani;
     private Transform _transform;
     private Rigidbody2D _rb;
-    private MoveComponent _moveComponent;
 
-    public AnimationComponent(Animator ani,Transform transform,Rigidbody2D rb) {
+
+    public AnimationComponent(Animator ani,Transform transform,Rigidbody2D rb,StateComponent stateComponent) {
         _ani = ani ?? throw new ArgumentNullException(nameof(ani), "Animator missing on prefab");
         _transform = transform;
         _rb = rb;
-    }
-    public void Initial(MoveComponent moveComponent) {
-        _moveComponent = moveComponent;
+        _stateComponent= stateComponent;
     }
 
-    public void PlayAttackAnimation(int skillId) {
+
+    public void PlayAttack(int skillId) {
         string moveSkillName = $"MoveSkill{skillId}";
         int moveSkillHash = Animator.StringToHash(moveSkillName);
 
-        if (IsMoving)
-        {
-            if(_ani.HasState(0, moveSkillHash))
-            {
-                Debug.Log("有移動攻擊，撥放");
-                Play($"MoveSkill{skillId}");
-            }
-            else
-            {
-                Debug.Log("沒有移動攻擊，撥放站立攻擊");
-                Play($"Skill{skillId}");
-            }
+        if (_stateComponent.IsMoving) 
+            if (TryPlay($"MoveSkill{skillId}")) return;
 
-        }   
-        else
-        {
-            Play($"Skill{skillId}");
-        }
+        TryPlay($"Skill{skillId}");
     }
-
-
-    public void PlayIdle() =>PlayAnimationIfExists("Idle");
-    public void PlayMove() =>PlayAnimationIfExists("Move");
-    public void PlayDie() => PlayAnimationIfExists("Die");
-    public void PlayHurt() => PlayAnimationIfExists("Hurt");
-    public void PlayRecover() => PlayAnimationIfExists("Recover");
+    public void PlayIdle() => TryPlay("Idle");
+    public void PlayMove() => TryPlay("Move");
+    public void PlayDie() => TryPlay("Die");
+    public void PlayHurt() => TryPlay("Hurt");
+    public void PlayRecover() => TryPlay("Recover");
 
     public void Play(string name) => _ani.Play(Animator.StringToHash(name));
 
@@ -65,13 +46,13 @@ public class AnimationComponent
         );
     }
 
-    //確認動畫是否存在
-    public void PlayAnimationIfExists(string stateName, int layer = 0) {
-        int hash = Animator.StringToHash(stateName);
+    public bool TryPlay(string stateName, int layer = 0) {
+        int stateNameHash = Animator.StringToHash(stateName);
+        if (!_ani.HasState(layer, stateNameHash)) 
+            return false;
 
-        if (!_ani.HasState(layer, hash))
-            return;
-
-        _ani.Play(hash, layer);
+        _ani.Play(stateNameHash, layer);
+        return true;
     }
+
 }

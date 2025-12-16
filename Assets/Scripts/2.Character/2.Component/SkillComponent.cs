@@ -14,6 +14,7 @@ public class SkillComponent
     private StatsData _statsData;
     private Dictionary<int, ISkillRuntime> _skillPool;
     private AnimationComponent _animationComponent;
+    private StateComponent _stateComponent;
     private SpawnerComponent _spawner;
     private Transform _transform;
     private DetectorSpriteSpawner _detectorSpriteSpawner;
@@ -35,6 +36,7 @@ public class SkillComponent
         int skillSlotCount,
         Dictionary<int, ISkillRuntime> skillPool,
         AnimationComponent animationComponent,
+        StateComponent stateComponent,
         Transform transform,
         IReadOnlyList<IInteractable> targetList
         ) {
@@ -43,6 +45,7 @@ public class SkillComponent
         _skillPool = skillPool;
 
         _animationComponent = animationComponent;
+        _stateComponent = stateComponent;
         _spawner = new SpawnerComponent();
         _transform = transform;
 
@@ -55,11 +58,13 @@ public class SkillComponent
     }
 
     public void Tick() {
+        if (IntentSlotIndex >= 0) _stateComponent.SetIsAttackingIntent(true);
+        else _stateComponent.SetIsAttackingIntent(false);
         TryPlaySkillAnimation();
     }
 
     private void TryPlaySkillAnimation() {
-        if (_animationComponent.IsPlayingAttackAnimation) return;                             // 正在施放中，不能再播放
+        if (_stateComponent.IsPlayingAttackAnimation) return;                             // 正在施放中，不能再播放
         if (IntentSlotIndex < 0) return;
         var slot = SkillSlots[IntentSlotIndex];
         if (!_skillPool.TryGetValue(slot.SkillId, out var skill)) return;
@@ -94,7 +99,7 @@ public class SkillComponent
         _pendingPosition = targetPos;
         _pendingSlotIndex = IntentSlotIndex;
 
-        _animationComponent.PlayAttackAnimation(skill.StatsData.Id);
+        _animationComponent.PlayAttack(skill.StatsData.Id);
         _animationComponent.FaceDirection(direction);
     }
 

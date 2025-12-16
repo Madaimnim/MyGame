@@ -46,10 +46,6 @@ public class AIComponent : IInputProvider
     public void DisableAI() => CanRunAI = false;
 
     //-------------------------------Intent³]©w--------------------------------------------------------------------------------
-    public void ResetPlayerIntent(MoveComponent moveComponent, SkillComponent skillComponent) {
-        SetIntentMove(moveComponent);
-        SetIntentSkill(skillComponent, -1);
-    }
     public void SetIntentMove(MoveComponent moveComponent,Vector2? direction = null, Vector2? targetPosition = null, Transform targetTransform = null) {
         moveComponent.IntentTargetTransform = targetTransform;
         moveComponent.IntentTargetPosition = targetPosition;
@@ -60,4 +56,9 @@ public class AIComponent : IInputProvider
         skillComponent.IntentTargetTransform = targetTransform;
         skillComponent.IntentTargetPosition = targetPosition ?? Vector2.zero;
     }
+
+    //public void ResetPlayerIntent(MoveComponent moveComponent, SkillComponent skillComponent) {
+    //    SetIntentMove(moveComponent);
+    //    SetIntentSkill(skillComponent, -1);
+    //}
 }

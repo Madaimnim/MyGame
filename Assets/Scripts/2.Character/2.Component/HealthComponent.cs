@@ -5,29 +5,28 @@ using UnityEngine;
 public class HealthComponent
 {
     private IHealthData _healthData;
+    private StateComponent _stateComponent;
 
-    public bool IsDead { get; private set; }
-    //事件
     public event Action<int, int> OnHpChanged;
     public event Action OnDie;
 
 
-    public HealthComponent(IHealthData healthData) {
+    public HealthComponent(IHealthData healthData,StateComponent stateComponent) {
         _healthData = healthData ?? throw new ArgumentNullException(nameof(healthData));
 
-        _healthData.CurrentHp = _healthData.MaxHp; 
-        IsDead = false;
+        _healthData.CurrentHp = _healthData.MaxHp;
+        _stateComponent= stateComponent;
     }
 
     public void TakeDamage(int dmg) {
-        if (IsDead) return; // 死掉就不再處理
+        if (_stateComponent.IsDead) return; // 死掉就不再處理
 
         _healthData.CurrentHp = Mathf.Clamp(_healthData.CurrentHp - dmg, 0, _healthData.MaxHp);
         //發事件
         OnHpChanged?.Invoke(_healthData.CurrentHp, _healthData.MaxHp);
         if (_healthData.CurrentHp <= 0)
         {
-            IsDead = true;
+            _stateComponent.SetIsDead(true);
             //發事件
             OnDie?.Invoke();
         }
@@ -40,7 +39,7 @@ public class HealthComponent
     }
 
     public void ResetCurrentHp() {
-        IsDead = false;
+        _stateComponent.SetIsDead(false);
         _healthData.CurrentHp = _healthData.MaxHp;
         //發事件
         OnHpChanged?.Invoke(_healthData.CurrentHp, _healthData.MaxHp);

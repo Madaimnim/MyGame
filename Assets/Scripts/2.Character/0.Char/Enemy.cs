@@ -17,6 +17,7 @@ public class Enemy :MonoBehaviour,IInteractable, IAnimationEventOwner
     [HideInInspector] public SpriteRenderer Spr;
     //模組化 --------------------------------------------------------------------------------------------------------------------------------------------------------------------------
     public EnemyStatsRuntime Rt { get; private set; }
+    public StateComponent StateComponent { get; private set; } 
     public ActionLockComponent ActionLockComponent { get; private set; }
     public HealthComponent HealthComponent { get; private set; }
     public RespawnComponent RespawnComponent { get; private set; }
@@ -27,7 +28,6 @@ public class Enemy :MonoBehaviour,IInteractable, IAnimationEventOwner
     public SkillComponent SkillComponent { get; private set; }
     public SpawnerComponent SpawnerComponent { get; private set; }
     public HeightComponent HeightComponent { get; private set; }
-    public bool IsDead => HealthComponent.IsDead;
     public Vector2 MoveVelocity => MoveComponent.IntentDirection * MoveComponent.MoveSpeed;
     
     private Transform _lastInteractSource;
@@ -54,18 +54,17 @@ public class Enemy :MonoBehaviour,IInteractable, IAnimationEventOwner
     {
         InputProvider = AIComponent;
     }
-    private void Update()
-    {
-        if (MoveComponent != null && !IsDead) SetFacingLeft(MoveComponent.IntentDirection);
-        if (AnimationComponent != null) AnimationTick();
-        if (SkillComponent != null) SkillComponent.Tick();
+    private void Update() {
+        if (MoveComponent != null && !StateComponent.IsDead)SetFacingLeft(MoveComponent.IntentDirection);
+        if (SkillComponent != null)SkillComponent.Tick();
+        if (ActionLockComponent != null ) ActionLockComponent.Tick();
         if (AIComponent != null) AIComponent.Tick();
 
         SkillComponent.TickCooldownTimer();
     }
     private void FixedUpdate()
     {
-        if (!ActionLockComponent.IsLocked) MoveComponent.Tick();
+        if (MoveComponent != null) MoveComponent.Tick();
     }
     public void Initialize(EnemyStatsRuntime stats) {
         if (_initialized) return;
@@ -74,24 +73,25 @@ public class Enemy :MonoBehaviour,IInteractable, IAnimationEventOwner
         Rt = stats;
 
         //注意依賴順序
-        ActionLockComponent = new ActionLockComponent(this);
-        HealthComponent = new HealthComponent(Rt);
-        AnimationComponent = new AnimationComponent(Ani, transform, Rb);
-        HeightComponent = new HeightComponent(Spr.transform, this,_initialHeightY,Rt.StatsData.MoveSpeed);
+        StateComponent = new StateComponent();
+        ActionLockComponent = new ActionLockComponent(this, StateComponent);
+        HealthComponent = new HealthComponent(Rt, StateComponent);
+        AnimationComponent = new AnimationComponent(Ani, transform, Rb,StateComponent);
+        HeightComponent = new HeightComponent(Spr.transform, this,_initialHeightY,Rt.StatsData.MoveSpeed,StateComponent);
 
-        EffectComponent = new EffectComponent(Rt.VisualData, transform, this, Spr, HealthComponent);
+        EffectComponent = new EffectComponent(Rt.VisualData, transform, this, Spr, StateComponent);
 
         RespawnComponent = new RespawnComponent(this, Rt.CanRespawn);
-        MoveComponent = new MoveComponent(Rb,Rt.StatsData.MoveSpeed, this, MoveDetector, AnimationComponent, HeightComponent);
+        MoveComponent = new MoveComponent(Rb,Rt.StatsData.MoveSpeed, this, MoveDetector, AnimationComponent, HeightComponent,StateComponent);
         SpawnerComponent = new SpawnerComponent();
-        SkillComponent = new SkillComponent(Rt.StatsData, Rt.SkillSlotCount,Rt.SkillPool, AnimationComponent, transform,PlayerListManager.Instance.TargetList);
+        SkillComponent = new SkillComponent(Rt.StatsData, Rt.SkillSlotCount,Rt.SkillPool, AnimationComponent,StateComponent, transform,PlayerListManager.Instance.TargetList);
         AIComponent = new AIComponent(SkillComponent, MoveComponent, transform,Rt.MoveStrategy);
 
 
         //額外初始化設定
         BehaviorTree behaviourTree =EnemyBehaviourTreeFactory.Create(Rt.EnemyBehaviourTreeType, AIComponent, MoveComponent, SkillComponent, Rt.MoveStrategy);
         AIComponent.SetBehaviorTree(behaviourTree);
-        AnimationComponent.Initial(MoveComponent);
+
 
         //事件訂閱
         HealthComponent.OnDie += OnDie;
@@ -109,14 +109,7 @@ public class Enemy :MonoBehaviour,IInteractable, IAnimationEventOwner
         InputProvider = AIComponent;
         ResetState();
     }
-    public void AnimationTick() {
-        if (AnimationComponent.IsPlayingAttackAnimation) return;
-        if (SkillComponent.IntentSlotIndex >= 0) return;
-        if (HealthComponent.IsDead) return;
 
-        if (ActionLockComponent.IsLocked) return;
-        if (MoveComponent.IsMoving ) AnimationComponent.PlayMove();
-    }
 
     public void Interact(InteractInfo info)
     {
@@ -125,7 +118,8 @@ public class Enemy :MonoBehaviour,IInteractable, IAnimationEventOwner
         EffectComponent.TakeDamageEffect(info.Damage);
         MoveComponent.Knockbacked(info.KnockbackForce, info.Source);
         HeightComponent.FloatUp(info.FloatPower);
-        ActionLockComponent.LockAction(0.5f);
+
+        ActionLockComponent.HurtLock();
         AnimationComponent.PlayHurt();
 
     }
@@ -141,7 +135,6 @@ public class Enemy :MonoBehaviour,IInteractable, IAnimationEventOwner
     private IEnumerator Die()
     {
         AIComponent.DisableAI();
-        MoveComponent.DisableMove();
 
         if (_lastInteractSource != null)
         {
@@ -173,14 +166,14 @@ public class Enemy :MonoBehaviour,IInteractable, IAnimationEventOwner
         AIComponent.EnableAI();
     }
     public void ResetState() {
-        AnimationComponent.IsPlayingAttackAnimation = false;
-        MoveComponent.Reset();
+        StateComponent.SetIsPlayingAttackAnimation (false);
+        MoveComponent.ResetVelocity();
         HealthComponent.ResetCurrentHp();
     }
 
     private void SetFacingLeft(Vector2 direction)
     {
-        if (AnimationComponent.IsPlayingAttackAnimation) return;  //確保攻擊時面相正確
+        if (StateComponent.IsPlayingAttackAnimation) return;  //確保攻擊時面相正確
         if (direction.sqrMagnitude < 0.01f) return;     //避免靜止時頻繁執行
 
         if (Mathf.Abs(direction.x) > 0.01f)

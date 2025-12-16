@@ -10,8 +10,8 @@ public class EnemyEnterExitBehaviour : StateMachineBehaviour
         if (enemy == null) enemy = animator.GetComponent<Enemy>();
 
         // 鎖定，避免其他動畫
-        enemy.AnimationComponent.IsPlayingAttackAnimation = true;
-        
+        enemy.StateComponent.SetIsPlayingAttackAnimation(true);
+
 
     }
 
@@ -26,7 +26,7 @@ public class EnemyEnterExitBehaviour : StateMachineBehaviour
         if (enemy == null) return;
 
         // 解除動畫鎖定
-        enemy.AnimationComponent.IsPlayingAttackAnimation = false;
+        enemy.StateComponent.SetIsPlayingAttackAnimation ( false);
 
         //float exitTime = Time.time;
         //float duration = exitTime - enterTime; // 播放時間

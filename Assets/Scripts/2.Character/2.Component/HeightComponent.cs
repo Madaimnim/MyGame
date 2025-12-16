@@ -5,23 +5,24 @@ using System.Collections;
 
 public class HeightComponent
 {
-    public bool IsGrounded { get; private set; }
-
-    float _initialHeightY;
-    float _recoverSpeed ;
-    Transform _sprTransform;
-    MonoBehaviour _runner;
+    private float _initialHeightY;
+    private float _recoverSpeed ;
+    private Transform _sprTransform;
+    private MonoBehaviour _runner;
+    private StateComponent _stateComponent;
 
     Coroutine _floatCoroutine;
     Coroutine _recoverHeightCoroutine;
 
-    public HeightComponent(Transform transform, MonoBehaviour runner,float initialHeightY,float recoverSpeed)
+    public HeightComponent(Transform transform, MonoBehaviour runner,float initialHeightY,float recoverSpeed,StateComponent stateComponent)
     {
         _sprTransform = transform;
         _runner = runner;
         _initialHeightY= initialHeightY;
         _recoverSpeed = recoverSpeed;
+        _stateComponent = stateComponent; 
     }
+
 
     public void FloatUp(float floatPower)
     {
@@ -34,7 +35,7 @@ public class HeightComponent
     }
     private IEnumerator FloatCoroutine(float floatPower)
     {
-        IsGrounded = false;
+        _stateComponent.SetIsGrounded (false);
 
         // ======= 物理參數 =======
         float gravity = PhysicManager.Instance.PhysicConfig.GravityScale;                 //重力加速度
@@ -52,7 +53,7 @@ public class HeightComponent
         }
 
         RecoverHeight(_recoverSpeed);
-        IsGrounded = true;
+        _stateComponent.SetIsGrounded(true);
     }
 
     public void RecoverHeight(float speed) {
@@ -77,7 +78,7 @@ public class HeightComponent
         }
 
         _recoverHeightCoroutine = null;
-        IsGrounded = true;
+        _stateComponent.SetIsGrounded(true);
     }
 
 }

@@ -2,15 +2,15 @@ using UnityEngine;
 
 public class PlayerAttackBehaviour : StateMachineBehaviour
 {
-    private AnimationComponent _charAni;
+    private StateComponent _stateComponent;
 
     // 進入攻擊動畫
     public override void OnStateEnter(Animator animator, AnimatorStateInfo stateInfo, int layerIndex) {
-        if (_charAni == null)
-            _charAni = animator.GetComponent<Player>()?.AnimationComponent;
+        if (_stateComponent == null)
+            _stateComponent = animator.GetComponent<Player>()?.StateComponent;
 
-        if (_charAni != null)
-            _charAni.IsPlayingAttackAnimation = true;
+        if (_stateComponent != null)
+            _stateComponent.SetIsPlayingAttackAnimation (true);
     }
 
     // 動畫進行過程（0~1 normalizedTime）
@@ -20,8 +20,8 @@ public class PlayerAttackBehaviour : StateMachineBehaviour
 
     // 離開攻擊動畫
     public override void OnStateExit(Animator animator, AnimatorStateInfo stateInfo, int layerIndex) {
-        if (_charAni == null) return;
+        if (_stateComponent == null) return;
 
-        _charAni.IsPlayingAttackAnimation = false;
+        _stateComponent.SetIsPlayingAttackAnimation(false);
     }
 }

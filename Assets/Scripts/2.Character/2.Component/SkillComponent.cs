@@ -25,8 +25,7 @@ public class SkillComponent
     private Transform _pendingTransform;
 
     public SkillSlot[] SkillSlots;
-    public bool HasAnyTarget =>
-        SkillSlots.Any(slot => slot.HasSkill && slot.Detector != null && slot.Detector.HasTarget);
+    public bool HasAnyTarget => SkillSlots.Any(slot => slot.HasSkill && slot.Detector != null && slot.Detector.HasTarget);
 
     public event Action OnSkillsChanged; // (slot, skillId, runtime)
     public event Action<int, ISkillRuntime> OnSkillUsed;         // (slot, runtime)

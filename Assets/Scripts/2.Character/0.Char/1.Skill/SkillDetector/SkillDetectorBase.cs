@@ -4,6 +4,7 @@ using UnityEngine;
 public abstract class SkillDetectorBase {
     public bool HasTarget => _targetTransform != null;
     public Transform TargetTransform => _targetTransform;
+    
     protected Transform _targetTransform;
     protected Transform _self;
 

@@ -6,11 +6,7 @@ using System.Linq;
 
 public class EnemySkillSystem
 {
-    public void EquipEnemySkill(int playerId, int slotIndex, int skillId) {
-        //var rt = EnemyUtility.Get(playerId);
-        //if (rt.SkillPool.TryGetValue(skillId, out var skill))
-        //{
-        //    rt.BattleEnemyObject.GetComponent<Enemy>()?.SkillComponent.EquipSkill(slotIndex, skillId, skill.VisualData.DetectPrefab);
-        //}
+    public void EquipEnemySkill(int enemyId, int slotIndex, int skillId) {
+
     }
 }

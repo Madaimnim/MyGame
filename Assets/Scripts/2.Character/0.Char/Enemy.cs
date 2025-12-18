@@ -3,6 +3,20 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
+//Done 實現敵人技能槽安裝，於Enemy.Initailized()時，呼叫SkillComponent.EquipEnemySkill()進行初始技能安裝。
+
+//以下挑一個
+//Todo 空中敵人的碰撞體調整，底部碰撞體可被穿越。or 小鳥技能的實現。
+//Todo 攻擊渲染Sprite圖層修正
+//Todo 小鳥技能實現
+//Todo 敵人血量顯示異常
+
+//SkillDetectorBase 下轄Circle_Detector、Box_Detector等偵測策略，可生成範圍Sprite物件，無實際技能槽，開關僅關閉可視化範圍
+
+//腳色技能安裝流程:
+//PlayerStateSystem.UnlockPlayer()-> PlayerSkillSystem.EquipPlayerSkil()->SkillComponent.EquipSkill->();
+//Enemy.Initialized()->EnemySkillSystem.EquipEnemySkill()->EnemySkillComponent.EquipSkill->();
+
 public class Enemy :MonoBehaviour,IInteractable, IAnimationEventOwner
 {
     //公開--------------------------------------------------------------------------------------------------------------------------------------------------------------------------
@@ -108,6 +122,7 @@ public class Enemy :MonoBehaviour,IInteractable, IAnimationEventOwner
         transform.name = $"EnemyID_{Rt.StatsData.Id}:({Rt.StatsData.Name})";
         InputProvider = AIComponent;
         ResetState();
+        SkillComponent.EquipSkill(0, 1);
     }
 
 

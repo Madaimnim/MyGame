@@ -29,9 +29,6 @@ public class EnemyStateSystem :SubSystemBase
         SkillSystem = new EnemySkillSystem();
     }
 
-    public Enemy SpawnEnemy(int id, Vector3 spawnPos) => SpawnSystem.SpawnEnemy(id, spawnPos);
-
-
 
     public void UnlockEnemy(int id) {
         if (!IDValidator.IsEnemyID(id)) {   Debug.LogWarning($"EnemyID不合法"); return; }

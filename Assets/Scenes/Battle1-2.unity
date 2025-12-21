@@ -292,16 +292,14 @@ MonoBehaviour:
   SpawnInterval: 1
   SpawnArea: {fileID: 1552200437}
   Waves:
-  - EnemyId: 2004
-    SpawnCount: 1
   - EnemyId: 2001
-    SpawnCount: 1
+    SpawnCount: 2
+  - EnemyId: 2002
+    SpawnCount: 2
+  - EnemyId: 2003
+    SpawnCount: 2
   - EnemyId: 2004
-    SpawnCount: 1
-  - EnemyId: 2004
-    SpawnCount: 1
-  - EnemyId: 2001
-    SpawnCount: 1
+    SpawnCount: 2
 --- !u!1 &384647081
 GameObject:
   m_ObjectHideFlags: 0

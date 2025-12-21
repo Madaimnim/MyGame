@@ -12,15 +12,15 @@ public class SkillSlot
     public bool HasSkill => SkillId  != -1;   //-1 代表無技能;
     public bool IsReady => SkillId != -1 && CooldownTimer <= 0f;
     
-    private Transform _owner;
+    private Transform _backSpriteTransform;
     private IReadOnlyList<IInteractable> _targetList;
 
-    public SkillSlot(Transform owner, IReadOnlyList<IInteractable> targetList) {
+    public SkillSlot(Transform backSpriteTransform, IReadOnlyList<IInteractable> targetList) {
         SkillId = -1;
         CooldownTimer = 0f;
         Detector = null;
 
-        _owner = owner;
+        _backSpriteTransform = backSpriteTransform;
         _targetList= targetList;
     }
 
@@ -33,11 +33,11 @@ public class SkillSlot
         SkillId = skillId;
         Detector = detectStrategy;
         CooldownTimer = 0f;
-        Detector.Initialize(_owner);
+        Detector.Initialize(_backSpriteTransform);
 
         if (RangeObject != null) GameObject.Destroy(RangeObject);
-        RangeObject = Detector.SpawnRangeObject(_owner);
-        RangeObject.transform.SetParent(_owner);
+        RangeObject = Detector.SpawnRangeObject(_backSpriteTransform);
+        RangeObject.transform.SetParent(_backSpriteTransform);
         RangeObject.transform.localPosition = Vector3.zero;
     }
     public void TriggerCooldown(float cd) {

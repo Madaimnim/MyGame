@@ -6,7 +6,7 @@ AnimationClip:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_Name: Player01_MoveSkill1
+  m_Name: Enemy03_Skill1
   serializedVersion: 6
   m_Legacy: 0
   m_Compressed: 0
@@ -20,18 +20,23 @@ AnimationClip:
   m_PPtrCurves:
   - curve:
     - time: 0
-      value: {fileID: -2053786515, guid: c9c77b61d9bd0a046af4c8d1de82aafc, type: 3}
-    - time: 0.16666667
-      value: {fileID: -228854816, guid: c9c77b61d9bd0a046af4c8d1de82aafc, type: 3}
-    - time: 0.33333334
-      value: {fileID: -540177485, guid: c9c77b61d9bd0a046af4c8d1de82aafc, type: 3}
-    - time: 0.5
-      value: {fileID: 1514310834, guid: c9c77b61d9bd0a046af4c8d1de82aafc, type: 3}
+      value: {fileID: -571399919, guid: 100bec4f67285d7469bce4642ae1c0e3, type: 3}
+    - time: 0.25
+      value: {fileID: 245220712, guid: 100bec4f67285d7469bce4642ae1c0e3, type: 3}
     attribute: m_Sprite
     path: RootSprite/Sprite
     classID: 212
     script: {fileID: 0}
-  m_SampleRate: 6
+  - curve:
+    - time: 0
+      value: {fileID: -571399919, guid: 100bec4f67285d7469bce4642ae1c0e3, type: 3}
+    - time: 0.25
+      value: {fileID: 245220712, guid: 100bec4f67285d7469bce4642ae1c0e3, type: 3}
+    attribute: m_Sprite
+    path: BackSprite/Shadow/ShadowSprite
+    classID: 212
+    script: {fileID: 0}
+  m_SampleRate: 4
   m_WrapMode: 0
   m_Bounds:
     m_Center: {x: 0, y: 0, z: 0}
@@ -45,17 +50,24 @@ AnimationClip:
       typeID: 212
       customType: 23
       isPPtrCurve: 1
+    - serializedVersion: 2
+      path: 2735391542
+      attribute: 0
+      script: {fileID: 0}
+      typeID: 212
+      customType: 23
+      isPPtrCurve: 1
     pptrCurveMapping:
-    - {fileID: -2053786515, guid: c9c77b61d9bd0a046af4c8d1de82aafc, type: 3}
-    - {fileID: -228854816, guid: c9c77b61d9bd0a046af4c8d1de82aafc, type: 3}
-    - {fileID: -540177485, guid: c9c77b61d9bd0a046af4c8d1de82aafc, type: 3}
-    - {fileID: 1514310834, guid: c9c77b61d9bd0a046af4c8d1de82aafc, type: 3}
+    - {fileID: -571399919, guid: 100bec4f67285d7469bce4642ae1c0e3, type: 3}
+    - {fileID: 245220712, guid: 100bec4f67285d7469bce4642ae1c0e3, type: 3}
+    - {fileID: -571399919, guid: 100bec4f67285d7469bce4642ae1c0e3, type: 3}
+    - {fileID: 245220712, guid: 100bec4f67285d7469bce4642ae1c0e3, type: 3}
   m_AnimationClipSettings:
     serializedVersion: 2
     m_AdditiveReferencePoseClip: {fileID: 0}
     m_AdditiveReferencePoseTime: 0
     m_StartTime: 0
-    m_StopTime: 0.6666667
+    m_StopTime: 0.5
     m_OrientationOffsetY: 0
     m_Level: 0
     m_CycleOffset: 0
@@ -74,11 +86,4 @@ AnimationClip:
   m_EulerEditorCurves: []
   m_HasGenericRootTransform: 0
   m_HasMotionFloatCurves: 0
-  m_Events:
-  - time: 0.33333334
-    functionName: AnimationEvent_SpawnerSkill
-    data: 
-    objectReferenceParameter: {fileID: 0}
-    floatParameter: 0
-    intParameter: 0
-    messageOptions: 0
+  m_Events: []

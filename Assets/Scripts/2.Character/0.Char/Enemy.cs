@@ -4,12 +4,15 @@ using System.Collections.Generic;
 using UnityEngine;
 
 //Done 實現敵人技能槽安裝，於Enemy.Initailized()時，呼叫SkillComponent.EquipEnemySkill()進行初始技能安裝。
+//Done 實現攻擊渲染Sprite圖層修正
+//Done 腳色Animation修正Player01、Player02、Enemy01
+//Done Enemy04動畫修正，02、03腳色整體修正
 
-//以下挑一個
-//Todo 空中敵人的碰撞體調整，底部碰撞體可被穿越。or 小鳥技能的實現。
-//Todo 攻擊渲染Sprite圖層修正
-//Todo 小鳥技能實現
-//Todo 敵人血量顯示異常
+//Todo
+//Enemy02移動邏輯處理
+//空中敵人的碰撞體調整，底部碰撞體可被穿越。or 小鳥技能的實現
+//小鳥技能實現
+//敵人血量顯示異常
 
 //SkillDetectorBase 下轄Circle_Detector、Box_Detector等偵測策略，可生成範圍Sprite物件，無實際技能槽，開關僅關閉可視化範圍
 
@@ -22,7 +25,9 @@ public class Enemy :MonoBehaviour,IInteractable, IAnimationEventOwner
     //公開--------------------------------------------------------------------------------------------------------------------------------------------------------------------------
     [SerializeField] private Collider2D sprCol;
     public Collider2D SprCol => sprCol;
-    public Transform BottomTransform => transform;
+    public Transform BottomTransform => RootSpriteTransform;
+    public Transform RootSpriteTransform;
+    public Transform BackSpriteTransform;
     public TargetDetector MoveDetector;
     public IInputProvider InputProvider;
     //組件--------------------------------------------------------------------------------------------------------------------------------------------------------------------------
@@ -98,7 +103,7 @@ public class Enemy :MonoBehaviour,IInteractable, IAnimationEventOwner
         RespawnComponent = new RespawnComponent(this, Rt.CanRespawn);
         MoveComponent = new MoveComponent(Rb,Rt.StatsData.MoveSpeed, this, MoveDetector, AnimationComponent, HeightComponent,StateComponent);
         SpawnerComponent = new SpawnerComponent();
-        SkillComponent = new SkillComponent(Rt.StatsData, Rt.SkillSlotCount,Rt.SkillPool, AnimationComponent,StateComponent, transform,PlayerListManager.Instance.TargetList);
+        SkillComponent = new SkillComponent(Rt.StatsData, Rt.SkillSlotCount,Rt.SkillPool, AnimationComponent,StateComponent, BackSpriteTransform, PlayerListManager.Instance.TargetList);
         AIComponent = new AIComponent(SkillComponent, MoveComponent, transform,Rt.MoveStrategy);
 
 

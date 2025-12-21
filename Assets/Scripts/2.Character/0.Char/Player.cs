@@ -10,7 +10,9 @@ public class Player : MonoBehaviour, IInteractable, IAnimationEventOwner
     //公開--------------------------------------------------------------------------------------------------------------------------------------------------------------------------
     [SerializeField] private Collider2D sprCol;
     public Collider2D SprCol => sprCol;
-    public Transform BottomTransform => transform;
+    public Transform BottomTransform => RootSpriteTransform;
+    public Transform RootSpriteTransform;
+    public Transform BackSpriteTransform;
 
     public TargetDetector MoveDetector;
     public GameObject SelectIndicator;
@@ -89,7 +91,7 @@ public class Player : MonoBehaviour, IInteractable, IAnimationEventOwner
         MoveComponent = new MoveComponent(Rb, Rt.StatsData.MoveSpeed, this, MoveDetector, AnimationComponent,HeightComponent, StateComponent);
         SpawnerComponent = new SpawnerComponent();
         if (EnemyListManager.Instance.TargetList == null) Debug.Log("EnemyListManager未初始化");
-        SkillComponent = new SkillComponent(Rt.StatsData, Rt.SkillSlotCount, Rt.SkillPool, AnimationComponent, StateComponent,transform,EnemyListManager.Instance.TargetList);
+        SkillComponent = new SkillComponent(Rt.StatsData, Rt.SkillSlotCount, Rt.SkillPool, AnimationComponent, StateComponent, BackSpriteTransform, EnemyListManager.Instance.TargetList);
         AIComponent = new AIComponent(SkillComponent, MoveComponent, transform, Rt.MoveStrategy);
         GrowthComponent = new GrowthComponent(Rt);
         //額外初始化設定

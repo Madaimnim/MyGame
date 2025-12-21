@@ -26,7 +26,7 @@ AnimationClip:
     - time: 0.33333334
       value: {fileID: 1030906324, guid: 8e377f6367a9bda4dbc1c6afad5a2c4a, type: 3}
     attribute: m_Sprite
-    path: Sprite
+    path: RootSprite/Sprite
     classID: 212
     script: {fileID: 0}
   - curve:
@@ -37,7 +37,7 @@ AnimationClip:
     - time: 0.33333334
       value: {fileID: 1030906324, guid: 8e377f6367a9bda4dbc1c6afad5a2c4a, type: 3}
     attribute: m_Sprite
-    path: Shadow/ShadowSprite
+    path: BackSprite/Shadow/ShadowSprite
     classID: 212
     script: {fileID: 0}
   m_SampleRate: 6
@@ -48,14 +48,14 @@ AnimationClip:
   m_ClipBindingConstant:
     genericBindings:
     - serializedVersion: 2
-      path: 850496168
+      path: 2439941589
       attribute: 0
       script: {fileID: 0}
       typeID: 212
       customType: 23
       isPPtrCurve: 1
     - serializedVersion: 2
-      path: 4270363920
+      path: 2735391542
       attribute: 0
       script: {fileID: 0}
       typeID: 212

@@ -4,7 +4,7 @@ using UnityEngine;
 using System.Collections;
 
 public class StateComponent {
-    public bool CanMove => !IsDead && !IsAttackingIntent && !IsControlLocked && !IsKnocked;
+    public bool CanMove => !IsDead && !IsControlLocked && !IsKnocked;
 
 
 
@@ -15,6 +15,7 @@ public class StateComponent {
     public bool IsMoving { get; private set; } = false;
     public bool IsPlayingAttackAnimation { get; private set; } = false;
     public bool IsControlLocked { get; private set; } = false;
+    public bool IsMoveAnimationOpen { get; private set; } = false;
     public StateComponent() {}
 
 
@@ -25,4 +26,5 @@ public class StateComponent {
     public void SetIsMoving(bool value) => IsMoving = value;
     public void SetIsPlayingAttackAnimation(bool value) => IsPlayingAttackAnimation = value;
     public void SetIsControlLocked(bool value) => IsControlLocked = value;
+    public void SetIsMoveAnimationOpen(bool value) => IsMoveAnimationOpen = value;
 }

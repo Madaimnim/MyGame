@@ -80,13 +80,18 @@ public class MoveComponent
         // 若只有方向輸入（玩家 WASD）
         else if (IntentDirection == Vector2.zero)
             return false;// 沒有方向時不移動
+        
+
 
         // 執行移動
         Vector2 newPosition = _rb.position + IntentDirection * MoveSpeed * Time.fixedDeltaTime;
         if (_stateComponent.IsPlayingAttackAnimation)
             newPosition = _rb.position + IntentDirection * MOVEATTACK_SPEED * Time.fixedDeltaTime;
-        _rb.MovePosition(newPosition);
+        //播放移動動畫
         _animationComponent.PlayMove();
+
+        _rb.MovePosition(newPosition);
+
         return true;
     }
 

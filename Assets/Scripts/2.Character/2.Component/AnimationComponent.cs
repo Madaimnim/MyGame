@@ -47,10 +47,10 @@ public class AnimationComponent
     }
 
     public bool TryPlay(string stateName, int layer = 0) {
+
         int stateNameHash = Animator.StringToHash(stateName);
         if (!_ani.HasState(layer, stateNameHash)) 
             return false;
-
         _ani.Play(stateNameHash, layer);
         return true;
     }

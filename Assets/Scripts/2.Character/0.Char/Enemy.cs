@@ -7,9 +7,10 @@ using UnityEngine;
 //Done 實現攻擊渲染Sprite圖層修正
 //Done 腳色Animation修正Player01、Player02、Enemy01
 //Done Enemy04動畫修正，02、03腳色整體修正
+//Done 嘗試將敵人開始移動與停止移動動畫事件設定
 
 //Todo
-//Enemy02移動邏輯處理
+//移動方式決策，玩家維持，敵人移動改由AnimationEvent觸發(並傳入動畫長短)，控制移動距離長短。
 //空中敵人的碰撞體調整，底部碰撞體可被穿越。or 小鳥技能的實現
 //小鳥技能實現
 //敵人血量顯示異常
@@ -141,11 +142,21 @@ public class Enemy :MonoBehaviour,IInteractable, IAnimationEventOwner
 
         ActionLockComponent.HurtLock();
         AnimationComponent.PlayHurt();
-
+        StateComponent.SetIsPlayingAttackAnimation(false);
     }
     public void AnimationEvent_SpawnerSkill() {
         SkillComponent.UseSkill();
     }
+
+    public void AnimationEvent_MoveStart(float moveDuration=1)
+    {
+       StateComponent.SetIsMoveAnimationOpen(true);
+    }
+    public void AnimationEvent_MoveEnd()
+    {
+        StateComponent.SetIsMoveAnimationOpen(false);
+    }
+
     //事件方法
     public void OnHpChanged(int currentHp, int maxHp) { }     //Todo SliderChange
     public void OnDie() {

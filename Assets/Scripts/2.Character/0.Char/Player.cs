@@ -125,6 +125,8 @@ public class Player : MonoBehaviour, IInteractable, IAnimationEventOwner
         EffectComponent.TakeDamageEffect(info.Damage);
         MoveComponent.Knockbacked(info.KnockbackForce, info.Source);
         HeightComponent.FloatUp(info.FloatPower);
+
+        StateComponent.SetIsPlayingAttackAnimation(false);
     }
     public void AnimationEvent_SpawnerSkill()
     {
@@ -135,6 +137,7 @@ public class Player : MonoBehaviour, IInteractable, IAnimationEventOwner
     //事件方法
     public void OnDie()
     {
+
         AnimationComponent.PlayDie();
         StartCoroutine(Die());
     }
@@ -169,6 +172,7 @@ public class Player : MonoBehaviour, IInteractable, IAnimationEventOwner
     {
         foreach (var col in GetComponentsInChildren<Collider2D>())
             col.enabled = true;
+
 
         ResetState();
 

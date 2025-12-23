@@ -1,19 +1,20 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Diagnostics;
 using UnityEngine;
 
-//Done 實現敵人技能槽安裝，於Enemy.Initailized()時，呼叫SkillComponent.EquipEnemySkill()進行初始技能安裝。
-//Done 實現攻擊渲染Sprite圖層修正
-//Done 腳色Animation修正Player01、Player02、Enemy01
-//Done Enemy04動畫修正，02、03腳色整體修正
-//Done 嘗試將敵人開始移動與停止移動動畫事件設定
+//Done 
+//Done 
+//Done 
+//Done
+//Done 
 
 //Todo
-//移動方式決策，玩家維持，敵人移動改由AnimationEvent觸發(並傳入動畫長短)，控制移動距離長短。
-//空中敵人的碰撞體調整，底部碰撞體可被穿越。or 小鳥技能的實現
-//小鳥技能實現
-//敵人血量顯示異常
+//
+//
+//
+//
 
 //SkillDetectorBase 下轄Circle_Detector、Box_Detector等偵測策略，可生成範圍Sprite物件，無實際技能槽，開關僅關閉可視化範圍
 
@@ -143,18 +144,15 @@ public class Enemy :MonoBehaviour,IInteractable, IAnimationEventOwner
         ActionLockComponent.HurtLock();
         AnimationComponent.PlayHurt();
         StateComponent.SetIsPlayingAttackAnimation(false);
+
     }
     public void AnimationEvent_SpawnerSkill() {
         SkillComponent.UseSkill();
     }
 
-    public void AnimationEvent_MoveStart(float moveDuration=1)
+    public void AnimationEvent_MoveStart(float duration)
     {
-       StateComponent.SetIsMoveAnimationOpen(true);
-    }
-    public void AnimationEvent_MoveEnd()
-    {
-        StateComponent.SetIsMoveAnimationOpen(false);
+        MoveComponent.MoveDuration(duration);
     }
 
     //事件方法

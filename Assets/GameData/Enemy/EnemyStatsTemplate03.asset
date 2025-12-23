@@ -17,19 +17,19 @@ MonoBehaviour:
     Name: "\u54E5\u5E03\u6797"
     Level: 1
     Power: 1
-    MoveSpeed: 2
+    MoveSpeed: 5
     KnockbackPower: 1
-    FloatPower: 0
+    FloatPower: 1
     Weight: 0
   VisualData:
-    Prefab: {fileID: 4738781730734430214, guid: 6561cd463a9afda43a6d7c34ef0a5e52, type: 3}
+    Prefab: {fileID: 3944193630288458971, guid: 59d379ee68495804fa9eede75222401f, type: 3}
     DetectPrefab: {fileID: 0}
     SpriteIcon: {fileID: 0}
     DeathSFX: {fileID: 0}
     NormalMaterial: {fileID: 2100000, guid: ce71ba01014fe3043971f56059a6c29d, type: 2}
     FlashMaterial: {fileID: 2100000, guid: 343628f4e759ecf46b917b0ca0685d23, type: 2}
-  MaxHp: 0
-  SkillSlotCount: 0
+  MaxHp: 10
+  SkillSlotCount: 1
   Exp: 1
   CanRespawn: 0
   SkillTemplateList:

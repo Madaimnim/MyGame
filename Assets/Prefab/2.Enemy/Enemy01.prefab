@@ -134,7 +134,7 @@ GameObject:
   m_Component:
   - component: {fileID: 3652742521525985845}
   - component: {fileID: 7231060085788208260}
-  m_Layer: 14
+  m_Layer: 0
   m_Name: RootSprite
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -358,7 +358,7 @@ GameObject:
   - component: {fileID: -1973428896106944167}
   - component: {fileID: 1518672151570096605}
   - component: {fileID: 1555447824}
-  m_Layer: 14
+  m_Layer: 0
   m_Name: Enemy01
   m_TagString: Untagged
   m_Icon: {fileID: 0}

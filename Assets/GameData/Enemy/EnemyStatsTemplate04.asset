@@ -17,9 +17,9 @@ MonoBehaviour:
     Name: "\u5C0F\u7070\u9CE5"
     Level: 1
     Power: 1
-    MoveSpeed: 1
-    KnockbackPower: 0
-    FloatPower: 0
+    MoveSpeed: 5
+    KnockbackPower: 1
+    FloatPower: 1
     Weight: 0
   VisualData:
     Prefab: {fileID: 8071129183117270245, guid: 4af2cabfe6c0fde46a5ba13601cdd5ff, type: 3}
@@ -29,7 +29,7 @@ MonoBehaviour:
     NormalMaterial: {fileID: 2100000, guid: ce71ba01014fe3043971f56059a6c29d, type: 2}
     FlashMaterial: {fileID: 2100000, guid: 343628f4e759ecf46b917b0ca0685d23, type: 2}
   MaxHp: 10
-  SkillSlotCount: 2
+  SkillSlotCount: 1
   Exp: 1
   CanRespawn: 0
   SkillTemplateList:
@@ -37,7 +37,7 @@ MonoBehaviour:
       Id: 1
       Name: "\u666E\u901A\u653B\u64CA"
       Level: 1
-      Power: 0
+      Power: 1
       MoveSpeed: 1
       KnockbackPower: 3
       FloatPower: 1

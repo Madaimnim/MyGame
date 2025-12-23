@@ -10,10 +10,21 @@ public class MoveComponent
     public Vector2 IntentDirection;
     public TargetDetector MoveDetector { get; private set; }
     public float MoveSpeed { get; private set; }
+    public float CurrentMoveSpeed { get; private set; }
 
     //移動相關
     private const float ARRIVAL_THRESHOLD = 0.05f;    //抵達判定距離
     private const float MOVEATTACK_SPEED = 0.3f;      //攻擊時的移動速度
+
+    //敵人移動相關
+    private float _moveDuration = 1f;
+    private float _moveWindowRemainTime = 0f;
+    private bool _useMoveWindow = false;
+    public void MoveDuration(float duration) {
+        CurrentMoveSpeed = MoveSpeed / duration;
+        _moveWindowRemainTime = duration;
+        _useMoveWindow= true;
+    } 
 
     //擊退相關
     private Coroutine _knockbackCoroutine;
@@ -23,17 +34,10 @@ public class MoveComponent
     private MonoBehaviour _runner;
     private HeightComponent _heightComponent;
     private StateComponent _stateComponent;
-    public MoveComponent(Rigidbody2D rb,
-        float moveSpeed ,
-        MonoBehaviour runner, 
-        TargetDetector moveDetector,
-        AnimationComponent animationComponent,
-        HeightComponent heightComponent,
-
-        StateComponent stateComponent
-        ) {
+    public MoveComponent(Rigidbody2D rb,float moveSpeed ,MonoBehaviour runner,TargetDetector moveDetector,AnimationComponent animationComponent,HeightComponent heightComponent,StateComponent stateComponent) {
         _rb = rb ;
         MoveSpeed = moveSpeed;
+        CurrentMoveSpeed = MoveSpeed;
         _runner = runner;
         MoveDetector = moveDetector;
         _animationComponent = animationComponent;
@@ -46,7 +50,7 @@ public class MoveComponent
         else _stateComponent.SetIsMoving(false);
     }
     private bool TryMove() {
-        if (!_stateComponent.CanMove) return false;    
+        if (!_stateComponent.CanMove) return false;
 
         // 若指定追蹤 Transform（AI 用）
         if (IntentTargetTransform != null) {
@@ -80,16 +84,18 @@ public class MoveComponent
         // 若只有方向輸入（玩家 WASD）
         else if (IntentDirection == Vector2.zero)
             return false;// 沒有方向時不移動
-        
-
 
         // 執行移動
-        Vector2 newPosition = _rb.position + IntentDirection * MoveSpeed * Time.fixedDeltaTime;
+        Vector2 newPosition = _rb.position + IntentDirection * CurrentMoveSpeed * Time.fixedDeltaTime;
+
         if (_stateComponent.IsPlayingAttackAnimation)
-            newPosition = _rb.position + IntentDirection * MOVEATTACK_SPEED * Time.fixedDeltaTime;
+            newPosition = _rb.position + IntentDirection * CurrentMoveSpeed*MOVEATTACK_SPEED * Time.fixedDeltaTime;
+
         //播放移動動畫
         _animationComponent.PlayMove();
 
+        if (_useMoveWindow && _moveWindowRemainTime <= 0f) return false;
+        if (_useMoveWindow) _moveWindowRemainTime -= Time.fixedDeltaTime;
         _rb.MovePosition(newPosition);
 
         return true;

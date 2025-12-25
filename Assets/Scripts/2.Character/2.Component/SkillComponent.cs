@@ -28,6 +28,7 @@ public class SkillComponent
     public bool HasAnyTarget => SkillSlots.Any(slot => slot.HasSkill && slot.Detector != null && slot.Detector.HasTarget);
 
     public event Action OnSkillsChanged; // (slot, skillId, runtime)
+    public event Action<Vector2> OnSkillAnimationPlayed;
     public event Action<int, ISkillRuntime> OnSkillUsed;         // (slot, runtime)
 
     public SkillComponent
@@ -99,7 +100,7 @@ public class SkillComponent
         _pendingSlotIndex = IntentSlotIndex;
 
         _animationComponent.PlayAttack(skill.StatsData.Id);
-        _animationComponent.FaceDirection(direction);
+        OnSkillAnimationPlayed.Invoke(direction);
     }
 
     public void UseSkill() {

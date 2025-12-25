@@ -191,7 +191,6 @@ GameObject:
   - component: {fileID: 251652422115885089}
   - component: {fileID: 13533197571593537}
   - component: {fileID: 7836925504802550091}
-  - component: {fileID: 8864957341285129999}
   m_Layer: 8
   m_Name: Sprite
   m_TagString: Untagged
@@ -293,18 +292,6 @@ BoxCollider2D:
   serializedVersion: 2
   m_Size: {x: 0.7767012, y: 0.73874426}
   m_EdgeRadius: 0
---- !u!114 &8864957341285129999
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 4138607357695044776}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 39683a2a40694534e869ce2378e61c8e, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
 --- !u!1 &4352690609020931775
 GameObject:
   m_ObjectHideFlags: 0
@@ -902,6 +889,7 @@ GameObject:
   - component: {fileID: 5728202746658678144}
   - component: {fileID: 4535470711809060100}
   - component: {fileID: 3162180957960293577}
+  - component: {fileID: 8762183949986933422}
   m_Layer: 14
   m_Name: Enemy04
   m_TagString: Untagged
@@ -1084,3 +1072,18 @@ Animator:
   m_AllowConstantClipSamplingOptimization: 1
   m_KeepAnimatorStateOnDisable: 0
   m_WriteDefaultValuesOnDisable: 0
+--- !u!114 &8762183949986933422
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8071129183117270245}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 19628b37e1505ee4aac382ae9b5921f4, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  slider: {fileID: 5097688415315766495}
+  text: {fileID: 0}
+  title: HP

@@ -25,6 +25,8 @@ public class MoveComponent
         _moveWindowRemainTime = duration;
         _useMoveWindow= true;
     } 
+    //事件
+    public event Action<Vector2> OnMoveDirectionChanged;
 
     //擊退相關
     private Coroutine _knockbackCoroutine;
@@ -91,15 +93,21 @@ public class MoveComponent
         if (_stateComponent.IsPlayingAttackAnimation)
             newPosition = _rb.position + IntentDirection * CurrentMoveSpeed*MOVEATTACK_SPEED * Time.fixedDeltaTime;
 
-        //播放移動動畫
-        _animationComponent.PlayMove();
+        //如果沒在攻擊，則播放移動動畫，否則交由攻擊動畫控制
+        if (!_stateComponent.IsPlayingAttackAnimation) {
+            _animationComponent.PlayMove();
+            OnMoveDirectionChanged?.Invoke(IntentDirection);
+        }
+
 
         if (_useMoveWindow && _moveWindowRemainTime <= 0f) return false;
         if (_useMoveWindow) _moveWindowRemainTime -= Time.fixedDeltaTime;
         _rb.MovePosition(newPosition);
 
+
         return true;
     }
+
 
     public void Knockbacked(Vector2 knockbackForce, Transform source) {
 

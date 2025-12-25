@@ -210,11 +210,11 @@ public class PlayerInputManager : MonoBehaviour, IInputProvider {
                             targetPosition = mouseWorldPos;
                         }
 
-                        Debug.Log($"Collider 內： targetPosition = {targetPosition}");
+                        //Debug.Log($"Collider 內： targetPosition = {targetPosition}");
                     }
                     else {
                         targetPosition = detector.GetClosestPoint(mouseWorldPos);
-                        Debug.Log($"Collider 外： targetPosition = {targetPosition}");
+                        //Debug.Log($"Collider 外： targetPosition = {targetPosition}");
                     }
 
                     SetIntentSkill(player.SkillComponent, i, targetPosition: targetPosition, targetTransform: targetTransform);

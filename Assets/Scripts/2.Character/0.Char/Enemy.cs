@@ -4,25 +4,13 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using UnityEngine;
 
-//Done 
-//Done 
-//Done 
-//Done
-//Done 
-
-//Todo
-//
-//
-//
-//
-
 //SkillDetectorBase 下轄Circle_Detector、Box_Detector等偵測策略，可生成範圍Sprite物件，無實際技能槽，開關僅關閉可視化範圍
 
 //腳色技能安裝流程:
 //PlayerStateSystem.UnlockPlayer()-> PlayerSkillSystem.EquipPlayerSkil()->SkillComponent.EquipSkill->();
 //Enemy.Initialized()->EnemySkillSystem.EquipEnemySkill()->EnemySkillComponent.EquipSkill->();
 
-public class Enemy :MonoBehaviour,IInteractable, IAnimationEventOwner
+public class Enemy :MonoBehaviour,IInteractable
 {
     //公開--------------------------------------------------------------------------------------------------------------------------------------------------------------------------
     [SerializeField] private Collider2D sprCol;
@@ -76,7 +64,6 @@ public class Enemy :MonoBehaviour,IInteractable, IAnimationEventOwner
         InputProvider = AIComponent;
     }
     private void Update() {
-        if (MoveComponent != null && !StateComponent.IsDead)SetFacingLeft(MoveComponent.IntentDirection);
         if (SkillComponent != null)SkillComponent.Tick();
         if (ActionLockComponent != null ) ActionLockComponent.Tick();
         if (AIComponent != null) AIComponent.Tick();
@@ -113,6 +100,8 @@ public class Enemy :MonoBehaviour,IInteractable, IAnimationEventOwner
         BehaviorTree behaviourTree =EnemyBehaviourTreeFactory.Create(Rt.EnemyBehaviourTreeType, AIComponent, MoveComponent, SkillComponent, Rt.MoveStrategy);
         AIComponent.SetBehaviorTree(behaviourTree);
 
+        HpSlider hpSlider = GetComponentInChildren<HpSlider>();
+        hpSlider.Bind(HealthComponent);
 
         //事件訂閱
         HealthComponent.OnDie += OnDie;
@@ -124,14 +113,21 @@ public class Enemy :MonoBehaviour,IInteractable, IAnimationEventOwner
             GameEventSystem.Instance.Event_OnWallBroken += AIComponent.DisableAI;
             GameEventSystem.Instance.Event_OnWallBroken += RespawnComponent.DisableRespawn;
         }
+        SkillComponent.OnSkillAnimationPlayed += SetFacingLeft;
+        MoveComponent.OnMoveDirectionChanged += SetFacingLeft;
 
         //初始化狀態--------------------------------------------------------------------------------------------------------------------------------------------------------------------
         transform.name = $"EnemyID_{Rt.StatsData.Id}:({Rt.StatsData.Name})";
         InputProvider = AIComponent;
         ResetState();
         SkillComponent.EquipSkill(0, 1);
+
+
     }
 
+    private void MoveComponent_OnMoveDirectionChanged(Vector2 obj) {
+        throw new NotImplementedException();
+    }
 
     public void Interact(InteractInfo info)
     {

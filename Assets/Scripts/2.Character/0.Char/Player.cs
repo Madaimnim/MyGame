@@ -5,7 +5,7 @@ using UnityEngine;
 using UnityEngine.UIElements;
 
 
-public class Player : MonoBehaviour, IInteractable, IAnimationEventOwner
+public class Player : MonoBehaviour, IInteractable
 {
     //公開--------------------------------------------------------------------------------------------------------------------------------------------------------------------------
     [SerializeField] private Collider2D sprCol;
@@ -65,7 +65,6 @@ public class Player : MonoBehaviour, IInteractable, IAnimationEventOwner
     }
     private void Update()
     {
-        if (MoveComponent != null && !StateComponent.IsDead)SetFacingRight(MoveComponent.IntentDirection); 
         if (SkillComponent != null) SkillComponent.Tick();
         if (ActionLockComponent != null) ActionLockComponent.Tick();
 
@@ -111,7 +110,8 @@ public class Player : MonoBehaviour, IInteractable, IAnimationEventOwner
             GameEventSystem.Instance.Event_BattleStart += RespawnComponent.EnableRespawn;
             GameEventSystem.Instance.Event_OnWallBroken += RespawnComponent.DisableRespawn;
         }
-
+        SkillComponent.OnSkillAnimationPlayed += SetFacingRight;
+        MoveComponent.OnMoveDirectionChanged += SetFacingRight;
 
         //初始化狀態--------------------------------------------------------------------------------------------------------------------------------------------------------------------
         transform.name = $"玩家ID_{Rt.StatsData.Id}:({Rt.StatsData.Name})";

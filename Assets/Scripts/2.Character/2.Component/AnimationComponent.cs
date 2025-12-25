@@ -35,16 +35,6 @@ public class AnimationComponent
 
     public void Play(string name) => _ani.Play(Animator.StringToHash(name));
 
-    public void FaceDirection(Vector2 direction) {
-        if (direction.x == 0) return;
-
-        float absScaleX = Mathf.Abs(_transform.localScale.x);
-        _transform.localScale = new Vector3(
-            direction.x < 0 ? -absScaleX : absScaleX,
-            _transform.localScale.y,
-            _transform.localScale.z
-        );
-    }
 
     public bool TryPlay(string stateName, int layer = 0) {
 
@@ -52,6 +42,7 @@ public class AnimationComponent
         if (!_ani.HasState(layer, stateNameHash)) 
             return false;
         _ani.Play(stateNameHash, layer);
+        Debug.Log($"¼·©ñ°Êµe: {stateName}");
         return true;
     }
 

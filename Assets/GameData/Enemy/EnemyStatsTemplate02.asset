@@ -17,12 +17,12 @@ MonoBehaviour:
     Name: "\u6A39\u7CBE"
     Level: 1
     Power: 1
-    MoveSpeed: 5
+    MoveSpeed: 1
     KnockbackPower: 1
     FloatPower: 1
     Weight: 0
   VisualData:
-    Prefab: {fileID: 4738781730734430214, guid: 6561cd463a9afda43a6d7c34ef0a5e52, type: 3}
+    Prefab: {fileID: 4359685404382160700, guid: feaf6910431b7c34fb1705612ba5ef3a, type: 3}
     DetectPrefab: {fileID: 0}
     SpriteIcon: {fileID: 0}
     DeathSFX: {fileID: 0}
@@ -43,7 +43,7 @@ MonoBehaviour:
       FloatPower: 0
       Weight: 0
     VisualData:
-      Prefab: {fileID: 7821809457673803968, guid: 34fc74616982aab439aab09dfc6d8c41, type: 3}
+      Prefab: {fileID: 3372780662201843477, guid: 2dd7717d106aeed4182c61195d94e8a5, type: 3}
       DetectPrefab: {fileID: 0}
       SpriteIcon: {fileID: 0}
       DeathSFX: {fileID: 0}
@@ -52,7 +52,7 @@ MonoBehaviour:
     Cooldown: 1
     TargetType: 0
     DetectorType: 0
-    DetectRadius: 2
+    DetectRadius: 10
     RangeX: 0
     RangeY: 0
   EnemyBehaviourTreeType: 1

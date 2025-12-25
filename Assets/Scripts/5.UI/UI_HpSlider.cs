@@ -5,26 +5,18 @@ using System.Collections;
 
 public class UI_HpSlider : MonoBehaviour
 {
-    #region 公開變數
-
     [Header("Slider物件")]
     public Slider slider;
     [Header("TextMeshPro數值顯示")]
     public TMP_Text text;
     [Header("血條顯示標題")]
     public string title = "HP"; 
-    #endregion
 
-    #region 私有變數
     private IInteractable thisInteractable; //取得玩家腳本
-    #endregion
 
-    //生命週期
-    #region 生命週期
     private void Awake() {
         thisInteractable = GetComponent<IInteractable>();
     }
-    #endregion
 
     private void OnEnable() {
         GameEventSystem.Instance.Event_HpChanged += UpdateUIValue;            //監聽Enemy的血量變化

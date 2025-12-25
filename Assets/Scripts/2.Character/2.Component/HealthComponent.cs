@@ -16,6 +16,7 @@ public class HealthComponent
 
         _healthData.CurrentHp = _healthData.MaxHp;
         _stateComponent= stateComponent;
+        OnHpChanged?.Invoke(_healthData.CurrentHp, _healthData.MaxHp);
     }
 
     public void TakeDamage(int dmg) {

@@ -92,7 +92,7 @@ public class Enemy :MonoBehaviour,IInteractable
         RespawnComponent = new RespawnComponent(this, Rt.CanRespawn);
         MoveComponent = new MoveComponent(Rb,Rt.StatsData.MoveSpeed, this, MoveDetector, AnimationComponent, HeightComponent,StateComponent);
         SpawnerComponent = new SpawnerComponent();
-        SkillComponent = new SkillComponent(Rt.StatsData, Rt.SkillSlotCount,Rt.SkillPool, AnimationComponent,StateComponent, BackSpriteTransform, PlayerListManager.Instance.TargetList);
+        SkillComponent = new SkillComponent(Rt.StatsData, Rt.SkillSlotCount,Rt.SkillPool, AnimationComponent,StateComponent, transform, PlayerListManager.Instance.TargetList);
         AIComponent = new AIComponent(SkillComponent, MoveComponent, transform,Rt.MoveStrategy);
 
 
@@ -125,9 +125,6 @@ public class Enemy :MonoBehaviour,IInteractable
 
     }
 
-    private void MoveComponent_OnMoveDirectionChanged(Vector2 obj) {
-        throw new NotImplementedException();
-    }
 
     public void Interact(InteractInfo info)
     {

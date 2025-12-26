@@ -9,7 +9,8 @@ public enum SkillMoveType {
     [InspectorName("直線朝目標發射")] Toward,
     [InspectorName("拋物線朝目標發射")] ParabolaToward,
     [InspectorName("直線飛行")] Straight,
-    [InspectorName("生成於目標位置")] SpawnAtTarget
+    [InspectorName("生成於目標位置")] SpawnAtTarget,
+    [InspectorName("附在角色")] AttackToOwner
 }
 public enum OnHitType {
     [InspectorName("沒反應")] Nothing,                      //沒反應
@@ -21,12 +22,16 @@ public enum HitEffectPositionType {
     TargetCenter,
     TargetUpper
 }
+public enum FacingDirection {
+    Left,
+    Right
+}
 
 public class SkillObject : MonoBehaviour, IInteractable {
     [SerializeField] private Collider2D sprCol;
     public Collider2D SprCol => sprCol;
     public Transform BottomTransform => transform;
-
+    public FacingDirection FacingDirection = FacingDirection.Right;
     [Header("可否旋轉")]
     public bool canRotate = true;
 
@@ -61,17 +66,16 @@ public class SkillObject : MonoBehaviour, IInteractable {
         UpdateRotation();
     }
 
-    public void Initial(StatsData pStatsData, StatsData sStatsData, Vector3 targetPosition, Transform targetTransform = null) {
+    public void Initial(Transform charTransform,StatsData pStatsData, StatsData sStatsData, Vector3 targetPosition, Transform targetTransform = null) {
         _pStatsData = pStatsData;
         _sStatsData = sStatsData;
         //模組初始化
-        _skillMoveComponent.Initialize(MoveType, MoveSpeed, targetPosition, targetTransform);
+        _skillMoveComponent.Initialize(MoveType, MoveSpeed, charTransform ,targetPosition, targetTransform);
         _skillHitComponent.Initialize(_skillMoveComponent, _pStatsData, _sStatsData);
 
 
         Vector3 referencePos = targetTransform ? targetTransform.position : targetPosition;
         InitialOffset(referencePos);
-        SetFacingRight(_skillMoveComponent.MoveDirection);
         UpdateRotation();
         StartDestroyTimer(DestroyDelay);
     }
@@ -111,15 +115,5 @@ public class SkillObject : MonoBehaviour, IInteractable {
     //Todo
     public void Interact(InteractInfo info) {
         // SkillObject 待實現
-    }
-    public void SetFacingRight(Vector2 direction) {
-        if (direction.sqrMagnitude < 0.01f) return;     //避免靜止時頻繁執行
-
-        if (Mathf.Abs(direction.x) > 0.01f) {
-            var s = transform.localScale;
-            float mag = Mathf.Abs(s.x);
-            s.x = (direction.x < 0f) ? -mag : mag;
-            transform.localScale = s;
-        }
     }
 }

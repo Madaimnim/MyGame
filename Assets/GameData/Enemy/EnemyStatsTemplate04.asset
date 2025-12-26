@@ -43,7 +43,7 @@ MonoBehaviour:
       FloatPower: 1
       Weight: 0
     VisualData:
-      Prefab: {fileID: 7821809457673803968, guid: 34fc74616982aab439aab09dfc6d8c41, type: 3}
+      Prefab: {fileID: 4690764757931481767, guid: 745c6ec482e4a6c4685d844874637375, type: 3}
       DetectPrefab: {fileID: 0}
       SpriteIcon: {fileID: 0}
       DeathSFX: {fileID: 0}

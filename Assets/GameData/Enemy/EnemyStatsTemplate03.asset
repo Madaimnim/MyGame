@@ -52,7 +52,7 @@ MonoBehaviour:
     Cooldown: 1
     TargetType: 0
     DetectorType: 0
-    DetectRadius: 0
+    DetectRadius: 2
     RangeX: 0
     RangeY: 0
   EnemyBehaviourTreeType: 1

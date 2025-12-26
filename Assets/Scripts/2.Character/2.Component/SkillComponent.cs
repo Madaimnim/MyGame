@@ -116,7 +116,7 @@ public class SkillComponent
             GameObject obj = _spawner.Spawn(skill.VisualData.Prefab, _transform.position, Quaternion.identity);
             var skillObj = obj.GetComponent<SkillObject>();
 
-            skillObj.Initial(_statsData,skill.StatsData,_pendingPosition,_pendingTransform);
+            skillObj.Initial(_transform,_statsData, skill.StatsData,_pendingPosition,_pendingTransform);
             slot.TriggerCooldown(skill.Cooldown);
 
             // µo¨Æ¥ó

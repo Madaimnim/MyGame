@@ -13,6 +13,10 @@ public enum SkillDetectorType {
     [InspectorName("全場最近敵人")] GlobalClosest,
 }
 
+//Todo
+
+
+
 [System.Serializable]
 public class SkillTemplate
 {
@@ -30,5 +34,7 @@ public class SkillTemplate
     public float RangeX;
     [ShowIfDetectType(SkillDetectorType.Box)]
     public float RangeY;
+
+    //
 }
 

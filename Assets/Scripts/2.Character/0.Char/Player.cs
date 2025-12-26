@@ -121,10 +121,11 @@ public class Player : MonoBehaviour, IInteractable
     public void Interact(InteractInfo info)
     {
         _lastInteractSource = info.Source;
-        HealthComponent.TakeDamage(info.Damage);
-        EffectComponent.TakeDamageEffect(info.Damage);
         MoveComponent.Knockbacked(info.KnockbackForce, info.Source);
         HeightComponent.FloatUp(info.FloatPower);
+        HealthComponent.TakeDamage(info.Damage);
+        EffectComponent.TakeDamageEffect(info.Damage);
+
 
         StateComponent.SetIsPlayingAttackAnimation(false);
     }

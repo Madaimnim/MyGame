@@ -21,9 +21,10 @@ public class DetectorSpriteSpawner {
         GameObject go = new GameObject();
         // 加入 SpriteRenderer
         SpriteRenderer sr = go.AddComponent<SpriteRenderer>();
-        sr.sprite = GenerateCircleSprite(radius);
+        sr.sprite = GenerateCircleSprite(1);
         sr.color = color;
         sr.sortingOrder = sortingOrder;
+        go.transform.localScale *= radius;
 
         return go;
     }

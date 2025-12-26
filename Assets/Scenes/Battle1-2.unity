@@ -289,17 +289,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 49c6026acdfeb33468cef7485692f47a, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  SpawnInterval: 1
   SpawnArea: {fileID: 1552200437}
-  Waves:
-  - EnemyId: 2001
-    SpawnCount: 2
-  - EnemyId: 2002
-    SpawnCount: 2
-  - EnemyId: 2003
-    SpawnCount: 2
-  - EnemyId: 2004
-    SpawnCount: 2
+  SpawnConfig: {fileID: 11400000, guid: d2275b253672c5b4e8ffdb4068bc9699, type: 2}
 --- !u!1 &384647081
 GameObject:
   m_ObjectHideFlags: 0

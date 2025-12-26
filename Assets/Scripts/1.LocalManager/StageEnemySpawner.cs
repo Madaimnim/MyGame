@@ -2,29 +2,21 @@ using System.Collections;
 using UnityEngine;
 
 public class StageEnemySpawner : MonoBehaviour {
-
-    [Header("生成條件設定")]
-    public float SpawnInterval = 1.5f;
+    
     [Header("生成區域（BoxCollider2D）")]
     public BoxCollider2D SpawnArea;
-
-    [System.Serializable]
-    public class SpawnWave {
-        public int EnemyId;
-        public int SpawnCount;
-    }
-    [Header("生成波次設定")]
-    public SpawnWave[] Waves;
-
+    [Header("怪物生成Config檔")]
+    public StageEnemySpawnConfig SpawnConfig;
 
     private void Start() {
+        if (SpawnConfig == null) {
+            Debug.LogError("StageEnemySpawner 缺少 SpawnConfig");
+            return;
+        }
         StartCoroutine(SpawnCoroutine());
     }
-
     private IEnumerator SpawnCoroutine() {
-        for (int w = 0; w < Waves.Length; w++) {
-            SpawnWave wave = Waves[w];
-
+        foreach (var wave in SpawnConfig.Waves) {
             for (int i = 0; i < wave.SpawnCount; i++) {
                 Vector3 spawnPos = GetRandomPositionInArea();
 
@@ -32,12 +24,10 @@ public class StageEnemySpawner : MonoBehaviour {
                     .SpawnSystem
                     .SpawnEnemy(wave.EnemyId, spawnPos);
 
-                yield return new WaitForSeconds(SpawnInterval);
+                yield return new WaitForSeconds(SpawnConfig.SpawnInterval);
             }
-
         }
     }
-
     private Vector3 GetRandomPositionInArea() {
         Bounds bounds = SpawnArea.bounds;
 

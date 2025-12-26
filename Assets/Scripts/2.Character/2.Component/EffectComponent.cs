@@ -23,9 +23,9 @@ public class EffectComponent
     }
 
     public void PlayerDeathEffect() {
-        Color c = _spr.color;
-        c.a = 0.5f;  // 透明度 0=完全透明，1=完全不透明，你可以調整成 0.3~0.7
-        _spr.color = c;
+        //Color c = _spr.color;
+        //c.a = 0.5f;  // 透明度 0=完全透明，1=完全不透明，你可以調整成 0.3~0.7
+        //_spr.color = c;
 
         VFXManager.Instance.Play("PlayerDeath", _transform.position);
         AudioManager.Instance.PlaySFX(_visualData.DeathSFX, 0.5f);

@@ -22,7 +22,7 @@ public class SkillMoveComponent {
         _sprCol = owner.SprCol;
     }
 
-    public void Initialize(SkillMoveType moveType, float moveSpeed, Vector3 targetPos, Transform targetTransform = null) {
+    public void Initialize(SkillMoveType moveType, float moveSpeed,Transform charTransform, Vector3 targetPos, Transform targetTransform = null) {
         _moveType = moveType;
         _targetTransform = targetTransform;
         _targetPosition = targetPos;
@@ -31,7 +31,7 @@ public class SkillMoveComponent {
         Vector3 referencePos = targetTransform ? targetTransform.position : targetPos;
         _initialDirection = (referencePos - _transform.position).normalized;
         MoveDirection = _initialDirection;
-        InitailPosition(referencePos);
+        InitailPosition(referencePos, charTransform);
 
         var target = targetTransform ? targetTransform.GetComponentInParent<IInteractable>():null;
         float targetHeight = target!=null ? target.SprCol.transform.localPosition.y : 0f;
@@ -48,11 +48,15 @@ public class SkillMoveComponent {
 
             out VerticalSpeed);
         //Debug.Log($"目標的 MoveSpeed:{targetVelocity}");
+
+        //if (_moveType != SkillMoveType.AttackToOwner)SetFacingRight(MoveDirection);
     }
 
 
     public void Tick() {
         switch (_moveType) {
+            case SkillMoveType.AttackToOwner:
+                break;
             case SkillMoveType.Station:
                 break;
             case SkillMoveType.Toward:
@@ -72,8 +76,13 @@ public class SkillMoveComponent {
         }
     }
 
-    private void InitailPosition(Vector3 targetPos) {
+    private void InitailPosition(Vector3 targetPos,Transform charTransform) {
         switch (_moveType) {
+            case SkillMoveType.AttackToOwner:
+                _transform.SetParent(charTransform);
+                _transform.localPosition = Vector3.zero;
+                _transform.localScale= Vector3.one;
+                break;
             case SkillMoveType.SpawnAtTarget:
                 _owner.transform.position = targetPos;
                 break;
@@ -88,7 +97,7 @@ public class SkillMoveComponent {
         else
             MoveDirection = _initialDirection;
 
-        _owner.SetFacingRight(MoveDirection);
+        SetFacingRight(MoveDirection);
         _transform.position += (Vector3)(MoveDirection * MoveSpeed * Time.deltaTime);
     }
     private void ParabolaTowardTick() {
@@ -116,5 +125,26 @@ public class SkillMoveComponent {
 
         float angle = Mathf.Atan2(VerticalSpeed,MoveSpeed) * Mathf.Rad2Deg;
         _sprCol.transform.localRotation = Quaternion.Euler(0f, 0f, angle);
+    }
+
+    public void SetFacingRight(Vector2 direction) {
+        if (direction.sqrMagnitude < 0.01f) return;     //避免靜止時頻繁執行
+
+        if (Mathf.Abs(direction.x) > 0.01f) {
+            var s = _owner.transform.localScale;
+            float mag = Mathf.Abs(s.x);
+
+            switch (_owner.FacingDirection) {
+                case FacingDirection.Left:
+                    s.x = (direction.x < 0f) ? mag : -mag;
+                    break;
+                case FacingDirection.Right:
+                    s.x = (direction.x < 0f) ? -mag : mag;
+                    break;
+            }
+
+
+            _owner.transform.localScale = s;
+        }
     }
 }

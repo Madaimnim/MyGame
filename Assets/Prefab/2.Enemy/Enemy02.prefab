@@ -802,7 +802,7 @@ MonoBehaviour:
   Rb: {fileID: 0}
   Ani: {fileID: 0}
   Spr: {fileID: 0}
-  id: 2001
+  id: 2002
 --- !u!95 &7449109019524036368
 Animator:
   serializedVersion: 5

@@ -3,56 +3,19 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-public enum SkillMoveType {
-    [InspectorName("原地生成")] Station,
-    [InspectorName("追蹤目標")] Homing,
-    [InspectorName("直線朝目標發射")] Toward,
-    [InspectorName("拋物線朝目標發射")] ParabolaToward,
-    [InspectorName("直線飛行")] Straight,
-    [InspectorName("生成於目標位置")] SpawnAtTarget,
-    [InspectorName("附在角色")] AttackToOwner
-}
-public enum OnHitType {
-    [InspectorName("沒反應")] Nothing,                      //沒反應
-    [InspectorName("命中消失")] Disappear,                  //命中即消失
-    [InspectorName("命中後停留爆炸")] Explode,              //命中後停留爆炸
-}
-public enum HitEffectPositionType {
-    ClosestPoint,
-    TargetCenter,
-    TargetUpper
-}
-public enum FacingDirection {
-    Left,
-    Right
-}
 
 public class SkillObject : MonoBehaviour, IInteractable {
     [SerializeField] private Collider2D sprCol;
     public Collider2D SprCol => sprCol;
     public Transform BottomTransform => transform;
-    public FacingDirection FacingDirection = FacingDirection.Right;
-    [Header("可否旋轉")]
-    public bool canRotate = true;
 
-    [Header("技能類型設定")]
-    public SkillMoveType MoveType;
-    public OnHitType OnHitType;
-    public HitEffectPositionType HitEffectPositionType;
-
-    [Header("基本參數")]
-    public LayerMask TargetLayers;
-    public float MoveSpeed = 0f;
-    public Vector2 SkillOffset = Vector2.zero;
-    public float DestroyDelay = 0f;
-    public float OnHitDestroyDelay = 0f;
-    // 碰撞用底部Y座標
     public Vector2 MoveVelocity => _skillMoveComponent.MoveDirection * _skillMoveComponent.MoveSpeed;
-
+    private bool _canRotate = false;
     private StatsData _pStatsData;
-    private StatsData _sStatsData;
+    private ISkillRuntime _skillRt;
     private SkillMoveComponent _skillMoveComponent;
     private SkillHitComponent _skillHitComponent;
+    private HeightComponent _heightComponent;
 
     private Coroutine _destroyCoroutine;
 
@@ -65,19 +28,24 @@ public class SkillObject : MonoBehaviour, IInteractable {
         if (_skillHitComponent != null) _skillHitComponent.Tick();
         UpdateRotation();
     }
+    private void FixedUpdate() {
+        if (_heightComponent != null) _heightComponent.FixedTick();
+    }
 
-    public void Initial(Transform charTransform,StatsData pStatsData, StatsData sStatsData, Vector3 targetPosition, Transform targetTransform = null) {
+    public void Initial(Transform charTransform,Transform charSprTransform, StatsData pStatsData, ISkillRuntime skillRt,  Vector3 targetPosition, Transform targetTransform = null) {
         _pStatsData = pStatsData;
-        _sStatsData = sStatsData;
+        _skillRt = skillRt;
+        _canRotate= _skillRt.canRotate;
+
         //模組初始化
-        _skillMoveComponent.Initialize(MoveType, MoveSpeed, charTransform ,targetPosition, targetTransform);
-        _skillHitComponent.Initialize(_skillMoveComponent, _pStatsData, _sStatsData);
+        _skillMoveComponent.Initialize(_skillRt,charTransform, charSprTransform ,targetPosition, targetTransform);
+        _skillHitComponent.Initialize(_skillRt,_skillMoveComponent, _pStatsData);
 
+        //Vector3 referencePos = targetTransform ? targetTransform.position : targetPosition;
 
-        Vector3 referencePos = targetTransform ? targetTransform.position : targetPosition;
-        InitialOffset(referencePos);
+        //InitialOffset(referencePos);
         UpdateRotation();
-        StartDestroyTimer(DestroyDelay);
+        StartDestroyTimer(skillRt.DestroyDelay);
     }
 
     private void OnTriggerEnter2D(Collider2D collision) => _skillHitComponent.TriggerEnter(collision);
@@ -94,9 +62,9 @@ public class SkillObject : MonoBehaviour, IInteractable {
         Destroy(gameObject);
     }
 
-    private void InitialOffset(Vector3 targetPosition) => transform.position = (Vector2)transform.position + new Vector2((targetPosition.x - transform.position.x >= 0) ? SkillOffset.x : -SkillOffset.x, SkillOffset.y);
+    //private void InitialOffset(Vector3 targetPosition) => transform.position = (Vector2)transform.position + new Vector2((targetPosition.x - transform.position.x >= 0) ? SkillOffset.x : -SkillOffset.x, SkillOffset.y);
     private void UpdateRotation() {
-        if (!canRotate || _skillMoveComponent.MoveDirection == Vector2.zero)
+        if (!_canRotate || _skillMoveComponent.MoveDirection == Vector2.zero)
             return;
 
         float angle = Mathf.Atan2(_skillMoveComponent.MoveDirection.y, _skillMoveComponent.MoveDirection.x) * Mathf.Rad2Deg;

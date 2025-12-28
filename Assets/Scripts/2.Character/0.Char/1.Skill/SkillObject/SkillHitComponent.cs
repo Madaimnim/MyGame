@@ -3,23 +3,25 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 public class SkillHitComponent {
-    private SkillObject _owner;
+    private SkillObject _skillObject;
     private SkillMoveComponent _skillMoveComponent;
+    private ISkillRuntime _skillRt;
     private int _damage;
     private float _knockbackPower;
     private float _floatPower;
 
     private List<(IInteractable target, Collider2D col)> _targetList = new();
 
-    public SkillHitComponent(SkillObject owner) {
-        _owner = owner;
+    public SkillHitComponent(SkillObject skillObject) {
+        _skillObject = skillObject;
     }
 
-    public void Initialize(SkillMoveComponent skillMoveComponent, StatsData pStatsData, StatsData sStatsData) {
+    public void Initialize(ISkillRuntime skillRt,SkillMoveComponent skillMoveComponent, StatsData pStatsData) {
+        _skillRt = skillRt;
         _skillMoveComponent = skillMoveComponent;
-        _damage = pStatsData.Power + sStatsData.Power;
-        _knockbackPower = pStatsData.KnockbackPower + sStatsData.KnockbackPower;
-        _floatPower = pStatsData.FloatPower + sStatsData.FloatPower;
+        _damage = pStatsData.Power + _skillRt.StatsData.Power;
+        _knockbackPower = pStatsData.KnockbackPower + _skillRt.StatsData.KnockbackPower;
+        _floatPower = pStatsData.FloatPower + _skillRt.StatsData.FloatPower;
     }
     public void Tick() {
         for (int i = _targetList.Count - 1; i >= 0; i--) {
@@ -29,7 +31,7 @@ public class SkillHitComponent {
                 continue;
             }
 
-            float bottomYDiff = Mathf.Abs(_owner.transform.position.y - target.BottomTransform.position.y);
+            float bottomYDiff = Mathf.Abs(_skillObject.transform.position.y - target.BottomTransform.position.y);
             if (bottomYDiff > PhysicManager.Instance.PhysicConfig.BottomYThreshold) continue;
 
             Hit(target, col);
@@ -37,7 +39,7 @@ public class SkillHitComponent {
         }
     }
     public void TriggerEnter(Collider2D collision) {
-        if (((1 << collision.gameObject.layer) & _owner.TargetLayers) == 0) return;
+        if (((1 << collision.gameObject.layer) & _skillRt.TargetLayers) == 0) return;
 
         IInteractable target = collision.GetComponentInParent<IInteractable>();
         if (target == null) return;
@@ -51,20 +53,20 @@ public class SkillHitComponent {
         if(target as Enemy)
             VFXManager.Instance.Play("DamageEffect01", hitPoint, targetCol.GetComponent<SpriteRenderer>());
         target.Interact(new InteractInfo {
-            Source = _owner.transform,
+            Source = _skillObject.transform,
             Damage = _damage,
             KnockbackForce = _knockbackPower * _skillMoveComponent.MoveDirection,
             FloatPower = _floatPower
 
         });
-        switch (_owner.OnHitType) {
+        switch (_skillRt.OnHitType) {
             case OnHitType.Disappear:
-                StartDestroyTimer(_owner.OnHitDestroyDelay);
+                StartDestroyTimer(_skillRt.OnHitDestroyDelay);
                 break;
 
             case OnHitType.Explode:
                 // 可在這裡觸發爆炸特效、AOE 等
-                StartDestroyTimer(_owner.OnHitDestroyDelay);
+                StartDestroyTimer(_skillRt.OnHitDestroyDelay);
                 break;
 
             case OnHitType.Nothing:
@@ -77,10 +79,10 @@ public class SkillHitComponent {
         Bounds targetbounds = targetCol.bounds;
         Vector2 targetcenter = targetbounds.center;
 
-        switch (_owner.HitEffectPositionType) {
+        switch (_skillRt.HitEffectPositionType) {
             case HitEffectPositionType.ClosestPoint:
-                Vector2 hitA = targetCol.ClosestPoint(_owner.transform.position);
-                Vector2 hitB = _owner.SprCol.ClosestPoint(targetCol.transform.position);
+                Vector2 hitA = targetCol.ClosestPoint(_skillObject.transform.position);
+                Vector2 hitB = _skillObject.SprCol.ClosestPoint(targetCol.transform.position);
                 return (hitA + hitB) / 2f;
 
             case HitEffectPositionType.TargetCenter:
@@ -114,6 +116,6 @@ public class SkillHitComponent {
         return point;
     }
 
-    private void StartDestroyTimer(float delay) => _owner.StartDestroyTimer(delay);
+    private void StartDestroyTimer(float delay) => _skillObject.StartDestroyTimer(delay);
 
 }

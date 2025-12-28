@@ -152,9 +152,9 @@ CircleCollider2D:
   m_IsTrigger: 1
   m_UsedByEffector: 0
   m_UsedByComposite: 0
-  m_Offset: {x: 0, y: 0}
+  m_Offset: {x: 0.027879104, y: 0.030976862}
   serializedVersion: 2
-  m_Radius: 0.1
+  m_Radius: 0.27
 --- !u!1 &7821809457673803968
 GameObject:
   m_ObjectHideFlags: 0
@@ -198,7 +198,7 @@ Rigidbody2D:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 7821809457673803968}
-  m_BodyType: 0
+  m_BodyType: 1
   m_Simulated: 1
   m_UseFullKinematicContacts: 0
   m_UseAutoMass: 0
@@ -233,7 +233,7 @@ MonoBehaviour:
     serializedVersion: 2
     m_Bits: 64
   MoveSpeed: 0
-  SkillOffset: {x: 0.38, y: 0.38}
+  SkillOffset: {x: 0.46, y: 0.372}
   DestroyDelay: 0.5
   OnHitDestroyDelay: 0
 --- !u!1 &8458090048704038593

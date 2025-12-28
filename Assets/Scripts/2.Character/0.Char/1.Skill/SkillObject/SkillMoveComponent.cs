@@ -7,31 +7,33 @@ public class SkillMoveComponent {
     private Transform _transform;
     private Collider2D _sprCol;
 
+    private ISkillRuntime _skillRt;
     private SkillMoveType _moveType;
     private Transform _targetTransform;
     private Vector3 _targetPosition;
     public Vector2 MoveDirection { get; private set; }
-
     private Vector2 _initialDirection;
     public float MoveSpeed { get; private set; }
     public float VerticalSpeed;
 
-    public SkillMoveComponent(SkillObject owner) {
-        _owner = owner;
-        _transform = owner.transform;
-        _sprCol = owner.SprCol;
+    public SkillMoveComponent(SkillObject skillObject) {
+        _owner = skillObject;
+        _transform = skillObject.transform;
+        _sprCol = skillObject.SprCol;
     }
 
-    public void Initialize(SkillMoveType moveType, float moveSpeed,Transform charTransform, Vector3 targetPos, Transform targetTransform = null) {
-        _moveType = moveType;
+    public void Initialize(ISkillRuntime skillRt,Transform charTransform,Transform charSprTransform, Vector3 targetPos, Transform targetTransform = null) {
+        _skillRt = skillRt;
+        _moveType = _skillRt.SkillMoveType;
+        MoveSpeed = _skillRt.StatsData.MoveSpeed;
         _targetTransform = targetTransform;
         _targetPosition = targetPos;
-        MoveSpeed = moveSpeed;
 
         Vector3 referencePos = targetTransform ? targetTransform.position : targetPos;
         _initialDirection = (referencePos - _transform.position).normalized;
         MoveDirection = _initialDirection;
-        InitailPosition(referencePos, charTransform);
+
+        InitailPosition(referencePos, charTransform, charSprTransform);
 
         var target = targetTransform ? targetTransform.GetComponentInParent<IInteractable>():null;
         float targetHeight = target!=null ? target.SprCol.transform.localPosition.y : 0f;
@@ -47,9 +49,7 @@ public class SkillMoveComponent {
             targetVelocity,
 
             out VerticalSpeed);
-        //Debug.Log($"目標的 MoveSpeed:{targetVelocity}");
 
-        //if (_moveType != SkillMoveType.AttackToOwner)SetFacingRight(MoveDirection);
     }
 
 
@@ -76,10 +76,11 @@ public class SkillMoveComponent {
         }
     }
 
-    private void InitailPosition(Vector3 targetPos,Transform charTransform) {
+    private void InitailPosition(Vector3 targetPos,Transform charTransform,Transform charSprTransform) {
+        _transform.position= charTransform.position;
         switch (_moveType) {
             case SkillMoveType.AttackToOwner:
-                _transform.SetParent(charTransform);
+                _transform.SetParent(charSprTransform);
                 _transform.localPosition = Vector3.zero;
                 _transform.localScale= Vector3.one;
                 break;
@@ -111,7 +112,7 @@ public class SkillMoveComponent {
         if (_sprCol.transform.localPosition.y < 0) {
             //Debug.Log("localPosition 小於0, reset為 0");
             _sprCol.transform.localPosition = new Vector3(0, 0, 0);
-            _owner.StartDestroyTimer(_owner.OnHitDestroyDelay);
+            _owner.StartDestroyTimer(_skillRt.OnHitDestroyDelay);
             return;
         }
 
@@ -134,7 +135,7 @@ public class SkillMoveComponent {
             var s = _owner.transform.localScale;
             float mag = Mathf.Abs(s.x);
 
-            switch (_owner.FacingDirection) {
+            switch (_skillRt.FacingDirection) {
                 case FacingDirection.Left:
                     s.x = (direction.x < 0f) ? mag : -mag;
                     break;

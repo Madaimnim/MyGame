@@ -12,12 +12,54 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 697f413c20ade114cab40fa1f2f679e3, type: 3}
   m_Name: EnemyStatsTemplate04
   m_EditorClassIdentifier: 
+  EnemyBehaviourTreeType: 1
+  MoveStrategyType: 0
+  SkillSlotCount: 1
+  SkillTemplateList:
+  - SkillTargetType: 0
+    SkillExecutionType: 0
+    SkillMoveType: 6
+    OnHitType: 1
+    HitEffectPositionType: 0
+    FacingDirection: 0
+    TargetLayers:
+      serializedVersion: 2
+      m_Bits: 64
+    StatsData:
+      Id: 1
+      Name: "\u666E\u901A\u653B\u64CA"
+      Level: 1
+      Power: 1
+      MoveSpeed: 1
+      VerticalMoveSpeed: 0
+      KnockbackPower: 1
+      FloatPower: 1
+      Weight: 0
+    VisualData:
+      Prefab: {fileID: 4690764757931481767, guid: 745c6ec482e4a6c4685d844874637375, type: 3}
+      DetectPrefab: {fileID: 0}
+      SpriteIcon: {fileID: 0}
+      DeathSFX: {fileID: 0}
+      NormalMaterial: {fileID: 0}
+      FlashMaterial: {fileID: 0}
+    canRotate: 0
+    Cooldown: 1
+    DestroyDelay: 1
+    OnHitDestroyDelay: 0
+    SkillDashMultiplier: 5
+    SkillDashDuration: 0.5
+    SkillDashVerticalVelocity: -5
+    DetectorType: 0
+    DetectRadius: 2
+    RangeX: 0
+    RangeY: 0
   StatsData:
     Id: 2004
     Name: "\u5C0F\u7070\u9CE5"
     Level: 1
     Power: 1
     MoveSpeed: 1
+    VerticalMoveSpeed: 0.8
     KnockbackPower: 1
     FloatPower: 1
     Weight: 0
@@ -28,32 +70,6 @@ MonoBehaviour:
     DeathSFX: {fileID: 0}
     NormalMaterial: {fileID: 2100000, guid: ce71ba01014fe3043971f56059a6c29d, type: 2}
     FlashMaterial: {fileID: 2100000, guid: 343628f4e759ecf46b917b0ca0685d23, type: 2}
-  MaxHp: 10
-  SkillSlotCount: 1
-  Exp: 1
   CanRespawn: 0
-  SkillTemplateList:
-  - StatsData:
-      Id: 1
-      Name: "\u666E\u901A\u653B\u64CA"
-      Level: 1
-      Power: 1
-      MoveSpeed: 1
-      KnockbackPower: 3
-      FloatPower: 1
-      Weight: 0
-    VisualData:
-      Prefab: {fileID: 4690764757931481767, guid: 745c6ec482e4a6c4685d844874637375, type: 3}
-      DetectPrefab: {fileID: 0}
-      SpriteIcon: {fileID: 0}
-      DeathSFX: {fileID: 0}
-      NormalMaterial: {fileID: 0}
-      FlashMaterial: {fileID: 0}
-    Cooldown: 1
-    TargetType: 0
-    DetectorType: 0
-    DetectRadius: 2
-    RangeX: 0
-    RangeY: 0
-  EnemyBehaviourTreeType: 1
-  MoveStrategyType: 0
+  MaxHp: 10
+  Exp: 1

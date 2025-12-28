@@ -5,80 +5,163 @@ using System.Collections;
 
 public class HeightComponent
 {
-    private float _initialHeightY;
-    private float _recoverSpeed ;
+    private float _initialHeight;
     private Transform _sprTransform;
-    private MonoBehaviour _runner;
     private StateComponent _stateComponent;
+    private AnimationComponent _animationComponent;
 
-    Coroutine _floatCoroutine;
+    private StatsData _statsData;
+    private bool _gravityEnabled = false;
+    private float _verticalVelocity = 0f;
+    private float _gravity;
+
+    private MonoBehaviour _runner ;
     Coroutine _recoverHeightCoroutine;
+    Coroutine _skillVerticalMoveCoroutine;
+    Coroutine _hurtCoroutine;
 
-    public HeightComponent(Transform transform, MonoBehaviour runner,float initialHeightY,float recoverSpeed,StateComponent stateComponent)
+    public HeightComponent(Transform sprTransform,StateComponent stateComponent, AnimationComponent animationComponent, MonoBehaviour runner,StatsData statsData )
     {
-        _sprTransform = transform;
+        _sprTransform = sprTransform;
+        _stateComponent = stateComponent;
+        _animationComponent = animationComponent;
         _runner = runner;
-        _initialHeightY= initialHeightY;
-        _recoverSpeed = recoverSpeed;
-        _stateComponent = stateComponent; 
+        _statsData= statsData;
+
+        _initialHeight = sprTransform.localPosition.y;
+        _gravity = PhysicManager.Instance.PhysicConfig.GravityScale;
+
+        if (_sprTransform.localPosition.y >0) _stateComponent.SetIsGrounded(false);
+        else _stateComponent.SetIsGrounded(true);
     }
 
+    public void FixedTick() {
 
-    public void FloatUp(float floatPower)
-    {
-        if (_floatCoroutine != null)
-        {
-            _runner.StopCoroutine(_floatCoroutine);
-            _floatCoroutine = null;
-        }
-        _floatCoroutine = _runner.StartCoroutine(FloatCoroutine(floatPower));
-    }
-    private IEnumerator FloatCoroutine(float floatPower)
-    {
-        _stateComponent.SetIsGrounded (false);
+        if (!_gravityEnabled) return;
 
-        // ======= 物理參數 =======
-        float gravity = PhysicManager.Instance.PhysicConfig.GravityScale;                 //重力加速度
-        float verticalVelocity = floatPower;                                              //初始向上速度
+        float dt = Time.fixedDeltaTime;
+        float currentHeight = _sprTransform.localPosition.y + _verticalVelocity * dt;
 
-        // ======= 迴圈：持續模擬直到角色落回地面 =======
-        while (true)
-        {
-            var deltaTime = Time.deltaTime;
-            verticalVelocity -= gravity * deltaTime;
-            _sprTransform.localPosition += new Vector3(0,verticalVelocity * deltaTime);
-
-            if(_sprTransform.localPosition.y <= 0 ) break;
-            yield return null;
+        if (currentHeight <= 0f) {
+            currentHeight = 0f;
+            _gravityEnabled = false;
+            _verticalVelocity = 0f;
+            _stateComponent.SetIsGrounded(true);
         }
 
-        RecoverHeight(_recoverSpeed);
-        _stateComponent.SetIsGrounded(true);
+        UpdateHeight(currentHeight);
+
+        _verticalVelocity -= _gravity * dt;
     }
 
-    public void RecoverHeight(float speed) {
-        if (_recoverHeightCoroutine != null) {
-            _runner.StopCoroutine(_recoverHeightCoroutine);
-            _recoverHeightCoroutine = null;
+    public void Hurt(float duration=0f) {
+        if (_hurtCoroutine != null) {
+            _runner.StopCoroutine(_hurtCoroutine);
+            _hurtCoroutine = null;
+        }
+        _hurtCoroutine = _runner.StartCoroutine(HurtCoroutine(duration));    
+    }
+
+    private IEnumerator HurtCoroutine(float duration) {
+        Debug.Log($"受傷持續時間:{duration}");
+        int steps = Mathf.CeilToInt(duration / Time.fixedDeltaTime);
+        EnableGravity();
+
+        for (int i = 0; i < steps; i++) {
+            yield return new WaitForFixedUpdate();
         }
 
-        _recoverHeightCoroutine = _runner.StartCoroutine(RecoverHeightCoroutine(speed)
-        );
+        DisableGravity();
+        RecoveryHeight(_statsData.VerticalMoveSpeed);
+        yield return null;
     }
-    private IEnumerator RecoverHeightCoroutine(float speed) {
+
+    public void FloatUp(float floatPower) {
+        _verticalVelocity= floatPower;
+    }
+
+    public void EnableGravity() {
+        _stateComponent.SetIsGrounded(false);
+        _stateComponent.SetIsInitialHeight(false);
+
+        _gravityEnabled = true;
+    }
+    public void DisableGravity(bool snapToGround = false) {
+        _gravityEnabled = false;
+        _verticalVelocity = 0f;
+    }
+    private void UpdateHeight(float y) {
+        _sprTransform.localPosition = new Vector3(_sprTransform.localPosition.x,y,_sprTransform.localPosition.z);
+    }
+
+
+    public void SkillVerticalMove(ISkillRuntime skillRt) {
+        _gravityEnabled = false;
+
+        StopSkillVerticalMoveCoroutine();
+
+        _recoverHeightCoroutine = _runner.StartCoroutine(SkillVerticalMoveCoroutine(skillRt.SkillDashVerticalVelocity, skillRt.SkillDashDuration));
+    }
+    public void RecoveryHeight(float verticalMovespeed) {
+        _animationComponent.PlayImmediate("Idle");
+        _gravityEnabled = false;
+
+        StopRecoverHeightCoroutine();
+
+        _recoverHeightCoroutine = _runner.StartCoroutine(RecoveryHeightCoroutine(verticalMovespeed));
+    }
+
+    private IEnumerator SkillVerticalMoveCoroutine(float skillDashVerticalVelocity, float skillDashDuration) {
+        int steps = Mathf.CeilToInt(skillDashDuration / Time.fixedDeltaTime);
+
+        //Debug.Log($"技能垂直移動 啟動 高度速度:{skillDashVerticalVelocity} 持續時間:{skillDashDuration}");
+
+        for (int i = 0; i < steps; i++) {
+            float currentHeight = _sprTransform.localPosition.y;
+            float nextHeight = currentHeight + skillDashVerticalVelocity * Time.fixedDeltaTime;
+
+            //高度下限保護
+            if (nextHeight <= 0f) {
+                UpdateHeight(0f);
+                break; //只跳出 for，不中斷協程
+            }
+
+            UpdateHeight(nextHeight);
+            yield return new WaitForFixedUpdate();
+        }
+    }
+    private IEnumerator RecoveryHeightCoroutine(float verticalMovespeed) {
         while (true) {
-            float currentY = _sprTransform.localPosition.y;
+            float currentHeight = _sprTransform.localPosition.y;
+            float nextHeight = Mathf.MoveTowards(currentHeight, _initialHeight, verticalMovespeed * Time.fixedDeltaTime);
 
-            if (Mathf.Approximately(currentY, _initialHeightY))break;
+            UpdateHeight(nextHeight);
 
-            float newY = Mathf.MoveTowards(currentY,_initialHeightY,speed * Time.deltaTime);
-            _sprTransform.localPosition = new Vector3(_sprTransform.localPosition.x,newY,_sprTransform.localPosition.z);
+            if (Mathf.Approximately(nextHeight, _initialHeight)) {
+                _sprTransform.localPosition = new Vector3(_sprTransform.localPosition.x, _initialHeight, _sprTransform.localPosition.z);
+                _stateComponent.SetIsInitialHeight(true);
+                //Debug.Log($"高度恢復完成:{_stateComponent.IsInitialHeight}");
+                break;
+            }
 
-            yield return null;
+
+            yield return new WaitForFixedUpdate();//關鍵
         }
 
         _recoverHeightCoroutine = null;
         _stateComponent.SetIsGrounded(true);
     }
 
+    public void StopSkillVerticalMoveCoroutine() {
+        if (_skillVerticalMoveCoroutine != null) {
+            _runner.StopCoroutine(_skillVerticalMoveCoroutine);
+            _skillVerticalMoveCoroutine = null;
+        }
+    }
+    public void StopRecoverHeightCoroutine() {
+        if (_recoverHeightCoroutine != null) {
+            _runner.StopCoroutine(_recoverHeightCoroutine);
+            _recoverHeightCoroutine = null;
+        }
+    }
 }

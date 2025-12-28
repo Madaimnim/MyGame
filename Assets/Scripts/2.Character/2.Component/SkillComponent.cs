@@ -14,10 +14,14 @@ public class SkillComponent
     private StatsData _statsData;
     private Dictionary<int, ISkillRuntime> _skillPool;
     private AnimationComponent _animationComponent;
+    private MoveComponent _moveComponent;
+    private HeightComponent _heightComponent;
     private StateComponent _stateComponent;
     private SpawnerComponent _spawner;
     private Transform _transform;
+    private Transform _sprTransform;
     private DetectorSpriteSpawner _detectorSpriteSpawner;
+
 
     //技能暫存狀態
     private int _pendingSlotIndex=-1;
@@ -31,15 +35,8 @@ public class SkillComponent
     public event Action<Vector2> OnSkillAnimationPlayed;
     public event Action<int, ISkillRuntime> OnSkillUsed;         // (slot, runtime)
 
-    public SkillComponent
-        (StatsData statsData,
-        int skillSlotCount,
-        Dictionary<int, ISkillRuntime> skillPool,
-        AnimationComponent animationComponent,
-        StateComponent stateComponent,
-        Transform transform,
-        IReadOnlyList<IInteractable> targetList
-        ) {
+    public SkillComponent(StatsData statsData,int skillSlotCount,Dictionary<int, ISkillRuntime> skillPool,AnimationComponent animationComponent,
+        StateComponent stateComponent,Transform transform, Transform sprTransform, IReadOnlyList<IInteractable> targetList,MoveComponent moveComponent,HeightComponent heightComponent) {
         _statsData = statsData;
         SkillSlotCount = skillSlotCount;
         _skillPool = skillPool;
@@ -48,7 +45,9 @@ public class SkillComponent
         _stateComponent = stateComponent;
         _spawner = new SpawnerComponent();
         _transform = transform;
-
+        _sprTransform = sprTransform;
+        _moveComponent = moveComponent;
+        _heightComponent= heightComponent;
 
         _detectorSpriteSpawner = new DetectorSpriteSpawner();
 
@@ -64,7 +63,8 @@ public class SkillComponent
     }
 
     private void TryPlaySkillAnimation() {
-        if (_stateComponent.IsPlayingAttackAnimation) return;                             // 正在施放中，不能再播放
+        if (!_stateComponent.CanAttack) return;
+
         if (IntentSlotIndex < 0) return;
         var slot = SkillSlots[IntentSlotIndex];
         if (!_skillPool.TryGetValue(slot.SkillId, out var skill)) return;
@@ -105,22 +105,22 @@ public class SkillComponent
 
     public void UseSkill() {
         var slot = SkillSlots[_pendingSlotIndex];
-        if (!_skillPool.TryGetValue(slot.SkillId, out var skill)) return;
+        if (!_skillPool.TryGetValue(slot.SkillId, out var skillRt)) return;
 
         //數值計算
         Vector2 direction = (_pendingPosition - (Vector2)_transform.position).normalized;
 
         //呼叫Spawner
-        if (skill.VisualData.Prefab != null)
+        if (skillRt.VisualData.Prefab != null)
         {
-            GameObject obj = _spawner.Spawn(skill.VisualData.Prefab, _transform.position, Quaternion.identity);
+            GameObject obj = _spawner.Spawn(skillRt.VisualData.Prefab, _transform.position, Quaternion.identity);
             var skillObj = obj.GetComponent<SkillObject>();
 
-            skillObj.Initial(_transform,_statsData, skill.StatsData,_pendingPosition,_pendingTransform);
-            slot.TriggerCooldown(skill.Cooldown);
+            skillObj.Initial(_transform, _sprTransform, _statsData, skillRt, _pendingPosition,_pendingTransform);
+            slot.TriggerCooldown(skillRt.Cooldown);
 
             // 發事件
-            OnSkillUsed?.Invoke(_pendingSlotIndex, skill);
+            OnSkillUsed?.Invoke(_pendingSlotIndex, skillRt);
         }
 
 
@@ -132,6 +132,11 @@ public class SkillComponent
         _pendingSlotIndex = -1;
     }
 
+    public void SkillDash(ISkillRuntime skillRt) {
+        _moveComponent.SkillDashMove(skillRt);
+        _heightComponent.SkillVerticalMove(skillRt);
+    }
+
     public void EquipSkill(int slotIndex, int skillId) {
         SkillSlots[slotIndex].Uninstall();
         SkillSlots[slotIndex].SetSlot(skillId, _skillPool[skillId].Detector);
@@ -139,7 +144,6 @@ public class SkillComponent
         //發事件
         OnSkillsChanged?.Invoke();
     }
-
     public void TickCooldownTimer() {
         foreach (var slot in SkillSlots) slot?.Tick();
     }

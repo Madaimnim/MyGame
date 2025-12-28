@@ -17,6 +17,7 @@ public class AnimationComponent
         _stateComponent= stateComponent;
     }
 
+    
 
     public void PlayAttack(int skillId) {
         string moveSkillName = $"MoveSkill{skillId}";
@@ -42,8 +43,18 @@ public class AnimationComponent
         if (!_ani.HasState(layer, stateNameHash)) 
             return false;
         _ani.Play(stateNameHash, layer);
-        Debug.Log($"撥放動畫: {stateName}");
+        //Debug.Log($"撥放動畫: {stateName}");
         return true;
     }
 
+    public void PlayImmediate(string stateName, int layer = 0) {
+        int hash = Animator.StringToHash(stateName);
+
+        if (!_ani.HasState(layer, hash))
+            return;
+
+        // 強制立刻切換到該動畫，normalizedTime = 0
+        _ani.Play(hash, layer, 0f);
+        _ani.Update(0f); // 關鍵：立刻刷新 Animator
+    }
 }

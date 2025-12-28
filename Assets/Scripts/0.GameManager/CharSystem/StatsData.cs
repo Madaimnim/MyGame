@@ -11,6 +11,7 @@ public class StatsData
 
     public int Power;
     public float MoveSpeed;
+    public float VerticalMoveSpeed;
 
     public float KnockbackPower = 1f;
     public float FloatPower = 0f;
@@ -24,6 +25,7 @@ public class StatsData
 
         Power = other.Power;
         MoveSpeed = other.MoveSpeed;
+        VerticalMoveSpeed= other.VerticalMoveSpeed;
 
         KnockbackPower = other.KnockbackPower;
         FloatPower = other.FloatPower;

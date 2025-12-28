@@ -72,7 +72,8 @@ public class Enemy :MonoBehaviour,IInteractable
     }
     private void FixedUpdate()
     {
-        if (MoveComponent != null) MoveComponent.Tick();
+        if (MoveComponent != null) MoveComponent.FixedTick();
+        if (HeightComponent != null) HeightComponent.FixedTick();
     }
     public void Initialize(EnemyStatsRuntime stats) {
         if (_initialized) return;
@@ -85,14 +86,15 @@ public class Enemy :MonoBehaviour,IInteractable
         ActionLockComponent = new ActionLockComponent(this, StateComponent);
         HealthComponent = new HealthComponent(Rt, StateComponent);
         AnimationComponent = new AnimationComponent(Ani, transform, Rb,StateComponent);
-        HeightComponent = new HeightComponent(Spr.transform, this,_initialHeightY,Rt.StatsData.MoveSpeed,StateComponent);
 
+        HeightComponent = new HeightComponent(Spr.transform, StateComponent ,AnimationComponent, this,Rt.StatsData);
         EffectComponent = new EffectComponent(Rt.VisualData, transform, this, Spr, StateComponent);
 
         RespawnComponent = new RespawnComponent(this, Rt.CanRespawn);
-        MoveComponent = new MoveComponent(Rb,Rt.StatsData.MoveSpeed, this, MoveDetector, AnimationComponent, HeightComponent,StateComponent);
+        MoveComponent = new MoveComponent(Rb,Rt.StatsData, this, MoveDetector, AnimationComponent, HeightComponent,StateComponent);
         SpawnerComponent = new SpawnerComponent();
-        SkillComponent = new SkillComponent(Rt.StatsData, Rt.SkillSlotCount,Rt.SkillPool, AnimationComponent,StateComponent, transform, PlayerListManager.Instance.TargetList);
+        SkillComponent = new SkillComponent(Rt.StatsData, Rt.SkillSlotCount,Rt.SkillPool, AnimationComponent,StateComponent, transform, sprCol.transform,
+            PlayerListManager.Instance.TargetList,MoveComponent,HeightComponent);
         AIComponent = new AIComponent(SkillComponent, MoveComponent, transform,Rt.MoveStrategy);
 
 
@@ -114,6 +116,7 @@ public class Enemy :MonoBehaviour,IInteractable
             GameEventSystem.Instance.Event_OnWallBroken += RespawnComponent.DisableRespawn;
         }
         SkillComponent.OnSkillAnimationPlayed += SetFacingLeft;
+        SkillComponent.OnSkillAnimationPlayed += MoveComponent.SetSkillDashDirection;
         MoveComponent.OnMoveDirectionChanged += SetFacingLeft;
 
         //初始化狀態--------------------------------------------------------------------------------------------------------------------------------------------------------------------
@@ -132,20 +135,34 @@ public class Enemy :MonoBehaviour,IInteractable
         HealthComponent.TakeDamage(info.Damage);
         EffectComponent.TakeDamageEffect(info.Damage);
         MoveComponent.Knockbacked(info.KnockbackForce, info.Source);
+
+        MoveComponent.StopSkillDashMoveCoroutine();
+        HeightComponent.StopSkillVerticalMoveCoroutine();
+        HeightComponent.StopRecoverHeightCoroutine();
+
+        HeightComponent.Hurt(0.5f);
         HeightComponent.FloatUp(info.FloatPower);
 
-        ActionLockComponent.HurtLock();
-        AnimationComponent.PlayHurt();
+        ActionLockComponent.HurtLock(0.5f);
+        AnimationComponent.PlayImmediate("Hurt");
+
         StateComponent.SetIsPlayingAttackAnimation(false);
 
     }
     public void AnimationEvent_SpawnerSkill() {
         SkillComponent.UseSkill();
     }
-
-    public void AnimationEvent_MoveStart(float duration)
+    public void AnimationEvent_MoveStart(float duration)//duration = frame數/sample率
     {
         MoveComponent.MoveDuration(duration);
+    }
+    public void AnimationEvent_SkillDashStart(int skillID)
+    {
+        if (!Rt.SkillPool.TryGetValue(skillID, out var skillRt)) return;
+        //To刪掉
+        SkillComponent.UseSkill();
+        //Todo 將進展攻擊及生成物件分開
+        SkillComponent.SkillDash(skillRt);
     }
 
     //事件方法

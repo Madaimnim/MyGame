@@ -12,34 +12,26 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 39ea11695daade34396b09cf9b4897ff, type: 3}
   m_Name: PlayerStatsTemplate02
   m_EditorClassIdentifier: 
-  StatsData:
-    Id: 1002
-    Name: "\u5F13\u624B"
-    Level: 1
-    Power: 1
-    MoveSpeed: 4
-    KnockbackPower: 1
-    FloatPower: 0
-    Weight: 0
-  VisualData:
-    Prefab: {fileID: 1901394458928384591, guid: 0d87d99a51500fd418339ea0f269bb01, type: 3}
-    DetectPrefab: {fileID: 0}
-    SpriteIcon: {fileID: 0}
-    DeathSFX: {fileID: 0}
-    NormalMaterial: {fileID: 2100000, guid: ce71ba01014fe3043971f56059a6c29d, type: 2}
-    FlashMaterial: {fileID: 2100000, guid: 343628f4e759ecf46b917b0ca0685d23, type: 2}
-  MaxHp: 5
-  SkillSlotCount: 4
-  CanRespawn: 1
   PlayerBehaviourTreeType: 0
   MoveStrategyType: 3
+  SkillSlotCount: 4
   SkillTemplateList:
-  - StatsData:
+  - SkillTargetType: 0
+    SkillExecutionType: 0
+    SkillMoveType: 3
+    OnHitType: 1
+    HitEffectPositionType: 0
+    FacingDirection: 1
+    TargetLayers:
+      serializedVersion: 2
+      m_Bits: 256
+    StatsData:
       Id: 1
       Name: "\u666E\u901A\u653B\u64CA"
       Level: 1
       Power: 1
-      MoveSpeed: 3
+      MoveSpeed: 10
+      VerticalMoveSpeed: 0
       KnockbackPower: 0.5
       FloatPower: 3
       Weight: 0
@@ -50,11 +42,35 @@ MonoBehaviour:
       DeathSFX: {fileID: 0}
       NormalMaterial: {fileID: 0}
       FlashMaterial: {fileID: 0}
+    canRotate: 1
     Cooldown: 0.1
-    TargetType: 0
+    DestroyDelay: 5
+    OnHitDestroyDelay: 0
+    SkillDashMultiplier: 1
+    SkillDashDuration: 0
+    SkillDashVerticalVelocity: 0
     DetectorType: 1
-    DetectRadius: 10
+    DetectRadius: 0
     RangeX: 20
     RangeY: 1
   UnlockedSkillIdList: 
+  StatsData:
+    Id: 1002
+    Name: "\u5F13\u624B"
+    Level: 1
+    Power: 1
+    MoveSpeed: 4
+    VerticalMoveSpeed: 0
+    KnockbackPower: 1
+    FloatPower: 0
+    Weight: 0
+  VisualData:
+    Prefab: {fileID: 1901394458928384591, guid: 0d87d99a51500fd418339ea0f269bb01, type: 3}
+    DetectPrefab: {fileID: 0}
+    SpriteIcon: {fileID: 0}
+    DeathSFX: {fileID: 0}
+    NormalMaterial: {fileID: 2100000, guid: ce71ba01014fe3043971f56059a6c29d, type: 2}
+    FlashMaterial: {fileID: 2100000, guid: 343628f4e759ecf46b917b0ca0685d23, type: 2}
+  CanRespawn: 1
+  MaxHp: 5
   ExpTable: 0400000006000000090000000d0000001200000019000000220000002d0000003a000000490000005a0000006d0000008200000099000000b2000000cd000000ea000000090100002a0100004d0100007201000099010000c2010000ed0100001a020000490200007a020000ad020000e202000019030000

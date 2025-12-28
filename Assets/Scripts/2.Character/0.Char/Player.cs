@@ -73,7 +73,8 @@ public class Player : MonoBehaviour, IInteractable
     }
     private void FixedUpdate()
     {
-        if (MoveComponent != null) MoveComponent.Tick();
+        if (MoveComponent != null) MoveComponent.FixedTick();
+        if (HeightComponent != null) HeightComponent.FixedTick();
     }
     public void Initialize(PlayerStatsRuntime stats)
     {
@@ -84,13 +85,15 @@ public class Player : MonoBehaviour, IInteractable
         ActionLockComponent = new ActionLockComponent(this,StateComponent);
         HealthComponent = new HealthComponent(Rt, StateComponent);
         AnimationComponent = new AnimationComponent(Ani, transform, Rb, StateComponent);
-        HeightComponent = new HeightComponent(Spr.transform, this, _initialHeightY,Rt.StatsData.MoveSpeed,StateComponent);
+
+        HeightComponent = new HeightComponent(Spr.transform,StateComponent, AnimationComponent,this, Rt.StatsData);
         EffectComponent = new EffectComponent(Rt.VisualData, transform, this, Spr, StateComponent);
         RespawnComponent = new RespawnComponent(this, Rt.CanRespawn);
-        MoveComponent = new MoveComponent(Rb, Rt.StatsData.MoveSpeed, this, MoveDetector, AnimationComponent,HeightComponent, StateComponent);
+        MoveComponent = new MoveComponent(Rb, Rt.StatsData, this, MoveDetector, AnimationComponent,HeightComponent, StateComponent);
         SpawnerComponent = new SpawnerComponent();
         if (EnemyListManager.Instance.TargetList == null) Debug.Log("EnemyListManager未初始化");
-        SkillComponent = new SkillComponent(Rt.StatsData, Rt.SkillSlotCount, Rt.SkillPool, AnimationComponent, StateComponent, BackSpriteTransform, EnemyListManager.Instance.TargetList);
+        SkillComponent = new SkillComponent(Rt.StatsData, Rt.SkillSlotCount, Rt.SkillPool, AnimationComponent, StateComponent, transform, sprCol.transform,
+            EnemyListManager.Instance.TargetList,MoveComponent,HeightComponent);
         AIComponent = new AIComponent(SkillComponent, MoveComponent, transform, Rt.MoveStrategy);
         GrowthComponent = new GrowthComponent(Rt);
         //額外初始化設定
@@ -122,7 +125,16 @@ public class Player : MonoBehaviour, IInteractable
     {
         _lastInteractSource = info.Source;
         MoveComponent.Knockbacked(info.KnockbackForce, info.Source);
+
+        MoveComponent.StopSkillDashMoveCoroutine();
+        HeightComponent.StopSkillVerticalMoveCoroutine();
+        HeightComponent.StopRecoverHeightCoroutine();
+
+        HeightComponent.Hurt(0.5f);
         HeightComponent.FloatUp(info.FloatPower);
+        //ActionLockComponent.HurtLock(0.5f);
+        AnimationComponent.PlayImmediate("Hurt");
+
         HealthComponent.TakeDamage(info.Damage);
         EffectComponent.TakeDamageEffect(info.Damage);
 
@@ -133,7 +145,6 @@ public class Player : MonoBehaviour, IInteractable
     {
         SkillComponent.UseSkill();
     }
-
 
     //事件方法
     public void OnDie()

@@ -10,13 +10,14 @@ public class MoveComponent
     public Vector2 IntentDirection;
     public TargetDetector MoveDetector { get; private set; }
     public float MoveSpeed { get; private set; }
+    public float VerticalMoveSpeed { get; private set; }
     public float CurrentMoveSpeed { get; private set; }
 
     //移動相關
     private const float ARRIVAL_THRESHOLD = 0.05f;    //抵達判定距離
     private const float MOVEATTACK_SPEED = 0.3f;      //攻擊時的移動速度
 
-    //敵人移動相關
+    //敵人移動相關---------------------------------
     private float _moveDuration = 1f;
     private float _moveWindowRemainTime = 0f;
     private bool _useMoveWindow = false;
@@ -27,7 +28,6 @@ public class MoveComponent
     } 
     //事件
     public event Action<Vector2> OnMoveDirectionChanged;
-
     //擊退相關
     private Coroutine _knockbackCoroutine;
     //組件
@@ -36,9 +36,16 @@ public class MoveComponent
     private MonoBehaviour _runner;
     private HeightComponent _heightComponent;
     private StateComponent _stateComponent;
-    public MoveComponent(Rigidbody2D rb,float moveSpeed ,MonoBehaviour runner,TargetDetector moveDetector,AnimationComponent animationComponent,HeightComponent heightComponent,StateComponent stateComponent) {
+
+    //技能發動移動相關-----------------------------------
+    private Coroutine _skillDashMoveCoroutine;
+    private Vector2 _skillDashDirection;
+    public void SetSkillDashDirection(Vector2 dir) => _skillDashDirection = dir.normalized;
+
+    public MoveComponent(Rigidbody2D rb,StatsData statsData ,MonoBehaviour runner,TargetDetector moveDetector,AnimationComponent animationComponent,HeightComponent heightComponent,StateComponent stateComponent) {
         _rb = rb ;
-        MoveSpeed = moveSpeed;
+        MoveSpeed = statsData.MoveSpeed;
+        VerticalMoveSpeed= statsData.VerticalMoveSpeed;
         CurrentMoveSpeed = MoveSpeed;
         _runner = runner;
         MoveDetector = moveDetector;
@@ -47,7 +54,7 @@ public class MoveComponent
 
         _stateComponent = stateComponent;
     }
-    public void Tick() {
+    public void FixedTick() {
         if(TryMove()) _stateComponent.SetIsMoving(true);
         else _stateComponent.SetIsMoving(false);
     }
@@ -102,12 +109,38 @@ public class MoveComponent
 
         if (_useMoveWindow && _moveWindowRemainTime <= 0f) return false;
         if (_useMoveWindow) _moveWindowRemainTime -= Time.fixedDeltaTime;
-        _rb.MovePosition(newPosition);
 
+        _rb.MovePosition(newPosition);
 
         return true;
     }
 
+    //技能衝刺相關-----------------------------------
+    public void SkillDashMove(ISkillRuntime skillRt) {
+        StopSkillDashMoveCoroutine();
+
+        _skillDashMoveCoroutine = _runner.StartCoroutine(SkillDashMoveCoroutine(_skillDashDirection, skillRt));
+    }
+    private IEnumerator SkillDashMoveCoroutine(Vector2 direction, ISkillRuntime skillRt) {
+        _stateComponent.SetIsSkillDash(true);  
+        _stateComponent.SetIsInitialHeight(false);
+
+        float elapsed = 0f;
+        float dashSpeed = MoveSpeed * skillRt.SkillDashMultiplier;
+        Vector2 moveVelocity = direction * dashSpeed;
+
+        while (elapsed < skillRt.SkillDashDuration) {
+            Vector2 newPos = _rb.position + moveVelocity * Time.fixedDeltaTime;
+            _rb.MovePosition(newPos);
+            yield return new WaitForFixedUpdate(); // 關鍵
+
+            elapsed += Time.fixedDeltaTime;
+        }
+        _stateComponent.SetIsSkillDash(false);
+        _heightComponent.RecoveryHeight(Mathf.Abs(skillRt.SkillDashVerticalVelocity)*0.8f);
+
+        _skillDashMoveCoroutine = null;
+    }
 
     public void Knockbacked(Vector2 knockbackForce, Transform source) {
 
@@ -118,7 +151,6 @@ public class MoveComponent
         }
         _knockbackCoroutine = _runner.StartCoroutine(KnockbackCoroutine(knockbackForce));
     }
-
     private IEnumerator KnockbackCoroutine(Vector2 knockbackForce)
     {
         _stateComponent.SetIsKnocked(true);
@@ -132,9 +164,17 @@ public class MoveComponent
         }
         _stateComponent.SetIsKnocked(false);
     }
-
     public void ResetVelocity() {
         IntentDirection = Vector2.zero;
         _rb.velocity = Vector2.zero;
+    }
+
+    public void StopSkillDashMoveCoroutine() {
+        if (_skillDashMoveCoroutine != null) {
+            _runner.StopCoroutine(_skillDashMoveCoroutine);
+            _skillDashMoveCoroutine = null;
+        }
+
+        _stateComponent.SetIsSkillDash(false);
     }
 }

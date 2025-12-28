@@ -18,8 +18,8 @@ public class ActionLockComponent {
         else _stateComponent.SetIsControlLocked(false);
     }
 
-    public void HurtLock() {
-        LockAction(0.5f);
+    public void HurtLock(float lockDuration) {
+        LockAction(lockDuration);
     }
 
     //¤WÂê°Ê§@

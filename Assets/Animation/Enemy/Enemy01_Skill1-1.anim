@@ -6,7 +6,7 @@ AnimationClip:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_Name: Enemy04_RecoverFly
+  m_Name: Enemy01_Skill1-1
   serializedVersion: 6
   m_Legacy: 0
   m_Compressed: 0
@@ -17,15 +17,45 @@ AnimationClip:
   m_PositionCurves: []
   m_ScaleCurves: []
   m_FloatCurves: []
-  m_PPtrCurves: []
-  m_SampleRate: 60
+  m_PPtrCurves:
+  - curve:
+    - time: 0
+      value: {fileID: -1841820739, guid: 7f341e18cff40f742add022f1701c318, type: 3}
+    attribute: m_Sprite
+    path: RootSprite/Sprite
+    classID: 212
+    script: {fileID: 0}
+  - curve:
+    - time: 0
+      value: {fileID: -1841820739, guid: 7f341e18cff40f742add022f1701c318, type: 3}
+    attribute: m_Sprite
+    path: BackSprite/Shadow/ShadowSprite
+    classID: 212
+    script: {fileID: 0}
+  m_SampleRate: 1
   m_WrapMode: 0
   m_Bounds:
     m_Center: {x: 0, y: 0, z: 0}
     m_Extent: {x: 0, y: 0, z: 0}
   m_ClipBindingConstant:
-    genericBindings: []
-    pptrCurveMapping: []
+    genericBindings:
+    - serializedVersion: 2
+      path: 2439941589
+      attribute: 0
+      script: {fileID: 0}
+      typeID: 212
+      customType: 23
+      isPPtrCurve: 1
+    - serializedVersion: 2
+      path: 2735391542
+      attribute: 0
+      script: {fileID: 0}
+      typeID: 212
+      customType: 23
+      isPPtrCurve: 1
+    pptrCurveMapping:
+    - {fileID: -1841820739, guid: 7f341e18cff40f742add022f1701c318, type: 3}
+    - {fileID: -1841820739, guid: 7f341e18cff40f742add022f1701c318, type: 3}
   m_AnimationClipSettings:
     serializedVersion: 2
     m_AdditiveReferencePoseClip: {fileID: 0}

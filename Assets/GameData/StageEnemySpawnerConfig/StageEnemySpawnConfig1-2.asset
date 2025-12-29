@@ -15,7 +15,7 @@ MonoBehaviour:
   SpawnInterval: 0.2
   Waves:
   - EnemyId: 2001
-    SpawnCount: 0
+    SpawnCount: 1
   - EnemyId: 2002
     SpawnCount: 0
   - EnemyId: 2003

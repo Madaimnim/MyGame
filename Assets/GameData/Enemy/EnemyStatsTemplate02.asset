@@ -18,7 +18,7 @@ MonoBehaviour:
   SkillTemplateList:
   - SkillTargetType: 0
     SkillExecutionType: 0
-    SkillMoveType: 0
+    SkillMoveType: 2
     OnHitType: 1
     HitEffectPositionType: 0
     FacingDirection: 0
@@ -48,6 +48,7 @@ MonoBehaviour:
     OnHitDestroyDelay: 0
     SkillDashMultiplier: 1
     SkillDashDuration: 0
+    SkillDashPrepareDuration: 0
     SkillDashVerticalVelocity: 0
     DetectorType: 0
     DetectRadius: 5

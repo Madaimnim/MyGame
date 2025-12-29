@@ -18,14 +18,14 @@ public class HpSlider : MonoBehaviour {
 
         // 訂閱事件
         _health.OnHpChanged += OnHpChanged;
-        _health.OnDie += OnDie;
+        _health.OnDie += OnDieDoSomething;
     }
 
     public void Unbind() {
         if (_health == null) return;
 
         _health.OnHpChanged -= OnHpChanged;
-        _health.OnDie -= OnDie;
+        _health.OnDie -= OnDieDoSomething;
         _health = null;
     }
 
@@ -38,7 +38,7 @@ public class HpSlider : MonoBehaviour {
         UpdateUI(current, max);
     }
 
-    private void OnDie() {
+    private void OnDieDoSomething() {
         // 可選：死亡時隱藏
     }
 

@@ -158,18 +158,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   sprCol: {fileID: 4748237863156718979}
-  FacingDirection: 0
-  canRotate: 1
-  MoveType: 2
-  OnHitType: 1
-  HitEffectPositionType: 0
-  TargetLayers:
-    serializedVersion: 2
-    m_Bits: 64
-  MoveSpeed: 5
-  SkillOffset: {x: 0, y: 0}
-  DestroyDelay: 3
-  OnHitDestroyDelay: 0
 --- !u!95 &3372780662201843464
 Animator:
   serializedVersion: 5

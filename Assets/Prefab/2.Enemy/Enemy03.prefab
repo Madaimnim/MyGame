@@ -939,7 +939,7 @@ GameObject:
   m_Component:
   - component: {fileID: 6912331794566383314}
   - component: {fileID: 650011528525285475}
-  m_Layer: 14
+  m_Layer: 0
   m_Name: RootSprite
   m_TagString: Untagged
   m_Icon: {fileID: 0}

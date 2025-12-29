@@ -22,6 +22,7 @@ public class EnemySkillRuntime: ISkillRuntime
     public float OnHitDestroyDelay { get; set; }
     public float SkillDashMultiplier { get; set; }
     public float SkillDashDuration { get; set; }
+    public float SkillDashPrepareDuration { get; set; }
     public float SkillDashVerticalVelocity { get; set; }
 
     public SkillDetectorBase Detector { get; set; }
@@ -45,7 +46,8 @@ public class EnemySkillRuntime: ISkillRuntime
         OnHitDestroyDelay= template.OnHitDestroyDelay;
         SkillDashMultiplier = template.SkillDashMultiplier;
         SkillDashDuration = template.SkillDashDuration;
-        SkillDashVerticalVelocity= template.SkillDashVerticalVelocity;
+        SkillDashPrepareDuration= template.SkillDashPrepareDuration;
+        SkillDashVerticalVelocity = template.SkillDashVerticalVelocity;
 
         Detector = template.DetectorType switch {
             SkillDetectorType.Circle => new Circle_Detector(template.DetectRadius),

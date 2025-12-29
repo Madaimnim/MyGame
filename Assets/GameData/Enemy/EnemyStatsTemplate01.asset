@@ -18,8 +18,8 @@ MonoBehaviour:
   SkillTemplateList:
   - SkillTargetType: 0
     SkillExecutionType: 0
-    SkillMoveType: 0
-    OnHitType: 0
+    SkillMoveType: 6
+    OnHitType: 1
     HitEffectPositionType: 0
     FacingDirection: 0
     TargetLayers:
@@ -30,7 +30,7 @@ MonoBehaviour:
       Name: "\u666E\u901A\u653B\u64CA"
       Level: 1
       Power: 1
-      MoveSpeed: 1
+      MoveSpeed: 0
       VerticalMoveSpeed: 0
       KnockbackPower: 1
       FloatPower: 1
@@ -46,11 +46,12 @@ MonoBehaviour:
     Cooldown: 1
     DestroyDelay: 0.5
     OnHitDestroyDelay: 0
-    SkillDashMultiplier: 5
+    SkillDashMultiplier: 3
     SkillDashDuration: 0.5
+    SkillDashPrepareDuration: 0.2
     SkillDashVerticalVelocity: 0
     DetectorType: 0
-    DetectRadius: 5
+    DetectRadius: 3
     RangeX: 0
     RangeY: 0
   StatsData:

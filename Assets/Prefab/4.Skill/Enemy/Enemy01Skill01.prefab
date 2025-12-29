@@ -43,7 +43,7 @@ GameObject:
   - component: {fileID: 6838293690947649926}
   - component: {fileID: 4897349727561046856}
   - component: {fileID: 2914756808597229994}
-  - component: {fileID: 263180525062912598}
+  - component: {fileID: 274997043518029449}
   m_Layer: 11
   m_Name: Sprite
   m_TagString: Untagged
@@ -139,8 +139,8 @@ SpriteRenderer:
   m_WasSpriteAssigned: 1
   m_MaskInteraction: 0
   m_SpriteSortPoint: 1
---- !u!58 &263180525062912598
-CircleCollider2D:
+--- !u!61 &274997043518029449
+BoxCollider2D:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
@@ -152,9 +152,19 @@ CircleCollider2D:
   m_IsTrigger: 1
   m_UsedByEffector: 0
   m_UsedByComposite: 0
-  m_Offset: {x: 0.027879104, y: 0.030976862}
+  m_Offset: {x: -0.21, y: 0.3}
+  m_SpriteTilingProperty:
+    border: {x: 0, y: 0, z: 0, w: 0}
+    pivot: {x: 0.5, y: 0.5}
+    oldSize: {x: 0.5, y: 0.5}
+    newSize: {x: 1, y: 1}
+    adaptiveTilingThreshold: 0.5
+    drawMode: 0
+    adaptiveTiling: 0
+  m_AutoTiling: 0
   serializedVersion: 2
-  m_Radius: 0.27
+  m_Size: {x: 0.71, y: 0.5}
+  m_EdgeRadius: 0
 --- !u!1 &7821809457673803968
 GameObject:
   m_ObjectHideFlags: 0
@@ -223,19 +233,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a4dfaaf66ef49214aae722a3f87c09a6, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  sprCol: {fileID: 263180525062912598}
-  FacingDirection: 0
-  canRotate: 0
-  MoveType: 6
-  OnHitType: 1
-  HitEffectPositionType: 0
-  TargetLayers:
-    serializedVersion: 2
-    m_Bits: 64
-  MoveSpeed: 0
-  SkillOffset: {x: 0.46, y: 0.372}
-  DestroyDelay: 0.5
-  OnHitDestroyDelay: 0
+  sprCol: {fileID: 274997043518029449}
 --- !u!1 &8458090048704038593
 GameObject:
   m_ObjectHideFlags: 0

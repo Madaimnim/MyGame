@@ -62,6 +62,7 @@ public class SkillTemplate
     public float OnHitDestroyDelay = 0f;
     public float SkillDashMultiplier = 1f;
     public float SkillDashDuration = 0f;
+    public float SkillDashPrepareDuration = 0f;
     public float SkillDashVerticalVelocity = 0f;
 
     [Header("技能偵測器")]

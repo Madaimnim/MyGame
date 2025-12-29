@@ -30,7 +30,7 @@ public class SkillHitComponent {
                 _targetList.RemoveAt(i);
                 continue;
             }
-
+            //Todo
             float bottomYDiff = Mathf.Abs(_skillObject.transform.position.y - target.BottomTransform.position.y);
             if (bottomYDiff > PhysicManager.Instance.PhysicConfig.BottomYThreshold) continue;
 

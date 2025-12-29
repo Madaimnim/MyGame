@@ -39,6 +39,7 @@ public class MoveComponent
 
     //技能發動移動相關-----------------------------------
     private Coroutine _skillDashMoveCoroutine;
+    private Coroutine _skillPrepareMoveCoroutine;
     private Vector2 _skillDashDirection;
     public void SetSkillDashDirection(Vector2 dir) => _skillDashDirection = dir.normalized;
 
@@ -60,6 +61,7 @@ public class MoveComponent
     }
     private bool TryMove() {
         if (!_stateComponent.CanMove) return false;
+
 
         // 若指定追蹤 Transform（AI 用）
         if (IntentTargetTransform != null) {
@@ -115,33 +117,71 @@ public class MoveComponent
         return true;
     }
 
-    //技能衝刺相關-----------------------------------
+    //技能衝刺
     public void SkillDashMove(ISkillRuntime skillRt) {
         StopSkillDashMoveCoroutine();
-
         _skillDashMoveCoroutine = _runner.StartCoroutine(SkillDashMoveCoroutine(_skillDashDirection, skillRt));
     }
     private IEnumerator SkillDashMoveCoroutine(Vector2 direction, ISkillRuntime skillRt) {
-        _stateComponent.SetIsSkillDash(true);  
-        _stateComponent.SetIsInitialHeight(false);
-
+        _stateComponent.SetIsSkillDashing(true);
         float elapsed = 0f;
         float dashSpeed = MoveSpeed * skillRt.SkillDashMultiplier;
         Vector2 moveVelocity = direction * dashSpeed;
-
+    
         while (elapsed < skillRt.SkillDashDuration) {
+            Vector2 before = _rb.position;
+            Vector2 expected = before + moveVelocity * Time.fixedDeltaTime;
+
+            _rb.MovePosition(expected);
+
+            yield return new WaitForFixedUpdate();
+
+            Vector2 after = _rb.position;
+
+            //Debug.Log($"[DashCheck] frame={Time.frameCount} " +$"before={before} expected={expected} after={after}");
+
+            elapsed += Time.fixedDeltaTime;
+        }
+
+        //衝刺結束後的緩衝時間
+        float dashRecoverTime = skillRt.SkillDashDuration*0.2f;
+        elapsed = 0f;
+        while (elapsed < dashRecoverTime) {
+            yield return new WaitForFixedUpdate();
+
+            elapsed += Time.fixedDeltaTime;
+        }
+
+        _stateComponent.SetIsSkillDashing(false);
+        _stateComponent.SetIsPlayingAttackAnimation(false);
+
+        _skillDashMoveCoroutine = null;
+    }
+
+    //技能準備
+    public void SkillPrepareMove(ISkillRuntime skillRt) {
+        StopSkillPrepareMoveCoroutine();
+        _skillPrepareMoveCoroutine = _runner.StartCoroutine(SkillPrepareMoveCoroutine(_skillDashDirection, skillRt));
+    }
+    private IEnumerator SkillPrepareMoveCoroutine(Vector2 direction, ISkillRuntime skillRt) {
+        _stateComponent.SetIsSkillDashing(true);
+        float elapsed = 0f;
+        float dashSpeed = MoveSpeed * skillRt.SkillDashMultiplier;
+        Vector2 moveVelocity = -direction * dashSpeed*0.1f;
+
+        while (elapsed < skillRt.SkillDashPrepareDuration) {
             Vector2 newPos = _rb.position + moveVelocity * Time.fixedDeltaTime;
             _rb.MovePosition(newPos);
             yield return new WaitForFixedUpdate(); // 關鍵
 
             elapsed += Time.fixedDeltaTime;
         }
-        _stateComponent.SetIsSkillDash(false);
-        _heightComponent.RecoveryHeight(Mathf.Abs(skillRt.SkillDashVerticalVelocity)*0.8f);
+        _animationComponent.SetParameterBool("IsPrepareReady", true);
 
-        _skillDashMoveCoroutine = null;
+        _skillPrepareMoveCoroutine = null;
     }
 
+    //被擊退
     public void Knockbacked(Vector2 knockbackForce, Transform source) {
 
         if (_knockbackCoroutine != null)
@@ -164,17 +204,24 @@ public class MoveComponent
         }
         _stateComponent.SetIsKnocked(false);
     }
+
+    //重置速度
     public void ResetVelocity() {
         IntentDirection = Vector2.zero;
         _rb.velocity = Vector2.zero;
     }
 
+    //停止協程
     public void StopSkillDashMoveCoroutine() {
         if (_skillDashMoveCoroutine != null) {
             _runner.StopCoroutine(_skillDashMoveCoroutine);
             _skillDashMoveCoroutine = null;
         }
-
-        _stateComponent.SetIsSkillDash(false);
+    }
+    public void StopSkillPrepareMoveCoroutine() {
+        if (_skillPrepareMoveCoroutine != null) {
+            _runner.StopCoroutine(_skillPrepareMoveCoroutine);
+            _skillPrepareMoveCoroutine = null;
+        }
     }
 }

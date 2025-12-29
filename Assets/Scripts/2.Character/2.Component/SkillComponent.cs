@@ -40,7 +40,7 @@ public class SkillComponent
         _statsData = statsData;
         SkillSlotCount = skillSlotCount;
         _skillPool = skillPool;
-
+        
         _animationComponent = animationComponent;
         _stateComponent = stateComponent;
         _spawner = new SpawnerComponent();
@@ -100,6 +100,7 @@ public class SkillComponent
         _pendingSlotIndex = IntentSlotIndex;
 
         _animationComponent.PlayAttack(skill.StatsData.Id);
+        _stateComponent.SetIsPlayingAttackAnimation(true);
         OnSkillAnimationPlayed.Invoke(direction);
     }
 
@@ -132,10 +133,18 @@ public class SkillComponent
         _pendingSlotIndex = -1;
     }
 
-    public void SkillDash(ISkillRuntime skillRt) {
-        _moveComponent.SkillDashMove(skillRt);
-        _heightComponent.SkillVerticalMove(skillRt);
+    public void SkillPrepareMove(ISkillRuntime skillRt) {
+        _animationComponent.SetParameterBool("IsPrepareReady", false);
+
+        _moveComponent.SkillPrepareMove(skillRt);
+        _heightComponent.SkillPrepareMove(skillRt);
     }
+    public void SkillDashMove(ISkillRuntime skillRt) {
+
+        _moveComponent.SkillDashMove(skillRt);
+        _heightComponent.SkillDashMove(skillRt);
+    }
+
 
     public void EquipSkill(int slotIndex, int skillId) {
         SkillSlots[slotIndex].Uninstall();

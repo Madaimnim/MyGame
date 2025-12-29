@@ -57,4 +57,8 @@ public class AnimationComponent
         _ani.Play(hash, layer, 0f);
         _ani.Update(0f); // √ˆ¡‰°G•ﬂ®Ë®Í∑s Animator
     }
+
+    public void SetParameterBool(string parameter,bool value) {
+        _ani.SetBool(parameter, value);
+    }
 }

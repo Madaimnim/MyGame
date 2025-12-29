@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
-using System.Diagnostics;
 using UnityEngine;
 
 //SkillDetectorBase 下轄Circle_Detector、Box_Detector等偵測策略，可生成範圍Sprite物件，無實際技能槽，開關僅關閉可視化範圍
@@ -137,7 +136,7 @@ public class Enemy :MonoBehaviour,IInteractable
         MoveComponent.Knockbacked(info.KnockbackForce, info.Source);
 
         MoveComponent.StopSkillDashMoveCoroutine();
-        HeightComponent.StopSkillVerticalMoveCoroutine();
+        HeightComponent.StopSkillDashMoveCoroutine();
         HeightComponent.StopRecoverHeightCoroutine();
 
         HeightComponent.Hurt(0.5f);
@@ -156,13 +155,18 @@ public class Enemy :MonoBehaviour,IInteractable
     {
         MoveComponent.MoveDuration(duration);
     }
-    public void AnimationEvent_SkillDashStart(int skillID)
+
+    public void AnimationEvent_SkillDashPrepareStart(int skillId) {
+        if (!Rt.SkillPool.TryGetValue(skillId, out var skillRt)) return;
+        SkillComponent.SkillPrepareMove(skillRt);
+    }
+    public void AnimationEvent_SkillDashStart(int skillId)
     {
-        if (!Rt.SkillPool.TryGetValue(skillID, out var skillRt)) return;
-        //To刪掉
+        if (!Rt.SkillPool.TryGetValue(skillId, out var skillRt)) return;
+
         SkillComponent.UseSkill();
         //Todo 將進展攻擊及生成物件分開
-        SkillComponent.SkillDash(skillRt);
+        SkillComponent.SkillDashMove(skillRt);
     }
 
     //事件方法
@@ -212,15 +216,16 @@ public class Enemy :MonoBehaviour,IInteractable
 
     private void SetFacingLeft(Vector2 direction)
     {
-        if (StateComponent.IsPlayingAttackAnimation) return;  //確保攻擊時面相正確
+        //if (StateComponent.IsPlayingAttackAnimation) return;  //確保攻擊時面相正確
         if (direction.sqrMagnitude < 0.01f) return;     //避免靜止時頻繁執行
-
+        Debug.Log($"敵人更新面相來源:{direction}");
         if (Mathf.Abs(direction.x) > 0.01f)
         {
             var s = transform.localScale;
             float mag = Mathf.Abs(s.x);
             s.x = (direction.x < 0f) ? mag : -mag;
             transform.localScale = s;
+
 
             //if (IsDead) Debug.Log($"更新敵人死亡面相:{transform.localScale}，");
         }

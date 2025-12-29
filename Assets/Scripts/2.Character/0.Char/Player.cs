@@ -127,7 +127,7 @@ public class Player : MonoBehaviour, IInteractable
         MoveComponent.Knockbacked(info.KnockbackForce, info.Source);
 
         MoveComponent.StopSkillDashMoveCoroutine();
-        HeightComponent.StopSkillVerticalMoveCoroutine();
+        HeightComponent.StopSkillDashMoveCoroutine();
         HeightComponent.StopRecoverHeightCoroutine();
 
         HeightComponent.Hurt(0.5f);

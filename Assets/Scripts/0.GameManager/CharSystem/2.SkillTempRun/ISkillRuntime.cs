@@ -21,6 +21,7 @@ public interface ISkillRuntime
     float OnHitDestroyDelay { get; }
     float SkillDashMultiplier { get; }
     float SkillDashDuration { get; }
+    float SkillDashPrepareDuration{ get; }
     float SkillDashVerticalVelocity { get; }
 
     SkillDetectorBase Detector { get; }

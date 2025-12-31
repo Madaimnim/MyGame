@@ -131,7 +131,7 @@ public class Player : MonoBehaviour, IInteractable
         HeightComponent.StopRecoverHeightCoroutine();
 
         HeightComponent.Hurt(0.5f);
-        HeightComponent.FloatUp(info.FloatPower);
+        HeightComponent.AddUpVelocity(info.FloatPower);
         //ActionLockComponent.HurtLock(0.5f);
         AnimationComponent.PlayImmediate("Hurt");
 
@@ -204,15 +204,14 @@ public class Player : MonoBehaviour, IInteractable
     }
     private void SetFacingRight(Vector2 direction)
     {
-        if (StateComponent.IsPlayingAttackAnimation) return;  //確保攻擊時面相正確
         if (direction.sqrMagnitude < 0.01f) return;     //避免靜止時頻繁執行
 
         if (Mathf.Abs(direction.x) > 0.01f)
         {
-            var s = transform.localScale;
-            float mag = Mathf.Abs(s.x);
-            s.x = (direction.x < 0f) ? -mag : mag;
-            transform.localScale = s;
+            var scale = transform.localScale;
+            float mag = Mathf.Abs(scale.x);
+            scale.x = (direction.x < 0f) ? -mag : mag;
+            transform.localScale = scale;
         }
     }
 }

@@ -43,7 +43,7 @@ MonoBehaviour:
       NormalMaterial: {fileID: 0}
       FlashMaterial: {fileID: 0}
     canRotate: 0
-    Cooldown: 1
+    Cooldown: 3
     DestroyDelay: 0.5
     OnHitDestroyDelay: 0
     SkillDashMultiplier: 3

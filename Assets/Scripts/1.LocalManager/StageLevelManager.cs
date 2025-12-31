@@ -5,7 +5,9 @@ using UnityEngine;
 public class StageLevelManager : MonoBehaviour
 {
     public static StageLevelManager Instance { get; private set; }
-    private int enemyCount; //當前關卡敵人的數量
+    private StageEnemySpawner _stageEnemySpawner;
+    private int _remainenemyCount=0;    //剩餘敵人的數量
+    private int _totalEnemyCount=0;     //當前關卡敵人的數量
 
     private void Awake() {
         if (Instance != null && Instance != this)
@@ -14,26 +16,42 @@ public class StageLevelManager : MonoBehaviour
             return;
         }
         Instance = this;
-        enemyCount = 0;
+
+        _stageEnemySpawner=GetComponent<StageEnemySpawner>();
     }
     private void OnEnable() {
         GameEventSystem.Instance.Event_OnPlayerDie += RespawnPlayer;
         GameEventSystem.Instance.Event_OnWallBroken += WallBroken;
-
     }
+    private void Start() {
+        _totalEnemyCount = CalculateTotalEnemyCount();
+        _remainenemyCount = _totalEnemyCount;
+
+        // 只有生成過敵人，旗幟才true
+        Debug.Log($"當前關卡敵人數量:{_totalEnemyCount}");
+    }
+
+    private void Update() {
+        
+    }
+
     private void OnDisable() {
         GameEventSystem.Instance.Event_OnPlayerDie -= RespawnPlayer;
         GameEventSystem.Instance.Event_OnWallBroken -= WallBroken;
     }
 
+    private int CalculateTotalEnemyCount() {
+        int total = 0;
+        foreach (var wave in _stageEnemySpawner.SpawnConfig.Waves) {
+            total += wave.SpawnCount;
+        }
+        return total;
+    }
 
-
-    #region  玩家死亡
     private void RespawnPlayer(IInteractable player) {
         //LevelDefeat();
         StartCoroutine(RespawnPlayerCoroutine(player as Player,3));
     }
-
     private IEnumerator RespawnPlayerCoroutine(Player player,float respawnDelay) {
         if (player == null) yield break;
         Vector3 deathPos = player.transform.position;
@@ -46,42 +64,24 @@ public class StageLevelManager : MonoBehaviour
         player.RespawnComponent.Respawn();
     }
 
-    #endregion
-
-    #region 當城牆毀壞
     private void WallBroken() {
         LevelDefeat();
     }
-    #endregion
-
-    #region 註冊敵人生成數量
-    public void RegisterEnemy() {
-        enemyCount++;
-        Debug.Log($"目前敵人數量為{enemyCount}");
-    }
-    #endregion
-
-    #region 註冊敵人死亡
     public void EnemyDefeated() {
-        enemyCount--;
-        Debug.Log($"敵人死亡，目前數量{enemyCount}");
-        if (enemyCount<=0)
+        _remainenemyCount--;
+        Debug.Log($"敵人死亡，目前數量{_remainenemyCount}");
+        if (_remainenemyCount <= 0)
         {
             LevelClear();
         }
     }
-    #endregion
 
-    #region LevelClear()
     private void LevelClear() {
         TextPopupManager.Instance.ShowStageClearPopup();
         FadeManager.Instance.FadeSetAlpha(0.3f);
 
         StartCoroutine(WaitAndGoPrepareState());
     }
-    #endregion
-
-    #region  LevelDefeat()
     private void LevelDefeat() {
         Debug.Log("觸發Defeat跳躍字體");
         TextPopupManager.Instance.ShowStageDefeatPopup();
@@ -89,28 +89,20 @@ public class StageLevelManager : MonoBehaviour
 
         StartCoroutine(WaitAndGoPrepareState());
     }
-    #endregion
 
     //關卡結束等待或滑鼠點擊，回到準備畫面
-    #region WaitAndGoPrepareState()
     private IEnumerator WaitAndGoPrepareState() {
         float timer = 0f;
 
-        // 等待最多 5 秒，或者點擊滑鼠就提前跳出
         while (timer < 5f)
         {
             timer += Time.deltaTime;
-
-            if (Input.GetMouseButtonDown(0))
-            { // 左鍵點擊
-                break;
-            }
-
-            yield return null; // 每幀檢查
+            if (Input.GetMouseButtonDown(0)) break;
+            yield return null; 
         }
 
         // 切換狀態
         GameManager.Instance.GameStateSystem.SetState(GameStateSystem.GameState.Preparation);
+        GameManager.Instance.PlayerStateSystem.AllPlayerClose();
     }
-    #endregion
 }

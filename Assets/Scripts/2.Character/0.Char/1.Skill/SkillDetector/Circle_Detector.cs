@@ -15,16 +15,16 @@ public class Circle_Detector : SkillDetectorBase
         _targetTransform = null; //每次 Tick 前清空舊目標
 
         float minDist = float.MaxValue;
-        foreach (var t in targetList) {
-            if (t == null || t.Equals(null)) continue;
+        foreach (var interactable in targetList) {
+            if (interactable == null || interactable.Equals(null)) continue;
 
-            Vector2 targetPos = t.BottomTransform.position;
+            Vector2 targetPos = interactable.BottomTransform.position;
             if (IsInRange(targetPos)) {
                 float dist = Vector2.Distance(_self.position, targetPos);
 
                 if (dist < minDist) {
                     minDist = dist;
-                    _targetTransform = t.BottomTransform;
+                    _targetTransform = interactable.BottomTransform;
                 }
             }
         }

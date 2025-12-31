@@ -16,26 +16,26 @@ public class TargetListManager:MonoBehaviour
     public IReadOnlyList<IInteractable> TargetList => _targetList;
 
     private GUIStyle _cachedStyle;
-    protected virtual void OnGUI() {
-        if (_cachedStyle == null) {
-            _cachedStyle = new GUIStyle(GUI.skin.label) {
-                fontSize = GUIfontSize,
-                normal = { textColor = Color.white },
-                alignment = GUIAnchor
-            };
-        }
 
-        float x = GUIAnchor == TextAnchor.UpperRight
-            ? Screen.width - GUISize.x - GUICornerOffset.x
-            : GUICornerOffset.x;
-
-        float y = GUICornerOffset.y;
-
-        GUI.Label(new Rect(x, y, GUISize.x, GUISize.y),
-            $"{name}\nTarget Count: {_targetList.Count}",
-            _cachedStyle);
-    }
-
+    //protected virtual void OnGUI() {
+    //    if (_cachedStyle == null) {
+    //       _cachedStyle = new GUIStyle(GUI.skin.label) {
+    //           fontSize = GUIfontSize,
+    //           normal = { textColor = Color.white },
+    //           alignment = GUIAnchor
+    //       };
+    //   }
+    //
+    //    float x = GUIAnchor == TextAnchor.UpperRight
+    //        ? Screen.width - GUISize.x - GUICornerOffset.x
+    //        : GUICornerOffset.x;
+    //
+    //    float y = GUICornerOffset.y;
+    //
+    //    GUI.Label(new Rect(x, y, GUISize.x, GUISize.y),
+    //        $"{name}\nTarget Count: {_targetList.Count}",
+    //        _cachedStyle);
+    //}
 
     private void Update()
     {

@@ -2,20 +2,10 @@ using System.Collections.Generic;
 
 public static class PlayerBehaviourTreeFactory {
 
-    public static BehaviorTree Create(
-        PlayerBehaviourTreeType type,
-        AIComponent aiComponent,
-        MoveComponent moveComponent,
-        SkillComponent skillComponent,
-        MoveStrategyBase moveStrategy
-    ) {
+    public static BehaviorTree Create(PlayerBehaviourTreeType type,AIComponent aiComponent,MoveComponent moveComponent,SkillComponent skillComponent,MoveStrategyBase moveStrategy) {
         return type switch {
-            PlayerBehaviourTreeType.NearTargetAttackFirst =>
-                CreateNearTargetAttackTree(aiComponent, moveComponent, skillComponent, moveStrategy),
-
-            PlayerBehaviourTreeType.DefensiveAttack =>
-                CreateDefensiveTree(aiComponent, moveComponent, skillComponent, moveStrategy),
-
+            PlayerBehaviourTreeType.NearTargetAttackFirst =>CreateNearTargetAttackTree(aiComponent, moveComponent, skillComponent, moveStrategy),
+            PlayerBehaviourTreeType.DefensiveAttack =>CreateDefensiveTree(aiComponent, moveComponent, skillComponent, moveStrategy),
             _ => throw new System.Exception("Unknown PlayerBehaviourTreeType")
         };
     }

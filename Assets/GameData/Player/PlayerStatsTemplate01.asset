@@ -48,6 +48,7 @@ MonoBehaviour:
     OnHitDestroyDelay: 0
     SkillDashMultiplier: 1
     SkillDashDuration: 0
+    SkillDashPrepareDuration: 0
     SkillDashVerticalVelocity: 0
     DetectorType: 0
     DetectRadius: 5
@@ -85,6 +86,7 @@ MonoBehaviour:
     OnHitDestroyDelay: 0
     SkillDashMultiplier: 1
     SkillDashDuration: 0
+    SkillDashPrepareDuration: 0
     SkillDashVerticalVelocity: 0
     DetectorType: 0
     DetectRadius: 3
@@ -96,7 +98,7 @@ MonoBehaviour:
     Name: "\u528D\u5175"
     Level: 1
     Power: 1
-    MoveSpeed: 3
+    MoveSpeed: 5
     VerticalMoveSpeed: 0
     KnockbackPower: 0
     FloatPower: 0

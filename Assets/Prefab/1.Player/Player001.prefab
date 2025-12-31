@@ -1,53 +1,5 @@
 %YAML 1.1
 %TAG !u! tag:unity3d.com,2011:
---- !u!1 &1482110719359698409
-GameObject:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
-  m_Component:
-  - component: {fileID: 527969737017944530}
-  - component: {fileID: 4928795387579831107}
-  m_Layer: 13
-  m_Name: MoveCollider
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 1
---- !u!4 &527969737017944530
-Transform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1482110719359698409}
-  m_LocalRotation: {x: 0.61274636, y: 0.35333738, z: -0.35376927, w: 0.61199826}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_ConstrainProportionsScale: 0
-  m_Children: []
-  m_Father: {fileID: 249597748086984320}
-  m_RootOrder: 2
-  m_LocalEulerAnglesHint: {x: 90.07, y: 60, z: 0}
---- !u!70 &4928795387579831107
-CapsuleCollider2D:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1482110719359698409}
-  m_Enabled: 1
-  m_Density: 1
-  m_Material: {fileID: 0}
-  m_IsTrigger: 0
-  m_UsedByEffector: 0
-  m_UsedByComposite: 0
-  m_Offset: {x: 235.11378, y: -135.68057}
-  m_Size: {x: 0.42052552, y: 0.6443507}
-  m_Direction: 0
 --- !u!1 &1545482545805397024
 GameObject:
   m_ObjectHideFlags: 0
@@ -200,7 +152,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 1843384522109208559}
-  m_Layer: 6
+  m_Layer: 0
   m_Name: SelectorIndicatorPoint
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -337,7 +289,6 @@ Transform:
   m_Children:
   - {fileID: 6552671969494188274}
   - {fileID: 1843384522109208559}
-  - {fileID: 527969737017944530}
   m_Father: {fileID: 1901394458928384585}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
@@ -361,7 +312,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 96195401807569800}
-  m_Layer: 14
+  m_Layer: 0
   m_Name: Shadow
   m_TagString: Untagged
   m_Icon: {fileID: 0}

@@ -52,7 +52,7 @@ public static class ParabolaHelper
         if (float.IsNaN(verticalSpeed) || Mathf.Abs(verticalSpeed) > v * 5f || t > 5f) {
             // 使用最大射程角度：45度（tan(45)=1 -> vy = vx）
             verticalSpeed = v;
-            Debug.LogWarning($"[ParabolaHelper] 水平速度過低或距離過遠，使用45°角出速。距離={distance:F2}, 水平速度={v:F2}");
+            //Debug.LogWarning($"[ParabolaHelper] 水平速度過低或距離過遠，使用45°角出速。距離={distance:F2}, 水平速度={v:F2}");
         }
 
         // --- 安全限制 ---

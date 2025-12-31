@@ -14,21 +14,21 @@ public sealed class PlayerStateSystem : SubSystemBase
     public PlayerSkillSystem SkillSystem { get; private set; }
     public PlayerSpawnSystem SpawnSystem { get; private set; }
 
+
     // 事件
+    public event Action<int> OnPlayerEnterBattle;
     public event Action<int> OnPlayerUnlocked;
 
     private Dictionary<int, PlayerStatsRuntime> _playerStatsRuntimeDtny = new();
     private Dictionary<int, Player> _battlePlayerDtny = new();
     private List<int> _unlockedIdList = new();
 
+    private ISpawnEffect _spawnEffect;
 
     public PlayerStateSystem(GameManager gm) : base(gm) { }
     public override void Initialize() {
-        SpawnSystem = new PlayerSpawnSystem(
-               new DefaultPlayerFactory(),
-               new DropBounceSpawnEffect(),
-               new CoroutineRunnerAdapter(GameManager)
-           );
+        _spawnEffect= new DropBounceSpawnEffect();
+        SpawnSystem = new PlayerSpawnSystem();
         SkillSystem = new PlayerSkillSystem();
     }
 
@@ -37,7 +37,7 @@ public sealed class PlayerStateSystem : SubSystemBase
         if (!IDValidator.IsPlayerID(id)) Debug.LogWarning($"PlayerID不合法");
         //解鎖、創造腳色
         _unlockedIdList.Add(id);
-        var player=SpawnSystem.CreatPlayer(id);
+        var player=SpawnSystem.SpawnerPlayer(id);
         _battlePlayerDtny.Add(id, player);
 
         //初始化解鎖、安裝技能
@@ -54,9 +54,8 @@ public sealed class PlayerStateSystem : SubSystemBase
 
         UnlockPlayer(1002);
 
-        SpawnSystem.CloseAllPlayer();
+        AllPlayerClose();
     }
-
     public void SetPlayerStatsRuntimeDtny(PlayerStatData playerStatData) {
         _playerStatsRuntimeDtny.Clear();
         foreach (var stat in playerStatData.playerStatsTemplateList)
@@ -66,5 +65,24 @@ public sealed class PlayerStateSystem : SubSystemBase
             //var Runtime = _playerStatsRuntimeDtny[stat.StatsData.Id];
         }
     }
-    public void SpawnAllPlayer(Vector3 spawnPoint) => SpawnAllPlayer(spawnPoint);
+
+    public void AllPlayerEnterBattle(Vector3 spawnPos) {
+        float offsetY = -1f;
+        foreach (var player in PlayerUtility.AllPlayers.Values) {
+            if (!player) continue;
+            player.gameObject.SetActive(true);
+            GameManager.StartCoroutine(_spawnEffect.Play(player.gameObject, spawnPos));
+            spawnPos.y += offsetY;
+
+            //發事件
+            OnPlayerEnterBattle?.Invoke(player.Rt.StatsData.Id);
+        }
+    }
+    public void AllPlayerClose() {
+        foreach (var player in PlayerUtility.AllPlayers.Values) {
+            if (!player) continue;
+            player.gameObject.SetActive(false);
+            player.transform.position = Vector2.zero;
+        }
+    }
 }

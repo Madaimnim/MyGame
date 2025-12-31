@@ -157,7 +157,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a4dfaaf66ef49214aae722a3f87c09a6, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  sprCol: {fileID: 4748237863156718979}
+  _sprCol: {fileID: 8621222898500944165}
+  CanGravityFall: 0
 --- !u!95 &3372780662201843464
 Animator:
   serializedVersion: 5
@@ -305,7 +306,7 @@ GameObject:
   m_Component:
   - component: {fileID: 2063879564346664531}
   - component: {fileID: 7652015685228181119}
-  - component: {fileID: 4748237863156718979}
+  - component: {fileID: 8621222898500944165}
   m_Layer: 11
   m_Name: Sprite
   m_TagString: Untagged
@@ -380,8 +381,8 @@ SpriteRenderer:
   m_WasSpriteAssigned: 1
   m_MaskInteraction: 0
   m_SpriteSortPoint: 1
---- !u!58 &4748237863156718979
-CircleCollider2D:
+--- !u!70 &8621222898500944165
+CapsuleCollider2D:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
@@ -393,6 +394,6 @@ CircleCollider2D:
   m_IsTrigger: 1
   m_UsedByEffector: 0
   m_UsedByComposite: 0
-  m_Offset: {x: 0, y: 0}
-  serializedVersion: 2
-  m_Radius: 0.1
+  m_Offset: {x: -0.006291778, y: 0.25000018}
+  m_Size: {x: 0.5125838, y: 0.348999}
+  m_Direction: 1

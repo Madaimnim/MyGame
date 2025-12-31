@@ -14,7 +14,7 @@ public class DetectorSpriteSpawner {
     private Color color = new Color(81f / 255f, 163f / 255f, 255f / 255f,   89f / 255f);
     private int referencePPU = 100;       // 與相機一致
     private float alphaEdge = 0f;
-    private int sortingOrder = -10;
+    private int sortingOrder = -20;
 
     public GameObject CreateCircleObject(float radius) {
         // 建立物件

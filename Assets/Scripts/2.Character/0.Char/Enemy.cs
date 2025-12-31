@@ -2,6 +2,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UIElements;
 
 //SkillDetectorBase 下轄Circle_Detector、Box_Detector等偵測策略，可生成範圍Sprite物件，無實際技能槽，開關僅關閉可視化範圍
 
@@ -140,7 +141,7 @@ public class Enemy :MonoBehaviour,IInteractable
         HeightComponent.StopRecoverHeightCoroutine();
 
         HeightComponent.Hurt(0.5f);
-        HeightComponent.FloatUp(info.FloatPower);
+        HeightComponent.AddUpVelocity(info.FloatPower);
 
         ActionLockComponent.HurtLock(0.5f);
         AnimationComponent.PlayImmediate("Hurt");
@@ -194,11 +195,10 @@ public class Enemy :MonoBehaviour,IInteractable
         yield return new WaitForSeconds(state.length / Ani.speed);
 
         if (RespawnComponent.CanRespawn) RespawnComponent.RespawnAfter(3f);
-        else
-        {
+        else {
             Destroy(gameObject);
-            if (GameManager.Instance != null)
-                GameManager.Instance.EnemyStateSystem.UnregisterEnemy(this);
+            if (StageLevelManager.Instance != null) StageLevelManager.Instance.EnemyDefeated();
+            if (GameManager.Instance != null) GameManager.Instance.EnemyStateSystem.UnregisterEnemy(this);
         }
     }
 
@@ -216,15 +216,13 @@ public class Enemy :MonoBehaviour,IInteractable
 
     private void SetFacingLeft(Vector2 direction)
     {
-        //if (StateComponent.IsPlayingAttackAnimation) return;  //確保攻擊時面相正確
         if (direction.sqrMagnitude < 0.01f) return;     //避免靜止時頻繁執行
-        Debug.Log($"敵人更新面相來源:{direction}");
         if (Mathf.Abs(direction.x) > 0.01f)
         {
-            var s = transform.localScale;
-            float mag = Mathf.Abs(s.x);
-            s.x = (direction.x < 0f) ? mag : -mag;
-            transform.localScale = s;
+            var scale = transform.localScale;
+            float mag = Mathf.Abs(scale.x);
+            scale.x = (direction.x < 0f) ? mag : -mag;
+            transform.localScale = scale;
 
 
             //if (IsDead) Debug.Log($"更新敵人死亡面相:{transform.localScale}，");

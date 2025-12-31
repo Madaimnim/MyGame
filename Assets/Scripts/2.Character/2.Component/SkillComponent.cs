@@ -150,9 +150,27 @@ public class SkillComponent
         SkillSlots[slotIndex].Uninstall();
         SkillSlots[slotIndex].SetSlot(skillId, _skillPool[skillId].Detector);
 
+        SetAllDetectRangesVisible(false);
+
+
         //µo¨Æ¥ó
         OnSkillsChanged?.Invoke();
     }
+    public void SetDetectRangeVisible(int slotIndex, bool visible) {
+        if (slotIndex < 0 || slotIndex >= SkillSlots.Length) return;
+
+        var slot = SkillSlots[slotIndex];
+        if (slot.DetectRangeObject == null) return;
+
+        slot.DetectRangeObject.SetActive(visible);
+    }
+    public void SetAllDetectRangesVisible(bool visible) {
+        foreach (var slot in SkillSlots) {
+            if (slot?.DetectRangeObject != null)
+                slot.DetectRangeObject.SetActive(visible);
+        }
+    }
+
     public void TickCooldownTimer() {
         foreach (var slot in SkillSlots) slot?.Tick();
     }

@@ -7,7 +7,7 @@ public class SkillSlot
     public int SkillId { get; private set; } = -1;
     public float CooldownTimer { get; private set; }
     public SkillDetectorBase Detector { get; private set; }
-    public GameObject RangeObject;
+    public GameObject DetectRangeObject;
 
     public bool HasSkill => SkillId  != -1;   //-1 代表無技能;
     public bool IsReady => SkillId != -1 && CooldownTimer <= 0f;
@@ -35,10 +35,10 @@ public class SkillSlot
         CooldownTimer = 0f;
         Detector.Initialize(_backSpriteTransform);
 
-        if (RangeObject != null) GameObject.Destroy(RangeObject);
-        RangeObject = Detector.SpawnRangeObject(_backSpriteTransform);
-        RangeObject.transform.SetParent(_backSpriteTransform);
-        RangeObject.transform.localPosition = Vector3.zero;
+        if (DetectRangeObject != null) GameObject.Destroy(DetectRangeObject);
+        DetectRangeObject = Detector.SpawnRangeObject(_backSpriteTransform);
+        DetectRangeObject.transform.SetParent(_backSpriteTransform);
+        DetectRangeObject.transform.localPosition = Vector3.zero;
     }
     public void TriggerCooldown(float cd) {
         if (SkillId == -1) return;

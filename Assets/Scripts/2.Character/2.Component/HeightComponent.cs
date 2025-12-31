@@ -39,17 +39,10 @@ public class HeightComponent
     }
 
     public void FixedTick() {
-        if (_sprTransform.localPosition.y <= GROUND_EPSILON) {
-            UpdateHeight(0f);
-            _verticalVelocity = 0f;
-            _stateComponent.SetIsGrounded(true);
-        }else _stateComponent.SetIsGrounded(false);
-
+        if (_stateComponent.IsInGravityFall) GravityFall();
+        else if (!_stateComponent.IsInitialHeight) RecoveryHeight();
 
         if (_stateComponent.IsGrounded) _stateComponent.SetIsInGravityFall(false);
-
-        if (_stateComponent.IsInGravityFall) GravityFall();
-        else if (!_stateComponent.IsInitialHeight) RecoveryHeight();  
     }
 
     //受傷，啟、閉重力
@@ -65,25 +58,32 @@ public class HeightComponent
 
         _stateComponent.SetIsGrounded(false);
         _stateComponent.SetIsInitialHeight(false);
+        _stateComponent.SetIsInGravityFall(true);
 
         for (int i = 0; i < steps; i++) {
             yield return new WaitForFixedUpdate();
         }
-
+        _animationComponent.PlayIdle();
         yield return null;
     }
 
     //浮空
-    public void FloatUp(float floatPower) {
-        _verticalVelocity= floatPower;
+    public void AddUpVelocity(float upVelocity) {
+        _verticalVelocity= upVelocity;
+        _stateComponent.SetIsGrounded(false);
+        _stateComponent.SetIsInitialHeight(false);
+        _stateComponent.SetIsInGravityFall(true);
     }
 
     //重力控制
     public void GravityFall() {
         float dt = Time.fixedDeltaTime;
         float currentHeight = _sprTransform.localPosition.y + _verticalVelocity * dt;
-        if (currentHeight <= 0f) currentHeight = 0f;  
-        UpdateHeight(currentHeight);
+        if (currentHeight <= 0f) {
+            UpdateHeight(0f);
+            _stateComponent.SetIsGrounded(true);
+        }else UpdateHeight(currentHeight);
+
         _verticalVelocity -= _gravity * dt;
     }
 

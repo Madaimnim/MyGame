@@ -12,13 +12,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 1e47d18682ec988458dd532f19e71136, type: 3}
   m_Name: StageEnemySpawnConfig1-2
   m_EditorClassIdentifier: 
-  SpawnInterval: 0.2
+  SpawnInterval: 1
   Waves:
   - EnemyId: 2001
-    SpawnCount: 1
+    SpawnCount: 2
   - EnemyId: 2002
-    SpawnCount: 0
+    SpawnCount: 2
   - EnemyId: 2003
     SpawnCount: 0
   - EnemyId: 2004
-    SpawnCount: 1
+    SpawnCount: 2

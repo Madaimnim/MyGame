@@ -4,6 +4,16 @@ using UnityEngine;
 public class StageEnemySpawnConfig : ScriptableObject {
     [Header("¥Í¦¨¶¡¹j")]
     public float SpawnInterval = 0.1f;
+    public int TotalSpawnCount {
+        get
+        {
+            if (Waves == null) return 0;
+            int total = 0;
+            foreach (var wave in Waves)
+                total += wave.SpawnCount;
+            return total;
+        }
+    }
 
     [System.Serializable]
     public class SpawnWave {

@@ -61,8 +61,8 @@ MonoBehaviour:
     Power: 1
     MoveSpeed: 1
     VerticalMoveSpeed: 0.8
-    KnockbackPower: 1
-    FloatPower: 1
+    KnockbackPower: 5
+    FloatPower: 5
     Weight: 0
   VisualData:
     Prefab: {fileID: 8071129183117270245, guid: 4af2cabfe6c0fde46a5ba13601cdd5ff, type: 3}

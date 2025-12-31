@@ -112,7 +112,9 @@ public class MoveComponent
         if (_useMoveWindow && _moveWindowRemainTime <= 0f) return false;
         if (_useMoveWindow) _moveWindowRemainTime -= Time.fixedDeltaTime;
 
-        _rb.MovePosition(newPosition);
+        //處理移動邊界
+        var resolvedPos = MoveBoundsManager.Instance != null ? MoveBoundsManager.Instance.Resolve(newPosition) : newPosition;
+        _rb.MovePosition(resolvedPos);
 
         return true;
     }
@@ -132,14 +134,13 @@ public class MoveComponent
             Vector2 before = _rb.position;
             Vector2 expected = before + moveVelocity * Time.fixedDeltaTime;
 
-            _rb.MovePosition(expected);
+            //處理移動邊界
+            var resolvedPos = MoveBoundsManager.Instance != null ? MoveBoundsManager.Instance.Resolve(expected) : expected;
+            _rb.MovePosition(resolvedPos);
 
             yield return new WaitForFixedUpdate();
-
             Vector2 after = _rb.position;
-
             //Debug.Log($"[DashCheck] frame={Time.frameCount} " +$"before={before} expected={expected} after={after}");
-
             elapsed += Time.fixedDeltaTime;
         }
 
@@ -171,7 +172,11 @@ public class MoveComponent
 
         while (elapsed < skillRt.SkillDashPrepareDuration) {
             Vector2 newPos = _rb.position + moveVelocity * Time.fixedDeltaTime;
-            _rb.MovePosition(newPos);
+
+            //處理移動邊界
+            var resolvedPos = MoveBoundsManager.Instance != null ? MoveBoundsManager.Instance.Resolve(newPos) : newPos;
+            _rb.MovePosition(resolvedPos);
+
             yield return new WaitForFixedUpdate(); // 關鍵
 
             elapsed += Time.fixedDeltaTime;
@@ -194,12 +199,18 @@ public class MoveComponent
     private IEnumerator KnockbackCoroutine(Vector2 knockbackForce)
     {
         _stateComponent.SetIsKnocked(true);
-        // ======= 迴圈：持續模擬直到角色落回地面 =======
         while (true)
         {
-            yield return null;
-            //Debug.Log($"{_isGrounded}");
-            _rb.position += knockbackForce * Time.deltaTime;
+            yield return new WaitForFixedUpdate();
+
+            Vector2 current = _rb.position;
+            Vector2 next = current + knockbackForce * Time.fixedDeltaTime;
+
+            //  關鍵：擊退也必須 Resolve
+            next = MoveBoundsManager.Instance != null ? MoveBoundsManager.Instance.Resolve(next) : next;
+
+            _rb.MovePosition(next);
+
             if (_stateComponent.IsGrounded) break;
         }
         _stateComponent.SetIsKnocked(false);
@@ -216,6 +227,8 @@ public class MoveComponent
         if (_skillDashMoveCoroutine != null) {
             _runner.StopCoroutine(_skillDashMoveCoroutine);
             _skillDashMoveCoroutine = null;
+
+            _stateComponent.SetIsSkillDashing(false);
         }
     }
     public void StopSkillPrepareMoveCoroutine() {

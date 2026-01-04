@@ -21,7 +21,7 @@ public class UI_StartSceneController : MonoBehaviour
     }
 
     private void OnClickStart() {
-        GameManager.Instance.GameStateSystem.SetState(GameStateSystem.GameState.Preparation); // °ª¼h API
+        GameManager.Instance.GameStateSystem.SetState(GameStateSystem.GameState.Preparation, "Preparation"); // °ª¼h API
         startButton.interactable=false;
     }
 

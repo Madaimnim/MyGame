@@ -27,9 +27,5 @@ public class EnemyEnterExitBehaviour : StateMachineBehaviour
 
         // 解除動畫鎖定
         enemy.StateComponent.SetIsPlayingAttackAnimation ( false);
-
-        //float exitTime = Time.time;
-        //float duration = exitTime - enterTime; // 播放時間
-        //Debug.Log($"離開{stateInfo.fullPathHash}動畫，isPlayingActionAnimation設為{enemy.isPlayingActionAnimation},經過時間={duration:F2}秒");
     }
 }

@@ -52,6 +52,7 @@ public class Player : MonoBehaviour, IInteractable
         //註冊UI:顯示血量、技能冷卻
         if (UIManager_BattlePlayer.Instance != null)UIManager_BattlePlayer.Instance.RegisterPlayerPanelUI(this);
         if (PlayerListManager.Instance != null) PlayerListManager.Instance.Register(this);
+        if(PlayerInputManager.Instance != null) PlayerInputManager.Instance.SelectPlayer(this);
     }
     private void OnDisable()
     {
@@ -138,8 +139,6 @@ public class Player : MonoBehaviour, IInteractable
         HealthComponent.TakeDamage(info.Damage);
         EffectComponent.TakeDamageEffect(info.Damage);
 
-
-        StateComponent.SetIsPlayingAttackAnimation(false);
     }
     public void AnimationEvent_SpawnerSkill()
     {

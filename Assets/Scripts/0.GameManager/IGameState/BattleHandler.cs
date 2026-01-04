@@ -24,8 +24,6 @@ public class BattleHandler : IGameStateHandler
     }
 
     public void Exit() {
-        _sceneSystem.OnSceneLoaded -= OnSceneLoaded;
-
         TextPopupManager.Instance.TextPrefab_StageClear.SetActive(false);
         TextPopupManager.Instance.TextPrefab_StageDefeat.SetActive(false);
     }

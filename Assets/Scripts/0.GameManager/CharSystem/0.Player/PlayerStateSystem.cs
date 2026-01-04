@@ -52,7 +52,7 @@ public sealed class PlayerStateSystem : SubSystemBase
         _playerStatsRuntimeDtny[1001].UnlockedSkillIdList.Add(2);
         //SkillSystem.EquipPlayerSkill(1001, 0, 2);
 
-        UnlockPlayer(1002);
+        //UnlockPlayer(1002);
 
         AllPlayerClose();
     }
@@ -67,6 +67,7 @@ public sealed class PlayerStateSystem : SubSystemBase
     }
 
     public void AllPlayerEnterBattle(Vector3 spawnPos) {
+        Debug.Log("AllPlayerEnterBattle");
         float offsetY = -1f;
         foreach (var player in PlayerUtility.AllPlayers.Values) {
             if (!player) continue;

@@ -28,7 +28,7 @@ public class StageLevelManager : MonoBehaviour
         _remainenemyCount = _totalEnemyCount;
 
         // 只有生成過敵人，旗幟才true
-        Debug.Log($"當前關卡敵人數量:{_totalEnemyCount}");
+        //Debug.Log($"當前關卡敵人數量:{_totalEnemyCount}");
     }
 
     private void Update() {
@@ -94,6 +94,10 @@ public class StageLevelManager : MonoBehaviour
     private IEnumerator WaitAndGoPrepareState() {
         float timer = 0f;
 
+        while (timer < 1f) {
+            timer += Time.deltaTime;
+            yield return null;
+        }
         while (timer < 5f)
         {
             timer += Time.deltaTime;
@@ -102,7 +106,7 @@ public class StageLevelManager : MonoBehaviour
         }
 
         // 切換狀態
-        GameManager.Instance.GameStateSystem.SetState(GameStateSystem.GameState.Preparation);
+        GameManager.Instance.GameStateSystem.SetState(GameStateSystem.GameState.Preparation,"Preparation");
         GameManager.Instance.PlayerStateSystem.AllPlayerClose();
     }
 }

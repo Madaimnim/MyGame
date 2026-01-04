@@ -11,7 +11,7 @@ public class GameStateSystem :SubSystemBase
     public bool IsControlEnabled => CurrentState == GameState.Battle;
 
     public GameStateSystem(GameManager gm) : base(gm) {}
-    public void SetState(GameState newState, string sceneKey = null) {
+    public void SetState(GameState newState, string sceneKey) {
         if (CurrentState == newState) return; 
         var prev = CurrentState;
         

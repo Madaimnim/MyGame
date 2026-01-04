@@ -17,11 +17,11 @@ public sealed class GameStateRouter:SubSystemBase
     }
 
     private void OnStateEnter(GameStateSystem.GameState gameState, string sceneName) {
-        if (_gameStateHandlers.TryGetValue(gameState, out var h)) h.Enter(sceneName);
+        if (_gameStateHandlers.TryGetValue(gameState, out var stateHandler)) stateHandler.Enter(sceneName);
         else Debug.LogWarning($"[StateRouter] No handler for {gameState}");
     }
     private void OnStateExit(GameStateSystem.GameState gameState) {
-        if (_gameStateHandlers.TryGetValue(gameState, out var h)) h.Exit();
+        if (_gameStateHandlers.TryGetValue(gameState, out var stateHandler)) stateHandler.Exit();
         else Debug.LogWarning($"[StateRouter] No handler for {gameState}");
     }
 }

@@ -19,6 +19,6 @@ MonoBehaviour:
   - EnemyId: 2002
     SpawnCount: 2
   - EnemyId: 2003
-    SpawnCount: 0
+    SpawnCount: 2
   - EnemyId: 2004
     SpawnCount: 2

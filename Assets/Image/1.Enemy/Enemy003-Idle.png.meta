@@ -1,5 +1,5 @@
 fileFormatVersion: 2
-guid: 100bec4f67285d7469bce4642ae1c0e3
+guid: 6c2fe5ab1c6f11d4891315dfb0c87ee6
 TextureImporter:
   internalIDToNameTable: []
   externalObjects: {}
@@ -47,7 +47,7 @@ TextureImporter:
   spriteMeshType: 1
   alignment: 0
   spritePivot: {x: 0.5, y: 0.5}
-  spritePixelsToUnits: 12
+  spritePixelsToUnits: 32
   spriteBorder: {x: 0, y: 0, z: 0, w: 0}
   spriteGenerateFallbackPhysicsShape: 1
   alphaUsage: 1
@@ -90,7 +90,7 @@ TextureImporter:
     androidETC2FallbackOverride: 0
     forceMaximumCompressionQuality_BC6H_BC7: 0
   - serializedVersion: 3
-    buildTarget: Server
+    buildTarget: iPhone
     maxTextureSize: 2048
     resizeAlgorithm: 0
     textureFormat: -1
@@ -113,122 +113,47 @@ TextureImporter:
     overridden: 0
     androidETC2FallbackOverride: 0
     forceMaximumCompressionQuality_BC6H_BC7: 0
-  - serializedVersion: 3
-    buildTarget: iPhone
-    maxTextureSize: 2048
-    resizeAlgorithm: 0
-    textureFormat: -1
-    textureCompression: 1
-    compressionQuality: 50
-    crunchedCompression: 0
-    allowsAlphaSplitting: 0
-    overridden: 0
-    androidETC2FallbackOverride: 0
-    forceMaximumCompressionQuality_BC6H_BC7: 0
   spriteSheet:
     serializedVersion: 2
     sprites:
     - serializedVersion: 2
-      name: Enemy003-Sheet_0
+      name: Enemy003-Idle_0
       rect:
         serializedVersion: 2
         x: 0
         y: 0
-        width: 24
-        height: 17
-      alignment: 7
-      pivot: {x: 0.5, y: 0}
+        width: 48
+        height: 48
+      alignment: 9
+      pivot: {x: 0.5, y: 0.1}
       border: {x: 0, y: 0, z: 0, w: 0}
       outline: []
       physicsShape: []
       tessellationDetail: 0
       bones: []
-      spriteID: 11f8db7602191a84a8357f5d940a4c25
-      internalID: -1457957122
+      spriteID: 6dc636bedf249f34d90526f125dfe399
+      internalID: 93139008
       vertices: []
       indices: 
       edges: []
       weights: []
     - serializedVersion: 2
-      name: Enemy003-Sheet_1
-      rect:
-        serializedVersion: 2
-        x: 24
-        y: 0
-        width: 24
-        height: 17
-      alignment: 7
-      pivot: {x: 0.5, y: 0}
-      border: {x: 0, y: 0, z: 0, w: 0}
-      outline: []
-      physicsShape: []
-      tessellationDetail: 0
-      bones: []
-      spriteID: db9a22525ab273748b8fd7075b94fb99
-      internalID: -571399919
-      vertices: []
-      indices: 
-      edges: []
-      weights: []
-    - serializedVersion: 2
-      name: Enemy003-Sheet_2
+      name: Enemy003-Idle_1
       rect:
         serializedVersion: 2
         x: 48
         y: 0
-        width: 24
-        height: 17
-      alignment: 7
-      pivot: {x: 0.5, y: 0}
+        width: 48
+        height: 48
+      alignment: 9
+      pivot: {x: 0.5, y: 0.1}
       border: {x: 0, y: 0, z: 0, w: 0}
       outline: []
       physicsShape: []
       tessellationDetail: 0
       bones: []
-      spriteID: d677a55a8edbc4d49a13b6c9c1c07619
-      internalID: 245220712
-      vertices: []
-      indices: 
-      edges: []
-      weights: []
-    - serializedVersion: 2
-      name: Enemy003-Sheet_3
-      rect:
-        serializedVersion: 2
-        x: 72
-        y: 0
-        width: 24
-        height: 17
-      alignment: 7
-      pivot: {x: 0.5, y: 0}
-      border: {x: 0, y: 0, z: 0, w: 0}
-      outline: []
-      physicsShape: []
-      tessellationDetail: 0
-      bones: []
-      spriteID: 344f7d20f6bcd0940af3eb831bc1c579
-      internalID: -483269607
-      vertices: []
-      indices: 
-      edges: []
-      weights: []
-    - serializedVersion: 2
-      name: Enemy003-Sheet_4
-      rect:
-        serializedVersion: 2
-        x: 96
-        y: 0
-        width: 24
-        height: 17
-      alignment: 7
-      pivot: {x: 0.5, y: 0}
-      border: {x: 0, y: 0, z: 0, w: 0}
-      outline: []
-      physicsShape: []
-      tessellationDetail: 0
-      bones: []
-      spriteID: 96af1544ce6680c4a9992a5b2fba5e19
-      internalID: 1860559233
+      spriteID: 73a29eb3acfa68f49a24fd93aa2afa1e
+      internalID: -2027603202
       vertices: []
       indices: 
       edges: []
@@ -244,11 +169,8 @@ TextureImporter:
     weights: []
     secondaryTextures: []
     nameFileIdTable:
-      Enemy003-Sheet_0: -1457957122
-      Enemy003-Sheet_1: -571399919
-      Enemy003-Sheet_2: 245220712
-      Enemy003-Sheet_3: -483269607
-      Enemy003-Sheet_4: 1860559233
+      Enemy003-Idle_0: 93139008
+      Enemy003-Idle_1: -2027603202
   spritePackingTag: 
   pSDRemoveMatte: 0
   pSDShowRemoveMatteOption: 0

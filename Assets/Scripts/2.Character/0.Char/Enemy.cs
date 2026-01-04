@@ -146,7 +146,6 @@ public class Enemy :MonoBehaviour,IInteractable
         ActionLockComponent.HurtLock(0.5f);
         AnimationComponent.PlayImmediate("Hurt");
 
-        StateComponent.SetIsPlayingAttackAnimation(false);
 
     }
     public void AnimationEvent_SpawnerSkill() {

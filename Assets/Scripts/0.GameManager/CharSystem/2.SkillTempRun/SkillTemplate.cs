@@ -2,15 +2,21 @@
 using System.Collections.Generic;
 using UnityEngine;
 
+
+public enum SkillReleaseType
+{
+    [InspectorName("指向技")] Towerd,   // 例如：地裂斬、放火球到地板
+    [InspectorName("指定技")] Target   // 例如：鎖定敵人射擊
+}
+public enum SkillLifetimeType {
+    [InspectorName("設定持續時間")] TimeLimit,   // 用 DestroyDelay
+    [InspectorName("動畫一次")] AnimationOnce,  // 動畫播完就消失
+}
 public enum SkillExecutionType {
     [InspectorName("發射投射物")] SpawnObject,
     [InspectorName("近戰碰撞體")] AttachedHitbox
 }
-public enum SkillTargetType
-{
-    [InspectorName("指向技")] Point,   // 例如：地裂斬、放火球到地板
-    [InspectorName("指定技")] Target   // 例如：鎖定敵人射擊
-}
+
 public enum SkillMoveType {
     [InspectorName("原地生成")] Station,
     [InspectorName("追蹤目標")] Homing,
@@ -44,9 +50,10 @@ public enum SkillDetectorType {
 public class SkillTemplate
 {
     [Header("發動方式")]
-    public SkillTargetType SkillTargetType;
+    public SkillReleaseType SkillReleaseType;
 
     [Header("技能類型")]
+    public SkillLifetimeType SkillLifetimeType;
     public SkillExecutionType SkillExecutionType;
     public SkillMoveType SkillMoveType;
     public OnHitType OnHitType;
@@ -56,7 +63,7 @@ public class SkillTemplate
 
     public StatsData StatsData;
     public VisualData VisualData;
-    public bool canRotate = true;
+    public bool canRotate;
     public float Cooldown;
     public float DestroyDelay = 0f;
     public float OnHitDestroyDelay = 0f;

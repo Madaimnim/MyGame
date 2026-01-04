@@ -113,8 +113,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 91cb9264c08bde6498cf7fd38d8b11aa, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  enableDebug: 0
   sprCol: {fileID: 9181696829266426698}
-  RootSpriteTransform: {fileID: 249597748086984320}
   BackSpriteTransform: {fileID: 2446907962778437791}
   MoveDetector: {fileID: 0}
   SelectIndicator: {fileID: 4167029791549883717, guid: f83ade4c18471fb429dc1ccc80f42329, type: 3}

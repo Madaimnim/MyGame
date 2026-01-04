@@ -16,7 +16,8 @@ MonoBehaviour:
   MoveStrategyType: 0
   SkillSlotCount: 1
   SkillTemplateList:
-  - SkillTargetType: 0
+  - SkillReleaseType: 0
+    SkillLifetimeType: 0
     SkillExecutionType: 0
     SkillMoveType: 2
     OnHitType: 1
@@ -36,7 +37,7 @@ MonoBehaviour:
       FloatPower: 1
       Weight: 0
     VisualData:
-      Prefab: {fileID: 4003776399557560127, guid: 3f34b424dba5cad41b4f1ae64de5a89b, type: 3}
+      Prefab: {fileID: 5281362192602328335, guid: c2027b93b47c38c49ac8df1d23725a03, type: 3}
       DetectPrefab: {fileID: 0}
       SpriteIcon: {fileID: 0}
       DeathSFX: {fileID: 0}
@@ -55,8 +56,8 @@ MonoBehaviour:
     RangeX: 0
     RangeY: 0
   StatsData:
-    Id: 2003
-    Name: "\u54E5\u5E03\u6797"
+    Id: 2005
+    Name: "\u5C0F\u54E5\u5E03\u6797"
     Level: 1
     Power: 1
     MoveSpeed: 1
@@ -65,7 +66,7 @@ MonoBehaviour:
     FloatPower: 1
     Weight: 0
   VisualData:
-    Prefab: {fileID: 3944193630288458971, guid: 59d379ee68495804fa9eede75222401f, type: 3}
+    Prefab: {fileID: 6483244831074600195, guid: 2c5ddd8415107ec438e8c22aaab61d13, type: 3}
     DetectPrefab: {fileID: 0}
     SpriteIcon: {fileID: 0}
     DeathSFX: {fileID: 0}

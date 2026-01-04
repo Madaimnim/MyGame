@@ -43,7 +43,10 @@ public sealed class PlayerStateSystem : SubSystemBase
         //初始化解鎖、安裝技能
         _playerStatsRuntimeDtny[id].UnlockedSkillIdList.Add(1);
         SkillSystem.EquipPlayerSkill(id, 0, 1);
-        
+        SkillSystem.EquipPlayerSkill(id, 1, 2);
+        SkillSystem.EquipPlayerSkill(id, 2, 3);
+        SkillSystem.EquipPlayerSkill(id, 3, 4);
+
         //發事件
         OnPlayerUnlocked?.Invoke(id);   
     }

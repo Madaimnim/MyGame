@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using System.Linq;
+using UnityEditor.Experimental.GraphView;
 using UnityEngine;
 
 [System.Serializable]
@@ -30,8 +31,10 @@ public class PlayerStatsRuntime : IHealthData
         MaxHp = template.MaxHp;
         SkillSlotCount = template.SkillSlotCount;
         CanRespawn = template.CanRespawn;
-        foreach (var skill in template.SkillTemplateList)
+        foreach (var skill in template.SkillTemplateList) { 
             SkillPool[skill.StatsData.Id] = new PlayerSkillRuntime(skill);
+        }
+
         UnlockedSkillIdList = new List<int>(template.UnlockedSkillIdList);
         ExpTable = template.ExpTable;
         PlayerBehaviourTreeType= template.PlayerBehaviourTreeType;

@@ -8,10 +8,12 @@ using UnityEngine.UIElements;
 public class Player : MonoBehaviour, IInteractable
 {
     //公開--------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+    [Header("Debug")]
+    [SerializeField] private bool enableDebug = true;
+
     [SerializeField] private Collider2D sprCol;
     public Collider2D SprCol => sprCol;
-    public Transform BottomTransform => RootSpriteTransform;
-    public Transform RootSpriteTransform;
+    public Transform BottomTransform => transform;
     public Transform BackSpriteTransform;
 
     public TargetDetector MoveDetector;
@@ -72,6 +74,11 @@ public class Player : MonoBehaviour, IInteractable
         if (InputProvider != PlayerInputManager.Instance && AIComponent != null) AIComponent.Tick();
         SkillComponent.TickCooldownTimer();
     }
+    private void LateUpdate() {
+        StateComponent.DebugState();
+    }
+
+
     private void FixedUpdate()
     {
         if (MoveComponent != null) MoveComponent.FixedTick();
@@ -82,7 +89,7 @@ public class Player : MonoBehaviour, IInteractable
         Rt = stats;
 
         //注意依賴順序
-        StateComponent = new StateComponent();
+        StateComponent = new StateComponent(DebugContext.Player,Rt.StatsData.Id);
         ActionLockComponent = new ActionLockComponent(this,StateComponent);
         HealthComponent = new HealthComponent(Rt, StateComponent);
         AnimationComponent = new AnimationComponent(Ani, transform, Rb, StateComponent);
@@ -213,4 +220,5 @@ public class Player : MonoBehaviour, IInteractable
             transform.localScale = scale;
         }
     }
+
 }

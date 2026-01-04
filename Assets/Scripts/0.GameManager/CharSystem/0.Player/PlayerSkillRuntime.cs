@@ -5,8 +5,8 @@ using UnityEngine;
 [System.Serializable]
 public class PlayerSkillRuntime: ISkillRuntime
 {
-    public SkillTargetType SkillTargetType { get; private set; }
-
+    public SkillReleaseType SkillReleaseType { get; private set; }
+    public SkillLifetimeType SkillLifetimeType {  get; private set; }
     public SkillExecutionType SkillExecutionType { get; private set; }
     public SkillMoveType SkillMoveType { get; set; }
     public OnHitType OnHitType { get; set; }
@@ -34,9 +34,9 @@ public class PlayerSkillRuntime: ISkillRuntime
 
     public PlayerSkillRuntime(SkillTemplate template) {
         //▓`л■ий
-        SkillTargetType = template.SkillTargetType;
-
-        SkillExecutionType= template.SkillExecutionType;
+        SkillReleaseType = template.SkillReleaseType;
+        SkillLifetimeType =template.SkillLifetimeType;
+        SkillExecutionType = template.SkillExecutionType;
         SkillMoveType = template.SkillMoveType;
         OnHitType = template.OnHitType;
         HitEffectPositionType = template.HitEffectPositionType;

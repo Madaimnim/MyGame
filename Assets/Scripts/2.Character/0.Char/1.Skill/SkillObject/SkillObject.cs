@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
+
 public class SkillObject : MonoBehaviour, IInteractable {
     [SerializeField] private Collider2D _sprCol;
     public Collider2D SprCol => _sprCol;
@@ -14,6 +15,7 @@ public class SkillObject : MonoBehaviour, IInteractable {
     private bool _canRotate = false;
     private StatsData _pStatsData;
     private ISkillRuntime _skillRt;
+    private SkillLifetimeType _skillLifetimeType;
     private SkillMoveType _skillMoveType;
     private SkillMoveComponent _skillMoveComponent;
     private SkillHitComponent _skillHitComponent;
@@ -45,17 +47,24 @@ public class SkillObject : MonoBehaviour, IInteractable {
         _pStatsData = pStatsData;
         _skillRt = skillRt;
         _skillMoveType= skillRt.SkillMoveType;
+        _skillLifetimeType= skillRt.SkillLifetimeType;
         _canRotate = _skillRt.canRotate;
 
         //模組初始化
         _skillMoveComponent.Initialize(_skillRt,charTransform, charSprTransform ,targetPosition, targetTransform);
         _skillHitComponent.Initialize(_skillRt,_skillMoveComponent, _pStatsData);
 
-        //Vector3 referencePos = targetTransform ? targetTransform.position : targetPosition;
 
-        //InitialOffset(referencePos);
         if(_skillMoveType != SkillMoveType.ParabolaToward) UpdateRotation();
-        StartDestroyTimer(skillRt.DestroyDelay);
+        switch (_skillLifetimeType) {
+            case SkillLifetimeType.TimeLimit:
+                StartDestroyTimer(_skillRt.DestroyDelay);
+                break;
+
+            case SkillLifetimeType.AnimationOnce:
+                // 什麼都不做，等動畫事件
+                break;
+        }
     }
 
     private void OnTriggerEnter2D(Collider2D collision) => _skillHitComponent.TriggerEnter(collision);
@@ -71,11 +80,9 @@ public class SkillObject : MonoBehaviour, IInteractable {
         yield return new WaitForSeconds(delay);
         Destroy(gameObject);
     }
-
-    //private void InitialOffset(Vector3 targetPosition) => transform.position = (Vector2)transform.position + new Vector2((targetPosition.x - transform.position.x >= 0) ? SkillOffset.x : -SkillOffset.x, SkillOffset.y);
     private void UpdateRotation() {
         if (!_canRotate || _skillMoveComponent.MoveDirection == Vector2.zero) return;
-        
+        Debug.Log($"_canRotate:{_canRotate},MoveDirection:{_skillMoveComponent.MoveDirection}");
         float angle = Mathf.Atan2(_skillMoveComponent.MoveDirection.y, _skillMoveComponent.MoveDirection.x) * Mathf.Rad2Deg;
 
         var newScale = new Vector3(1, 1, 1);
@@ -93,4 +100,10 @@ public class SkillObject : MonoBehaviour, IInteractable {
     public void Interact(InteractInfo info) {
         // SkillObject 待實現
     }
+
+    //動畫事件 搭配SkillLifetimeType
+    public void AnimationEvent_Destroy() { 
+        Destroy(gameObject);
+    }   
+
 }

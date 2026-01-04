@@ -4,8 +4,8 @@ using UnityEngine;
 
 public interface ISkillRuntime
 {
-    SkillTargetType SkillTargetType { get; }
-
+    SkillReleaseType SkillReleaseType { get; }
+    SkillLifetimeType SkillLifetimeType { get; }
     SkillExecutionType SkillExecutionType { get; }
     SkillMoveType SkillMoveType { get; }
     OnHitType OnHitType { get; }

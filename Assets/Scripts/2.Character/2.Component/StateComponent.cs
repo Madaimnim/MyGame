@@ -1,8 +1,16 @@
 using System;
-using System.Diagnostics.Tracing;
-using UnityEngine;
 using System.Collections;
-
+using System.Collections.Generic;
+using System.Diagnostics.Tracing;
+using System.Security.Cryptography;
+using Unity.VisualScripting.FullSerializer;
+using UnityEditor.Rendering.LookDev;
+using UnityEngine;
+public enum DebugContext {
+    None,
+    Player,
+    Enemy
+}
 public class StateComponent {
     public bool CanMove => !IsDead && !IsControlLocked && !IsKnocked && !IsSkillDashing;
     public bool CanAttack => !IsDead && !IsControlLocked && !IsKnocked && !IsPlayingAttackAnimation && IsInitialHeight;
@@ -18,10 +26,17 @@ public class StateComponent {
     public bool IsControlLocked { get; private set; } = false;
     public bool IsMoveAnimationOpen { get; private set; } = false;
     public bool IsInGravityFall { get; private set; } = false;
-
     //技能狀態
     public bool IsSkillDashing { get;private set; } = false;
-    public StateComponent() {}
+
+    // 身份（建構時注入）
+    private DebugContext _context = DebugContext.None;
+    private int _id = -1;
+
+    public StateComponent(DebugContext context, int id) {
+        _context = context;
+        _id = id;
+    }
 
 
     public void SetIsDead(bool value) => IsDead = value;
@@ -36,4 +51,55 @@ public class StateComponent {
     public void SetIsInGravityFall(bool value) => IsInGravityFall = value;
     //技能狀態
     public void SetIsSkillDashing(bool value) => IsSkillDashing = value;
+
+    //Debug搭配EnemyScreenDebug用、EnemyScreenDebug用
+    public void DebugState() {
+        if (_context == DebugContext.None) return;
+
+        // 判斷目前是否該顯示
+        if (_context == DebugContext.Player &&
+            PlayerScreenDebug.DebugPlayerId != _id)
+            return;
+
+        if (_context == DebugContext.Enemy &&
+            EnemyScreenDebug.DebugEnemyId != _id)
+            return;
+
+        string prefix = _context == DebugContext.Player
+            ? $"[Player {_id}]"
+            : $"[Enemy {_id}]";
+
+        var snapshot = GetDebugSnapshot();
+
+        foreach (var kv in snapshot) {
+            string key = $"{prefix} {kv.Key}";
+
+            if (_context == DebugContext.Player)
+                PlayerScreenDebug.Set(key, kv.Value);
+            else
+                EnemyScreenDebug.Set(key, kv.Value);
+        }
+    }
+    private Dictionary<string, bool> GetDebugSnapshot() {
+        return new Dictionary<string, bool>
+        {
+            { "IsDead", IsDead },
+            { "IsKnocked", IsKnocked },
+            { "IsGrounded", IsGrounded },
+            { "IsInitialHeight", IsInitialHeight },
+            { "IsInGravityFall", IsInGravityFall },
+
+            { "IsMoving", IsMoving },
+            { "IsAttackingIntent", IsAttackingIntent },
+            { "IsPlayingAttackAnimation", IsPlayingAttackAnimation },
+            { "IsMoveAnimationOpen", IsMoveAnimationOpen },
+
+            { "IsControlLocked", IsControlLocked },
+            { "IsSkillDashing", IsSkillDashing },
+
+            { "CanMove", CanMove },
+            { "CanAttack", CanAttack },
+            { "CanRecoverHeight", CanRecoverHeight },
+        };
+    }
 }

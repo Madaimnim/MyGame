@@ -7,7 +7,7 @@ public class EnemyEnterExitBehaviour : StateMachineBehaviour
 
     // 進入攻擊動畫
     public override void OnStateEnter(Animator animator, AnimatorStateInfo stateInfo, int layerIndex) {
-        if (enemy == null) enemy = animator.GetComponent<Enemy>();
+        if (enemy == null) enemy = animator.GetComponentInParent<Enemy>();
 
         // 鎖定，避免其他動畫
         enemy.StateComponent.SetIsPlayingAttackAnimation(true);

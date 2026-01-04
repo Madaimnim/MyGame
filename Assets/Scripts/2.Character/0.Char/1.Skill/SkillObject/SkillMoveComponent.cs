@@ -3,9 +3,9 @@ using System.Collections.Generic;
 using UnityEngine;
 
 public class SkillMoveComponent {
-    private SkillObject _owner;
     private Transform _transform;
     private Collider2D _sprCol;
+    private SkillObject _skillObject;
 
     private ISkillRuntime _skillRt;
     private SkillMoveType _skillMoveType;
@@ -16,9 +16,10 @@ public class SkillMoveComponent {
     public float MoveSpeed { get; private set; }
     public float VerticalSpeed;
 
+
     public SkillMoveComponent(SkillObject skillObject) {
-        _owner = skillObject;
-        _transform = skillObject.transform;
+        _skillObject = skillObject;
+        _transform = _skillObject.transform;
         _sprCol = skillObject.SprCol;
     }
 
@@ -29,10 +30,10 @@ public class SkillMoveComponent {
         _targetTransform = targetTransform;
         _targetPosition = targetPos;
 
-        Vector3 referencePos = targetTransform ? targetTransform.position : targetPos;
+        Vector3 referencePos = targetTransform ? targetTransform.position : _targetPosition;
         _initialDirection = (referencePos - _transform.position).normalized;
         MoveDirection = _initialDirection;
-        InitailPosition(referencePos, charTransform, charSprTransform);
+        InitailPosition(charTransform, charSprTransform);
 
         var target = targetTransform ? targetTransform.GetComponentInParent<IInteractable>():null;
         float targetHeight = target!=null ? target.SprCol.transform.localPosition.y : 0f;
@@ -75,7 +76,7 @@ public class SkillMoveComponent {
         }
     }
 
-    private void InitailPosition(Vector3 targetPos,Transform charTransform,Transform charSprTransform) {
+    private void InitailPosition(Transform charTransform,Transform charSprTransform) {
         _transform.position= charTransform.position;
         switch (_skillMoveType) {
             case SkillMoveType.AttackToOwner:
@@ -84,7 +85,7 @@ public class SkillMoveComponent {
                 _transform.localScale= Vector3.one;
                 break;
             case SkillMoveType.SpawnAtTarget:
-                _owner.transform.position = targetPos;
+                _transform.position = _targetPosition;
                 break;
         }
         SetFacingRight(MoveDirection);
@@ -111,7 +112,7 @@ public class SkillMoveComponent {
 
         if (_sprCol.transform.localPosition.y < 0) {
             _sprCol.transform.localPosition = new Vector3(0, 0, 0);
-            _owner.StartDestroyTimer(_skillRt.OnHitDestroyDelay);
+            _skillObject.StartDestroyTimer(_skillRt.OnHitDestroyDelay);
             return;
         }
 
@@ -131,7 +132,7 @@ public class SkillMoveComponent {
         if (direction.sqrMagnitude < 0.01f) return;     //Á×§KÀR¤î®ÉÀWÁc°õ¦æ
 
         if (Mathf.Abs(direction.x) > 0.01f) {
-            var scale = _owner.transform.localScale;
+            var scale = _transform.localScale;
             float mag = Mathf.Abs(scale.x);
 
             switch (_skillRt.FacingDirection) {
@@ -144,7 +145,7 @@ public class SkillMoveComponent {
             }
 
 
-            _owner.transform.localScale = scale;
+            _transform.localScale = scale;
         }
     }
 }

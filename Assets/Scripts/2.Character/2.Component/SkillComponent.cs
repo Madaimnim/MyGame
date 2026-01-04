@@ -70,9 +70,9 @@ public class SkillComponent
         if (!_skillPool.TryGetValue(slot.SkillId, out var skill)) return;
         Vector3 targetPos = Vector3.zero; //統一變數方便後續處理
 
-        switch (skill.SkillTargetType)
+        switch (skill.SkillReleaseType)
         {
-            case SkillTargetType.Target:
+            case SkillReleaseType.Target:
                 if (IntentTargetTransform == null)
                 {
                     Debug.Log("指定技能沒有目標，無法施放");
@@ -85,7 +85,7 @@ public class SkillComponent
                 targetPos = IntentTargetTransform.position;
                 break;
 
-            case SkillTargetType.Point:
+            case SkillReleaseType.Towerd:
                 if (!IntentTargetPosition.HasValue)
                 {
                     return;
@@ -119,7 +119,6 @@ public class SkillComponent
 
             skillObj.Initial(_transform, _sprTransform, _statsData, skillRt, _pendingPosition,_pendingTransform);
             slot.TriggerCooldown(skillRt.Cooldown);
-
             // 發事件
             OnSkillUsed?.Invoke(_pendingSlotIndex, skillRt);
         }

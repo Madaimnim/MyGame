@@ -15,8 +15,8 @@ public class Enemy :MonoBehaviour,IInteractable
     //公開--------------------------------------------------------------------------------------------------------------------------------------------------------------------------
     [SerializeField] private Collider2D sprCol;
     public Collider2D SprCol => sprCol;
-    public Transform BottomTransform => RootSpriteTransform;
-    public Transform RootSpriteTransform;
+    public Transform BottomTransform => transform;
+    public Transform VisulaRootTransform;
     public Transform BackSpriteTransform;
     public TargetDetector MoveDetector;
     public IInputProvider InputProvider;
@@ -70,6 +70,9 @@ public class Enemy :MonoBehaviour,IInteractable
 
         SkillComponent.TickCooldownTimer();
     }
+    private void LateUpdate() {
+        StateComponent.DebugState();
+    }
     private void FixedUpdate()
     {
         if (MoveComponent != null) MoveComponent.FixedTick();
@@ -82,7 +85,7 @@ public class Enemy :MonoBehaviour,IInteractable
         Rt = stats;
 
         //注意依賴順序
-        StateComponent = new StateComponent();
+        StateComponent = new StateComponent(DebugContext.Enemy, Rt.StatsData.Id);
         ActionLockComponent = new ActionLockComponent(this, StateComponent);
         HealthComponent = new HealthComponent(Rt, StateComponent);
         AnimationComponent = new AnimationComponent(Ani, transform, Rb,StateComponent);
@@ -148,26 +151,7 @@ public class Enemy :MonoBehaviour,IInteractable
 
 
     }
-    public void AnimationEvent_SpawnerSkill() {
-        SkillComponent.UseSkill();
-    }
-    public void AnimationEvent_MoveStart(float duration)//duration = frame數/sample率
-    {
-        MoveComponent.MoveDuration(duration);
-    }
 
-    public void AnimationEvent_SkillDashPrepareStart(int skillId) {
-        if (!Rt.SkillPool.TryGetValue(skillId, out var skillRt)) return;
-        SkillComponent.SkillPrepareMove(skillRt);
-    }
-    public void AnimationEvent_SkillDashStart(int skillId)
-    {
-        if (!Rt.SkillPool.TryGetValue(skillId, out var skillRt)) return;
-
-        SkillComponent.UseSkill();
-        //Todo 將進展攻擊及生成物件分開
-        SkillComponent.SkillDashMove(skillRt);
-    }
 
     //事件方法
     public void OnHpChanged(int currentHp, int maxHp) { }     //Todo SliderChange
@@ -221,7 +205,7 @@ public class Enemy :MonoBehaviour,IInteractable
             var scale = transform.localScale;
             float mag = Mathf.Abs(scale.x);
             scale.x = (direction.x < 0f) ? mag : -mag;
-            transform.localScale = scale;
+            VisulaRootTransform.localScale = scale;
 
 
             //if (IsDead) Debug.Log($"更新敵人死亡面相:{transform.localScale}，");

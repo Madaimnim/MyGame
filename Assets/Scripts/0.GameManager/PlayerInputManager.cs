@@ -10,7 +10,13 @@ public class PlayerInputManager : MonoBehaviour, IInputProvider {
 
     //-------------------------------事件--------------------------------------------------------------
     public event Action<Transform> OnBattlePlayerSelected;
-
+    
+    private KeyCode[] _skillKeys = {
+    KeyCode.Q,
+    KeyCode.W,
+    KeyCode.E,
+    KeyCode.R
+};
     private readonly List<Player> _selectedPlayerList = new List<Player>();
     private bool _canControl = false;
 
@@ -43,8 +49,8 @@ public class PlayerInputManager : MonoBehaviour, IInputProvider {
         if (allowManualControl) _canControl = true;
 
         if (!_canControl) return;
-        ClickPlayer();
-        HandleSelectionBox();
+        //ClickPlayer();
+        //HandleSelectionBox();
 
         HandleMoveInput();
         HandleSkillInput();
@@ -53,16 +59,15 @@ public class PlayerInputManager : MonoBehaviour, IInputProvider {
     //-------------------------------玩家點擊選取------------------------------------------------------
     private void ClickPlayer() {
         if (!Input.GetMouseButtonDown(0)) return;
-
+    
         Vector2 mouseWorldPos = Camera.main.ScreenToWorldPoint(Input.mousePosition);
         int layerMask = LayerMask.GetMask("Player");
         Collider2D hit = Physics2D.OverlapPoint(mouseWorldPos, layerMask);
-
+    
         if (hit == null) return;
         var player = hit.GetComponentInParent<Player>();
         SelectPlayer(player);
     }
-
     #region 拖曳框選功能
     private void HandleSelectionBox() {
         if (Input.GetMouseButtonDown(0)) {
@@ -146,24 +151,24 @@ public class PlayerInputManager : MonoBehaviour, IInputProvider {
     //-------------------------------Input 輸入處理-----------------------------------------------------
     private void HandleMoveInput() {
         if (_selectedPlayerList.Count == 0) return;
-
-        float moveX = Input.GetAxisRaw("Horizontal");
-        float moveY = Input.GetAxisRaw("Vertical");
-
-        // WASD 移動（方向輸入）
-        if (moveX != 0 || moveY != 0) {
-            Vector2 dir = new Vector2(moveX, moveY).normalized;
-
-            foreach (var player in _selectedPlayerList)
-                SetIntentMove(player.MoveComponent, direction: dir);
-
-            return;
-        }
-
-        // 若沒有方向輸入，則清空移動意圖（除非有目标位置）
-        foreach (var player in _selectedPlayerList)
-            if (!player.MoveComponent.IntentTargetPosition.HasValue)
-                SetIntentMove(player.MoveComponent, direction: Vector2.zero);
+        //
+        //float moveX = Input.GetAxisRaw("Horizontal");
+        //float moveY = Input.GetAxisRaw("Vertical");
+        //
+        //// WASD 移動（方向輸入）
+        //if (moveX != 0 || moveY != 0) {
+        //    Vector2 dir = new Vector2(moveX, moveY).normalized;
+        //
+        //    foreach (var player in _selectedPlayerList)
+        //        SetIntentMove(player.MoveComponent, direction: dir);
+        //
+        //    return;
+        //}
+        //
+        //// 若沒有方向輸入，則清空移動意圖（除非有目标位置）
+        //foreach (var player in _selectedPlayerList)
+        //    if (!player.MoveComponent.IntentTargetPosition.HasValue)
+        //        SetIntentMove(player.MoveComponent, direction: Vector2.zero);
 
         // 滑鼠右鍵 → 設定移動目標位置
         if (Input.GetMouseButtonDown(1)) {
@@ -176,50 +181,45 @@ public class PlayerInputManager : MonoBehaviour, IInputProvider {
         }
     }
 
+
     private void HandleSkillInput() {
         if (_selectedPlayerList.Count == 0) return;
-
         foreach (var player in _selectedPlayerList) {
-            for (int i = 0; i < player.SkillComponent.SkillSlots.Length; i++) {
-                if (Input.GetKeyDown(KeyCode.Alpha1 + i)) {
-                    var slot = player.SkillComponent.SkillSlots[i];
-                    if (!slot.HasSkill) {
-                        Debug.LogWarning($"技能槽 {i} 沒有技能，無法施放。");
-                        return;
-                    }
+            // 限制技能數量為 QWER
+            int maxSkillCount = Mathf.Min(_skillKeys.Length,player.SkillComponent.SkillSlots.Length);
 
-                    var detector = slot.Detector;
-                    if (detector == null) {
-                        Debug.LogWarning($"技能槽 {i} 無 DetectStrategy。");
-                        return;
-                    }
+            for (int i = 0; i < maxSkillCount; i++) {
+                //QWER 技能鍵判斷
+                if (!Input.GetKeyDown(_skillKeys[i])) continue;
 
-                    // 技能目標決定
-                    Vector2 mouseWorldPos = Camera.main.ScreenToWorldPoint(Input.mousePosition);
-                    Vector2 targetPosition;
-                    Transform targetTransform = null;
+                var slot = player.SkillComponent.SkillSlots[i];
+                if (!slot.HasSkill) {Debug.LogWarning($"技能槽 {i} 沒有技能，無法施放。");return;}
 
-                    if (detector.IsInRange(mouseWorldPos)) {
-                        Collider2D hit = Physics2D.OverlapPoint(mouseWorldPos, LayerMask.GetMask("Enemy"));
+                var detector = slot.Detector;
+                if (detector == null) {Debug.LogWarning($"技能槽 {i} 無 DetectStrategy。");return;}
 
-                        if (hit != null) {
-                            targetTransform = hit.transform;
-                            targetPosition = hit.transform.position;
-                        }
-                        else {
-                            targetPosition = mouseWorldPos;
-                        }
+                // 技能目標決定
+                Vector2 mouseWorldPos = Camera.main.ScreenToWorldPoint(Input.mousePosition);
+                Vector2 targetPosition;
+                Transform targetTransform = null;
 
-                        //Debug.Log($"Collider 內： targetPosition = {targetPosition}");
+                if (detector.IsInRange(mouseWorldPos)) {
+                    Collider2D hit = Physics2D.OverlapPoint(mouseWorldPos, LayerMask.GetMask("Enemy"));
+
+                    if (hit != null) {
+                        targetTransform = hit.transform;
+                        targetPosition = hit.transform.position;
                     }
                     else {
-                        targetPosition = detector.GetClosestPoint(mouseWorldPos);
-                        //Debug.Log($"Collider 外： targetPosition = {targetPosition}");
+                        targetPosition = mouseWorldPos;
                     }
-
-                    SetIntentSkill(player.SkillComponent, i, targetPosition: targetPosition, targetTransform: targetTransform);
-                    break;
                 }
+                else {
+                    targetPosition = detector.GetClosestPoint(mouseWorldPos);
+                }
+
+                SetIntentSkill(player.SkillComponent, i, targetPosition, targetTransform);
+                break; // 一次只處理一個技能
             }
         }
     }

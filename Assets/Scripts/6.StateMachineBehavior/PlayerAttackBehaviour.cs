@@ -7,7 +7,7 @@ public class PlayerAttackBehaviour : StateMachineBehaviour
     // 進入攻擊動畫
     public override void OnStateEnter(Animator animator, AnimatorStateInfo stateInfo, int layerIndex) {
         if (_stateComponent == null)
-            _stateComponent = animator.GetComponent<Player>()?.StateComponent;
+            _stateComponent = animator.GetComponentInParent<Player>()?.StateComponent;
 
         if (_stateComponent != null)
             _stateComponent.SetIsPlayingAttackAnimation (true);

@@ -9,8 +9,6 @@ public class TextPopupManager : MonoBehaviour
 
     public GameObject TextPrefab_Exp;
     public GameObject TextPrefab_LevelUp;
-    public GameObject TextPrefab_StageClear;
-    public GameObject TextPrefab_StageDefeat;
     public GameObject TextPrefab_Resume;
     public GameObject TextPrefab_Damage;
     public GameObject TextPrafab_RespawnTimer;
@@ -192,8 +190,7 @@ public class TextPopupManager : MonoBehaviour
     }
     #endregion
 
-    //顯示經驗值
-    #region 顯示經驗值 
+    //顯示經驗
     public void ShowExpPopup(int expValue,Vector3 position) {
 
         // 生成 Popup
@@ -208,30 +205,8 @@ public class TextPopupManager : MonoBehaviour
         }
         StartCoroutine(FloatPopup(popup));
     }
-    #endregion
-
-    //顯示通關Text
-    #region ShowStageClearPopup()
-    public void ShowStageClearPopup() {
-        TextPrefab_StageClear.SetActive(true);
-        TextPrefab_StageClear.transform.SetAsLastSibling();
-
-        StartCoroutine(BounceEffect(TextPrefab_StageClear.transform));
-    }
-    #endregion
-
-    //顯示失敗Text
-    #region ShowStageDefeatPopup()
-    public void ShowStageDefeatPopup() {
-        TextPrefab_StageDefeat.SetActive(true);
-        TextPrefab_StageDefeat.transform.SetAsLastSibling();
-
-        StartCoroutine(BounceEffect(TextPrefab_StageDefeat.transform));
-    }
-    #endregion
 
     //傷害、受傷害字體隨機生成、縮放、漂浮效果
-    #region FloatDamagePopup(GameObject popup)
     private IEnumerator FloatDamagePopup(GameObject popup) {
         float duration = 0.7f;
         float elapsed = 0f;
@@ -257,17 +232,18 @@ public class TextPopupManager : MonoBehaviour
 
         if (popup != null) Destroy(popup);
     }
-    #endregion
 
     //字體彈跳效果
-    #region 字體彈跳
-    private IEnumerator BounceEffect(Transform textPrefab) {
+    public void TextBounceBounceEffect(Transform textTransform) {
+        StartCoroutine(BounceEffect(textTransform));
+    }
+    private IEnumerator BounceEffect(Transform textTransform) {
         float elapsed = 0f;
         float duration = 1f; // 總共 2 秒
         int bounces = 3;
         float height = 200f; // 初始彈跳高度
 
-        Vector3 startPos = textPrefab.position;
+        Vector3 startPos = textTransform.position;
              while (elapsed < duration)
              {
                  elapsed += Time.deltaTime;
@@ -275,15 +251,14 @@ public class TextPopupManager : MonoBehaviour
                  // 計算彈跳 (用 sin 波 + 衰減)
                  float t = elapsed / duration;
                  float yOffset = Mathf.Abs(Mathf.Sin(t * bounces * Mathf.PI)) * height * (1 - t);
-             
-             textPrefab.position = startPos + Vector3.up * yOffset;
+
+            textTransform.position = startPos + Vector3.up * yOffset;
              yield return null;
             }
 
 
 
     }
-    #endregion
 
     //字體向上飄效果
     #region 字體向上飄

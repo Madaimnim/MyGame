@@ -15,7 +15,6 @@ public class PreparationHandler : IGameStateHandler
     public void Enter(string sceneKey = null) {
         _sceneSystem.LoadSceneByKey(sceneKey?? "Preparation");
         UIManager.Instance.UIInputController.EnableUIInput(true);
-        TextPopupManager.Instance.TextPrefab_StageClear.transform.localPosition = Vector3.zero;
     }
 
     public void Exit() {

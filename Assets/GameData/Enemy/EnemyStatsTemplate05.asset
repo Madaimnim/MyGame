@@ -33,8 +33,8 @@ MonoBehaviour:
       Power: 1
       MoveSpeed: 3
       VerticalMoveSpeed: 0
-      KnockbackPower: 1
-      FloatPower: 1
+      KnockbackPower: 0
+      FloatPower: 0
       Weight: 0
     VisualData:
       Prefab: {fileID: 5281362192602328335, guid: c2027b93b47c38c49ac8df1d23725a03, type: 3}
@@ -52,7 +52,7 @@ MonoBehaviour:
     SkillDashPrepareDuration: 0.2
     SkillDashVerticalVelocity: 0
     DetectorType: 0
-    DetectRadius: 2
+    DetectRadius: 3
     RangeX: 0
     RangeY: 0
   StatsData:
@@ -62,8 +62,8 @@ MonoBehaviour:
     Power: 1
     MoveSpeed: 1
     VerticalMoveSpeed: 0
-    KnockbackPower: 1
-    FloatPower: 1
+    KnockbackPower: 0
+    FloatPower: 0
     Weight: 0
   VisualData:
     Prefab: {fileID: 6483244831074600195, guid: 2c5ddd8415107ec438e8c22aaab61d13, type: 3}

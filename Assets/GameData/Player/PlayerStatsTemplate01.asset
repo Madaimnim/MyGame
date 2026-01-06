@@ -16,10 +16,10 @@ MonoBehaviour:
   MoveStrategyType: 3
   SkillSlotCount: 4
   SkillTemplateList:
-  - SkillReleaseType: 0
-    SkillLifetimeType: 0
+  - SkillReleaseType: 1
+    SkillLifetimeType: 1
     SkillExecutionType: 0
-    SkillMoveType: 2
+    SkillMoveType: 5
     OnHitType: 1
     HitEffectPositionType: 0
     FacingDirection: 1
@@ -44,15 +44,15 @@ MonoBehaviour:
       NormalMaterial: {fileID: 0}
       FlashMaterial: {fileID: 0}
     canRotate: 1
-    Cooldown: 0.1
-    DestroyDelay: 1
+    Cooldown: 0
+    DestroyDelay: 3
     OnHitDestroyDelay: 0
     SkillDashMultiplier: 1
-    SkillDashDuration: 0
+    SkillDashDuration: 0.5
     SkillDashPrepareDuration: 0
     SkillDashVerticalVelocity: 0
     DetectorType: 0
-    DetectRadius: 5
+    DetectRadius: 1.5
     RangeX: 0
     RangeY: 0
   - SkillReleaseType: 0
@@ -72,8 +72,8 @@ MonoBehaviour:
       Power: 1
       MoveSpeed: 0
       VerticalMoveSpeed: 0
-      KnockbackPower: 0
-      FloatPower: 5
+      KnockbackPower: 2
+      FloatPower: 6
       Weight: 0
     VisualData:
       Prefab: {fileID: 7327708947082931564, guid: ebc3332d416aec74cb1e857b78e74da3, type: 3}
@@ -83,7 +83,7 @@ MonoBehaviour:
       NormalMaterial: {fileID: 0}
       FlashMaterial: {fileID: 0}
     canRotate: 0
-    Cooldown: 0.5
+    Cooldown: 7
     DestroyDelay: 1
     OnHitDestroyDelay: 0
     SkillDashMultiplier: 1
@@ -178,7 +178,7 @@ MonoBehaviour:
     Name: "\u528D\u5175"
     Level: 1
     Power: 1
-    MoveSpeed: 5
+    MoveSpeed: 3
     VerticalMoveSpeed: 0
     KnockbackPower: 0
     FloatPower: 0
@@ -191,5 +191,5 @@ MonoBehaviour:
     NormalMaterial: {fileID: 2100000, guid: ce71ba01014fe3043971f56059a6c29d, type: 2}
     FlashMaterial: {fileID: 2100000, guid: 343628f4e759ecf46b917b0ca0685d23, type: 2}
   CanRespawn: 1
-  MaxHp: 5
+  MaxHp: 30
   ExpTable: 0400000006000000090000000d0000001200000019000000220000002d0000003a000000490000005a0000006d0000008200000099000000b2000000cd000000ea000000090100002a0100004d0100007201000099010000c2010000ed0100001a020000490200007a020000ad020000e202000019030000

@@ -16,7 +16,8 @@ MonoBehaviour:
   MoveStrategyType: 0
   SkillSlotCount: 1
   SkillTemplateList:
-  - SkillTargetType: 0
+  - SkillReleaseType: 0
+    SkillLifetimeType: 0
     SkillExecutionType: 0
     SkillMoveType: 6
     OnHitType: 1
@@ -32,8 +33,8 @@ MonoBehaviour:
       Power: 1
       MoveSpeed: 0
       VerticalMoveSpeed: 0
-      KnockbackPower: 1
-      FloatPower: 1
+      KnockbackPower: 3
+      FloatPower: 0
       Weight: 0
     VisualData:
       Prefab: {fileID: 4690764757931481767, guid: 745c6ec482e4a6c4685d844874637375, type: 3}
@@ -51,7 +52,7 @@ MonoBehaviour:
     SkillDashPrepareDuration: 0.2
     SkillDashVerticalVelocity: -5
     DetectorType: 0
-    DetectRadius: 2
+    DetectRadius: 3
     RangeX: 0
     RangeY: 0
   StatsData:
@@ -61,8 +62,8 @@ MonoBehaviour:
     Power: 1
     MoveSpeed: 1
     VerticalMoveSpeed: 0.8
-    KnockbackPower: 5
-    FloatPower: 5
+    KnockbackPower: 0
+    FloatPower: 0
     Weight: 0
   VisualData:
     Prefab: {fileID: 8071129183117270245, guid: 4af2cabfe6c0fde46a5ba13601cdd5ff, type: 3}

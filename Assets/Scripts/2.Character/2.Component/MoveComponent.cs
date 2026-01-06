@@ -28,6 +28,7 @@ public class MoveComponent
     } 
     //事件
     public event Action<Vector2> OnMoveDirectionChanged;
+
     //擊退相關
     private Coroutine _knockbackCoroutine;
     //組件
@@ -99,14 +100,14 @@ public class MoveComponent
         // 執行移動
         Vector2 newPosition = _rb.position + IntentDirection * CurrentMoveSpeed * Time.fixedDeltaTime;
 
-        if (_stateComponent.IsPlayingAttackAnimation)
-            newPosition = _rb.position + IntentDirection * CurrentMoveSpeed*MOVEATTACK_SPEED * Time.fixedDeltaTime;
+        //if (_stateComponent.IsPlayingAttackAnimation)
+        //    newPosition = _rb.position + IntentDirection * CurrentMoveSpeed*MOVEATTACK_SPEED * Time.fixedDeltaTime;
 
         //如果沒在攻擊，則播放移動動畫，否則交由攻擊動畫控制
-        if (!_stateComponent.IsPlayingAttackAnimation) {
-            _animationComponent.PlayMove();
-            OnMoveDirectionChanged?.Invoke(IntentDirection);
-        }
+        //if (!_stateComponent.IsPlayingAttackAnimation) {
+        _animationComponent.PlayMove();
+         OnMoveDirectionChanged?.Invoke(IntentDirection);
+        //}
 
 
         if (_useMoveWindow && _moveWindowRemainTime <= 0f) return false;
@@ -205,7 +206,6 @@ public class MoveComponent
 
             Vector2 current = _rb.position;
             Vector2 next = current + knockbackForce * Time.fixedDeltaTime;
-
             //  關鍵：擊退也必須 Resolve
             next = MoveBoundsManager.Instance != null ? MoveBoundsManager.Instance.Resolve(next) : next;
 

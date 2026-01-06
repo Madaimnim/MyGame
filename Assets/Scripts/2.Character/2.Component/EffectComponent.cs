@@ -2,20 +2,30 @@ using System;
 using System.Diagnostics.Tracing;
 using UnityEngine;
 using System.Collections;
-
+public enum OutlineState {
+    None,
+    Hover,
+    Target
+}
 public class EffectComponent
 {
     private Transform _transform;
     private VisualData _visualData;
     private MonoBehaviour _runner;
-    private SpriteRenderer _spr;
     private StateComponent _stateComponent;
+    private SpriteRenderer _spriteRenderer;
+
+    private SpriteEffectController _spriteEffectController;
+    private OutlineState _outlineState = OutlineState.None;
+
     public EffectComponent(VisualData visualData,Transform transform, MonoBehaviour runner,SpriteRenderer spr,StateComponent stateComponent) {
         _transform = transform;
         _visualData = visualData;
         _runner = runner;
-        _spr = spr;
         _stateComponent = stateComponent;
+        _spriteRenderer= spr;
+
+        _spriteEffectController = new SpriteEffectController(_spriteRenderer);
     }
 
     public void GainedExpEffect(int exp) {
@@ -36,16 +46,40 @@ public class EffectComponent
     }
 
     public void TakeDamageEffect(int damage) {
-        if(!_stateComponent.IsDead) _runner.StartCoroutine(FlashWhite(0.3f));
+        if(!_stateComponent.IsDead) _runner.StartCoroutine(FlashWhite(0.1f));
         TextPopupManager.Instance.ShowTakeDamagePopup(damage, _transform); 
     }
-    protected virtual IEnumerator FlashWhite(float duration) {
-        if (_spr != null)
-        {
-            _spr.material = _visualData.FlashMaterial;
-            yield return new WaitForSeconds(duration);
-            _spr.material = _visualData.NormalMaterial;
-        }
+
+    public void ShowHoverOutline() => SetOutlineState(OutlineState.Hover);
+    public void ShowTargetOutline() => SetOutlineState(OutlineState.Target);
+    public void HideOutline() => SetOutlineState(OutlineState.None);
+
+
+    private IEnumerator FlashWhite(float duration) {
+        if (_spriteEffectController == null) yield break;
+
+        _spriteEffectController.SetFlash(0.8f);
+        yield return new WaitForSeconds(duration);
+        _spriteEffectController.SetFlash(0f);
+
     }
 
+    public void SetOutlineState(OutlineState state) {
+        if (_outlineState == state) return;
+        _outlineState = state;
+
+        switch (state) {
+            case OutlineState.None:
+                _spriteEffectController.SetOutline(false, Color.clear, 0f);
+                break;
+
+            case OutlineState.Hover:
+                _spriteEffectController.SetOutline(true, Color.white, 1f);
+                break;
+
+            case OutlineState.Target:
+                _spriteEffectController.SetOutline(true, Color.red, 2f);
+                break;
+        }
+    }
 }

@@ -22,7 +22,18 @@ public class StageLevelManager : MonoBehaviour
     private void OnEnable() {
         GameEventSystem.Instance.Event_OnPlayerDie += RespawnPlayer;
         GameEventSystem.Instance.Event_OnWallBroken += WallBroken;
+        ExperienceManager.Instance.ResetExp();
+
+        UIManager.Instance.UI_StageClearController.Text_StageClear.transform.localPosition = Vector3.zero;
+        UIManager.Instance.UI_StageClearController.Text_StageDefeat.transform.localPosition = Vector3.zero;
+        UIManager.Instance.UI_SkillCooldownPanel.gameObject.SetActive(true);
     }
+    private void OnDisable() {
+        GameEventSystem.Instance.Event_OnPlayerDie -= RespawnPlayer;
+        GameEventSystem.Instance.Event_OnWallBroken -= WallBroken;
+        UIManager.Instance.UI_SkillCooldownPanel.gameObject.SetActive(false);
+    }
+
     private void Start() {
         _totalEnemyCount = CalculateTotalEnemyCount();
         _remainenemyCount = _totalEnemyCount;
@@ -35,10 +46,6 @@ public class StageLevelManager : MonoBehaviour
         
     }
 
-    private void OnDisable() {
-        GameEventSystem.Instance.Event_OnPlayerDie -= RespawnPlayer;
-        GameEventSystem.Instance.Event_OnWallBroken -= WallBroken;
-    }
 
     private int CalculateTotalEnemyCount() {
         int total = 0;
@@ -67,9 +74,11 @@ public class StageLevelManager : MonoBehaviour
     private void WallBroken() {
         LevelDefeat();
     }
-    public void EnemyDefeated() {
+    public void EnemyDefeated(int exp) {
         _remainenemyCount--;
+        ExperienceManager.Instance.AddExp(exp);
         Debug.Log($"敵人死亡，目前數量{_remainenemyCount}");
+
         if (_remainenemyCount <= 0)
         {
             LevelClear();
@@ -77,29 +86,30 @@ public class StageLevelManager : MonoBehaviour
     }
 
     private void LevelClear() {
-        TextPopupManager.Instance.ShowStageClearPopup();
-        FadeManager.Instance.FadeSetAlpha(0.3f);
+        UIManager.Instance.UI_StageClearController.Text_StageClear.gameObject.SetActive(true);
 
         StartCoroutine(WaitAndGoPrepareState());
     }
     private void LevelDefeat() {
-        Debug.Log("觸發Defeat跳躍字體");
-        TextPopupManager.Instance.ShowStageDefeatPopup();
-        FadeManager.Instance.FadeSetAlpha(0.3f);
+        UIManager.Instance.UI_StageClearController.Text_StageDefeat.gameObject.SetActive(true);
 
         StartCoroutine(WaitAndGoPrepareState());
     }
 
     //關卡結束等待或滑鼠點擊，回到準備畫面
-    private IEnumerator WaitAndGoPrepareState() {
-        float timer = 0f;
+    private IEnumerator WaitAndGoPrepareState() {   
+        FadeManager.Instance.FadeSetAlpha(0.3f);
 
+        float timer = 0f;
         while (timer < 1f) {
             timer += Time.deltaTime;
             yield return null;
         }
-        while (timer < 5f)
-        {
+
+        UIManager.Instance.UI_StageClearController.UI_RewardSystem.gameObject.SetActive(true);
+
+        timer = 0f;
+        while (timer < 5f){
             timer += Time.deltaTime;
             if (Input.GetMouseButtonDown(0)) break;
             yield return null; 
@@ -108,5 +118,10 @@ public class StageLevelManager : MonoBehaviour
         // 切換狀態
         GameManager.Instance.GameStateSystem.SetState(GameStateSystem.GameState.Preparation,"Preparation");
         GameManager.Instance.PlayerStateSystem.AllPlayerClose();
+        UIManager.Instance.UI_StageClearController.UI_RewardSystem.gameObject.SetActive(false);
+        UIManager.Instance.UI_StageClearController.Text_StageClear.gameObject.SetActive(false);
+        UIManager.Instance.UI_StageClearController.Text_StageDefeat.gameObject.SetActive(false);
     }
+
+  
 }

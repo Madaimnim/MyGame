@@ -20,6 +20,7 @@ public class Enemy :MonoBehaviour,IInteractable
     public Transform BackSpriteTransform;
     public TargetDetector MoveDetector;
     public IInputProvider InputProvider;
+    public GameObject UI_HpSliderCanvas;
     //組件--------------------------------------------------------------------------------------------------------------------------------------------------------------------------
     [HideInInspector] public Rigidbody2D Rb;
     [HideInInspector] public Animator Ani;
@@ -58,6 +59,8 @@ public class Enemy :MonoBehaviour,IInteractable
         //註冊UI:顯示血量、技能冷卻
         if (GameManager.Instance != null)GameManager.Instance.EnemyStateSystem.RegisterEnemy(this);
         if (EnemyListManager.Instance != null)EnemyListManager.Instance.Register(this);
+
+        UI_HpSliderCanvas.SetActive(false);
     }
     private void Start()
     {
@@ -154,8 +157,16 @@ public class Enemy :MonoBehaviour,IInteractable
 
 
     //事件方法
-    public void OnHpChanged(int currentHp, int maxHp) { }     //Todo SliderChange
+    public void OnHpChanged(int currentHp, int maxHp) {
+        // 第一次被打（血量不滿）才顯示
+        if (currentHp < maxHp) {
+            if (!UI_HpSliderCanvas.activeSelf)
+                UI_HpSliderCanvas.SetActive(true);
+        }
+    }   
     public void OnDie() {
+        EffectComponent.HideOutline();
+
         AnimationComponent.PlayDie();
         StartCoroutine(Die());
     }
@@ -180,7 +191,7 @@ public class Enemy :MonoBehaviour,IInteractable
         if (RespawnComponent.CanRespawn) RespawnComponent.RespawnAfter(3f);
         else {
             Destroy(gameObject);
-            if (StageLevelManager.Instance != null) StageLevelManager.Instance.EnemyDefeated();
+            if (StageLevelManager.Instance != null) StageLevelManager.Instance.EnemyDefeated(Rt.Exp);
             if (GameManager.Instance != null) GameManager.Instance.EnemyStateSystem.UnregisterEnemy(this);
         }
     }
@@ -202,7 +213,7 @@ public class Enemy :MonoBehaviour,IInteractable
         if (direction.sqrMagnitude < 0.01f) return;     //避免靜止時頻繁執行
         if (Mathf.Abs(direction.x) > 0.01f)
         {
-            var scale = transform.localScale;
+            var scale = VisulaRootTransform.localScale;
             float mag = Mathf.Abs(scale.x);
             scale.x = (direction.x < 0f) ? mag : -mag;
             VisulaRootTransform.localScale = scale;

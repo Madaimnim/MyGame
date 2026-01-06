@@ -53,7 +53,7 @@ SpriteRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 10754, guid: 0000000000000000f000000000000000, type: 0}
+  - {fileID: 2100000, guid: ce71ba01014fe3043971f56059a6c29d, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -555,6 +555,7 @@ MonoBehaviour:
   VisulaRootTransform: {fileID: 5966867919434190702}
   BackSpriteTransform: {fileID: 2430894647932572178}
   MoveDetector: {fileID: 0}
+  UI_HpSliderCanvas: {fileID: 8018049400880881807}
   Rb: {fileID: 0}
   Ani: {fileID: 0}
   Spr: {fileID: 0}
@@ -633,7 +634,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_Material: {fileID: 0}
-  m_Color: {r: 1, g: 1, b: 1, a: 1}
+  m_Color: {r: 1, g: 1, b: 1, a: 0.5019608}
   m_RaycastTarget: 1
   m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
   m_Maskable: 1
@@ -687,7 +688,7 @@ RectTransform:
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
   m_AnchoredPosition: {x: 0, y: 0}
-  m_SizeDelta: {x: 240, y: 30}
+  m_SizeDelta: {x: 240, y: 15}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &8018049400048563513
 MonoBehaviour:

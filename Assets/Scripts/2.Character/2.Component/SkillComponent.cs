@@ -24,6 +24,7 @@ public class SkillComponent
 
 
     //技能暫存狀態
+    private bool _isContinuousAttack = false;
     private int _pendingSlotIndex=-1;
     private Vector2 _pendingPosition;
     private Transform _pendingTransform;
@@ -59,14 +60,32 @@ public class SkillComponent
     public void Tick() {
         if (IntentSlotIndex >= 0) _stateComponent.SetIsAttackingIntent(true);
         else _stateComponent.SetIsAttackingIntent(false);
+        
+        HandleContinuousAttackChase();
+
         TryPlaySkillAnimation();
     }
 
+
     private void TryPlaySkillAnimation() {
         if (!_stateComponent.CanAttack) return;
+        if (IntentSlotIndex < 0 || IntentSlotIndex >= SkillSlots.Length) return;
 
-        if (IntentSlotIndex < 0) return;
         var slot = SkillSlots[IntentSlotIndex];
+        if (!slot.IsReady) {      
+            if(!_isContinuousAttack)ClearIntent();         
+            return;
+        }
+
+        //  只對「普通攻擊 Slot 0」做距離 Gate
+        if (IntentSlotIndex == 0) {
+            if (slot.Detector != null && IntentTargetTransform != null) {
+                if (!slot.Detector.IsInRange(IntentTargetTransform.position)) {
+                    return; // 不在距離 → 等待移動系統靠近
+                }
+            }
+        }
+
         if (!_skillPool.TryGetValue(slot.SkillId, out var skill)) return;
         Vector3 targetPos = Vector3.zero; //統一變數方便後續處理
 
@@ -105,6 +124,8 @@ public class SkillComponent
     }
 
     public void UseSkill() {
+        if (_pendingSlotIndex < 0 || _pendingSlotIndex >= SkillSlots.Length) return;
+
         var slot = SkillSlots[_pendingSlotIndex];
         if (!_skillPool.TryGetValue(slot.SkillId, out var skillRt)) return;
 
@@ -123,13 +144,8 @@ public class SkillComponent
             OnSkillUsed?.Invoke(_pendingSlotIndex, skillRt);
         }
 
+        if(!_isContinuousAttack)ClearIntent();
 
-        // 技能施放結束 → 解鎖狀態與Intent重置
-        IntentSlotIndex = -1;
-        IntentTargetPosition = null;
-        IntentTargetTransform = null;
-
-        _pendingSlotIndex = -1;
     }
 
     public void SkillPrepareMove(ISkillRuntime skillRt) {
@@ -143,7 +159,6 @@ public class SkillComponent
         _moveComponent.SkillDashMove(skillRt);
         _heightComponent.SkillDashMove(skillRt);
     }
-
 
     public void EquipSkill(int slotIndex, int skillId) {
         SkillSlots[slotIndex].Uninstall();
@@ -172,5 +187,49 @@ public class SkillComponent
 
     public void TickCooldownTimer() {
         foreach (var slot in SkillSlots) slot?.Tick();
+    }
+    public void SetContinuousAttack(bool value)=> _isContinuousAttack = value;
+
+    // 只處理連續普攻
+    private void HandleContinuousAttackChase() {
+        if (IntentSlotIndex != 0) return;
+        if (!_isContinuousAttack) return;
+        
+        // 核心修正：目標失效
+        if (IntentTargetTransform == null) {
+            StopContinuousAttack();
+            return;
+        }
+
+        var slot = SkillSlots[0];
+        if (slot.Detector == null) return;
+
+        Vector2 targetPos = IntentTargetTransform.position;
+
+        // 還沒進距離 → 發出「移動意圖」
+        if (!slot.Detector.IsInRange(targetPos)) {
+            _moveComponent.IntentTargetTransform = IntentTargetTransform;
+            _moveComponent.IntentTargetPosition = targetPos;
+            return;
+        }
+
+    }
+    private void StopContinuousAttack() {
+        _isContinuousAttack = false;
+
+        // 清 Skill 意圖
+        ClearIntent();
+
+        // 清 Move 意圖
+        _moveComponent.IntentTargetTransform = null;
+        _moveComponent.IntentTargetPosition = null;
+        _moveComponent.IntentDirection = Vector2.zero;
+    }
+
+    private void ClearIntent() {
+        IntentSlotIndex = -1;
+        IntentTargetPosition = null;
+        IntentTargetTransform = null;
+        _pendingSlotIndex = -1;
     }
 }

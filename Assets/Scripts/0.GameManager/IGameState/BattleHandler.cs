@@ -8,10 +8,7 @@ public class BattleHandler : IGameStateHandler
     private readonly GameSceneSystem _sceneSystem;
     private readonly PlayerStateSystem _playerStateSystem;
 
-    public BattleHandler(
-            GameSceneSystem sceneSystem,
-            PlayerStateSystem playerSystem
-        ) {
+    public BattleHandler(GameSceneSystem sceneSystem,PlayerStateSystem playerSystem) {
         _sceneSystem = sceneSystem;
         _playerStateSystem = playerSystem;
 
@@ -24,8 +21,7 @@ public class BattleHandler : IGameStateHandler
     }
 
     public void Exit() {
-        TextPopupManager.Instance.TextPrefab_StageClear.SetActive(false);
-        TextPopupManager.Instance.TextPrefab_StageDefeat.SetActive(false);
+
     }
 
     private void OnSceneLoaded(string sceneKey) {

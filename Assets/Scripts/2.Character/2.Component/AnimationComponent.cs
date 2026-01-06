@@ -23,9 +23,6 @@ public class AnimationComponent
         string moveSkillName = $"MoveSkill{skillId}";
         int moveSkillHash = Animator.StringToHash(moveSkillName);
 
-        if (_stateComponent.IsMoving) 
-            if (TryPlay($"MoveSkill{skillId}")) return;
-
         TryPlay($"Skill{skillId}");
     }
     public void PlayIdle() => TryPlay("Idle");

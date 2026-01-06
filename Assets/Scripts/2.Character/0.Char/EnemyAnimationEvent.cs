@@ -1,13 +1,14 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using static UnityEditor.Experimental.GraphView.GraphView;
 
 public class EnemyAnimationEvent : MonoBehaviour
 {
     private Enemy _enemy;
     private void Awake() {
         _enemy=GetComponentInParent<Enemy>();
-        if (_enemy == null) Debug.Log("Enemy is null");
+        if (_enemy == null) Debug.LogWarning("Enemy is Null!");
     }
 
     public void AnimationEvent_SpawnerSkill() {
@@ -26,7 +27,7 @@ public class EnemyAnimationEvent : MonoBehaviour
         if (!_enemy.Rt.SkillPool.TryGetValue(skillId, out var skillRt)) return;
 
         _enemy.SkillComponent.UseSkill();
-        //Todo 將進展攻擊及生成物件分開
+
         _enemy.SkillComponent.SkillDashMove(skillRt);
     }
 }

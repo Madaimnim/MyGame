@@ -12,9 +12,14 @@ public class UIManager : MonoBehaviour
     private readonly List<UI_PanelBase> _allPanels = new List<UI_PanelBase>();
     public UI_InputController UIInputController => _uiInputController;
 
-    [Header("UI Panels")]
+    [Header("UI物件")]
+    public UI_StageClearController UI_StageClearController;
     public UI_PanelBase MenuPanel;
     public GameObject UI_Loading;
+    public GameObject UI_SkillCooldownPanel;
+    public UI_SkillSliderController UI_SkillSliderController;
+
+
     public Stack<UI_PanelBase> UiPanelsStack = new Stack<UI_PanelBase>(); // 儲存開啟中的 UI 面板
     private UI_InputController _uiInputController;
 

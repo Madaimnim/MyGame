@@ -14,6 +14,7 @@ public class Player : MonoBehaviour, IInteractable
     [SerializeField] private Collider2D sprCol;
     public Collider2D SprCol => sprCol;
     public Transform BottomTransform => transform;
+    public Transform VisulaRootTransform;
     public Transform BackSpriteTransform;
 
     public TargetDetector MoveDetector;
@@ -51,14 +52,13 @@ public class Player : MonoBehaviour, IInteractable
     }
     private void OnEnable()
     {
-        //註冊UI:顯示血量、技能冷卻
-        if (UIManager_BattlePlayer.Instance != null)UIManager_BattlePlayer.Instance.RegisterPlayerPanelUI(this);
-        if (PlayerListManager.Instance != null) PlayerListManager.Instance.Register(this);
+        if(PlayerListManager.Instance != null) PlayerListManager.Instance.Register(this);
         if(PlayerInputManager.Instance != null) PlayerInputManager.Instance.SelectPlayer(this);
+        TryBindSkillSliderUI();
+
     }
     private void OnDisable()
     {
-        if (UIManager_BattlePlayer.Instance != null)UIManager_BattlePlayer.Instance.UnregisterPlayer(this);
         if (PlayerListManager.Instance != null) PlayerListManager.Instance.Unregister(this);
     }
     private void Start()
@@ -83,6 +83,7 @@ public class Player : MonoBehaviour, IInteractable
     {
         if (MoveComponent != null) MoveComponent.FixedTick();
         if (HeightComponent != null) HeightComponent.FixedTick();
+        if(!StateComponent.IsMoving && !StateComponent.IsAttackingIntent) AnimationComponent.PlayIdle();
     }
     public void Initialize(PlayerStatsRuntime stats)
     {
@@ -108,6 +109,9 @@ public class Player : MonoBehaviour, IInteractable
         BehaviorTree behaviourTree = PlayerBehaviourTreeFactory.Create(Rt.PlayerBehaviourTreeType, AIComponent, MoveComponent, SkillComponent, Rt.MoveStrategy);
         AIComponent.SetBehaviorTree(behaviourTree);
 
+        HpSlider hpSlider = GetComponentInChildren<HpSlider>();
+        hpSlider.Bind(HealthComponent);
+
         //事件訂閱
         HealthComponent.OnDie += OnDie;
         HealthComponent.OnHpChanged += OnHpChanged;
@@ -127,30 +131,28 @@ public class Player : MonoBehaviour, IInteractable
         //初始化狀態--------------------------------------------------------------------------------------------------------------------------------------------------------------------
         transform.name = $"玩家ID_{Rt.StatsData.Id}:({Rt.StatsData.Name})";
 
+        TryBindSkillSliderUI();
         ResetState();
     }
     public void Interact(InteractInfo info)
     {
         _lastInteractSource = info.Source;
-        MoveComponent.Knockbacked(info.KnockbackForce, info.Source);
+        if(info.KnockbackForce!=Vector2.zero) MoveComponent.Knockbacked(info.KnockbackForce, info.Source);
 
         MoveComponent.StopSkillDashMoveCoroutine();
         HeightComponent.StopSkillDashMoveCoroutine();
         HeightComponent.StopRecoverHeightCoroutine();
 
-        HeightComponent.Hurt(0.5f);
+        //HeightComponent.Hurt(0.5f);
         HeightComponent.AddUpVelocity(info.FloatPower);
         //ActionLockComponent.HurtLock(0.5f);
-        AnimationComponent.PlayImmediate("Hurt");
+        //AnimationComponent.PlayImmediate("Hurt");
 
         HealthComponent.TakeDamage(info.Damage);
         EffectComponent.TakeDamageEffect(info.Damage);
 
     }
-    public void AnimationEvent_SpawnerSkill()
-    {
-        SkillComponent.UseSkill();
-    }
+
 
     //事件方法
     public void OnDie()
@@ -214,11 +216,19 @@ public class Player : MonoBehaviour, IInteractable
 
         if (Mathf.Abs(direction.x) > 0.01f)
         {
-            var scale = transform.localScale;
+            var scale = VisulaRootTransform.localScale;
             float mag = Mathf.Abs(scale.x);
             scale.x = (direction.x < 0f) ? -mag : mag;
-            transform.localScale = scale;
+            VisulaRootTransform.localScale = scale;
         }
     }
 
+    private void TryBindSkillSliderUI() {
+        if (SkillComponent == null) return;
+        if (UIManager.Instance == null) return;
+        if (UIManager.Instance.UI_SkillSliderController == null) return;
+
+        UIManager.Instance.UI_SkillSliderController
+            .BindSkillComponent(SkillComponent, Rt.SkillPool);
+    }
 }

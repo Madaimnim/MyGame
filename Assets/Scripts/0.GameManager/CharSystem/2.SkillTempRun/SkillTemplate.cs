@@ -47,8 +47,10 @@ public enum SkillDetectorType {
 }
 
 [System.Serializable]
-public class SkillTemplate
-{
+public class SkillTemplate {
+
+    public StatsData StatsData;
+    public VisualData VisualData;
     [Header("發動方式")]
     public SkillReleaseType SkillReleaseType;
 
@@ -61,8 +63,7 @@ public class SkillTemplate
     public FacingDirection FacingDirection = FacingDirection.Right;
     public LayerMask TargetLayers;
 
-    public StatsData StatsData;
-    public VisualData VisualData;
+
     public bool canRotate;
     public float Cooldown;
     public float DestroyDelay = 0f;

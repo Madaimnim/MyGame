@@ -20,7 +20,6 @@ public class Player : MonoBehaviour, IInteractable
     public TargetDetector MoveDetector;
     public GameObject SelectIndicator;
     public Transform SelectIndicatorParent;
-    public IInputProvider InputProvider;
     //組件--------------------------------------------------------------------------------------------------------------------------------------------------------------------------
     [HideInInspector] public Rigidbody2D Rb;
     [HideInInspector] public Animator Ani;
@@ -71,7 +70,8 @@ public class Player : MonoBehaviour, IInteractable
         if (SkillComponent != null) SkillComponent.Tick();
         if (ActionLockComponent != null) ActionLockComponent.Tick();
 
-        if (InputProvider != PlayerInputManager.Instance && AIComponent != null) AIComponent.Tick();
+        //if (InputProvider != PlayerInputManager.Instance && AIComponent != null) AIComponent.Tick();
+
         SkillComponent.TickCooldownTimer();
     }
     private void LateUpdate() {
@@ -103,10 +103,10 @@ public class Player : MonoBehaviour, IInteractable
         if (EnemyListManager.Instance.TargetList == null) Debug.Log("EnemyListManager未初始化");
         SkillComponent = new SkillComponent(Rt.StatsData, Rt.SkillSlotCount, Rt.SkillPool, AnimationComponent, StateComponent, transform, sprCol.transform,
             EnemyListManager.Instance.TargetList,MoveComponent,HeightComponent);
-        AIComponent = new AIComponent(SkillComponent, MoveComponent, transform, Rt.MoveStrategy);
+        AIComponent = new AIComponent( MoveComponent, SkillComponent, transform, Rt.MoveStrategy);
         GrowthComponent = new GrowthComponent(Rt);
         //額外初始化設定
-        BehaviorTree behaviourTree = PlayerBehaviourTreeFactory.Create(Rt.PlayerBehaviourTreeType, AIComponent, MoveComponent, SkillComponent, Rt.MoveStrategy);
+        BehaviorTree behaviourTree = PlayerBehaviourTreeFactory.Create(Rt.PlayerBehaviourTreeType, this);
         AIComponent.SetBehaviorTree(behaviourTree);
 
         HpSlider hpSlider = GetComponentInChildren<HpSlider>();
@@ -163,6 +163,9 @@ public class Player : MonoBehaviour, IInteractable
     }
     private IEnumerator Die()
     {
+        SkillComponent.ClearAllSkillIntent();
+        MoveComponent.ClearAllMoveIntent();
+
         AIComponent.DisableAI();
         EffectComponent.PlayerDeathEffect();
 
@@ -206,10 +209,6 @@ public class Player : MonoBehaviour, IInteractable
         HealthComponent.ResetCurrentHp();
     }
 
-    public void SetInputProvider(IInputProvider inputProvider)
-    {
-        InputProvider = inputProvider;
-    }
     private void SetFacingRight(Vector2 direction)
     {
         if (direction.sqrMagnitude < 0.01f) return;     //避免靜止時頻繁執行

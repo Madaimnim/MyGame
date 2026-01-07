@@ -8,7 +8,7 @@ public class RandomMoveStrategy : MoveStrategyBase
     private float _maxDistance = 3f;
 
     public override Vector2? GetTargetPosition(AIComponent ai) {
-        Vector2 origin = ai.SelfTransform.position;
+        Vector2 origin = ai.Transform.position;
 
         // 隨機方向（單位向量）
         Vector2 dir = Random.insideUnitCircle.normalized;

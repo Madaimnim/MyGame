@@ -46,6 +46,7 @@ public sealed class PlayerStateSystem : SubSystemBase
         SkillSystem.EquipPlayerSkill(id, 1, 2);
         SkillSystem.EquipPlayerSkill(id, 2, 3);
         SkillSystem.EquipPlayerSkill(id, 3, 4);
+        SkillSystem.EquipPlayerSkill(id, 4, 5);
 
         //µo¨Æ¥ó
         OnPlayerUnlocked?.Invoke(id);   

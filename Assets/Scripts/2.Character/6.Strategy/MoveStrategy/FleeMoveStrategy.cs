@@ -6,7 +6,7 @@ public class FleeMoveStrategy : MoveStrategyBase
 {
     public override Vector2? GetMoveDirection(AIComponent ai) {
         var target = ai.GetMoveDetector().TargetTransform;
-        var self = ai.SelfTransform;
+        var self = ai.Transform;
 
         if (target == null) return null;
         return ((Vector2)(self.position- target.position)).normalized;

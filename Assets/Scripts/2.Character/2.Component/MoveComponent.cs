@@ -237,4 +237,16 @@ public class MoveComponent
             _skillPrepareMoveCoroutine = null;
         }
     }
+
+
+    public void SetIntentMove( Vector2? direction = null, Vector2? targetPosition = null, Transform targetTransform = null) {
+        IntentTargetTransform = targetTransform;
+        IntentTargetPosition = targetPosition;
+        IntentDirection = direction ?? Vector2.zero;
+    }
+    public void ClearAllMoveIntent() {
+        IntentTargetTransform = null;
+        IntentTargetPosition = null;
+        IntentDirection = Vector2.zero;
+    }
 }

@@ -5,9 +5,9 @@ using UnityEngine;
 public class Action_MoveAttempt : Node
 {
     private AIComponent _ai;
-    private MoveComponent _moveComp;
+    private MoveComponent _moveComponent;
     private SkillComponent _skillComponent;
-    private MoveStrategyBase _strategy;
+    private MoveStrategyBase _moveStrategy;
 
     //攻擊目標檢測
     private const float ATK_INTERVAL = 0.2f;
@@ -17,7 +17,7 @@ public class Action_MoveAttempt : Node
     private float _moveTime;
 
     //設定Intent
-    private Vector2 _currentPos => _ai.SelfTransform.position;
+    private Vector2 _currentPos => _ai.Transform.position;
     private Vector2? _direction;
     private Vector2? _targetPos;
     private Transform _targetTransform;
@@ -31,11 +31,11 @@ public class Action_MoveAttempt : Node
     private const float STUCK_INTERVAL = 0.2f ;         // 每 0.2 秒檢查一次
     private const float STUCK_RATIO_THRESHOLD = 0.5f; // 實際移動量低於50%算卡住
 
-    public Action_MoveAttempt(AIComponent ai, MoveStrategyBase strategy,MoveComponent moveComponent, SkillComponent skillComponent, float moveTime) {
-        _ai = ai;
-        _moveComp = moveComponent;
-        _skillComponent = skillComponent;
-        _strategy = strategy;
+    public Action_MoveAttempt(AIComponent ai, float moveTime) {
+        _ai= ai;
+        _moveComponent = _ai.MoveComponent;
+        _skillComponent = _ai.SkillComponent;
+        _moveStrategy = _ai.MoveStrategy;
 
         _moveTime = moveTime;
         _timer = 0;
@@ -52,12 +52,12 @@ public class Action_MoveAttempt : Node
 
         if (_timer == 0)
         {
-            _lastPosition = _ai.SelfTransform.position;
+            _lastPosition = _ai.Transform.position;
 
-            _direction = _strategy.GetMoveDirection(_ai);
-            _targetPos = _strategy.GetTargetPosition(_ai);
-            _targetTransform = _strategy.GetTargetTransform(_ai);
-            _ai.SetIntentMove(_moveComp, _direction, _targetPos, _targetTransform);
+            _direction = _moveStrategy.GetMoveDirection(_ai);
+            _targetPos = _moveStrategy.GetTargetPosition(_ai);
+            _targetTransform = _moveStrategy.GetTargetTransform(_ai);
+            _moveComponent.SetIntentMove( _direction, _targetPos, _targetTransform);
         }
         _timer += updateInterval;
         //卡住，SUCCESS
@@ -65,7 +65,7 @@ public class Action_MoveAttempt : Node
         if (_stuckTimer >= STUCK_INTERVAL)
         {
             float moved = Vector2.Distance(_currentPos, _lastPosition);
-            float expected = _moveComp.MoveSpeed * _stuckTimer;  // 應該移動距離
+            float expected = _moveComponent.MoveSpeed * _stuckTimer;  // 應該移動距離
             float ratio = moved / expected;
 
             if (ratio < STUCK_RATIO_THRESHOLD)
@@ -100,6 +100,6 @@ public class Action_MoveAttempt : Node
     private void ResetTimerAndIntent() {
         _timer = 0f;
         _stuckTimer = 0f;
-        _ai.SetIntentMove(_moveComp);
+        _moveComponent.ClearAllMoveIntent();
     }
 }

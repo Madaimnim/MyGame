@@ -17,14 +17,15 @@ public enum PlayerBehaviourTreeType {
 [CreateAssetMenu(fileName ="PlayerStatsTemplate",menuName="GameData/PlayerStatsTemplate")]
 public class PlayerStatsTemplate:ScriptableObject
 {
+    public StatsData StatsData;
+    public VisualData VisualData;
     public PlayerBehaviourTreeType PlayerBehaviourTreeType;
     public MoveStrategyType MoveStrategyType;
     public int SkillSlotCount;
     [FormerlySerializedAs("SkillTemplateList")]
     public List<SkillTemplate> SkillTemplateList = new List<SkillTemplate>();
     public List<int> UnlockedSkillIdList = new List<int>();
-    public StatsData StatsData;
-    public VisualData VisualData;
+
     public bool CanRespawn = true;
     public int MaxHp;
     public int[] ExpTable = new int[] {

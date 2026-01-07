@@ -13,14 +13,14 @@ public enum EnemyBehaviourTreeType {
 [CreateAssetMenu(fileName ="EnemyStatsTemplate",menuName= "GameData/EnemyStatsTemplate")]
 public class EnemyStatsTemplate:ScriptableObject
 {
+    public StatsData StatsData;
+    public VisualData VisualData;
     public EnemyBehaviourTreeType EnemyBehaviourTreeType;
     public MoveStrategyType MoveStrategyType;
     public int SkillSlotCount;
+
     [FormerlySerializedAs("SkillTemplateList")]
     public List<SkillTemplate> SkillTemplateList = new List<SkillTemplate>();
-
-    public StatsData StatsData;
-    public VisualData VisualData;
     public bool CanRespawn = false;
     public int MaxHp;
     public int Exp;

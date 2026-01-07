@@ -1,8 +1,9 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using TMPro;
 using UnityEngine;
-using System.Linq;
+using static UnityEngine.Rendering.DebugUI;
 
 public class SkillComponent
 {
@@ -24,7 +25,7 @@ public class SkillComponent
 
 
     //技能暫存狀態
-    private bool _isContinuousAttack = false;
+    private bool _isBaseAttackContinuous = false;
     private int _pendingSlotIndex=-1;
     private Vector2 _pendingPosition;
     private Transform _pendingTransform;
@@ -60,31 +61,32 @@ public class SkillComponent
     public void Tick() {
         if (IntentSlotIndex >= 0) _stateComponent.SetIsAttackingIntent(true);
         else _stateComponent.SetIsAttackingIntent(false);
-        
-        HandleContinuousAttackChase();
 
-        TryPlaySkillAnimation();
+        ContinuousAttackTick();
+        TryPlaySkillAnimationTick();
     }
 
 
-    private void TryPlaySkillAnimation() {
+    private void TryPlaySkillAnimationTick() {
         if (!_stateComponent.CanAttack) return;
         if (IntentSlotIndex < 0 || IntentSlotIndex >= SkillSlots.Length) return;
 
         var slot = SkillSlots[IntentSlotIndex];
-        if (!slot.IsReady) {      
-            if(!_isContinuousAttack)ClearIntent();         
+        if (!slot.IsReady) {
+            if (!_isBaseAttackContinuous) ClearAllSkillIntent();//技能只要沒冷卻玩，就清空意圖，避免技能暫存(除了普通攻擊以外)
             return;
         }
 
-        //  只對「普通攻擊 Slot 0」做距離 Gate
-        if (IntentSlotIndex == 0) {
+
+        //  先確認「普通攻擊 Slot 0」做距離 Gate
+        if (IntentSlotIndex == 0 && _isBaseAttackContinuous) {
             if (slot.Detector != null && IntentTargetTransform != null) {
                 if (!slot.Detector.IsInRange(IntentTargetTransform.position)) {
-                    return; // 不在距離 → 等待移動系統靠近
+                    return; // 不在距離 → 不播放動畫，等待移動系統靠近
                 }
             }
         }
+   
 
         if (!_skillPool.TryGetValue(slot.SkillId, out var skill)) return;
         Vector3 targetPos = Vector3.zero; //統一變數方便後續處理
@@ -105,10 +107,7 @@ public class SkillComponent
                 break;
 
             case SkillReleaseType.Towerd:
-                if (!IntentTargetPosition.HasValue)
-                {
-                    return;
-                }
+                if (!IntentTargetPosition.HasValue) return;
                 _pendingTransform = IntentTargetTransform? IntentTargetTransform:null;
                 targetPos = IntentTargetPosition.Value;
                 break;
@@ -144,7 +143,7 @@ public class SkillComponent
             OnSkillUsed?.Invoke(_pendingSlotIndex, skillRt);
         }
 
-        if(!_isContinuousAttack)ClearIntent();
+        if(!_isBaseAttackContinuous) ClearAllSkillIntent();
 
     }
 
@@ -188,16 +187,14 @@ public class SkillComponent
     public void TickCooldownTimer() {
         foreach (var slot in SkillSlots) slot?.Tick();
     }
-    public void SetContinuousAttack(bool value)=> _isContinuousAttack = value;
 
     // 只處理連續普攻
-    private void HandleContinuousAttackChase() {
+    private void ContinuousAttackTick() {
         if (IntentSlotIndex != 0) return;
-        if (!_isContinuousAttack) return;
-        
-        // 核心修正：目標失效
+        if (!_isBaseAttackContinuous) return;
         if (IntentTargetTransform == null) {
-            StopContinuousAttack();
+            ClearAllSkillIntent();
+            _moveComponent.ClearAllMoveIntent();
             return;
         }
 
@@ -214,22 +211,34 @@ public class SkillComponent
         }
 
     }
-    private void StopContinuousAttack() {
-        _isContinuousAttack = false;
 
-        // 清 Skill 意圖
-        ClearIntent();
 
-        // 清 Move 意圖
-        _moveComponent.IntentTargetTransform = null;
-        _moveComponent.IntentTargetPosition = null;
-        _moveComponent.IntentDirection = Vector2.zero;
+    //===========普攻攻擊意圖============
+    public void SetBaseAttackIntent(Transform target) {
+        if (target == null) return;
+        _isBaseAttackContinuous = true;
+
+        IntentSlotIndex = 0;                 // 普攻固定 Slot0
+        IntentTargetTransform = target;
+        IntentTargetPosition = null;         // 普攻不需要固定地面點
     }
 
-    private void ClearIntent() {
+    //===========設定、清空意圖============
+
+    public void SetIntentSkill(int slotIndex, Vector2? targetPosition = null, Transform targetTransform = null) {
+        IntentSlotIndex = slotIndex;
+        IntentTargetTransform = targetTransform;
+        IntentTargetPosition = targetPosition ?? Vector2.zero;
+    }
+
+    public void ClearAllSkillIntent() {
+        _isBaseAttackContinuous = false;
+
         IntentSlotIndex = -1;
         IntentTargetPosition = null;
         IntentTargetTransform = null;
+
         _pendingSlotIndex = -1;
+        _pendingTransform = null;
     }
 }

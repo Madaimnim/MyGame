@@ -7,7 +7,7 @@ public class FollowMoveStrategy : MoveStrategyBase
 
     public override Vector2? GetMoveDirection(AIComponent ai) {
         var target = ai.GetMoveDetector().TargetTransform;
-        var self = ai.SelfTransform;
+        var self = ai.Transform;
 
         if (target == null) return null;
         return ((Vector2)(target.position - self.position)).normalized;

@@ -94,10 +94,15 @@ public class SkillMoveComponent {
     private void TowardTick() => _transform.position += (Vector3)(MoveDirection * MoveSpeed * Time.deltaTime);
     private void StraightTick() => _transform.position += (Vector3)(MoveDirection * MoveSpeed * Time.deltaTime);
     private void HomingTick() {
-        if (_targetTransform != null)
+        if (_targetTransform != null) {
             MoveDirection = (_targetTransform.position - _transform.position).normalized;
-        else
+            //Debug.Log($"改變方向{MoveDirection}");
+        }
+        else {
             MoveDirection = _initialDirection;
+            //Debug.Log($"原方向{MoveDirection}");
+        }
+
 
         SetFacingRight(MoveDirection);
         _transform.position += (Vector3)(MoveDirection * MoveSpeed * Time.deltaTime);

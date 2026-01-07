@@ -82,7 +82,7 @@ public class SkillObject : MonoBehaviour, IInteractable {
     }
     private void UpdateRotation() {
         if (!_canRotate || _skillMoveComponent.MoveDirection == Vector2.zero) return;
-        Debug.Log($"_canRotate:{_canRotate},MoveDirection:{_skillMoveComponent.MoveDirection}");
+        //Debug.Log($"_canRotate:{_canRotate},MoveDirection:{_skillMoveComponent.MoveDirection}");
         float angle = Mathf.Atan2(_skillMoveComponent.MoveDirection.y, _skillMoveComponent.MoveDirection.x) * Mathf.Rad2Deg;
 
         var newScale = new Vector3(1, 1, 1);

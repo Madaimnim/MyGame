@@ -19,7 +19,6 @@ public class Enemy :MonoBehaviour,IInteractable
     public Transform VisulaRootTransform;
     public Transform BackSpriteTransform;
     public TargetDetector MoveDetector;
-    public IInputProvider InputProvider;
     public GameObject UI_HpSliderCanvas;
     //組件--------------------------------------------------------------------------------------------------------------------------------------------------------------------------
     [HideInInspector] public Rigidbody2D Rb;
@@ -64,7 +63,7 @@ public class Enemy :MonoBehaviour,IInteractable
     }
     private void Start()
     {
-        InputProvider = AIComponent;
+
     }
     private void Update() {
         if (SkillComponent != null)SkillComponent.Tick();
@@ -101,11 +100,11 @@ public class Enemy :MonoBehaviour,IInteractable
         SpawnerComponent = new SpawnerComponent();
         SkillComponent = new SkillComponent(Rt.StatsData, Rt.SkillSlotCount,Rt.SkillPool, AnimationComponent,StateComponent, transform, sprCol.transform,
             PlayerListManager.Instance.TargetList,MoveComponent,HeightComponent);
-        AIComponent = new AIComponent(SkillComponent, MoveComponent, transform,Rt.MoveStrategy);
+        AIComponent = new AIComponent( MoveComponent, SkillComponent, transform,Rt.MoveStrategy);
 
 
         //額外初始化設定
-        BehaviorTree behaviourTree =EnemyBehaviourTreeFactory.Create(Rt.EnemyBehaviourTreeType, AIComponent, MoveComponent, SkillComponent, Rt.MoveStrategy);
+        BehaviorTree behaviourTree =EnemyBehaviourTreeFactory.Create(Rt.EnemyBehaviourTreeType, this);
         AIComponent.SetBehaviorTree(behaviourTree);
 
         HpSlider hpSlider = GetComponentInChildren<HpSlider>();
@@ -127,7 +126,6 @@ public class Enemy :MonoBehaviour,IInteractable
 
         //初始化狀態--------------------------------------------------------------------------------------------------------------------------------------------------------------------
         transform.name = $"EnemyID_{Rt.StatsData.Id}:({Rt.StatsData.Name})";
-        InputProvider = AIComponent;
         ResetState();
         SkillComponent.EquipSkill(0, 1);
 

@@ -2,12 +2,13 @@ using UnityEngine;
 
 public class Action_AttackAllSlots : Node
 {
+    private AIComponent _ai;
     private SkillComponent _skillComponent;
-    private AIComponent _aiComponent;
 
-    public Action_AttackAllSlots(SkillComponent skillComponent, AIComponent aiComponent) {
-        _skillComponent = skillComponent;
-        _aiComponent = aiComponent;
+    public Action_AttackAllSlots(AIComponent ai) {
+        _ai = ai;
+        _skillComponent= _ai.SkillComponent;
+
     }
 
     public override NodeState Evaluate(float updateInterval) {
@@ -16,12 +17,12 @@ public class Action_AttackAllSlots : Node
             var slot = _skillComponent.SkillSlots[i];
             if (slot == null || slot.SkillId ==-1) continue;
             if (!slot.IsReady || slot.Detector == null || !slot.Detector.HasTarget) continue;
-     
-            _aiComponent.SetIntentSkill(_skillComponent,i, slot.Detector.TargetTransform.position, slot.Detector.TargetTransform);
+
+            _skillComponent.SetIntentSkill(i, slot.Detector.TargetTransform.position, slot.Detector.TargetTransform);
             return NodeState.SUCCESS;
         }
 
-        _aiComponent.SetIntentSkill(_skillComponent ,- 1);
+        _skillComponent.ClearAllSkillIntent();
         return NodeState.FAILURE; // 沒有任何技能能用
     }
 }

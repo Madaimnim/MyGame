@@ -5,7 +5,7 @@ using UnityEngine;
 using System;
 using System.Linq;
 
-public sealed class PlayerStateSystem : SubSystemBase
+public sealed class PlayerStateSystem : GameSubSystem
 {
     public IReadOnlyDictionary<int, PlayerStatsRuntime> PlayerStatsRuntimeDtny => _playerStatsRuntimeDtny;
     public IReadOnlyDictionary<int, Player> BattlePlayerDtny => _battlePlayerDtny;

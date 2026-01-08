@@ -4,7 +4,10 @@ using UnityEngine.ResourceManagement.AsyncOperations;
 using UnityEngine.ResourceManagement.ResourceProviders;
 using System.Collections;
 
-public class GameSceneSystem : SubSystemBase
+
+//只負責場景切換流程
+//
+public class GameSceneSystem : GameSubSystem
 {
     private ICoroutineRunner _runner;
     private SceneConfig _sceneConfig;

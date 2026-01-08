@@ -1,49 +1,48 @@
-﻿using System.Collections;
+﻿using JetBrains.Annotations;
+using System;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.AddressableAssets;
 using UnityEngine.ResourceManagement.AsyncOperations;
-using System;
-using JetBrains.Annotations;
+using static UnityEngine.Rendering.VirtualTexturing.Debugging;
 
 [DefaultExecutionOrder(-50)]
 public class GameManager : MonoBehaviour
 {
+    public static GameManager Instance { get; private set; }
+
     public Transform EnemyBattleParent;
     public LineRenderer LineRenderer;
     public Transform PlayerBattleParent;
-    private readonly List<SubSystemBase> _subSystems = new();
-    private GameStateRouter _gameStateRouter;
+    private readonly List<GameSubSystem> _subSystems = new();
+
     [SerializeField] private PrefabConfig _prefabConfig;
     [SerializeField] private SceneConfig _sceneConfig;
 
-    public event Action OnAllDataLoaded;
-
     //事件
+    public event Action OnAllDataLoaded;
     public event Action OnAllSubSystemReady;
 
-    public static GameManager Instance { get; private set; }
+    //子系統
+    public PlayerStateSystem PlayerStateSystem { get; private set; }
     public EnemyStateSystem EnemyStateSystem { get; private set; }
 
+    public GameStageSystem GameStageSystem { get; private set; }
+    public GameStateSystem GameStateSystem { get; private set; }
+    private GameStateRouter _gameStateRouter;
+    public Dictionary<GameState, IGameStateHandler> GameStateHandlers { get; private set; }
     public GameSceneSystem GameSceneSystem { get; private set; }
 
-    public Dictionary<GameStateSystem.GameState, IGameStateHandler> GameStateHandlers { get; private set; }
-
-    //子系統
-    public GameStateSystem GameStateSystem { get; private set; }
 
     public bool IsAllDataLoaded { get; private set; } = false;
 
-
-    public PlayerStateSystem PlayerStateSystem { get; private set; }
-
     //Config
     public PrefabConfig PrefabConfig => _prefabConfig;
-
     public SceneConfig SceneConfig => _sceneConfig;
 
-    //繼承SubSystemBase的子系統，建構子時自動訂閱
-    public void RegisterSubsystem(SubSystemBase subSystem)
+    //繼承GameSubSystem的子系統，建構子時自動訂閱
+    public void RegisterSubsystem(GameSubSystem subSystem)
     {
         if (!_subSystems.Contains(subSystem))
             _subSystems.Add(subSystem);
@@ -54,26 +53,28 @@ public class GameManager : MonoBehaviour
         //單例
         if (Instance != null && Instance != this)
         {
-            Destroy(gameObject);
+            Destroy(this);
             return;
         }
         Instance = this;
         DontDestroyOnLoad(gameObject);
 
         //建子系統
+        GameStageSystem = new GameStageSystem(this);
         GameStateSystem = new GameStateSystem(this);
         GameSceneSystem = new GameSceneSystem(this);
-        _gameStateRouter = new GameStateRouter(this);
         PlayerStateSystem = new PlayerStateSystem(this);
         EnemyStateSystem = new EnemyStateSystem(this);
+        _gameStateRouter = new GameStateRouter(this);
 
         //建 Handler map並建構子給_gameStateRouter
         var runner = new CoroutineRunnerAdapter(this);
-        GameStateHandlers = new Dictionary<GameStateSystem.GameState, IGameStateHandler>{
-            { GameStateSystem.GameState.GameStart, new GameStartHandler(runner,GameSceneSystem, PlayerStateSystem) },
-            { GameStateSystem.GameState.Preparation, new PreparationHandler( GameSceneSystem) },
-            { GameStateSystem.GameState.Battle, new BattleHandler( GameSceneSystem, PlayerStateSystem) },
+        GameStateHandlers = new Dictionary<GameState, IGameStateHandler>{
+            { GameState.GameStart, new GameStartHandler(runner,GameSceneSystem, PlayerStateSystem) },
+            { GameState.Preparation, new PreparationHandler( GameSceneSystem) },
+            { GameState.Battle, new BattleHandler( GameSceneSystem, PlayerStateSystem) },
         };
+
 
         //所有子系統初始化
         foreach (var sub in _subSystems) sub.Initialize();
@@ -82,24 +83,6 @@ public class GameManager : MonoBehaviour
         OnAllSubSystemReady?.Invoke();
 
         UnityEngine.Random.InitState((int)System.DateTime.Now.Ticks);
-    }
-
-    private IEnumerator LoadEnemyStatsList()
-    {
-        string address = "EnemyStatData";
-        AsyncOperationHandle<EnemyStatData> handle = Addressables.LoadAssetAsync<EnemyStatData>(address);
-        yield return handle;
-        if (handle.Status == AsyncOperationStatus.Succeeded)
-            EnemyStateSystem.SetEnemyStatesTemplateDtny(handle.Result);
-    }
-
-    private IEnumerator LoadPlayerStatsList()
-    {
-        string address = "PlayerStatData";
-        AsyncOperationHandle<PlayerStatData> handle = Addressables.LoadAssetAsync<PlayerStatData>(address);
-        yield return handle;
-        if (handle.Status == AsyncOperationStatus.Succeeded)
-            PlayerStateSystem.SetPlayerStatsRuntimeDtny(handle.Result);
     }
 
     private void OnDisable()
@@ -111,8 +94,9 @@ public class GameManager : MonoBehaviour
     private IEnumerator Start()
     {
         yield return Addressables.InitializeAsync();
-        yield return LoadPlayerStatsList();
-        yield return LoadEnemyStatsList();
+        yield return LoadAssetAsync<PlayerStatData>("PlayerStatData",playerStatData => PlayerStateSystem.SetPlayerStatsRuntimeDtny(playerStatData));
+        yield return LoadAssetAsync<EnemyStatData>("EnemyStatData", enemyStatData => EnemyStateSystem.SetEnemyStatsTemplateDtny(enemyStatData));
+        yield return LoadAssetAsync<StageTable>("StageTable",stageTable=> GameStageSystem.SetStageDataDtny(stageTable));
 
         IsAllDataLoaded = true;
         OnAllDataLoaded?.Invoke();
@@ -126,4 +110,17 @@ public class GameManager : MonoBehaviour
         float dt = Time.deltaTime;
         foreach (var sub in _subSystems) sub.Update(dt);
     }
+
+    //外部有提供一個Action方法引用，並用這次載入完成的結果當參數，呼叫那個方法
+    private IEnumerator LoadAssetAsync<T>(string address,Action<T> onLoaded) {
+        var handle = Addressables.LoadAssetAsync<T>(address);
+        yield return handle;
+
+        if (handle.Status == AsyncOperationStatus.Succeeded) 
+            onLoaded(handle.Result);
+        else 
+            Debug.LogError($"LoadAssetAsync<{typeof(T).Name}> failed : {address}");
+        
+    }
+
 }

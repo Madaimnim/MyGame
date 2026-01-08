@@ -12,14 +12,18 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 04f9b6d1d68833343a002b40aa2152e6, type: 3}
   m_Name: SceneConfig
   m_EditorClassIdentifier: 
-  scenes:
+  SceneKeyAddressis:
   - key: Start
     address: Start
   - key: Preparation
     address: Preparation
-  - key: Battle1-1
-    address: Battle1-1
-  - key: Battle1-2
-    address: Battle1-2
-  - key: Battle1-3
-    address: Battle1-3
+  - key: Battle101
+    address: Battle101
+  - key: Battle102
+    address: Battle102
+  - key: Battle103
+    address: Battle103
+  - key: Battle104
+    address: Battle104
+  - key: Battle105
+    address: Battle105

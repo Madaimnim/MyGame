@@ -70,11 +70,10 @@ public class EnemyScreenDebug : MonoBehaviour {
 
     private void Awake() {
         if (_instance != null) {
-            Destroy(gameObject);
+            Destroy(this);
             return;
         }
         _instance = this;
-        DontDestroyOnLoad(gameObject);
     }
 
     // Inspector 初始化 / 修改時自動補齊

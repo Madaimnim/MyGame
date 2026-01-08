@@ -69,12 +69,11 @@ public class PlayerScreenDebug : MonoBehaviour {
 
     private void Awake() {
         if (_instance != null) {
-            Destroy(gameObject);
+            Destroy(this);
             return;
         }
 
         _instance = this;
-        DontDestroyOnLoad(gameObject);
     }
 
     // Inspector 初始化 / 修改時自動補齊 DebugItems
@@ -105,15 +104,10 @@ public class PlayerScreenDebug : MonoBehaviour {
         UpdateDebugTarget();
     }
 
-    // =========================
     // Debug 目標判定（核心）
-    // =========================
     private void UpdateDebugTarget() {
         // -1：強制不顯示
-        if (manualDebugPlayerId < 0) {
-            DebugPlayerId = -1;
-            return;
-        }
+        if (manualDebugPlayerId < 0) {DebugPlayerId = -1;return;}
 
         // 嘗試從 PlayerUtility 取得 Player
         if (PlayerUtility.AllPlayers != null &&
@@ -128,9 +122,7 @@ public class PlayerScreenDebug : MonoBehaviour {
         }
     }
 
-    // =========================
     // 對外 API（Player / Enemy 用）
-    // =========================
     public static void Set(string key, object value) {
         if (_instance == null) return;
         if (!_instance.EnableDebug) return;
@@ -143,53 +135,29 @@ public class PlayerScreenDebug : MonoBehaviour {
         _instance._debugMap.Clear();
     }
 
-    // =========================
-    // GUI
-    // =========================
     private void OnGUI() {
         if (!EnableDebug) return;
         if (DebugPlayerId == -1) return;
 
-        GUIStyle style = new GUIStyle(GUI.skin.label) {
-            fontSize = FontSize,
-            wordWrap = false,
-            clipping = TextClipping.Overflow
-        };
+        GUIStyle style = new GUIStyle(GUI.skin.label) {fontSize = FontSize,wordWrap = false,clipping = TextClipping.Overflow};
 
         int line = 0;
 
         foreach (var pair in _debugMap) {
-            // Player ID 過濾
-            if (!pair.Key.Contains($"Player {DebugPlayerId}"))
-                continue;
-
-            // Inspector 勾選過濾
-            if (!IsItemEnabled(pair.Key))
-                continue;
+            if (!pair.Key.Contains($"Player {DebugPlayerId}")) continue;            // Player ID 過濾
+            if (!IsItemEnabled(pair.Key)) continue;                                         // Inspector 勾選過濾
 
             // 顏色
             style.normal.textColor = DefaultColor;
             if (pair.Value == "True") style.normal.textColor = TrueColor;
             else if (pair.Value == "False") style.normal.textColor = FalseColor;
 
-            GUI.Label(
-                new Rect(
-                    StartPos.x,
-                    StartPos.y + line * LineHeight,
-                    1000,
-                    LineHeight
-                ),
-                $"{pair.Key}: {pair.Value}",
-                style
-            );
-
+            GUI.Label(new Rect(StartPos.x,StartPos.y + line * LineHeight,1000,LineHeight),$"{pair.Key}: {pair.Value}",style);
             line++;
         }
     }
 
-    // =========================
     // Inspector 勾選控制
-    // =========================
     private bool IsItemEnabled(string key) {
         foreach (var item in DebugItems) {
             if (string.IsNullOrEmpty(item.KeyContains))

@@ -12,8 +12,8 @@ public class PreparationHandler : IGameStateHandler
         ) {
         _sceneSystem = sceneSystem;
     }
-    public void Enter(string sceneKey = null) {
-        _sceneSystem.LoadSceneByKey(sceneKey?? "Preparation");
+    public void Enter() {
+        _sceneSystem.LoadSceneByKey( "Preparation");
         UIManager.Instance.UIInputController.EnableUIInput(true);
     }
 

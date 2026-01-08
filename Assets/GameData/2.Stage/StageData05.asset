@@ -12,7 +12,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 3b85873707c2f364c9e256ef9e739dfe, type: 3}
   m_Name: StageData05
   m_EditorClassIdentifier: 
-  StageId: 5
+  StageId: 105
+  StageName: "\u68EE\u67975"
   SpawnInterval: 1
   Waves:
   - EnemyId: 2003

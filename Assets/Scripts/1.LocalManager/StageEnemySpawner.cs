@@ -6,17 +6,20 @@ public class StageEnemySpawner : MonoBehaviour {
     [Header("生成區域（BoxCollider2D）")]
     public BoxCollider2D SpawnArea;
     [Header("怪物生成Config檔")]
-    public StageEnemySpawnConfig SpawnConfig;
-
+    private StageData _stageData;
+    private void OnEnable() {
+        if(GameManager.Instance.GameStageSystem != null) 
+            _stageData = GameManager.Instance.GameStageSystem.CurrentStageData;
+    }
     private void Start() {
-        if (SpawnConfig == null) {
-            Debug.LogError("StageEnemySpawner 缺少 SpawnConfig");
+        if (_stageData == null) {
+            Debug.LogError("StageEnemySpawner 缺少 StageData");
             return;
         }
         StartCoroutine(SpawnCoroutine());
     }
     private IEnumerator SpawnCoroutine() {
-        foreach (var wave in SpawnConfig.Waves) {
+        foreach (var wave in _stageData.Waves) {
             for (int i = 0; i < wave.SpawnCount; i++) {
                 Vector3 spawnPos = GetRandomPositionInArea();
 
@@ -24,7 +27,7 @@ public class StageEnemySpawner : MonoBehaviour {
                     .SpawnSystem
                     .SpawnEnemy(wave.EnemyId, spawnPos);
 
-                yield return new WaitForSeconds(SpawnConfig.SpawnInterval);
+                yield return new WaitForSeconds(_stageData.SpawnInterval);
             }
         }
     }

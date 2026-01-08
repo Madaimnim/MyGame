@@ -49,11 +49,10 @@ public class PlayerInputManager : MonoBehaviour {
     public void Awake() {
         // 單例
         if (Instance != null && Instance != this) {
-            Destroy(gameObject);
+            Destroy(this);
             return;
         }
         Instance = this;
-        DontDestroyOnLoad(gameObject);
 
         LineRenderer.enabled = false;
         if (GameManager.Instance != null)

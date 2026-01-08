@@ -12,7 +12,7 @@ public class StageLevelManager : MonoBehaviour
     private void Awake() {
         if (Instance != null && Instance != this)
         {
-            Destroy(gameObject);
+            Destroy(this);
             return;
         }
         Instance = this;
@@ -27,6 +27,8 @@ public class StageLevelManager : MonoBehaviour
         UIManager.Instance.UI_StageClearController.Text_StageClear.transform.localPosition = Vector3.zero;
         UIManager.Instance.UI_StageClearController.Text_StageDefeat.transform.localPosition = Vector3.zero;
         UIManager.Instance.UI_SkillCooldownPanel.gameObject.SetActive(true);
+
+
     }
     private void OnDisable() {
         GameEventSystem.Instance.Event_OnPlayerDie -= RespawnPlayer;
@@ -49,7 +51,7 @@ public class StageLevelManager : MonoBehaviour
 
     private int CalculateTotalEnemyCount() {
         int total = 0;
-        foreach (var wave in _stageEnemySpawner.SpawnConfig.Waves) {
+        foreach (var wave in GameManager.Instance.GameStageSystem.CurrentStageData.Waves) {
             total += wave.SpawnCount;
         }
         return total;
@@ -116,7 +118,7 @@ public class StageLevelManager : MonoBehaviour
         }
 
         // ¤Á´«ª¬ºA
-        GameManager.Instance.GameStateSystem.SetState(GameStateSystem.GameState.Preparation,"Preparation");
+        GameManager.Instance.GameStateSystem.SetState(GameState.Preparation);
         GameManager.Instance.PlayerStateSystem.AllPlayerClose();
         UIManager.Instance.UI_StageClearController.UI_RewardSystem.gameObject.SetActive(false);
         UIManager.Instance.UI_StageClearController.Text_StageClear.gameObject.SetActive(false);

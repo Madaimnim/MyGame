@@ -1,5 +1,5 @@
 public interface IGameStateHandler
 {
-    void Enter(string sceneName = null);
+    void Enter();
     void Exit();
 }

@@ -8,7 +8,7 @@ public class EndGameHandler : IGameStateHandler
     public EndGameHandler(GameSceneSystem sceneSystem) {
 
     }
-    public void Enter(string sceneName) {
+    public void Enter() {
 
     }
 

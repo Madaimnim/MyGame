@@ -26,7 +26,7 @@ MonoBehaviour:
     m_ReadOnly: 0
     m_SerializedLabels: []
   - m_GUID: 51614d3b5b5559e4a9427e6385cd0b7c
-    m_Address: Battle1-1
+    m_Address: Battle101
     m_ReadOnly: 0
     m_SerializedLabels: []
   - m_GUID: 0a4ea8bf841601a4cbfe583723d54ad6
@@ -35,6 +35,26 @@ MonoBehaviour:
     m_SerializedLabels: []
   - m_GUID: 49a73f6a50adef144a5b89e2dbdd5ec2
     m_Address: Start
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+  - m_GUID: 82778eba176ddcf4b8eee6ad2ae89135
+    m_Address: StageTable
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+  - m_GUID: d4c9f9b859d5c034c886a71d73760660
+    m_Address: Battle102
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+  - m_GUID: 774fceafce66b2d4888cb754917f3849
+    m_Address: Battle103
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+  - m_GUID: e855e8765c7037f4693aa95cc8913ccc
+    m_Address: Battle104
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+  - m_GUID: e25eeff194a8f594db047ca506c35580
+    m_Address: Battle105
     m_ReadOnly: 0
     m_SerializedLabels: []
   m_ReadOnly: 0

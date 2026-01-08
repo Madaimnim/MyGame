@@ -13,11 +13,10 @@ public class VFXManager : MonoBehaviour
     private void Awake() {
         if (Instance != null && Instance != this)
         {
-            Destroy(gameObject);
+            Destroy(this);
             return;
         }
         Instance = this;
-        DontDestroyOnLoad(gameObject);
 
         foreach (var vfxPair in _vfxData.EffectList)
         {

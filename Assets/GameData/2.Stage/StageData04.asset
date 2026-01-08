@@ -10,10 +10,13 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 3b85873707c2f364c9e256ef9e739dfe, type: 3}
-  m_Name: StageData01
+  m_Name: StageData04
   m_EditorClassIdentifier: 
-  StageId: 1
+  StageId: 104
+  StageName: "\u68EE\u67974"
   SpawnInterval: 1
   Waves:
   - EnemyId: 2001
+    SpawnCount: 2
+  - EnemyId: 2003
     SpawnCount: 1

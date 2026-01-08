@@ -15,9 +15,9 @@ public class BattleHandler : IGameStateHandler
         // 訂閱事件
         _sceneSystem.OnSceneLoaded += OnSceneLoaded;
     }
-    public void Enter(string sceneKey = null) {
-        // 只觸發場景載入，不在這裡直接初始化
-        _sceneSystem.LoadSceneByKey(sceneKey??"Battle_Default");
+    public void Enter() {
+        var stageData = GameManager.Instance.GameStageSystem.CurrentStageData;
+        _sceneSystem.LoadSceneByKey(stageData.SceneKey);
     }
 
     public void Exit() {

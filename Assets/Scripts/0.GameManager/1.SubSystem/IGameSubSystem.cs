@@ -1,4 +1,4 @@
-public interface ISubSystem 
+public interface IGameSubSystem 
 {
     void Initialize();
     void Update(float deltaTime);

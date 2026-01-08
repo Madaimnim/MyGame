@@ -5,12 +5,12 @@ using System;
 using UnityEngine.UIElements;
 using System.Linq;
 
-public class EnemyStateSystem :SubSystemBase
+public class EnemyStateSystem :GameSubSystem
 {
     public IReadOnlyDictionary<int, EnemyStatsTemplate> EnemyStatsTemplateDtny => _enemyStatsTemplateDtny;
     public IReadOnlyCollection<Enemy> BattleEnemyList => _battleEnemyList;
     public IReadOnlyCollection<int> UnlockedIdList => _unlockedIdList;
-    public List<EnemyStatsRuntime> EnemyStatsRuntimeList { get; private set; } = new List<EnemyStatsRuntime>();
+    //public List<EnemyStatsRuntime> EnemyStatsRuntimeList { get; private set; } = new List<EnemyStatsRuntime>();
     public EnemySkillSystem SkillSystem { get; private set; }
     public EnemySpawnSystem SpawnSystem { get; private set; }
 
@@ -46,7 +46,7 @@ public class EnemyStateSystem :SubSystemBase
             if (_battleEnemyList.Contains(enemy)) _battleEnemyList.Remove(enemy);
     }
 
-    public void SetEnemyStatesTemplateDtny(EnemyStatData enemyStatData) {
+    public void SetEnemyStatsTemplateDtny(EnemyStatData enemyStatData) {
         _enemyStatsTemplateDtny.Clear();
         foreach (var stat in enemyStatData.enemyStatsTemplateList)
         {

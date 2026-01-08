@@ -555,15 +555,15 @@ MonoBehaviour:
     m_PersistentCalls:
       m_Calls:
       - m_Target: {fileID: 1148364110}
-        m_TargetAssemblyTypeName: StageSelectUI, Assembly-CSharp
+        m_TargetAssemblyTypeName: UI_StageButtonController, Assembly-CSharp
         m_MethodName: OnSubStageClicked
-        m_Mode: 5
+        m_Mode: 3
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
           m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
-          m_IntArgument: 0
+          m_IntArgument: 103
           m_FloatArgument: 0
-          m_StringArgument: Battle1-3
+          m_StringArgument: 103
           m_BoolArgument: 0
         m_CallState: 2
 --- !u!114 &158179781
@@ -1586,7 +1586,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   MainPanelTransform: {fileID: 1064903675}
-  SubPanelTransform: {fileID: 18054402}
+  SubPanelTransform: {fileID: 2110916966}
   FloatUpPixels: 1000
   FloutDuration: 0.25
 --- !u!4 &1148364111
@@ -1670,15 +1670,15 @@ MonoBehaviour:
     m_PersistentCalls:
       m_Calls:
       - m_Target: {fileID: 1148364110}
-        m_TargetAssemblyTypeName: StageSelectUI, Assembly-CSharp
+        m_TargetAssemblyTypeName: UI_StageButtonController, Assembly-CSharp
         m_MethodName: OnSubStageClicked
-        m_Mode: 5
+        m_Mode: 3
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
           m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
-          m_IntArgument: 0
+          m_IntArgument: 102
           m_FloatArgument: 0
-          m_StringArgument: Battle1-2
+          m_StringArgument: 102
           m_BoolArgument: 0
         m_CallState: 2
 --- !u!114 &1395239502
@@ -2112,15 +2112,15 @@ MonoBehaviour:
     m_PersistentCalls:
       m_Calls:
       - m_Target: {fileID: 1148364110}
-        m_TargetAssemblyTypeName: StageSelectUI, Assembly-CSharp
+        m_TargetAssemblyTypeName: UI_StageButtonController, Assembly-CSharp
         m_MethodName: OnSubStageClicked
-        m_Mode: 5
+        m_Mode: 3
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
           m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
-          m_IntArgument: 0
+          m_IntArgument: 101
           m_FloatArgument: 0
-          m_StringArgument: Battle1-1
+          m_StringArgument: 101
           m_BoolArgument: 0
         m_CallState: 2
 --- !u!114 &1584928767
@@ -2400,7 +2400,19 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 1794582287}
   m_OnClick:
     m_PersistentCalls:
-      m_Calls: []
+      m_Calls:
+      - m_Target: {fileID: 1148364110}
+        m_TargetAssemblyTypeName: UI_StageButtonController, Assembly-CSharp
+        m_MethodName: OnSubStageClicked
+        m_Mode: 3
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 104
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
 --- !u!114 &1794582287
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -2522,7 +2534,19 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 2026443761}
   m_OnClick:
     m_PersistentCalls:
-      m_Calls: []
+      m_Calls:
+      - m_Target: {fileID: 1148364110}
+        m_TargetAssemblyTypeName: UI_StageButtonController, Assembly-CSharp
+        m_MethodName: OnSubStageClicked
+        m_Mode: 3
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 105
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
 --- !u!114 &2026443761
 MonoBehaviour:
   m_ObjectHideFlags: 0

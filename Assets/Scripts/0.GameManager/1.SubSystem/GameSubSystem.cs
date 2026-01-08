@@ -2,10 +2,10 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public abstract class SubSystemBase : ISubSystem
+public abstract class GameSubSystem : IGameSubSystem
 {
     protected readonly GameManager GameManager;
-    public SubSystemBase(GameManager gm) {
+    public GameSubSystem(GameManager gm) {
         GameManager =gm;
         GameManager.RegisterSubsystem(this);
     }

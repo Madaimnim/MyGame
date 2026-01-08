@@ -40,7 +40,7 @@ public class DialogueManager : UI_PanelBase
     private void Awake() {
         if (Instance != null && Instance != this)
         {
-            Destroy(gameObject);
+            Destroy(this);
             return;
         }
         Instance = this;

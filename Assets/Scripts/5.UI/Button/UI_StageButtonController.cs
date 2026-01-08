@@ -3,10 +3,10 @@ using UnityEngine.UI;
 using System.Collections;
 using Unity.VisualScripting;
 
-public class StageSelectUI : MonoBehaviour
+public class UI_StageButtonController : MonoBehaviour
 {
-    public RectTransform MainPanelTransform;      // 第一層 Canvas
-    public RectTransform SubPanelTransform;   // 每個章節對應的子 Canvas
+    public RectTransform MainPanelTransform;  
+    public RectTransform SubPanelTransform;   
     [Header("主清單向上位移高度")]
     public int FloatUpPixels = 1000;
     public float FloutDuration = 0.25f;
@@ -31,38 +31,33 @@ public class StageSelectUI : MonoBehaviour
         SubPanelTransform.gameObject.SetActive(false);
     }
 
-    // Inspector 綁定：點章節按鈕，傳入關卡stageMainNumber
-    #region OnMainStageClicked(int stageMainNumber)
+    // Inspector 綁定：章節按鈕
     public void OnMainStageClicked(int stageMainNumber) {        
         if (SubPanelTransform==null) return;
         SubPanelTransform.anchoredPosition = new Vector3(SubPanelTransform.anchoredPosition.x, SubPanelTransform.anchoredPosition.y - FloatUpPixels);
         SubPanelTransform.gameObject.SetActive(true);
 
         StartCoroutine(SmoothMove(FloutDuration));
-
-
-
     }
+
+    // Inspector 綁定：子關卡按鈕
+    public void OnSubStageClicked(int stageId) {
+        if(GameManager.Instance.GameStageSystem == null) return;
+        GameManager.Instance.GameStageSystem.StartStage(stageId);
+    }
+
     private IEnumerator SmoothMove(float duration) {
         float t = 0f;
         var startMainPos = MainPanelTransform.anchoredPosition;
-        var startSubPos= SubPanelTransform.anchoredPosition;
-        var movVectro = new Vector2(0,FloatUpPixels);
+        var startSubPos = SubPanelTransform.anchoredPosition;
+        var movVectro = new Vector2(0, FloatUpPixels);
 
-        while (t < duration)
-        {
+        while (t < duration) {
             t += Time.deltaTime;
-            MainPanelTransform.anchoredPosition = Vector3.Lerp(startMainPos, startMainPos+ movVectro, t / duration);
+            MainPanelTransform.anchoredPosition = Vector3.Lerp(startMainPos, startMainPos + movVectro, t / duration);
             SubPanelTransform.anchoredPosition = Vector3.Lerp(startSubPos, startSubPos + movVectro, t / duration);
             yield return null;
         }
         MainPanelTransform.gameObject.SetActive(false);
-    }
-
-    #endregion
-
-    // Inspector 綁定：點子關卡
-    public void OnSubStageClicked(string sceneName) {
-        GameManager.Instance.GameStateSystem.SetState(GameStateSystem.GameState.Battle, sceneName);
     }
 }

@@ -5,16 +5,16 @@ using UnityEngine;
 using UnityEngine.UIElements;
 
 
-public class Player : MonoBehaviour, IInteractable
-{
+public class Player : MonoBehaviour, IInteractable, IVisualFacing {
     //公開--------------------------------------------------------------------------------------------------------------------------------------------------------------------------
     [Header("Debug")]
     [SerializeField] private bool enableDebug = true;
 
-    [SerializeField] private Collider2D sprCol;
-    public Collider2D SprCol => sprCol;
+    [SerializeField] private Collider2D _sprCol;
+    public Collider2D SprCol => _sprCol;
     public Transform BottomTransform => transform;
-    public Transform VisulaRootTransform;
+    [SerializeField] private Transform _visualRootTransform;
+    public Transform VisulaRootTransform=> _visualRootTransform;
     public Transform BackSpriteTransform;
 
     public TargetDetector MoveDetector;
@@ -39,8 +39,10 @@ public class Player : MonoBehaviour, IInteractable
     public GrowthComponent GrowthComponent { get; private set; }
     public HeightComponent HeightComponent { get; private set; }
     public Vector2 MoveVelocity=>MoveComponent.IntentDirection * MoveComponent.MoveSpeed;
-    private Transform _lastInteractSource;
+
+    private Vector3 _lastInteractPosition;
     private float _initialHeightY;
+    private HitShakeVisual _hitShakeVisual;
 
     private void Awake()
     {
@@ -48,6 +50,7 @@ public class Player : MonoBehaviour, IInteractable
         Spr = GetComponentInChildren<SpriteRenderer>();
         Ani = GetComponentInChildren<Animator>();
         _initialHeightY = Spr.transform.localPosition.y;
+        _hitShakeVisual = GetComponentInChildren<HitShakeVisual>();
     }
     private void OnEnable()
     {
@@ -62,7 +65,7 @@ public class Player : MonoBehaviour, IInteractable
     }
     private void Start()
     {
-        if (GameManager.Instance != null) SelectIndicator = Instantiate(GameManager.Instance.PrefabConfig.SelectionIndicatorPrefab, SelectIndicatorParent);
+        if (GameManager.Instance != null) SelectIndicator = Instantiate(GameManager.Instance.SelectionIndicatorData.SelectionIndicatorPrefab, SelectIndicatorParent);
         SelectIndicator.SetActive(false);
     }
     private void Update()
@@ -72,10 +75,9 @@ public class Player : MonoBehaviour, IInteractable
 
         //if (InputProvider != PlayerInputManager.Instance && AIComponent != null) AIComponent.Tick();
 
-        SkillComponent.TickCooldownTimer();
     }
     private void LateUpdate() {
-        StateComponent.DebugState();
+        if(StateComponent!=null)StateComponent.DebugState();
     }
 
 
@@ -83,7 +85,8 @@ public class Player : MonoBehaviour, IInteractable
     {
         if (MoveComponent != null) MoveComponent.FixedTick();
         if (HeightComponent != null) HeightComponent.FixedTick();
-        if(!StateComponent.IsMoving && !StateComponent.IsAttackingIntent) AnimationComponent.PlayIdle();
+        if(StateComponent!=null)
+            if(!StateComponent.IsMoving && !StateComponent.IsAttackingIntent) AnimationComponent.PlayIdle();
     }
     public void Initialize(PlayerStatsRuntime stats)
     {
@@ -95,13 +98,13 @@ public class Player : MonoBehaviour, IInteractable
         HealthComponent = new HealthComponent(Rt, StateComponent);
         AnimationComponent = new AnimationComponent(Ani, transform, Rb, StateComponent);
 
-        HeightComponent = new HeightComponent(Spr.transform,StateComponent, AnimationComponent,this, Rt.StatsData);
+        HeightComponent = new HeightComponent(_sprCol.transform,StateComponent, AnimationComponent,this, Rt.StatsData);
         EffectComponent = new EffectComponent(Rt.VisualData, transform, this, Spr, StateComponent);
         RespawnComponent = new RespawnComponent(this, Rt.CanRespawn);
         MoveComponent = new MoveComponent(Rb, Rt.StatsData, this, MoveDetector, AnimationComponent,HeightComponent, StateComponent);
         SpawnerComponent = new SpawnerComponent();
         if (EnemyListManager.Instance.TargetList == null) Debug.Log("EnemyListManager未初始化");
-        SkillComponent = new SkillComponent(Rt.StatsData, Rt.SkillSlotCount, Rt.SkillPool, AnimationComponent, StateComponent, transform, sprCol.transform,
+        SkillComponent = new SkillComponent(Rt.StatsData, Rt.SkillSlotCount, Rt.SkillPool, AnimationComponent, StateComponent, transform, _sprCol.transform,
             EnemyListManager.Instance.TargetList,MoveComponent,HeightComponent);
         AIComponent = new AIComponent( MoveComponent, SkillComponent, transform, Rt.MoveStrategy);
         GrowthComponent = new GrowthComponent(Rt);
@@ -125,8 +128,8 @@ public class Player : MonoBehaviour, IInteractable
             GameEventSystem.Instance.Event_BattleStart += RespawnComponent.EnableRespawn;
             GameEventSystem.Instance.Event_OnWallBroken += RespawnComponent.DisableRespawn;
         }
-        SkillComponent.OnSkillAnimationPlayed += SetFacingRight;
-        MoveComponent.OnMoveDirectionChanged += SetFacingRight;
+        SkillComponent.OnSkillAnimationPlayed += TurnFacingByIntent;
+        MoveComponent.OnMoveDirectionChanged += TurnFacingByIntent;
 
         //初始化狀態--------------------------------------------------------------------------------------------------------------------------------------------------------------------
         transform.name = $"玩家ID_{Rt.StatsData.Id}:({Rt.StatsData.Name})";
@@ -136,21 +139,24 @@ public class Player : MonoBehaviour, IInteractable
     }
     public void Interact(InteractInfo info)
     {
-        _lastInteractSource = info.Source;
-        if(info.KnockbackForce!=Vector2.zero) MoveComponent.Knockbacked(info.KnockbackForce, info.Source);
+        _lastInteractPosition = info.SourcePosition;
+        var directX = info.SourcePosition.x - SprCol.transform.localPosition.x;
 
+        EffectComponent.TakeDamageEffect(info.Damage);
+
+        if (info.Damage<=0f) return;
+
+
+        HealthComponent.TakeDamage(info.Damage);
+        _hitShakeVisual.Play(HitShakeType.PushBack, directX);
+        if (info.KnockbackPower != 0f) MoveComponent.Knockbacked(info.KnockbackPower, info.SourcePosition);
         MoveComponent.StopSkillDashMoveCoroutine();
         HeightComponent.StopSkillDashMoveCoroutine();
         HeightComponent.StopRecoverHeightCoroutine();
 
-        //HeightComponent.Hurt(0.5f);
         HeightComponent.AddUpVelocity(info.FloatPower);
         //ActionLockComponent.HurtLock(0.5f);
         //AnimationComponent.PlayImmediate("Hurt");
-
-        HealthComponent.TakeDamage(info.Damage);
-        EffectComponent.TakeDamageEffect(info.Damage);
-
     }
 
 
@@ -169,11 +175,9 @@ public class Player : MonoBehaviour, IInteractable
         AIComponent.DisableAI();
         EffectComponent.PlayerDeathEffect();
 
-        if (_lastInteractSource != null)
-        {
-            Vector2 dir = _lastInteractSource.position - transform.position;
-            SetFacingRight(dir); // 重用你現有的方向翻轉方法
-        }
+        Vector2 dir = _lastInteractPosition-transform.position ;
+        //SetFacingRight(dir); // 
+
 
         foreach (var col in GetComponentsInChildren<Collider2D>())
             col.enabled = false;
@@ -209,7 +213,7 @@ public class Player : MonoBehaviour, IInteractable
         HealthComponent.ResetCurrentHp();
     }
 
-    private void SetFacingRight(Vector2 direction)
+    private void TurnFacingByIntent(Vector2 direction)
     {
         if (direction.sqrMagnitude < 0.01f) return;     //避免靜止時頻繁執行
 
@@ -217,7 +221,7 @@ public class Player : MonoBehaviour, IInteractable
         {
             var scale = VisulaRootTransform.localScale;
             float mag = Mathf.Abs(scale.x);
-            scale.x = (direction.x < 0f) ? -mag : mag;
+            scale.x = (direction.x < 0f) ? -mag : mag;          //假設朝向即向右，向左即向左
             VisulaRootTransform.localScale = scale;
         }
     }

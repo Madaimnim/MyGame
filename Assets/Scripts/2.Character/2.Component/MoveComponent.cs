@@ -188,16 +188,19 @@ public class MoveComponent
     }
 
     //被擊退
-    public void Knockbacked(Vector2 knockbackForce, Transform source) {
+    public void Knockbacked(float knockbackPower, Vector3 sourcePosition) {
 
         if (_knockbackCoroutine != null)
         {
             _runner.StopCoroutine(_knockbackCoroutine);
             _knockbackCoroutine = null;
         }
-        _knockbackCoroutine = _runner.StartCoroutine(KnockbackCoroutine(knockbackForce));
+        var baseDirection = ((Vector2)sourcePosition-_rb.position).normalized;
+        var knockbackVector = knockbackPower * baseDirection;
+        //Debug.Log($"{_rb.gameObject.name}被擊退，方向力道{knockbackVector}");
+        _knockbackCoroutine = _runner.StartCoroutine(KnockbackCoroutine(knockbackVector));
     }
-    private IEnumerator KnockbackCoroutine(Vector2 knockbackForce)
+    private IEnumerator KnockbackCoroutine(Vector2 knockbackVector)
     {
         _stateComponent.SetIsKnocked(true);
         while (true)
@@ -205,7 +208,7 @@ public class MoveComponent
             yield return new WaitForFixedUpdate();
 
             Vector2 current = _rb.position;
-            Vector2 next = current + knockbackForce * Time.fixedDeltaTime;
+            Vector2 next = current + knockbackVector * Time.fixedDeltaTime;
             //  關鍵：擊退也必須 Resolve
             next = MoveBoundsManager.Instance != null ? MoveBoundsManager.Instance.Resolve(next) : next;
 

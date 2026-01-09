@@ -64,6 +64,8 @@ public class SkillComponent
 
         ContinuousAttackTick();
         TryPlaySkillAnimationTick();
+
+        TickCooldownTimer();
     }
 
 
@@ -96,7 +98,7 @@ public class SkillComponent
             case SkillReleaseType.Target:
                 if (IntentTargetTransform == null)
                 {
-                    Debug.Log("指定技能沒有目標，無法施放");
+                    //Debug.Log("指定技能沒有目標，無法施放");
                     IntentSlotIndex = -1;
                     IntentTargetPosition = null;
                     IntentTargetTransform = null;
@@ -184,7 +186,7 @@ public class SkillComponent
         }
     }
 
-    public void TickCooldownTimer() {
+    private void TickCooldownTimer() {
         foreach (var slot in SkillSlots) slot?.Tick();
     }
 

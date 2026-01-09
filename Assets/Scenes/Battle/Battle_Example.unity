@@ -4055,7 +4055,6 @@ GameObject:
   m_Component:
   - component: {fileID: 864872353}
   - component: {fileID: 5767422746733491011}
-  - component: {fileID: 3143608729428450978}
   m_Layer: 0
   m_Name: "\u91CD\u751F\u9EDE"
   m_TagString: Untagged
@@ -6309,8 +6308,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 1bee9944f81b5d6498c6faf0d1db0e27, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  playerUIParent: {fileID: 1944407697}
-  playerUIPrefab: {fileID: 2774637203852973511, guid: 45a6ea7d78a639745b04b1467adb8900, type: 3}
+  PlayerSkillCooldownPanel: {fileID: 0}
 --- !u!114 &1155783975
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -6915,18 +6913,6 @@ PolygonCollider2D:
       - {x: -6.492978, y: -5.083261}
       - {x: 12.777683, y: -5.226527}
       - {x: 12.785576, y: 7.7847886}
---- !u!114 &3143608729428450978
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 864872352}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 7b1afa8a510ffca429b835c4276d4b0f, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
 --- !u!212 &5767422746733491011
 SpriteRenderer:
   m_ObjectHideFlags: 0

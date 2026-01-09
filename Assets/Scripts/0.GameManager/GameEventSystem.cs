@@ -22,7 +22,6 @@ public class GameEventSystem : MonoBehaviour
     //UI
     public Action<PlayerStatsRuntime> Event_UICurrentPlayerChanged;
 
-
     //³õ´º
     public Action Event_BattleStart;
 

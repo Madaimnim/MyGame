@@ -19,6 +19,8 @@ public class GrowthComponent
     public void AddExp(int amount) {
         if (amount <= 0) return;
         _rt.Exp+= amount;
+        Debug.Log($"{_rt.StatsData.Name}獲得EXP:{amount}，當前EXP:{_rt.Exp}");
+
         //發事件
         OnExpGained?.Invoke(amount);
 

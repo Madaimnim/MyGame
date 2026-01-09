@@ -5,7 +5,7 @@ using UnityEngine;
 
 public class PlayerSpawnSystem
 {
-
+    private DefaultEnemyFactory _factory;
 
     public PlayerSpawnSystem() {}
 

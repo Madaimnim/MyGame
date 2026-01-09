@@ -17,4 +17,7 @@ public class StageData : ScriptableObject {
 
     public float SpawnInterval = 1f;
     public List<StageWave> Waves;
+
+    public AppearType PlayerAppearType = AppearType.Instant;
+    public AppearType EnemyAppearType= AppearType.Instant;
 }

@@ -11,7 +11,8 @@ public class PlayerInputManager : MonoBehaviour {
 
     //-------------------------------事件--------------------------------------------------------------
     public event Action<Transform> OnBattlePlayerSelected;
-    
+    public Player CurrentControlPlayer;
+
     private KeyCode[] _skillKeys = {
     KeyCode.Q,
     KeyCode.W,
@@ -20,7 +21,8 @@ public class PlayerInputManager : MonoBehaviour {
 };
 
     private readonly List<Player> _selectedPlayerList = new List<Player>();
-    private bool _canControl = false;
+    public bool CanControl { get; private set; } = false;
+    public void SetCanControl(bool value)=> CanControl= value;
 
     private SkillCastMode _skillCastMode;
     private Player _holdingPlayer;
@@ -35,7 +37,6 @@ public class PlayerInputManager : MonoBehaviour {
     private Enemy _hoverEnemy;
     private Enemy _dangerEnemy;
 
-    public void OnPlayerCanControlChanged(bool canControl) => _canControl = canControl;
     private bool TryGetSkillSlotFromKey(KeyCode key, out int slotIndex) {
         slotIndex = -1;
         switch (key) {
@@ -55,13 +56,12 @@ public class PlayerInputManager : MonoBehaviour {
         Instance = this;
 
         LineRenderer.enabled = false;
-        if (GameManager.Instance != null)
-            GameManager.Instance.GameStateSystem.OnPlayerCanControlChanged += OnPlayerCanControlChanged;
         if (GameSettingManager.Instance != null) _skillCastMode=GameSettingManager.Instance.SkillCastMode;
+        GameEventSystem.Instance.Event_BattleStart += () => SetCanControl(true);
     }
 
     public void Update() {
-        if (!_canControl) return;
+        if (!CanControl) return;
         //ClickPlayer();
         //HandleSelectionBox();
         UpdateHoverEnemy();   // 新增
@@ -158,6 +158,7 @@ public class PlayerInputManager : MonoBehaviour {
         selectedPlayer.SelectIndicator.SetActive(true);
         CameraManager.Instance.Follow(selectedPlayer.transform);
 
+        CurrentControlPlayer = selectedPlayer;
         OnBattlePlayerSelected?.Invoke(selectedPlayer.transform);
     }
     //===============================Input 輸入處理========================================

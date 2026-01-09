@@ -18,7 +18,7 @@ public class SkillHeightComponent {
         _sprTransform= sprTransform;
         _canGravityFall= canGravityFall;
 
-        _gravity = PhysicManager.Instance.PhysicConfig.GravityScale;
+        _gravity = GameSettingManager.Instance.PhysicConfig.GravityScale;
     }
 
     public void FixedTick() {

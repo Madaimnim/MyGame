@@ -7,9 +7,7 @@ public class PreparationHandler : IGameStateHandler
 
     private readonly GameSceneSystem _sceneSystem;
 
-    public PreparationHandler(
-        GameSceneSystem sceneSystem
-        ) {
+    public PreparationHandler(GameSceneSystem sceneSystem) {
         _sceneSystem = sceneSystem;
     }
     public void Enter() {

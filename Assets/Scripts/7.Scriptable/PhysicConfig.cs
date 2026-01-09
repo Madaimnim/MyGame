@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 
 
-[CreateAssetMenu(fileName = "PhysicConfig", menuName = "GameData/PhysicConfig")]
+[CreateAssetMenu(fileName = "PhysicConfig", menuName = "GameConfig/PhysicConfig")]
 public class PhysicConfig : ScriptableObject
 {
     public float GravityScale = 15f;     //重力強度，可在 Inspector 調整

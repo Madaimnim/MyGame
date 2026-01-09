@@ -27,4 +27,10 @@ public class SceneConfig : ScriptableObject
         Debug.LogError($"SceneConfig: 找不到對應場景 Key = {key}");
         return null;
     }
+
+    [System.Serializable]
+    public class NamedAddressEntry {
+        public string key;
+        public string address;
+    }
 }

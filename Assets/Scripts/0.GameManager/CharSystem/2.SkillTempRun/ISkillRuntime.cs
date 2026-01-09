@@ -6,7 +6,7 @@ public interface ISkillRuntime
 {
     SkillReleaseType SkillReleaseType { get; }
     SkillLifetimeType SkillLifetimeType { get; }
-    SkillExecutionType SkillExecutionType { get; }
+    SkillVisualFromType SkillVisualFromType { get; }
     SkillMoveType SkillMoveType { get; }
     OnHitType OnHitType { get; }
     HitEffectPositionType HitEffectPositionType { get; }

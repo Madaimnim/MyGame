@@ -32,7 +32,7 @@ public class SkillHitComponent {
             }
             //Todo
             float bottomYDiff = Mathf.Abs(_skillObject.transform.position.y - target.BottomTransform.position.y);
-            if (bottomYDiff > PhysicManager.Instance.PhysicConfig.BottomYThreshold) continue;
+            if (bottomYDiff > GameSettingManager.Instance.PhysicConfig.BottomYThreshold) continue;
 
             Hit(target, col);
             _targetList.RemoveAt(i);
@@ -50,15 +50,21 @@ public class SkillHitComponent {
 
     private void Hit(IInteractable target, Collider2D targetCol) {
         Vector2 hitPoint = GetHitEffectPosition(targetCol);
-        if(target as Enemy)
-            VFXManager.Instance.Play("DamageEffect01", hitPoint, targetCol.GetComponent<SpriteRenderer>());
+        if(target as Enemy) VFXManager.Instance.Play("DamageEffect01", hitPoint, targetCol.GetComponent<SpriteRenderer>());
+        var sourcePosition = Vector3.zero;
+        
+        if (_skillRt.SkillVisualFromType == SkillVisualFromType.FromChar)
+            sourcePosition = _skillObject.CharSprTransform.localPosition;
+        else
+            sourcePosition = _skillObject.SprCol.transform.localPosition;
+        
         target.Interact(new InteractInfo {
-            Source = _skillObject.transform,
+            SourcePosition = sourcePosition,
             Damage = _damage,
-            KnockbackForce = _knockbackPower * _skillMoveComponent.MoveDirection,
+            KnockbackPower = _knockbackPower,
             FloatPower = _floatPower
-
         });
+
         switch (_skillRt.OnHitType) {
             case OnHitType.Disappear:
                 StartDestroyTimer(_skillRt.OnHitDestroyDelay);

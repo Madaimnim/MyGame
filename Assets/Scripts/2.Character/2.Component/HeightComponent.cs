@@ -33,7 +33,7 @@ public class HeightComponent
         _statsData= statsData;
 
         _initialHeight = sprTransform.localPosition.y;
-        _gravity = PhysicManager.Instance.PhysicConfig.GravityScale;
+        _gravity = GameSettingManager.Instance.PhysicConfig.GravityScale;
 
 
     }
@@ -71,6 +71,7 @@ public class HeightComponent
 
     //浮空
     public void AddUpVelocity(float upVelocity) {
+        //Debug.Log($"施加浮空力{upVelocity}");
         _verticalVelocity= upVelocity;
         _stateComponent.SetIsGrounded(false);
         _stateComponent.SetIsInitialHeight(false);

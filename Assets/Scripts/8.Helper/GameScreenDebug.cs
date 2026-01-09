@@ -18,16 +18,17 @@ public class GameScreenDebug : MonoBehaviour {
     private void OnGUI() {
         if (!EnableDebug) return;
         if (GameManager.Instance == null) return;
-        var stateSystem = GameManager.Instance.GameStateSystem;
-        if (stateSystem == null) return;
+        var gameStateSystem = GameManager.Instance.GameStateSystem;
+        var playerInputSystem=PlayerInputManager.Instance;
+        if (gameStateSystem == null) return;
 
         GUIStyle style = new GUIStyle(GUI.skin.label) {fontSize = FontSize,wordWrap = false,clipping = TextClipping.Overflow};
 
         int line = 0;
 
-        if (ShowGameState) DrawLine($"GameState: {stateSystem.CurrentState}", ref line, style);
+        if (ShowGameState) DrawLine($"GameState: {gameStateSystem.CurrentState}", ref line, style);
 
-        if (ShowCanControl) DrawLine($"CanControl: {stateSystem.IsControlEnabled}", ref line, style);
+        if (ShowCanControl) DrawLine($"CanControl: {playerInputSystem.CanControl}", ref line, style);
     }
 
     private void DrawLine(string text, ref int line, GUIStyle style) {

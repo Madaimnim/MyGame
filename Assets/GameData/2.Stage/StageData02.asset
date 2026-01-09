@@ -14,7 +14,9 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   StageId: 102
   StageName: "\u68EE\u67972"
-  SpawnInterval: 1
+  SpawnInterval: 0
   Waves:
   - EnemyId: 2001
     SpawnCount: 3
+  PlayerAppearType: 0
+  EnemyAppearType: 0

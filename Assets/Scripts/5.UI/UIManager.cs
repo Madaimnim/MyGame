@@ -89,6 +89,8 @@ public class UIManager : MonoBehaviour
                 panel.Hide();
             }
         }
+
+        UI_SkillSliderController.gameObject.SetActive(false);
     }
 
 

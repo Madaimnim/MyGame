@@ -1,28 +1,26 @@
-using UnityEngine;
-using UnityEngine.UI;
+ï»¿using UnityEngine;
+using System.Collections;
 
-[DefaultExecutionOrder(0)]
-public class TestManager : MonoBehaviour
-{
-    public Enemy Enemy;
-    public Button TestFunctionButton;
-    public Vector2 KnockbackForce;
-    public float FloatPower = 5f;
+public class TestManager : MonoBehaviour {
+    public int testPlayerId = 1001;
+    public int skillSlot = 1;
+    public float interval = 2f;
+    [SerializeField]private MonoBehaviour _positionProvider;
+    public IPositionProvider PositionProvider => _positionProvider as IPositionProvider;
 
-    private void Start()
-    {
-        Enemy = FindObjectOfType<Enemy>();
-        if (TestFunctionButton == null) Debug.LogError(" TestFunctionButton ¥¼¸j©w¡I");
-        TestFunctionButton.onClick.AddListener(OnTestFunctionButtonClicked);
-    }
+    private IEnumerator Start() {
+        // ç­‰è³‡æ–™è¼‰å®Œ
+        yield return new WaitUntil(() =>GameManager.Instance != null &&GameManager.Instance.IsAllDataLoaded);
 
-    private void OnTestFunctionButtonClicked()
-    {
-        Enemy.Interact(new InteractInfo
-        {
-            Source = null,
-            KnockbackForce=KnockbackForce,
-            FloatPower = FloatPower
-        });
+        GameManager.Instance.PlayerStateSystem.PrepareInitialPlayers();
+        var player = PlayerUtility.GetPlayer(testPlayerId);
+        GameManager.Instance.PlayerStateSystem.PlayerAppear(player, PositionProvider.GetPosition(), AppearType.Instant);
+
+        // 3 Presentation
+        var host = player.GetComponent<PresentationHost>();
+        if (host == null)
+            host = player.gameObject.AddComponent<PresentationHost>();
+
+        host.Play(new SkillPresentationController(skillSlot, interval));
     }
 }

@@ -40,7 +40,7 @@ public class SkillMoveComponent {
         Vector2 targetVelocity= target != null ? target.MoveVelocity: Vector2.zero;
 
         ParabolaHelper.TryGetVerticalSpeed(
-            PhysicManager.Instance.PhysicConfig.GravityScale,
+            GameSettingManager.Instance.PhysicConfig.GravityScale,
             _transform.position,
              _sprCol.transform.localPosition.y,
              MoveSpeed,
@@ -124,7 +124,7 @@ public class SkillMoveComponent {
         UpdateRotation();
         _sprCol.transform.localPosition += new Vector3(0f, VerticalSpeed * Time.deltaTime, 0f);
 
-        VerticalSpeed -= PhysicManager.Instance.PhysicConfig.GravityScale * Time.deltaTime;
+        VerticalSpeed -= GameSettingManager.Instance.PhysicConfig.GravityScale * Time.deltaTime;
 
     }
     private void UpdateRotation() {

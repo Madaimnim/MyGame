@@ -10,13 +10,14 @@ using UnityEngine.UIElements;
 //PlayerStateSystem.UnlockPlayer()-> PlayerSkillSystem.EquipPlayerSkil()->SkillComponent.EquipSkill->();
 //Enemy.Initialized()->EnemySkillSystem.EquipEnemySkill()->EnemySkillComponent.EquipSkill->();
 
-public class Enemy :MonoBehaviour,IInteractable
+public class Enemy :MonoBehaviour,IInteractable,IVisualFacing
 {
     //公開--------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-    [SerializeField] private Collider2D sprCol;
-    public Collider2D SprCol => sprCol;
+    [SerializeField] private Collider2D _sprCol;
+    public Collider2D SprCol => _sprCol;
     public Transform BottomTransform => transform;
-    public Transform VisulaRootTransform;
+    [SerializeField] private Transform _visualRootTransform;
+    public Transform VisulaRootTransform=> _visualRootTransform;
     public Transform BackSpriteTransform;
     public TargetDetector MoveDetector;
     public GameObject UI_HpSliderCanvas;
@@ -38,9 +39,14 @@ public class Enemy :MonoBehaviour,IInteractable
     public SpawnerComponent SpawnerComponent { get; private set; }
     public HeightComponent HeightComponent { get; private set; }
     public Vector2 MoveVelocity => MoveComponent.IntentDirection * MoveComponent.MoveSpeed;
-    
-    private Transform _lastInteractSource;
+
+    private Vector3 _lastInteractPosition;
     private float _initialHeightY ;
+    private HitShakeVisual _hitShakeVisual;
+    //Test Rarity
+    private SpriteInnerEdgeController _innerEdgeController;
+    [SerializeField]private Rarity _rarity;
+
 
     //識別ID--------------------------------------------------------------------------------------------------------------------------------------------------------------------------
     [Header("手動ID初始化")]public int id; //在Inspector設定敵人ID以載入數據
@@ -52,6 +58,11 @@ public class Enemy :MonoBehaviour,IInteractable
         Spr = GetComponentInChildren<SpriteRenderer>();
         Ani = GetComponentInChildren<Animator>();
         _initialHeightY = Spr.transform.localPosition.y;
+        _hitShakeVisual = GetComponentInChildren<HitShakeVisual>();
+
+        //Test Rarity
+        var sr = GetComponentInChildren<SpriteRenderer>();
+        _innerEdgeController = new SpriteInnerEdgeController(sr);
     }
     private void OnEnable()
     {
@@ -60,20 +71,40 @@ public class Enemy :MonoBehaviour,IInteractable
         if (EnemyListManager.Instance != null)EnemyListManager.Instance.Register(this);
 
         UI_HpSliderCanvas.SetActive(false);
+        //Test 方法
+        //ApplyRarityVisual(); 
+    }
+    //Test 方法
+    private void ApplyRarityVisual() {
+        Color color = RarityColor.Get(_rarity);
+        float size = _rarity switch {
+            Rarity.Normal => 0f,
+            Rarity.Uncommon => 1f,
+            Rarity.Rare => 1.2f,
+            Rarity.Epic => 1.5f,
+            Rarity.Legendary => 2f,
+            Rarity.Mythic => 2.5f,
+            _ => 0f
+        };
+        _innerEdgeController.SetInnerEdge(color, 1f);
+    }
+
+    private void OnDisable() {
+        if (GameManager.Instance != null) GameManager.Instance.EnemyStateSystem.UnregisterEnemy(this);
+        if (EnemyListManager.Instance != null) EnemyListManager.Instance.Unregister(this);
     }
     private void Start()
     {
 
     }
     private void Update() {
-        if (SkillComponent != null)SkillComponent.Tick();
+        if (SkillComponent != null) SkillComponent.Tick();
         if (ActionLockComponent != null ) ActionLockComponent.Tick();
         if (AIComponent != null) AIComponent.Tick();
 
-        SkillComponent.TickCooldownTimer();
     }
     private void LateUpdate() {
-        StateComponent.DebugState();
+        if(StateComponent!=null) StateComponent.DebugState();
     }
     private void FixedUpdate()
     {
@@ -92,13 +123,13 @@ public class Enemy :MonoBehaviour,IInteractable
         HealthComponent = new HealthComponent(Rt, StateComponent);
         AnimationComponent = new AnimationComponent(Ani, transform, Rb,StateComponent);
 
-        HeightComponent = new HeightComponent(Spr.transform, StateComponent ,AnimationComponent, this,Rt.StatsData);
+        HeightComponent = new HeightComponent(_sprCol.transform, StateComponent ,AnimationComponent, this,Rt.StatsData);
         EffectComponent = new EffectComponent(Rt.VisualData, transform, this, Spr, StateComponent);
 
         RespawnComponent = new RespawnComponent(this, Rt.CanRespawn);
         MoveComponent = new MoveComponent(Rb,Rt.StatsData, this, MoveDetector, AnimationComponent, HeightComponent,StateComponent);
         SpawnerComponent = new SpawnerComponent();
-        SkillComponent = new SkillComponent(Rt.StatsData, Rt.SkillSlotCount,Rt.SkillPool, AnimationComponent,StateComponent, transform, sprCol.transform,
+        SkillComponent = new SkillComponent(Rt.StatsData, Rt.SkillSlotCount,Rt.SkillPool, AnimationComponent,StateComponent, transform, _sprCol.transform,
             PlayerListManager.Instance.TargetList,MoveComponent,HeightComponent);
         AIComponent = new AIComponent( MoveComponent, SkillComponent, transform,Rt.MoveStrategy);
 
@@ -135,11 +166,17 @@ public class Enemy :MonoBehaviour,IInteractable
 
     public void Interact(InteractInfo info)
     {
-        _lastInteractSource= info.Source;
-        HealthComponent.TakeDamage(info.Damage);
-        EffectComponent.TakeDamageEffect(info.Damage);
-        MoveComponent.Knockbacked(info.KnockbackForce, info.Source);
+        _lastInteractPosition = info.SourcePosition;
+        var directX = info.SourcePosition.x - SprCol.transform.localPosition.x;
 
+        EffectComponent.TakeDamageEffect(info.Damage);
+
+        if (info.Damage <= 0f) return;
+
+        _hitShakeVisual.Play(HitShakeType.Shake,directX);
+        HealthComponent.TakeDamage(info.Damage);
+        if (info.KnockbackPower != 0f) MoveComponent.Knockbacked(info.KnockbackPower, info.SourcePosition);
+        
         MoveComponent.StopSkillDashMoveCoroutine();
         HeightComponent.StopSkillDashMoveCoroutine();
         HeightComponent.StopRecoverHeightCoroutine();
@@ -148,9 +185,7 @@ public class Enemy :MonoBehaviour,IInteractable
         HeightComponent.AddUpVelocity(info.FloatPower);
 
         ActionLockComponent.HurtLock(0.5f);
-        AnimationComponent.PlayImmediate("Hurt");
-
-
+        //AnimationComponent.Play("Hurt");
     }
 
 
@@ -172,12 +207,10 @@ public class Enemy :MonoBehaviour,IInteractable
     {
         AIComponent.DisableAI();
 
-        if (_lastInteractSource != null)
-        {
-            Vector2 dir = _lastInteractSource.position - transform.position;
-            SetFacingLeft(dir); // 重用你現有的方向翻轉方法
-            //Debug.Log($"敵人死亡面相更新來源:{dir}");
-        }
+
+        Vector2 dir = _lastInteractPosition - SprCol.transform.position;
+        SetFacingLeft(dir); // 重用你現有的方向翻轉方法
+                          
 
         foreach (var col in GetComponentsInChildren<Collider2D>())
             col.enabled = false;
@@ -189,7 +222,6 @@ public class Enemy :MonoBehaviour,IInteractable
         if (RespawnComponent.CanRespawn) RespawnComponent.RespawnAfter(3f);
         else {
             Destroy(gameObject);
-            if (StageLevelManager.Instance != null) StageLevelManager.Instance.EnemyDefeated(Rt.Exp);
             if (GameManager.Instance != null) GameManager.Instance.EnemyStateSystem.UnregisterEnemy(this);
         }
     }

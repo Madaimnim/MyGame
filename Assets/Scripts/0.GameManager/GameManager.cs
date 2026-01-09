@@ -17,8 +17,7 @@ public class GameManager : MonoBehaviour
     public Transform PlayerBattleParent;
     private readonly List<GameSubSystem> _subSystems = new();
 
-    [SerializeField] private PrefabConfig _prefabConfig;
-    [SerializeField] private SceneConfig _sceneConfig;
+    [SerializeField] private SelectionIndicatorData _selectionIndicatorData;
 
     //事件
     public event Action OnAllDataLoaded;
@@ -38,8 +37,7 @@ public class GameManager : MonoBehaviour
     public bool IsAllDataLoaded { get; private set; } = false;
 
     //Config
-    public PrefabConfig PrefabConfig => _prefabConfig;
-    public SceneConfig SceneConfig => _sceneConfig;
+    public SelectionIndicatorData SelectionIndicatorData => _selectionIndicatorData;
 
     //繼承GameSubSystem的子系統，建構子時自動訂閱
     public void RegisterSubsystem(GameSubSystem subSystem)
@@ -70,9 +68,9 @@ public class GameManager : MonoBehaviour
         //建 Handler map並建構子給_gameStateRouter
         var runner = new CoroutineRunnerAdapter(this);
         GameStateHandlers = new Dictionary<GameState, IGameStateHandler>{
-            { GameState.GameStart, new GameStartHandler(runner,GameSceneSystem, PlayerStateSystem) },
+            { GameState.GameStart, new GameStartHandler(GameSceneSystem) },
             { GameState.Preparation, new PreparationHandler( GameSceneSystem) },
-            { GameState.Battle, new BattleHandler( GameSceneSystem, PlayerStateSystem) },
+            { GameState.Battle, new BattleHandler( GameSceneSystem) },
         };
 
 

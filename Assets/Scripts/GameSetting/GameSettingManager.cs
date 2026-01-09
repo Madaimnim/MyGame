@@ -5,9 +5,11 @@ public class GameSettingManager : MonoBehaviour {
     public static GameSettingManager Instance { get; private set; }
 
     public InputSettings InputSettings;
+    public PhysicConfig PhysicConfig;
+    public SceneConfig SceneConfig;
+    public HitShakeConfig HitShakeConfig;
 
-    [Header("Input Settings")]
-    public SkillCastMode SkillCastMode;
+    public SkillCastMode SkillCastMode { get; private set; }
 
     private void Awake() {
         if (Instance != null && Instance != this) {

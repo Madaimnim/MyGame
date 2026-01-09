@@ -15,7 +15,6 @@ public class UI_InputController: MonoBehaviour
         if (!IsUIInputEnabled) return;
         if (Input.GetKeyDown(KeyCode.Escape))
         {
-
             Debug.Log($"Escape detected! listener count = {OnToggleMenuButton?.GetInvocationList().Length}");
             OnToggleMenuButton?.Invoke();
         }

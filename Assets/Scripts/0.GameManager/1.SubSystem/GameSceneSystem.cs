@@ -17,14 +17,14 @@ public class GameSceneSystem : GameSubSystem
 
     //新增事件給 UI 使用
     public event System.Action<float> OnSceneLoadProgress; // 0~1
-    public event System.Action<string> OnSceneLoaded;
+    public event System.Action<string> OnSceneLoaded;           //======此事件不可依賴場景內物件，只能依賴全景移動的物件和方法======
 
     public GameSceneSystem(GameManager gm) : base(gm) {
         _runner = new CoroutineRunnerAdapter(gm);
     }
 
     public override void Initialize() {
-        _sceneConfig = GameManager.SceneConfig;
+        _sceneConfig = GameSettingManager.Instance.SceneConfig;
     }
     public void LoadSceneByKey(string key) {
         string address = _sceneConfig.GetAddress(key);

@@ -18,6 +18,7 @@ public class ExperienceManager : MonoBehaviour
     }
 
 
+
     public int GetCurrentExp() {
         return currentExp;
     }

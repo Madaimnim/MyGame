@@ -15,7 +15,9 @@ public class EffectComponent
     private StateComponent _stateComponent;
     private SpriteRenderer _spriteRenderer;
 
-    private SpriteEffectController _spriteEffectController;
+    private readonly SpriteFlashController _spriteFlashController;
+    private readonly SpriteOutlineController _spriteOutlineController;
+
     private OutlineState _outlineState = OutlineState.None;
 
     public EffectComponent(VisualData visualData,Transform transform, MonoBehaviour runner,SpriteRenderer spr,StateComponent stateComponent) {
@@ -25,7 +27,8 @@ public class EffectComponent
         _stateComponent = stateComponent;
         _spriteRenderer= spr;
 
-        _spriteEffectController = new SpriteEffectController(_spriteRenderer);
+        _spriteFlashController = new SpriteFlashController(spr);
+        _spriteOutlineController = new SpriteOutlineController(spr);
     }
 
     public void GainedExpEffect(int exp) {
@@ -56,11 +59,11 @@ public class EffectComponent
 
 
     private IEnumerator FlashWhite(float duration) {
-        if (_spriteEffectController == null) yield break;
+        if (_spriteFlashController == null) yield break;
 
-        _spriteEffectController.SetFlash(0.8f);
+        _spriteFlashController.SetFlash(0.5f);
         yield return new WaitForSeconds(duration);
-        _spriteEffectController.SetFlash(0f);
+        _spriteFlashController.SetFlash(0f);
 
     }
 
@@ -70,15 +73,15 @@ public class EffectComponent
 
         switch (state) {
             case OutlineState.None:
-                _spriteEffectController.SetOutline(false, Color.clear, 0f);
+                _spriteOutlineController.SetOutline(false, Color.clear, 0f);
                 break;
 
             case OutlineState.Hover:
-                _spriteEffectController.SetOutline(true, Color.white, 1f);
+                _spriteOutlineController.SetOutline(true, Color.white, 1f);
                 break;
 
             case OutlineState.Target:
-                _spriteEffectController.SetOutline(true, Color.red, 2f);
+                _spriteOutlineController.SetOutline(true, Color.red, 2f);
                 break;
         }
     }

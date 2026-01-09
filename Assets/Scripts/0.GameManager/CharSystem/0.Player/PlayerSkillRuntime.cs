@@ -7,7 +7,7 @@ public class PlayerSkillRuntime: ISkillRuntime
 {
     public SkillReleaseType SkillReleaseType { get; private set; }
     public SkillLifetimeType SkillLifetimeType {  get; private set; }
-    public SkillExecutionType SkillExecutionType { get; private set; }
+    public SkillVisualFromType SkillVisualFromType { get; private set; }
     public SkillMoveType SkillMoveType { get; set; }
     public OnHitType OnHitType { get; set; }
     public HitEffectPositionType HitEffectPositionType { get; set; }
@@ -36,7 +36,7 @@ public class PlayerSkillRuntime: ISkillRuntime
         //▓`л■ий
         SkillReleaseType = template.SkillReleaseType;
         SkillLifetimeType =template.SkillLifetimeType;
-        SkillExecutionType = template.SkillExecutionType;
+        SkillVisualFromType = template.SkillVisualFromType;
         SkillMoveType = template.SkillMoveType;
         OnHitType = template.OnHitType;
         HitEffectPositionType = template.HitEffectPositionType;

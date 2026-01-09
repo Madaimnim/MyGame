@@ -12,9 +12,9 @@ public enum SkillLifetimeType {
     [InspectorName("設定持續時間")] TimeLimit,   // 用 DestroyDelay
     [InspectorName("動畫一次")] AnimationOnce,  // 動畫播完就消失
 }
-public enum SkillExecutionType {
-    [InspectorName("發射投射物")] SpawnObject,
-    [InspectorName("近戰碰撞體")] AttachedHitbox
+public enum SkillVisualFromType {
+    [InspectorName("來自技能物件的攻擊")] FromSkill,
+    [InspectorName("來自角色的攻擊")] FromChar
 }
 
 public enum SkillMoveType {
@@ -56,7 +56,7 @@ public class SkillTemplate {
 
     [Header("技能類型")]
     public SkillLifetimeType SkillLifetimeType;
-    public SkillExecutionType SkillExecutionType;
+    public SkillVisualFromType SkillVisualFromType;
     public SkillMoveType SkillMoveType;
     public OnHitType OnHitType;
     public HitEffectPositionType HitEffectPositionType;

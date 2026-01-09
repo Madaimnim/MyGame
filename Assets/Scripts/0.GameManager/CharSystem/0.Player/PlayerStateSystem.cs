@@ -8,26 +8,19 @@ using System.Linq;
 public sealed class PlayerStateSystem : GameSubSystem
 {
     public IReadOnlyDictionary<int, PlayerStatsRuntime> PlayerStatsRuntimeDtny => _playerStatsRuntimeDtny;
-    public IReadOnlyDictionary<int, Player> BattlePlayerDtny => _battlePlayerDtny;
+    public IReadOnlyDictionary<int, Player> PlayerInstanceDtny => _playerInstanceDtny;
     public List<int> UnlockedIdList => _unlockedIdList;
 
     public PlayerSkillSystem SkillSystem { get; private set; }
     public PlayerSpawnSystem SpawnSystem { get; private set; }
 
-
-    // 事件
-    public event Action<int> OnPlayerEnterBattle;
-    public event Action<int> OnPlayerUnlocked;
-
     private Dictionary<int, PlayerStatsRuntime> _playerStatsRuntimeDtny = new();
-    private Dictionary<int, Player> _battlePlayerDtny = new();
+    private Dictionary<int, Player> _playerInstanceDtny = new();
     private List<int> _unlockedIdList = new();
 
-    private ISpawnEffect _spawnEffect;
 
     public PlayerStateSystem(GameManager gm) : base(gm) { }
     public override void Initialize() {
-        _spawnEffect= new DropBounceSpawnEffect();
         SpawnSystem = new PlayerSpawnSystem();
         SkillSystem = new PlayerSkillSystem();
     }
@@ -38,7 +31,7 @@ public sealed class PlayerStateSystem : GameSubSystem
         //解鎖、創造腳色
         _unlockedIdList.Add(id);
         var player=SpawnSystem.SpawnerPlayer(id);
-        _battlePlayerDtny.Add(id, player);
+        _playerInstanceDtny.Add(id, player);
 
         //初始化解鎖、安裝技能
         _playerStatsRuntimeDtny[id].UnlockedSkillIdList.Add(1);
@@ -47,18 +40,15 @@ public sealed class PlayerStateSystem : GameSubSystem
         SkillSystem.EquipPlayerSkill(id, 2, 3);
         SkillSystem.EquipPlayerSkill(id, 3, 4);
         SkillSystem.EquipPlayerSkill(id, 4, 5);
-
-        //發事件
-        OnPlayerUnlocked?.Invoke(id);   
     }
-    public void InitialGameStartPlayerSpawn() {
+    public void PrepareInitialPlayers() {
         UnlockPlayer(1001);
         _playerStatsRuntimeDtny[1001].UnlockedSkillIdList.Add(2);
         //SkillSystem.EquipPlayerSkill(1001, 0, 2);
 
         //UnlockPlayer(1002);
 
-        AllPlayerClose();
+        HideAllPlayers();
     }
     public void SetPlayerStatsRuntimeDtny(PlayerStatData playerStatData) {
         _playerStatsRuntimeDtny.Clear();
@@ -69,25 +59,29 @@ public sealed class PlayerStateSystem : GameSubSystem
             //var Runtime = _playerStatsRuntimeDtny[stat.StatsData.Id];
         }
     }
+    public void PlayerAppear(Player player,Vector3 spawnPos,AppearType appearType) {    
+        var effector = AppearEffectorFactory.CreateEffector(appearType);
 
-    public void AllPlayerEnterBattle(Vector3 spawnPos) {
-        Debug.Log("AllPlayerEnterBattle");
-        float offsetY = -1f;
+        player.gameObject.SetActive(true);
+        GameManager.StartCoroutine(effector.Play(player.gameObject, spawnPos));
+    }
+    public void AllPlayerAppear(Vector3 spawnPos, AppearType playerAppearType) {
+        var appearEffector = AppearEffectorFactory.CreateEffector(playerAppearType);
+
         foreach (var player in PlayerUtility.AllPlayers.Values) {
             if (!player) continue;
             player.gameObject.SetActive(true);
-            GameManager.StartCoroutine(_spawnEffect.Play(player.gameObject, spawnPos));
-            spawnPos.y += offsetY;
+            GameManager.StartCoroutine(appearEffector.Play(player.gameObject, spawnPos));
 
-            //發事件
-            OnPlayerEnterBattle?.Invoke(player.Rt.StatsData.Id);
+            //Debug.Log($"{player.name}生成在{spawnPos}");
         }
     }
-    public void AllPlayerClose() {
+    public void HideAllPlayers() {
         foreach (var player in PlayerUtility.AllPlayers.Values) {
             if (!player) continue;
             player.gameObject.SetActive(false);
             player.transform.position = Vector2.zero;
         }
     }
+
 }

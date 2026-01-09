@@ -43,7 +43,7 @@ public class UI_StageButtonController : MonoBehaviour
     // Inspector 綁定：子關卡按鈕
     public void OnSubStageClicked(int stageId) {
         if(GameManager.Instance.GameStageSystem == null) return;
-        GameManager.Instance.GameStageSystem.StartStage(stageId);
+        GameManager.Instance.GameStageSystem.RequestEnterStage(stageId);
     }
 
     private IEnumerator SmoothMove(float duration) {

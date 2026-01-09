@@ -12,7 +12,6 @@ public class EnemyStateSystem :GameSubSystem
     public IReadOnlyCollection<int> UnlockedIdList => _unlockedIdList;
     //public List<EnemyStatsRuntime> EnemyStatsRuntimeList { get; private set; } = new List<EnemyStatsRuntime>();
     public EnemySkillSystem SkillSystem { get; private set; }
-    public EnemySpawnSystem SpawnSystem { get; private set; }
 
     // 事件
     public event Action<int> OnEnemyUnlocked;
@@ -25,7 +24,7 @@ public class EnemyStateSystem :GameSubSystem
     public EnemyStateSystem(GameManager gm) : base(gm) { }
 
     public override void Initialize() {
-        SpawnSystem = new EnemySpawnSystem(new DefaultEnemyFactory(),new DropBounceSpawnEffect(),new CoroutineRunnerAdapter(GameManager));
+        var appearEffector = AppearEffectorFactory.CreateEffector(AppearType.Instant);
         SkillSystem = new EnemySkillSystem();
     }
 

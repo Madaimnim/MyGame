@@ -54,9 +54,9 @@ public sealed class PlayerStateSystem : GameSubSystem
         _playerStatsRuntimeDtny.Clear();
         foreach (var stat in playerStatData.playerStatsTemplateList)
         {
-            if (!IDValidator.IsPlayerID(stat.StatsData.Id)) continue;
-            _playerStatsRuntimeDtny[stat.StatsData.Id] = new PlayerStatsRuntime(stat);
-            //var Runtime = _playerStatsRuntimeDtny[stat.StatsData.Id];
+            if (!IDValidator.IsPlayerID(stat.Id)) continue;
+            _playerStatsRuntimeDtny[stat.Id] = new PlayerStatsRuntime(stat);
+            //var Runtime = _playerStatsRuntimeDtny[stat.Id];
         }
     }
     public void PlayerAppear(Player player,Vector3 spawnPos,AppearType appearType) {    

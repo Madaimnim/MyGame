@@ -12,15 +12,17 @@ public class MultiPositionProvider : MonoBehaviour, IPositionProvider {
     private void Awake() {
         _points.Clear();
         foreach (Transform child in transform) _points.Add(child);
-        
     }
+
+    private void OnEnable() {
+        _index = 0;
+    }
+
     public Vector3 GetPosition() {
         if (_points == null || _points.Count == 0) {
             Debug.LogError($"{name} 沒有設定任何生成點");
             return transform.position;
         }
-
-        //Debug.Log($"[MultiPositionProvider] {name} index={_index}");
 
         if (_isRandom) {
             int i = Random.Range(0, _points.Count);

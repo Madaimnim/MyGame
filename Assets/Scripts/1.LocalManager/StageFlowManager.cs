@@ -1,94 +1,126 @@
-using UnityEngine;
-using System.Collections;
 using System;
+using System.Collections;
+using System.Collections.Generic;
+using UnityEngine;
 
 public class StageFlowManager : MonoBehaviour {
     private EnemyCounter _enemyCounter;
     private EnemySpawner _enemySpawner;
-    private PlayerEntryController _playerEntryController;
-
-    private bool _isClear;      // 關卡結果
-    private bool _stageEnded;   // 流程控制
+    private PlayerEntrySystem _playerEntrySystem;
+    private EnemyEntrySystem _enemyEntrySystem;
+    private GameStageSystem _gameStageSystem;
+    private StageData _stageData;
 
     private void Awake() {
         _enemyCounter = GetComponent<EnemyCounter>();
         _enemySpawner = GetComponent<EnemySpawner>();
-        _playerEntryController= GetComponent<PlayerEntryController>();  
+        _playerEntrySystem= GetComponent<PlayerEntrySystem>();
+        _enemyEntrySystem =GetComponent<EnemyEntrySystem>();
+        _gameStageSystem = GameManager.Instance.GameStageSystem;
+        _stageData = _gameStageSystem.CurrentStageData;
+    }
+    public void OnEnable() {
+        _gameStageSystem.ResetBattleState();
+        _enemyCounter.OnEnemyClear += OnEnemyClear;
+    }
+    public void OnDisable() {
+        _enemyCounter.OnEnemyClear -= OnEnemyClear;
     }
 
-    public IEnumerator Start() {
-        yield return StartCoroutine(StageFlow());
+    private void Start() {
+        StartCoroutine(StageFlow());
     }
 
     private IEnumerator StageFlow() {
         //關卡開始（可加對話、演出）
-        yield return null;
+        PrepareStage();
 
-        _playerEntryController.PlayerEntryBattle();
+        yield return EnterBattle();
+        yield return WaitForBattleEnd();
 
-        //開始生怪
-        _enemySpawner.SpawnBegin();
+        bool isCleared = _enemyCounter.IsCleared;
 
-        _stageEnded = false;
-        _isClear = false;
-
-        GameEventSystem.Instance.Event_BattleStart.Invoke();
-
-
-        _enemyCounter.OnEnemyClear += OnEnemyClear;
-        // Todo
-        // wallHealth.OnWallDestroyed +=OnStageDefeat;
-
-        //等待關卡結束
-        while (!_stageEnded) yield return null;
-
-        PlayerInputManager.Instance.SetCanControl(false);
-        //結算 / UI / 切狀態（原本在 StageLevelManager 的東西）
-        yield return ShowStageResultAndExit();
+        yield return ShowStageResult(isCleared);
+        yield return WaitForContinueInput();
+        yield return ExitStage(isCleared);
     }
 
-    private IEnumerator ShowStageResultAndExit() {
+    private void PrepareStage() {
+        ExperienceManager.Instance.ResetExp();
+    }
+    private IEnumerator EnterBattle() {
+        List<Coroutine> entryRoutines = new List<Coroutine>();
+        // 敵人進場
+        foreach (var wave in _stageData.Waves) {
+            for (int i = 0; i < wave.SpawnCount; i++) {
+                var enemy = _enemySpawner.Spawn(wave.EnemyId);
+                entryRoutines.Add(StartCoroutine(_enemyEntrySystem.EntryEnemy(enemy)));
+            }
+        }
+        // 玩家進場
+        entryRoutines.Add(StartCoroutine(_playerEntrySystem.BeginEntryRoutine()));
 
+        // 關鍵：等全部完成
+        foreach (var routine in entryRoutines) yield return routine;
+
+        yield return new WaitForSeconds(0.5f);
+        // 所有人都到位，才開始戰鬥
+        GameEventSystem.Instance.Event_BattleStart.Invoke();
+    }
+    private IEnumerator WaitForBattleEnd() {
+        while (!_gameStageSystem.IsBattleEnded) yield return null;
+        PlayerInputManager.Instance.SetCanControl(false);
+    }
+    private IEnumerator ShowStageResult(bool isCleared) {
         FadeManager.Instance.FadeSetAlpha(0.3f);
 
-        float timer = 0f;
-        while (timer < 1f) {
-            timer += Time.deltaTime;
-            yield return null;
-        }
+       // yield return new WaitForSeconds(1f);
 
-        if (_isClear) {
-            UIManager.Instance.UI_StageClearController.Text_StageClear.gameObject.SetActive(true);
-            PlayerInputManager.Instance.CurrentControlPlayer.GrowthComponent
-                .AddExp(ExperienceManager.Instance.GetCurrentExp());
+        var ui = UIManager.Instance.UI_StageClearController;
+
+        if (isCleared) {
+            ui.Text_StageClear.gameObject.SetActive(true);
+            PlayerInputManager.Instance.CurrentControlPlayer.GrowthComponent.AddExp(ExperienceManager.Instance.GetCurrentExp());
+            _gameStageSystem.MarkStageCleared(_gameStageSystem.CurrentStageData.StageId);
         }
         else {
-            UIManager.Instance.UI_StageClearController.Text_StageDefeat.gameObject.SetActive(true);
+            PlayerInputManager.Instance.CurrentControlPlayer.GrowthComponent.AddExp(ExperienceManager.Instance.GetCurrentExp());
+            ui.Text_StageDefeat.gameObject.SetActive(true);
         }
 
-        UIManager.Instance.UI_StageClearController.UI_RewardSystem.gameObject.SetActive(true);
+        ui.UI_RewardSystem.gameObject.SetActive(true);
+        ui.Text_Continue.gameObject.SetActive(true);
 
-        timer = 0f;
-        while (timer < 5f) {
-            timer += Time.deltaTime;
+        yield break;
+    }
+    private IEnumerator WaitForContinueInput() {
+        float countdown = 5f;
+
+        var ui = UIManager.Instance.UI_StageClearController;
+        while (countdown > 0f) {
+            ui.Text_Continue.text =$"{Mathf.CeilToInt(countdown)} 秒後返回(點擊滑鼠)";
+            countdown -= Time.deltaTime;
+
             if (Input.GetMouseButtonDown(0)) break;
             yield return null;
         }
+        ui.Text_Continue.gameObject.SetActive(false);
+    }
+    private IEnumerator ExitStage(bool isCleared) {
+        var ui = UIManager.Instance.UI_StageClearController;
 
         GameManager.Instance.GameStateSystem.SetState(GameState.Preparation);
         GameManager.Instance.PlayerStateSystem.HideAllPlayers();
 
-        UIManager.Instance.UI_StageClearController.UI_RewardSystem.gameObject.SetActive(false);
-        UIManager.Instance.UI_StageClearController.Text_StageClear.gameObject.SetActive(false);
-        UIManager.Instance.UI_StageClearController.Text_StageDefeat.gameObject.SetActive(false);
+        ui.UI_RewardSystem.gameObject.SetActive(false);
+        ui.Text_StageClear.gameObject.SetActive(false);
+        ui.Text_StageDefeat.gameObject.SetActive(false);
+
+        yield break;
     }
 
+
     private void OnEnemyClear() {
-        _isClear = true;
-        _stageEnded = true;
-    }
-    private void OnStageDefeat() {
-        _isClear = false;
-        _stageEnded = true;
+        _gameStageSystem.SetIsBattleEneded(true);
     }
 }

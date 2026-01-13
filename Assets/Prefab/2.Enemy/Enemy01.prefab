@@ -572,7 +572,6 @@ MonoBehaviour:
   Rb: {fileID: 0}
   Ani: {fileID: 0}
   Spr: {fileID: 0}
-  _rarity: 5
   id: 2001
 --- !u!114 &585879831
 MonoBehaviour:

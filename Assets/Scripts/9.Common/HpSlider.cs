@@ -19,6 +19,8 @@ public class HpSlider : MonoBehaviour {
         // ­q¾\¨Æ¥ó
         _health.OnHpChanged += OnHpChanged;
         _health.OnDie += OnDieDoSomething;
+
+        _health.ForceNotify();
     }
 
     public void Unbind() {

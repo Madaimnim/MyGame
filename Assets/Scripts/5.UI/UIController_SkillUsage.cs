@@ -54,7 +54,7 @@ public class UIController_SkillUsage : UI_PanelBase
         //    var playerSkillDataRuntime = playerStatsRuntime.GetSkillRuntime(skillInfo.skillID);
         //    if (playerSkillDataRuntime == null)
         //    {
-        //        Debug.LogWarning($"[UIController_SkillUsage] 技能 {skillInfo.skillID} 不存在於角色 {playerStatsRuntime.StatsData.Name} 的技能池");
+        //        Debug.LogWarning($"[UIController_SkillUsage] 技能 {skillInfo.skillID} 不存在於角色 {playerStatsRuntime.Name} 的技能池");
         //        continue;
         //    }
         //

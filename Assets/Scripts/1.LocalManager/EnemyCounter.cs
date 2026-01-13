@@ -6,7 +6,7 @@ public class EnemyCounter : MonoBehaviour {
     public event Action OnEnemyClear;
     private int _remainEnemy;
     private int _totalEnemy;
-
+    public bool IsCleared => _remainEnemy <= 0;
 
     private void Start() {
         _totalEnemy = CalculateTotalEnemyCount();

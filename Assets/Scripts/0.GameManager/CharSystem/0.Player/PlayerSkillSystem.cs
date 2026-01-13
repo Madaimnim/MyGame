@@ -25,7 +25,7 @@ public class PlayerSkillSystem
         }
         if (rt.UnlockedSkillIdList.Contains(skillId))
         {
-            Debug.LogWarning($"_unlockedSkillIdList已解鎖 ID:{skillId} {rt.SkillPool[skillId].StatsData.Name}");
+            Debug.LogWarning($"_unlockedSkillIdList已解鎖 ID:{skillId} {rt.SkillPool[skillId].Name}");
             return;
         }
         rt.UnlockedSkillIdList.Add(skillId);

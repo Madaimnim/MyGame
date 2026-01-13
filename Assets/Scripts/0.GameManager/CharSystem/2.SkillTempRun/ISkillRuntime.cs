@@ -12,7 +12,8 @@ public interface ISkillRuntime
     HitEffectPositionType HitEffectPositionType { get; }
     FacingDirection FacingDirection { get; }
     LayerMask TargetLayers { get; }
-
+    int Id { get; }
+    string Name { get; }
     StatsData StatsData { get; }
     VisualData VisualData { get; }
     bool canRotate { get; }

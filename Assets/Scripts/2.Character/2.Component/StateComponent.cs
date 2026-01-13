@@ -18,7 +18,7 @@ public class StateComponent {
 
     public bool IsDead { get; private set; } = false;
     public bool IsKnocked { get; private set; }=false;
-    public bool IsGrounded { get; private set; }
+    public bool IsGrounded { get; private set; } = false;
     public bool IsInitialHeight { get; private set; } = true;
     public bool IsAttackingIntent { get; private set; } = false;
     public bool IsMoving { get; private set; } = false;
@@ -33,12 +33,24 @@ public class StateComponent {
     private DebugContext _context = DebugContext.None;
     private int _id = -1;
 
-    public StateComponent(DebugContext context, int id) {
+    public StateComponent(DebugContext context = DebugContext.None, int id=-1) {
         _context = context;
         _id = id;
     }
 
-
+    public void ResetState() {
+        IsDead = false;
+        IsKnocked = false;
+        IsGrounded = false;
+        IsInitialHeight = true;
+        IsAttackingIntent = false;
+        IsMoving = false;
+        IsPlayingAttackAnimation = false;
+        IsControlLocked = false;
+        IsMoveAnimationOpen = false;
+        IsInGravityFall = false;
+        IsSkillDashing = false;
+    }
     public void SetIsDead(bool value) => IsDead = value;
     public void SetIsKnocked(bool value) => IsKnocked = value;
     public void SetIsGrounded(bool value) => IsGrounded = value;

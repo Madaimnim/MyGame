@@ -7,6 +7,9 @@ using UnityEngine;
 public class PlayerStatsRuntime : IHealthData
 {
     // Template Data---------------------------------------------------------------------------------------------
+    public int Id;
+    public string Name;
+    public int Level;
     public StatsData StatsData;
     public VisualData VisualData;
     public int MaxHp { get; }
@@ -26,13 +29,16 @@ public class PlayerStatsRuntime : IHealthData
     public GameObject UiObject;
     //«Øºc¤l---------------------------------------------------------------------------------------------------------
     public PlayerStatsRuntime(PlayerStatsTemplate template) {
+        Id= template.Id;
+        Name= template.Name;
+        Level= template.Level;
         StatsData = new StatsData(template.StatsData);
         VisualData = new VisualData(template.VisualData);
         MaxHp = template.MaxHp;
         SkillSlotCount = template.SkillSlotCount;
         CanRespawn = template.CanRespawn;
         foreach (var skill in template.SkillTemplateList) { 
-            SkillPool[skill.StatsData.Id] = new PlayerSkillRuntime(skill);
+            SkillPool[skill.Id] = new PlayerSkillRuntime(skill);
         }
 
         UnlockedSkillIdList = new List<int>(template.UnlockedSkillIdList);

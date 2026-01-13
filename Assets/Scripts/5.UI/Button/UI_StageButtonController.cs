@@ -11,12 +11,13 @@ public class UI_StageButtonController : MonoBehaviour
     public int FloatUpPixels = 1000;
     public float FloutDuration = 0.25f;
 
+    private GameStageSystem _gameStageSystem;
     private Vector3 _mainPanelDefaultPos;      // 記錄主 CanvasPanel 的初始位置
 
     //生命週期
     private void Awake() {
-        if (MainPanelTransform != null)
-            _mainPanelDefaultPos = MainPanelTransform.anchoredPosition;
+        if (MainPanelTransform != null) _mainPanelDefaultPos = MainPanelTransform.anchoredPosition;
+        _gameStageSystem= GameManager.Instance.GameStageSystem;
     }
 
     private void OnEnable() {
@@ -27,8 +28,7 @@ public class UI_StageButtonController : MonoBehaviour
             MainPanelTransform.anchoredPosition = _mainPanelDefaultPos;
         }
 
-        // 關閉所有子 Canvas
-        SubPanelTransform.gameObject.SetActive(false);
+        if (SubPanelTransform != null) SubPanelTransform.gameObject.SetActive(false);
     }
 
     // Inspector 綁定：章節按鈕
@@ -37,13 +37,12 @@ public class UI_StageButtonController : MonoBehaviour
         SubPanelTransform.anchoredPosition = new Vector3(SubPanelTransform.anchoredPosition.x, SubPanelTransform.anchoredPosition.y - FloatUpPixels);
         SubPanelTransform.gameObject.SetActive(true);
 
-        StartCoroutine(SmoothMove(FloutDuration));
-    }
+        // ⭐ 刷新所有子關卡狀態
+        foreach (var button in SubPanelTransform.GetComponentsInChildren<UI_SubStageButton>(true)) {
+            button.Refresh();
+        }
 
-    // Inspector 綁定：子關卡按鈕
-    public void OnSubStageClicked(int stageId) {
-        if(GameManager.Instance.GameStageSystem == null) return;
-        GameManager.Instance.GameStageSystem.RequestEnterStage(stageId);
+        StartCoroutine(SmoothMove(FloutDuration));
     }
 
     private IEnumerator SmoothMove(float duration) {

@@ -13,7 +13,8 @@ public class PlayerSkillRuntime: ISkillRuntime
     public HitEffectPositionType HitEffectPositionType { get; set; }
     public FacingDirection FacingDirection { get; set; }
     public LayerMask TargetLayers { get; set; }
-
+    public int Id { get; set; }
+    public string Name { get; set; }
     public StatsData StatsData { get; private set; }
     public VisualData VisualData { get; private set; }
     public bool canRotate { get; set; }
@@ -43,6 +44,8 @@ public class PlayerSkillRuntime: ISkillRuntime
         FacingDirection = template.FacingDirection;
         TargetLayers = template.TargetLayers;
 
+        Id = template.Id;
+        Name = template.Name;
         StatsData = new StatsData(template.StatsData);
         VisualData = new VisualData(template.VisualData);
         canRotate = template.canRotate;

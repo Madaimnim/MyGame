@@ -10,6 +10,7 @@ public class MoveComponent
     public Vector2 IntentDirection;
     public TargetDetector MoveDetector { get; private set; }
     public float MoveSpeed { get; private set; }
+    private float _pendingMoveSpeed;
     public float VerticalMoveSpeed { get; private set; }
     public float CurrentMoveSpeed { get; private set; }
 
@@ -21,6 +22,11 @@ public class MoveComponent
     private float _moveDuration = 1f;
     private float _moveWindowRemainTime = 0f;
     private bool _useMoveWindow = false;
+
+    //入場移動控制相關
+    public bool IgnoreMoveBounds { get; private set; } = false;
+    public void SetIgnoreMoveBounds(bool value) {IgnoreMoveBounds = value;}
+
     public void MoveDuration(float duration) {
         CurrentMoveSpeed = MoveSpeed / duration;
         _moveWindowRemainTime = duration;
@@ -114,7 +120,9 @@ public class MoveComponent
         if (_useMoveWindow) _moveWindowRemainTime -= Time.fixedDeltaTime;
 
         //處理移動邊界
-        var resolvedPos = MoveBoundsManager.Instance != null ? MoveBoundsManager.Instance.Resolve(newPosition) : newPosition;
+        Vector2 resolvedPos = newPosition;
+        if (!IgnoreMoveBounds && MoveBoundsManager.Instance != null)
+            resolvedPos = MoveBoundsManager.Instance.Resolve(newPosition);
         _rb.MovePosition(resolvedPos);
 
         return true;
@@ -251,5 +259,13 @@ public class MoveComponent
         IntentTargetTransform = null;
         IntentTargetPosition = null;
         IntentDirection = Vector2.zero;
+    }
+
+    public void MultiCurrentMoveSpeed(float multiple) {
+        _pendingMoveSpeed= CurrentMoveSpeed;
+        CurrentMoveSpeed *= multiple;
+    }
+    public void ResetCurrentMoveSpeed() {
+        CurrentMoveSpeed = _pendingMoveSpeed;
     }
 }

@@ -3,6 +3,8 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UIElements;
+using static Cinemachine.DocumentationSortingAttribute;
+using static UnityEditor.Experimental.GraphView.GraphView;
 
 
 public class Player : MonoBehaviour, IInteractable, IVisualFacing {
@@ -38,10 +40,13 @@ public class Player : MonoBehaviour, IInteractable, IVisualFacing {
     public SpawnerComponent SpawnerComponent { get; private set; }
     public GrowthComponent GrowthComponent { get; private set; }
     public HeightComponent HeightComponent { get; private set; }
+    public StatsComponent StatsComponent { get; private set; }
+    public EquipmentComponent EquipmentComponent { get; private set; }
     public Vector2 MoveVelocity=>MoveComponent.IntentDirection * MoveComponent.MoveSpeed;
 
     private Vector3 _lastInteractPosition;
     private float _initialHeightY;
+    private bool _isInitialized = false;
     private HitShakeVisual _hitShakeVisual;
 
     private void Awake()
@@ -57,7 +62,7 @@ public class Player : MonoBehaviour, IInteractable, IVisualFacing {
         if(PlayerListManager.Instance != null) PlayerListManager.Instance.Register(this);
         if(PlayerInputManager.Instance != null) PlayerInputManager.Instance.SelectPlayer(this);
         TryBindSkillSliderUI();
-
+        if(_isInitialized) StateComponent.ResetState();
     }
     private void OnDisable()
     {
@@ -93,21 +98,24 @@ public class Player : MonoBehaviour, IInteractable, IVisualFacing {
         Rt = stats;
 
         //注意依賴順序
-        StateComponent = new StateComponent(DebugContext.Player,Rt.StatsData.Id);
+        StatsComponent= new StatsComponent(Rt.StatsData);
+        StateComponent = new StateComponent(DebugContext.Player,Rt.Id);
+        EquipmentComponent = new EquipmentComponent(StatsComponent);
+
         ActionLockComponent = new ActionLockComponent(this,StateComponent);
         HealthComponent = new HealthComponent(Rt, StateComponent);
         AnimationComponent = new AnimationComponent(Ani, transform, Rb, StateComponent);
 
-        HeightComponent = new HeightComponent(_sprCol.transform,StateComponent, AnimationComponent,this, Rt.StatsData);
-        EffectComponent = new EffectComponent(Rt.VisualData, transform, this, Spr, StateComponent);
+        HeightComponent = new HeightComponent(_sprCol.transform,StateComponent, AnimationComponent,this, StatsComponent.FinalStats);
+        EffectComponent = new EffectComponent(transform, this, Spr, StateComponent);
         RespawnComponent = new RespawnComponent(this, Rt.CanRespawn);
-        MoveComponent = new MoveComponent(Rb, Rt.StatsData, this, MoveDetector, AnimationComponent,HeightComponent, StateComponent);
+        MoveComponent = new MoveComponent(Rb, StatsComponent.FinalStats, this, MoveDetector, AnimationComponent,HeightComponent, StateComponent);
         SpawnerComponent = new SpawnerComponent();
         if (EnemyListManager.Instance.TargetList == null) Debug.Log("EnemyListManager未初始化");
-        SkillComponent = new SkillComponent(Rt.StatsData, Rt.SkillSlotCount, Rt.SkillPool, AnimationComponent, StateComponent, transform, _sprCol.transform,
+        SkillComponent = new SkillComponent(StatsComponent.FinalStats, Rt.SkillSlotCount, Rt.SkillPool, AnimationComponent, StateComponent, transform, _sprCol.transform,
             EnemyListManager.Instance.TargetList,MoveComponent,HeightComponent);
         AIComponent = new AIComponent( MoveComponent, SkillComponent, transform, Rt.MoveStrategy);
-        GrowthComponent = new GrowthComponent(Rt);
+        GrowthComponent = new GrowthComponent(Rt,StatsComponent);
         //額外初始化設定
         BehaviorTree behaviourTree = PlayerBehaviourTreeFactory.Create(Rt.PlayerBehaviourTreeType, this);
         AIComponent.SetBehaviorTree(behaviourTree);
@@ -132,10 +140,11 @@ public class Player : MonoBehaviour, IInteractable, IVisualFacing {
         MoveComponent.OnMoveDirectionChanged += TurnFacingByIntent;
 
         //初始化狀態--------------------------------------------------------------------------------------------------------------------------------------------------------------------
-        transform.name = $"玩家ID_{Rt.StatsData.Id}:({Rt.StatsData.Name})";
+        transform.name = $"玩家ID_{Rt.Id}:({Rt.Name})";
 
         TryBindSkillSliderUI();
         ResetState();
+        _isInitialized = true;
     }
     public void Interact(InteractInfo info)
     {
@@ -155,8 +164,6 @@ public class Player : MonoBehaviour, IInteractable, IVisualFacing {
         HeightComponent.StopRecoverHeightCoroutine();
 
         HeightComponent.AddUpVelocity(info.FloatPower);
-        //ActionLockComponent.HurtLock(0.5f);
-        //AnimationComponent.PlayImmediate("Hurt");
     }
 
 
@@ -193,7 +200,6 @@ public class Player : MonoBehaviour, IInteractable, IVisualFacing {
         if (PlayerListManager.Instance != null) PlayerListManager.Instance.Unregister(this);
     }
 
-
     public void OnHpChanged(int currentHp, int maxHp) { }    //Todo SliderChange
     public void OnRespawn()
     {
@@ -208,7 +214,7 @@ public class Player : MonoBehaviour, IInteractable, IVisualFacing {
     }
     public void ResetState()
     {
-        StateComponent.SetIsPlayingAttackAnimation( false);
+        StateComponent.ResetState();
         MoveComponent.ResetVelocity();
         HealthComponent.ResetCurrentHp();
     }

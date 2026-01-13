@@ -17,14 +17,11 @@ public class AnimationComponent
         _stateComponent= stateComponent;
     }
 
-    
 
     public void PlayAttack(int skillId) {
-        string moveSkillName = $"MoveSkill{skillId}";
-        int moveSkillHash = Animator.StringToHash(moveSkillName);
-
-        TryPlay($"Skill{skillId}");
+        if(TryPlay($"Skill{skillId}")) _stateComponent.SetIsPlayingAttackAnimation(true);
     }
+
     public void PlayIdle() => TryPlay("Idle");
     public void PlayMove() => TryPlay("Move");
     public void PlayDie() => TryPlay("Die");
@@ -34,28 +31,18 @@ public class AnimationComponent
     public void Play(string name) => _ani.Play(Animator.StringToHash(name));
 
 
-    public bool TryPlay(string stateName, int layer = 0) {
+    private bool TryPlay(string stateName, int layer = 0) {
 
         int stateNameHash = Animator.StringToHash(stateName);
-        if (!_ani.HasState(layer, stateNameHash)) 
-            return false;
+        if (!_ani.HasState(layer, stateNameHash)) return false;
         _ani.Play(stateNameHash, layer);
         //Debug.Log($"撥放動畫: {stateName}");
         return true;
     }
 
-    public void PlayImmediate(string stateName, int layer = 0) {
-        int hash = Animator.StringToHash(stateName);
-
-        if (!_ani.HasState(layer, hash))
-            return;
-
-        // 強制立刻切換到該動畫，normalizedTime = 0
-        _ani.Play(hash, layer, 0f);
-        _ani.Update(0f); // 關鍵：立刻刷新 Animator
-    }
-
     public void SetParameterBool(string parameter,bool value) {
         _ani.SetBool(parameter, value);
     }
+
+
 }

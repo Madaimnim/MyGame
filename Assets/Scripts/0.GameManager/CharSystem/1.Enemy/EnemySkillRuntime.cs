@@ -14,6 +14,8 @@ public class EnemySkillRuntime: ISkillRuntime
     public FacingDirection FacingDirection { get; set; }
     public LayerMask TargetLayers { get; set; }
 
+    public int Id { get; set; }
+    public string Name { get; set; }
     public StatsData StatsData { get; private set; }
     public VisualData VisualData { get; private set; }
     public bool canRotate { get; set; }
@@ -29,7 +31,7 @@ public class EnemySkillRuntime: ISkillRuntime
 
     public EnemySkillRuntime(SkillTemplate template){
         //²L«þ¨©
-        SkillReleaseType= template.SkillReleaseType;
+        SkillReleaseType = template.SkillReleaseType;
         SkillLifetimeType= template.SkillLifetimeType;
         SkillVisualFromType = template.SkillVisualFromType;
         SkillMoveType = template.SkillMoveType;
@@ -38,6 +40,8 @@ public class EnemySkillRuntime: ISkillRuntime
         FacingDirection= template.FacingDirection;
         TargetLayers= template.TargetLayers;
 
+        Id = template.Id;
+        Name = template.Name;
         StatsData = template.StatsData;
         VisualData = template.VisualData;
         canRotate = template.canRotate;

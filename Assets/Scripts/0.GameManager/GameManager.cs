@@ -68,6 +68,7 @@ public class GameManager : MonoBehaviour
         //建 Handler map並建構子給_gameStateRouter
         var runner = new CoroutineRunnerAdapter(this);
         GameStateHandlers = new Dictionary<GameState, IGameStateHandler>{
+            { GameState.None, new NoneHandler(GameSceneSystem)},
             { GameState.GameStart, new GameStartHandler(GameSceneSystem) },
             { GameState.Preparation, new PreparationHandler( GameSceneSystem) },
             { GameState.Battle, new BattleHandler( GameSceneSystem) },
@@ -99,8 +100,8 @@ public class GameManager : MonoBehaviour
         IsAllDataLoaded = true;
         OnAllDataLoaded?.Invoke();
 
-        // 遊戲一開始 → 自動切到 StartScene
-        GameSceneSystem.LoadSceneByKey("Start");
+        // 遊戲一開始 → 自動切到 GameState.GameStart
+        GameStateSystem.SetState(GameState.GameStart);
     }
 
     private void Update()

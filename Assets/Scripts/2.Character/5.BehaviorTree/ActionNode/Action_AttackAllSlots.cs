@@ -17,7 +17,7 @@ public class Action_AttackAllSlots : Node
             var slot = _skillComponent.SkillSlots[i];
             if (slot == null || slot.SkillId ==-1) continue;
             if (!slot.IsReady || slot.Detector == null || !slot.Detector.HasTarget) continue;
-
+            //Debug.Log($"{_ai.Transform.name}: 設定技能槽 {i} 的技能 {slot.SkillId} 攻擊意圖");
             _skillComponent.SetIntentSkill(i, slot.Detector.TargetTransform.position, slot.Detector.TargetTransform);
             return NodeState.SUCCESS;
         }

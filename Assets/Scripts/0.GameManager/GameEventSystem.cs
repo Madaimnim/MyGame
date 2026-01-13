@@ -1,7 +1,7 @@
 using System;
 using UnityEngine;
 
-[DefaultExecutionOrder(-50)]   // 讓 GameEventSystem 先於大多數腳本執行
+[DefaultExecutionOrder(-100)]   // 讓 GameEventSystem 先於大多數腳本執行
 public class GameEventSystem : MonoBehaviour
 {
 
@@ -18,10 +18,8 @@ public class GameEventSystem : MonoBehaviour
     public Action<int, float, float, Player> Event_SkillCooldownChanged;
     //SkillSystem
     public Action<int, int> Event_SkillUnlocked;
-
     //UI
     public Action<PlayerStatsRuntime> Event_UICurrentPlayerChanged;
-
     //場景
     public Action Event_BattleStart;
 
@@ -33,5 +31,4 @@ public class GameEventSystem : MonoBehaviour
         }
         Instance = this;
     }
-
 }

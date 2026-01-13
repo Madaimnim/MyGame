@@ -13,6 +13,8 @@ MonoBehaviour:
   m_Name: Hit Shake Config
   m_EditorClassIdentifier: 
   Amplitude: 0.2
-  Duration: 0.5
+  Duration: 0.3
   Frequency: 12
   maxAmplitude: 1
+  PushBackDistance: 0.1
+  PushBackDuration: 0.1

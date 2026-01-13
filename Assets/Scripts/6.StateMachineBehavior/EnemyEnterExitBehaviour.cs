@@ -1,31 +1,32 @@
 using UnityEngine;
 
-public class EnemyEnterExitBehaviour : StateMachineBehaviour
-{
+public class EnemyEnterExitBehaviour : StateMachineBehaviour {
     private Enemy enemy;
-    //private float enterTime; // 記錄進入動畫的時間
+    private EffectComponent effect;
 
-    // 進入攻擊動畫
     public override void OnStateEnter(Animator animator, AnimatorStateInfo stateInfo, int layerIndex) {
-        if (enemy == null) enemy = animator.GetComponentInParent<Enemy>();
+        if (enemy == null) {
+            enemy = animator.GetComponentInParent<Enemy>();
+            effect = enemy?.EffectComponent;
+        }
 
-        // 鎖定，避免其他動畫
-        enemy.StateComponent.SetIsPlayingAttackAnimation(true);
-
-
-    }
-
-    // 動畫進行過程（0~1 normalizedTime）
-    public override void OnStateUpdate(Animator animator, AnimatorStateInfo stateInfo, int layerIndex) {
         if (enemy == null) return;
 
+        enemy.StateComponent.SetIsPlayingAttackAnimation(true);
+
+        //攻擊變紅（只給敵人）
+        if (effect != null) {
+            float duration = stateInfo.length / Mathf.Max(animator.speed, 0.0001f);
+            effect.PlayAttackTint(Color.red, duration);
+        }
     }
 
-    // 離開攻擊動畫
     public override void OnStateExit(Animator animator, AnimatorStateInfo stateInfo, int layerIndex) {
         if (enemy == null) return;
 
-        // 解除動畫鎖定
-        enemy.StateComponent.SetIsPlayingAttackAnimation ( false);
+        enemy.StateComponent.SetIsPlayingAttackAnimation(false);
+
+        //確保中斷也會清掉
+        effect?.StopAttackTint();
     }
 }

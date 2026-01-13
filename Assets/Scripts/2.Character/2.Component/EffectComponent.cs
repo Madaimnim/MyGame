@@ -10,25 +10,32 @@ public enum OutlineState {
 public class EffectComponent
 {
     private Transform _transform;
-    private VisualData _visualData;
     private MonoBehaviour _runner;
     private StateComponent _stateComponent;
     private SpriteRenderer _spriteRenderer;
 
     private readonly SpriteFlashController _spriteFlashController;
     private readonly SpriteOutlineController _spriteOutlineController;
+    private readonly SpriteAttackTintController _spriteAttackTintController;
+    private readonly SpriteInnerEdgeController _spriteInnerEdgeController;
 
     private OutlineState _outlineState = OutlineState.None;
+    //Test Rarity
+    private Rarity _rarity;             //待傳入參數
+    private Coroutine _attackTintCoroutine;
 
-    public EffectComponent(VisualData visualData,Transform transform, MonoBehaviour runner,SpriteRenderer spr,StateComponent stateComponent) {
+    public EffectComponent(Transform transform, MonoBehaviour runner,SpriteRenderer spr,StateComponent stateComponent) {
         _transform = transform;
-        _visualData = visualData;
         _runner = runner;
         _stateComponent = stateComponent;
         _spriteRenderer= spr;
 
-        _spriteFlashController = new SpriteFlashController(spr);
         _spriteOutlineController = new SpriteOutlineController(spr);
+        _spriteInnerEdgeController = new SpriteInnerEdgeController(spr);
+        
+        var sharedMPB = new SpriteEffectPropertyBlock();
+        _spriteFlashController =new SpriteFlashController(spr, sharedMPB);
+        _spriteAttackTintController =new SpriteAttackTintController(spr, sharedMPB);
     }
 
     public void GainedExpEffect(int exp) {
@@ -41,7 +48,6 @@ public class EffectComponent
         //_spr.color = c;
 
         VFXManager.Instance.Play("PlayerDeath", _transform.position);
-        AudioManager.Instance.PlaySFX(_visualData.DeathSFX, 0.5f);
     }
 
     public void LevelUpEffect(int newLevel) {
@@ -57,7 +63,7 @@ public class EffectComponent
     public void ShowTargetOutline() => SetOutlineState(OutlineState.Target);
     public void HideOutline() => SetOutlineState(OutlineState.None);
 
-
+    //閃白系統
     private IEnumerator FlashWhite(float duration) {
         if (_spriteFlashController == null) yield break;
 
@@ -67,6 +73,7 @@ public class EffectComponent
 
     }
 
+    //描外框系統
     public void SetOutlineState(OutlineState state) {
         if (_outlineState == state) return;
         _outlineState = state;
@@ -84,5 +91,56 @@ public class EffectComponent
                 _spriteOutlineController.SetOutline(true, Color.red, 2f);
                 break;
         }
+    }
+
+    //稀有度系統
+    private void ApplyRarityVisual() {
+        Color color = RarityColor.Get(_rarity);
+        float size = _rarity switch {
+            Rarity.Normal => 0f,
+            Rarity.Uncommon => 1f,
+            Rarity.Rare => 1.2f,
+            Rarity.Epic => 1.5f,
+            Rarity.Legendary => 2f,
+            Rarity.Mythic => 2.5f,
+            _ => 0f
+        };
+        _spriteInnerEdgeController.SetInnerEdge(color, 1f);
+    }
+
+    //攻擊變紅協程
+    public void PlayAttackTint(Color color, float duration) {
+        StopAttackTint(); // 保證不疊加
+        _attackTintCoroutine = _runner.StartCoroutine(AttackTintRoutine(color, duration));
+    }
+    private IEnumerator AttackTintRoutine(Color color, float duration) {
+        float t = 0f;
+
+        while (t < duration) {
+            // 如果攻擊動畫已經不是播放中 → 中斷
+            if (!_stateComponent.IsPlayingAttackAnimation) {
+                _spriteAttackTintController.Clear();
+                yield break;
+            }
+
+            t += Time.deltaTime;
+            float progress = Mathf.Clamp01(t / duration);
+
+            _spriteAttackTintController.SetAttackTint(color, progress);
+            yield return null;
+        }
+
+        // 動畫自然結束
+        _spriteAttackTintController.Clear();
+    }
+
+    public void StopAttackTint() {
+        if (_attackTintCoroutine != null) {
+            _runner.StopCoroutine(_attackTintCoroutine);
+            _attackTintCoroutine = null;
+        }
+
+        // 只清 AttackTint，不碰其他效果
+        _spriteAttackTintController.Clear();
     }
 }

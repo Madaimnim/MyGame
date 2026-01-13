@@ -38,6 +38,8 @@ public class UIManager : MonoBehaviour
     }
     private void OnEnable() {
         _uiInputController.OnToggleMenuButton += OnToggleMenuButton;
+
+        GameEventSystem.Instance.Event_BattleStart+=()=>UI_SkillSliderController.gameObject.SetActive(true);
     }
     private void OnDisable() {
         _uiInputController.OnToggleMenuButton -= OnToggleMenuButton;
@@ -80,7 +82,6 @@ public class UIManager : MonoBehaviour
         if(topPanel!=null) topPanel.Hide();
     }
     public void HideAllUIPanels() {
-
         while (UiPanelsStack.Count > 0)
         {
             var panel = UiPanelsStack.Pop();
@@ -89,8 +90,11 @@ public class UIManager : MonoBehaviour
                 panel.Hide();
             }
         }
-
+        //Debug.Log($"{UI_SkillSliderController.gameObject.activeSelf}");
         UI_SkillSliderController.gameObject.SetActive(false);
+        UI_StageClearController.UI_RewardSystem.gameObject.SetActive(false);
+        UI_StageClearController.Text_Continue.gameObject.SetActive(false);
+        //Debug.Log($"{UI_SkillSliderController.gameObject.activeSelf}");
     }
 
 

@@ -21,6 +21,6 @@ public class CooldownSlider : MonoBehaviour {
 
     public void UpdateSkillInfo(ISkillRuntime skillRt) {
         if (SkillNameText != null)
-            SkillNameText.text = skillRt != null ? skillRt.StatsData.Name : "空";
+            SkillNameText.text = skillRt != null ? skillRt.Name : "空";
     }
 }

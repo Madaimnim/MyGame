@@ -482,6 +482,7 @@ GameObject:
   - component: {fileID: 158179782}
   - component: {fileID: 158179781}
   - component: {fileID: 158179780}
+  - component: {fileID: 158179783}
   m_Layer: 5
   m_Name: Button_SubStage3
   m_TagString: Untagged
@@ -553,19 +554,7 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 158179781}
   m_OnClick:
     m_PersistentCalls:
-      m_Calls:
-      - m_Target: {fileID: 1148364110}
-        m_TargetAssemblyTypeName: UI_StageButtonController, Assembly-CSharp
-        m_MethodName: OnSubStageClicked
-        m_Mode: 3
-        m_Arguments:
-          m_ObjectArgument: {fileID: 0}
-          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
-          m_IntArgument: 103
-          m_FloatArgument: 0
-          m_StringArgument: 103
-          m_BoolArgument: 0
-        m_CallState: 2
+      m_Calls: []
 --- !u!114 &158179781
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -604,6 +593,20 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 158179778}
   m_CullTransparentMesh: 1
+--- !u!114 &158179783
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 158179778}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5f319cfd5a726264fb6c8fdb93dc23e0, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _stageId: 103
+  _lockMask: {fileID: 0}
 --- !u!1 &168420552
 GameObject:
   m_ObjectHideFlags: 0
@@ -1618,6 +1621,7 @@ GameObject:
   - component: {fileID: 1395239503}
   - component: {fileID: 1395239502}
   - component: {fileID: 1395239501}
+  - component: {fileID: 1395239505}
   m_Layer: 5
   m_Name: Button_SubStage2
   m_TagString: Untagged
@@ -1668,19 +1672,7 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 1395239502}
   m_OnClick:
     m_PersistentCalls:
-      m_Calls:
-      - m_Target: {fileID: 1148364110}
-        m_TargetAssemblyTypeName: UI_StageButtonController, Assembly-CSharp
-        m_MethodName: OnSubStageClicked
-        m_Mode: 3
-        m_Arguments:
-          m_ObjectArgument: {fileID: 0}
-          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
-          m_IntArgument: 102
-          m_FloatArgument: 0
-          m_StringArgument: 102
-          m_BoolArgument: 0
-        m_CallState: 2
+      m_Calls: []
 --- !u!114 &1395239502
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1740,6 +1732,20 @@ RectTransform:
   m_AnchoredPosition: {x: -350, y: 0}
   m_SizeDelta: {x: 300, y: 100}
   m_Pivot: {x: 0.5, y: 0.5}
+--- !u!114 &1395239505
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1395239500}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5f319cfd5a726264fb6c8fdb93dc23e0, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _stageId: 102
+  _lockMask: {fileID: 0}
 --- !u!1 &1415391288
 GameObject:
   m_ObjectHideFlags: 0
@@ -2060,6 +2066,7 @@ GameObject:
   - component: {fileID: 1584928768}
   - component: {fileID: 1584928767}
   - component: {fileID: 1584928766}
+  - component: {fileID: 1584928770}
   m_Layer: 5
   m_Name: Button_SubStage1
   m_TagString: Untagged
@@ -2110,19 +2117,7 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 1584928767}
   m_OnClick:
     m_PersistentCalls:
-      m_Calls:
-      - m_Target: {fileID: 1148364110}
-        m_TargetAssemblyTypeName: UI_StageButtonController, Assembly-CSharp
-        m_MethodName: OnSubStageClicked
-        m_Mode: 3
-        m_Arguments:
-          m_ObjectArgument: {fileID: 0}
-          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
-          m_IntArgument: 101
-          m_FloatArgument: 0
-          m_StringArgument: 101
-          m_BoolArgument: 0
-        m_CallState: 2
+      m_Calls: []
 --- !u!114 &1584928767
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -2182,6 +2177,20 @@ RectTransform:
   m_AnchoredPosition: {x: -700, y: 0}
   m_SizeDelta: {x: 300, y: 100}
   m_Pivot: {x: 0.5, y: 0.5}
+--- !u!114 &1584928770
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1584928765}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5f319cfd5a726264fb6c8fdb93dc23e0, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _stageId: 101
+  _lockMask: {fileID: 0}
 --- !u!1 &1609543100
 GameObject:
   m_ObjectHideFlags: 0
@@ -2329,6 +2338,7 @@ GameObject:
   - component: {fileID: 1794582288}
   - component: {fileID: 1794582287}
   - component: {fileID: 1794582286}
+  - component: {fileID: 1794582289}
   m_Layer: 5
   m_Name: Button_SubStage4
   m_TagString: Untagged
@@ -2400,19 +2410,7 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 1794582287}
   m_OnClick:
     m_PersistentCalls:
-      m_Calls:
-      - m_Target: {fileID: 1148364110}
-        m_TargetAssemblyTypeName: UI_StageButtonController, Assembly-CSharp
-        m_MethodName: OnSubStageClicked
-        m_Mode: 3
-        m_Arguments:
-          m_ObjectArgument: {fileID: 0}
-          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
-          m_IntArgument: 104
-          m_FloatArgument: 0
-          m_StringArgument: 
-          m_BoolArgument: 0
-        m_CallState: 2
+      m_Calls: []
 --- !u!114 &1794582287
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -2451,6 +2449,20 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1794582284}
   m_CullTransparentMesh: 1
+--- !u!114 &1794582289
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1794582284}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5f319cfd5a726264fb6c8fdb93dc23e0, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _stageId: 104
+  _lockMask: {fileID: 0}
 --- !u!1 &2026443758
 GameObject:
   m_ObjectHideFlags: 0
@@ -2463,6 +2475,7 @@ GameObject:
   - component: {fileID: 2026443762}
   - component: {fileID: 2026443761}
   - component: {fileID: 2026443760}
+  - component: {fileID: 2026443763}
   m_Layer: 5
   m_Name: Button_SubStage5
   m_TagString: Untagged
@@ -2534,19 +2547,7 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 2026443761}
   m_OnClick:
     m_PersistentCalls:
-      m_Calls:
-      - m_Target: {fileID: 1148364110}
-        m_TargetAssemblyTypeName: UI_StageButtonController, Assembly-CSharp
-        m_MethodName: OnSubStageClicked
-        m_Mode: 3
-        m_Arguments:
-          m_ObjectArgument: {fileID: 0}
-          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
-          m_IntArgument: 105
-          m_FloatArgument: 0
-          m_StringArgument: 
-          m_BoolArgument: 0
-        m_CallState: 2
+      m_Calls: []
 --- !u!114 &2026443761
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -2585,6 +2586,20 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 2026443758}
   m_CullTransparentMesh: 1
+--- !u!114 &2026443763
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2026443758}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5f319cfd5a726264fb6c8fdb93dc23e0, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _stageId: 105
+  _lockMask: {fileID: 0}
 --- !u!1 &2110916965
 GameObject:
   m_ObjectHideFlags: 0

@@ -49,10 +49,10 @@ public class EnemyStateSystem :GameSubSystem
         _enemyStatsTemplateDtny.Clear();
         foreach (var stat in enemyStatData.enemyStatsTemplateList)
         {
-            if (!IDValidator.IsEnemyID(stat.StatsData.Id)) { Debug.LogWarning($"EnemyID不合法: {stat.StatsData.Id}"); continue; }
-            if (_enemyStatsTemplateDtny.ContainsKey(stat.StatsData.Id)){Debug.LogWarning($"重複的EnemyID:{stat.StatsData.Id}");continue;}
+            if (!IDValidator.IsEnemyID(stat.Id)) { Debug.LogWarning($"EnemyID不合法: {stat.Id}"); continue; }
+            if (_enemyStatsTemplateDtny.ContainsKey(stat.Id)){Debug.LogWarning($"重複的EnemyID:{stat.Id}");continue;}
             
-            _enemyStatsTemplateDtny[stat.StatsData.Id] = stat;
+            _enemyStatsTemplateDtny[stat.Id] = stat;
         }
     }
 }

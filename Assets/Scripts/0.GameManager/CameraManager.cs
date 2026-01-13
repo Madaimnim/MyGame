@@ -68,7 +68,7 @@ public class CameraManager : MonoBehaviour
         {
             confiner.m_BoundingShape2D = collider;
             confiner.InvalidateCache();
-            Debug.Log($" CameraManager: Confiner 已設為 {collider.name}");
+            //Debug.Log($" CameraManager: Confiner 已設為 {collider.name}");
         }
     }
     #endregion

@@ -12,9 +12,10 @@ public class GameStartHandler : IGameStateHandler
     }
 
     public void Enter() {
+        //Debug.Log("EnterGameStartHandler");
+        UIManager.Instance.HideAllUIPanels();
         UIManager.Instance.SetLoadingUI(true);
         _gameSceneSystem.LoadSceneByKey("Start");
-        UIManager.Instance.HideAllUIPanels();
     }
     public void Exit() {
         GameManager.Instance.PlayerStateSystem.PrepareInitialPlayers();

@@ -124,7 +124,7 @@ public class EnemyScreenDebug : MonoBehaviour {
             .FirstOrDefault(e =>
                 e != null &&
                 e.Rt != null &&
-                e.Rt.StatsData.Id == manualEnemyId);
+                e.Rt.Id == manualEnemyId);
 
         DebugEnemyId = target != null ? manualEnemyId : -1;
     }

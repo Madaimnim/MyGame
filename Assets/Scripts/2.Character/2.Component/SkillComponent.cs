@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Linq;
 using TMPro;
 using UnityEngine;
-using static UnityEngine.Rendering.DebugUI;
 
 public class SkillComponent
 {
@@ -72,7 +71,7 @@ public class SkillComponent
     private void TryPlaySkillAnimationTick() {
         if (!_stateComponent.CanAttack) return;
         if (IntentSlotIndex < 0 || IntentSlotIndex >= SkillSlots.Length) return;
-
+        //Debug.Log($"嘗試播放技能動畫，槽位 {IntentSlotIndex}");
         var slot = SkillSlots[IntentSlotIndex];
         if (!slot.IsReady) {
             if (!_isBaseAttackContinuous) ClearAllSkillIntent();//技能只要沒冷卻玩，就清空意圖，避免技能暫存(除了普通攻擊以外)
@@ -119,8 +118,7 @@ public class SkillComponent
         _pendingPosition = targetPos;
         _pendingSlotIndex = IntentSlotIndex;
 
-        _animationComponent.PlayAttack(skill.StatsData.Id);
-        _stateComponent.SetIsPlayingAttackAnimation(true);
+        _animationComponent.PlayAttack(skill.Id);
         OnSkillAnimationPlayed.Invoke(direction);
     }
 
@@ -164,7 +162,7 @@ public class SkillComponent
     public void EquipSkill(int slotIndex, int skillId) {
         SkillSlots[slotIndex].Uninstall();
         SkillSlots[slotIndex].SetSlot(skillId, _skillPool[skillId].Detector);
-
+        //Debug.Log($"{_transform.name}裝備技能 {skillId} 到槽位 {slotIndex}");
         SetAllDetectRangesVisible(false);
 
 

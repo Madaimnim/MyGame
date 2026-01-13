@@ -5,10 +5,6 @@ using UnityEngine;
 [System.Serializable]
 public class StatsData
 {
-    public int Id;
-    public string Name;
-    public int Level;
-
     public int Power;
     public float MoveSpeed;
     public float VerticalMoveSpeed;
@@ -17,12 +13,16 @@ public class StatsData
     public float FloatPower = 0f;
     public float Weight;
 
+    public StatsData() {
+        Power = 0;
+        MoveSpeed = 0f;
+        VerticalMoveSpeed = 0f;
+        KnockbackPower = 0f;
+        FloatPower = 0f;
+        Weight = 0f;
+    }
 
     public StatsData(StatsData other) {
-        Id = other.Id;
-        Name = other.Name;
-        Level = other.Level;
-
         Power = other.Power;
         MoveSpeed = other.MoveSpeed;
         VerticalMoveSpeed= other.VerticalMoveSpeed;

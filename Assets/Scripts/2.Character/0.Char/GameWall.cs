@@ -3,85 +3,65 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class GameWall : MonoBehaviour, IInteractable
-{
+public class GameWall : MonoBehaviour, IInteractable, IHealthData, IVisualFacing {
     [SerializeField] private Collider2D sprCol;
     public Collider2D SprCol => sprCol;
     public Transform BottomTransform => transform;
+    [SerializeField]private int _maxHp = 10;
+    public int MaxHp =>_maxHp;
+    public int CurrentHp { get; set; }
+    public Vector2 MoveVelocity { get; }
+    [SerializeField] private Transform _visualRootTransform;
+    public Transform VisulaRootTransform => _visualRootTransform;
 
-    public int gameWallID=1;     
-    public string gameWallName ="CommonWall";
-    public int maxHealth = 10;
-    public int attackPower =0;
-    public float coolDownTime =0f;
-    public float flashWhiteTime =0.1f;
-    public Material NormalMaterial;
-    public Material FlashMaterial;
+    private SpriteRenderer _spriteRenderer;
 
-    public Vector2 MoveVelocity => Vector2.zero;
+    private HitShakeVisual _hitShakeVisual ;
+    private HealthComponent _healthComponent;
+    private EffectComponent _effectComponent;
+    private StateComponent _stateComponent ;
 
-    #region 私有變數
-    private Animator animator;
-    private Rigidbody2D rb;
-    private SpriteRenderer spriteRenderer;
-    private int currentHealth;
-    private bool isDefeat=false;
-    #endregion
-
-    #region Awake()方法
     private void Awake() {
-        animator = GetComponent<Animator>();
-        rb = GetComponent<Rigidbody2D>();
-        spriteRenderer = GetComponent<SpriteRenderer>();
-    }
-    #endregion
+        CurrentHp = MaxHp;
 
-    #region Start()方法
+        _spriteRenderer = GetComponentInChildren<SpriteRenderer>();
+
+        _hitShakeVisual = GetComponentInChildren<HitShakeVisual>();
+        _stateComponent = new StateComponent();
+        _healthComponent = new HealthComponent(this, _stateComponent);
+        _effectComponent = new EffectComponent(transform, this, _spriteRenderer, _stateComponent);
+
+        HpSlider hpSlider = GetComponent<HpSlider>();
+        if (hpSlider == null) Debug.Log("GameWall 缺少 HpSlider 元件！");
+        else hpSlider.Bind(_healthComponent);
+
+        if (PlayerListManager.Instance != null) PlayerListManager.Instance.Register(this);
+    }
+    public void OnEnable() {
+        _healthComponent.OnDie += OnDie;
+    }
+    public void OnDisable() {
+        _healthComponent.OnDie -= OnDie;
+    }
+
     private void Start() {
-        isDefeat=false;
 
-    
-        currentHealth = maxHealth;
-        GameEventSystem.Instance.Event_HpChanged?.Invoke(currentHealth, maxHealth,this);// 觸發事件，通知 UI 初始血量
     }
-    #endregion
 
-    //受傷
-    #region 公開方法 TakeDamage()
+
     public void Interact(InteractInfo info) {
-        if (isDefeat) return;
 
-        currentHealth -= info.Damage;
-        TextPopupManager.Instance.ShowTakeDamagePopup(info.Damage, transform); // 顯示傷害數字
+        _effectComponent.TakeDamageEffect(info.Damage);
 
-        currentHealth = Mathf.Clamp(currentHealth, 0,maxHealth);
-        GameEventSystem.Instance.Event_HpChanged?.Invoke(currentHealth, maxHealth,this); // 更新 UI 血量
+        if (info.Damage <= 0f) return;
 
-        if (currentHealth <= 0)
-        {
-            Die();
-            return;
-        }
-
-        StartCoroutine(FlashWhite(0.1f)); // 執行閃白協程
-
+        _healthComponent.TakeDamage(info.Damage);
+        _hitShakeVisual.Play(HitShakeType.PushBack, 0f);
 
     }
-    #endregion
 
-    public void Die() {
-        isDefeat = true;
-        GameEventSystem.Instance.Event_OnWallBroken.Invoke();
+    public void OnDie() {
+        GameEventSystem.Instance?.Event_OnWallBroken?.Invoke();
     }
 
-    //受傷特效
-
-    private IEnumerator FlashWhite(float duration) {
-        if (spriteRenderer != null)
-        {
-            spriteRenderer.material = FlashMaterial;
-            yield return new WaitForSeconds(duration);
-            spriteRenderer.material = NormalMaterial;
-        }
-    }
 }

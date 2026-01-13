@@ -6,7 +6,7 @@ public class SkillHitComponent {
     private SkillObject _skillObject;
     private SkillMoveComponent _skillMoveComponent;
     private ISkillRuntime _skillRt;
-    private int _damage;
+    private StatsData _pStatsData;
     private float _knockbackPower;
     private float _floatPower;
 
@@ -19,7 +19,7 @@ public class SkillHitComponent {
     public void Initialize(ISkillRuntime skillRt,SkillMoveComponent skillMoveComponent, StatsData pStatsData) {
         _skillRt = skillRt;
         _skillMoveComponent = skillMoveComponent;
-        _damage = pStatsData.Power + _skillRt.StatsData.Power;
+        _pStatsData = pStatsData;
         _knockbackPower = pStatsData.KnockbackPower + _skillRt.StatsData.KnockbackPower;
         _floatPower = pStatsData.FloatPower + _skillRt.StatsData.FloatPower;
     }
@@ -60,10 +60,11 @@ public class SkillHitComponent {
         
         target.Interact(new InteractInfo {
             SourcePosition = sourcePosition,
-            Damage = _damage,
+            Damage = _pStatsData.Power+ _skillRt.StatsData.Power,
             KnockbackPower = _knockbackPower,
             FloatPower = _floatPower
         });
+        //Debug.Log($"技能命中目標 {target}，造成傷害 {_pStatsData.Power} + {_skillRt.StatsData.Power}");
 
         switch (_skillRt.OnHitType) {
             case OnHitType.Disappear:

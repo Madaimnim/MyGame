@@ -60,7 +60,7 @@ public class UIController_Skill : MonoBehaviour
 
     private void OnSkillUnlockedUI(int playerId, int skillId) {
         // 例如刷新技能清單
-        if (_currentRt != null && _currentRt.StatsData.Id == playerId)
+        if (_currentRt != null && _currentRt.Id == playerId)
         {
             RefreshSkillSlotButtonText();
         }
@@ -79,7 +79,7 @@ public class UIController_Skill : MonoBehaviour
             if (slotIndex >= SlotSkillNames.Length) continue;
             var skillId = _currentRt.BattleObject.GetComponent<Player>().SkillComponent.SkillSlots[slotIndex].SkillId;
             if(_currentRt.SkillPool.TryGetValue(skillId,out var skill))
-                SlotSkillNames[slotIndex].text = skill != null ? skill.StatsData.Name : "空";
+                SlotSkillNames[slotIndex].text = skill != null ? skill.Name : "空";
 
         }
     }
@@ -115,17 +115,17 @@ public class UIController_Skill : MonoBehaviour
 
             if (skillText != null)
             {
-                skillText.text = skill.StatsData.Name;
+                skillText.text = skill.Name;
             }
 
-            skillButton.onClick.AddListener(() => EquipSkill(slotIndex, skill.StatsData.Id));
+            skillButton.onClick.AddListener(() => EquipSkill(slotIndex, skill.Id));
         }
 
         // 顯示技能選擇面板
         SkillSelectionPanel.SetActive(availableSkills.Count > 0);
     }
     private void EquipSkill(int slotIndex, int skillID) {
-        GameManager.Instance.PlayerStateSystem.SkillSystem.EquipPlayerSkill(_currentRt.StatsData.Id, slotIndex, skillID);
+        GameManager.Instance.PlayerStateSystem.SkillSystem.EquipPlayerSkill(_currentRt.Id, slotIndex, skillID);
 
         RefreshSkillSlotButtonText();
         SkillSelectionPanel.SetActive(false);

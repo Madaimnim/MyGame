@@ -12,10 +12,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 39ea11695daade34396b09cf9b4897ff, type: 3}
   m_Name: PlayerStatsTemplate01
   m_EditorClassIdentifier: 
+  Id: 1001
+  Name: "\u528D\u5175"
+  Level: 1
   StatsData:
-    Id: 1001
-    Name: "\u528D\u5175"
-    Level: 1
     Power: 1
     MoveSpeed: 3
     VerticalMoveSpeed: 0
@@ -33,10 +33,9 @@ MonoBehaviour:
   MoveStrategyType: 3
   SkillSlotCount: 5
   SkillTemplateList:
-  - StatsData:
-      Id: 1
-      Name: "\u666E\u901A\u653B\u64CA"
-      Level: 1
+  - Id: 1
+    Name: "\u666E\u901A\u653B\u64CA"
+    StatsData:
       Power: 1
       MoveSpeed: 0
       VerticalMoveSpeed: 0
@@ -52,7 +51,7 @@ MonoBehaviour:
       FlashMaterial: {fileID: 0}
     SkillReleaseType: 1
     SkillLifetimeType: 1
-    SkillExecutionType: 0
+    SkillVisualFromType: 0
     SkillMoveType: 5
     OnHitType: 0
     HitEffectPositionType: 0
@@ -72,10 +71,9 @@ MonoBehaviour:
     DetectRadius: 1.5
     RangeX: 0
     RangeY: 0
-  - StatsData:
-      Id: 2
-      Name: "\u528D\u6C23"
-      Level: 1
+  - Id: 2
+    Name: "\u528D\u6C23"
+    StatsData:
       Power: 1
       MoveSpeed: 10
       VerticalMoveSpeed: 0
@@ -91,7 +89,7 @@ MonoBehaviour:
       FlashMaterial: {fileID: 0}
     SkillReleaseType: 0
     SkillLifetimeType: 0
-    SkillExecutionType: 0
+    SkillVisualFromType: 0
     SkillMoveType: 2
     OnHitType: 1
     HitEffectPositionType: 1
@@ -111,10 +109,9 @@ MonoBehaviour:
     DetectRadius: 3
     RangeX: 0
     RangeY: 0
-  - StatsData:
-      Id: 3
-      Name: "\u9B54\u528D"
-      Level: 1
+  - Id: 3
+    Name: "\u9B54\u528D"
+    StatsData:
       Power: 1
       MoveSpeed: 7
       VerticalMoveSpeed: 0
@@ -130,7 +127,7 @@ MonoBehaviour:
       FlashMaterial: {fileID: 0}
     SkillReleaseType: 0
     SkillLifetimeType: 0
-    SkillExecutionType: 0
+    SkillVisualFromType: 0
     SkillMoveType: 2
     OnHitType: 0
     HitEffectPositionType: 1
@@ -150,10 +147,9 @@ MonoBehaviour:
     DetectRadius: 3
     RangeX: 0
     RangeY: 0
-  - StatsData:
-      Id: 4
-      Name: "\u91CD\u64CA"
-      Level: 1
+  - Id: 4
+    Name: "\u91CD\u64CA"
+    StatsData:
       Power: 1
       MoveSpeed: 0
       VerticalMoveSpeed: 0
@@ -169,7 +165,7 @@ MonoBehaviour:
       FlashMaterial: {fileID: 0}
     SkillReleaseType: 0
     SkillLifetimeType: 1
-    SkillExecutionType: 0
+    SkillVisualFromType: 0
     SkillMoveType: 5
     OnHitType: 0
     HitEffectPositionType: 1
@@ -189,10 +185,9 @@ MonoBehaviour:
     DetectRadius: 3
     RangeX: 0
     RangeY: 0
-  - StatsData:
-      Id: 5
-      Name: "\u5967\u7FA9"
-      Level: 1
+  - Id: 5
+    Name: "\u5967\u7FA9"
+    StatsData:
       Power: 1
       MoveSpeed: 8
       VerticalMoveSpeed: 0
@@ -208,7 +203,7 @@ MonoBehaviour:
       FlashMaterial: {fileID: 0}
     SkillReleaseType: 1
     SkillLifetimeType: 0
-    SkillExecutionType: 0
+    SkillVisualFromType: 0
     SkillMoveType: 1
     OnHitType: 0
     HitEffectPositionType: 1
@@ -231,4 +226,4 @@ MonoBehaviour:
   UnlockedSkillIdList: 
   CanRespawn: 1
   MaxHp: 6
-  ExpTable: 0400000006000000090000000d0000001200000019000000220000002d0000003a000000490000005a0000006d0000008200000099000000b2000000cd000000ea000000090100002a0100004d0100007201000099010000c2010000ed0100001a020000490200007a020000ad020000e202000019030000
+  ExpTable: 000000000400000006000000090000000d0000001200000019000000220000002d0000003a000000490000005a0000006d0000008200000099000000b2000000cd000000ea000000090100002a0100004d0100007201000099010000c2010000ed0100001a020000490200007a020000ad020000e202000019030000

@@ -12,6 +12,9 @@ Shader "Custom/Sprite/Effect_Outline_InnerEdge_Flash2D"
         _InnerEdgeSize ("Inner Edge Size (px)", Float) = 0
 
         _FlashStrength ("Flash Strength", Range(0,1)) = 0
+
+        _AttackColor ("Attack Tint Color", Color) = (1,0,0,0.5)
+        _AttackProgress ("Attack Progress", Range(0,1)) = 0
     }
 
     SubShader
@@ -47,6 +50,9 @@ Shader "Custom/Sprite/Effect_Outline_InnerEdge_Flash2D"
             float _InnerEdgeSize;
 
             float _FlashStrength;
+
+            fixed4 _AttackColor;
+            float _AttackProgress;
 
             struct appdata
             {
@@ -103,6 +109,29 @@ Shader "Custom/Sprite/Effect_Outline_InnerEdge_Flash2D"
                     if (a < 1)
                         col.rgb = lerp(col.rgb, _InnerEdgeColor.rgb, _InnerEdgeColor.a);
                 }
+
+                // 攻擊時：整體慢慢變紅（覆蓋式）
+                //if (_AttackProgress > 0)
+                //{
+                //    float attackMask = saturate(_AttackProgress);
+                //    col.rgb = lerp(col.rgb, _AttackColor.rgb, attackMask * _AttackColor.a);
+                //}
+
+                // 攻擊時：乘法式套紅
+                //if (_AttackProgress > 0)
+                //    col.rgb *= lerp(1.0.xxx, _AttackColor.rgb, _AttackColor.a);           
+                if (_AttackProgress > 0)
+                    col.rgb = lerp(col.rgb, _AttackColor.rgb, _AttackColor.a * 0.2);
+
+                //if (_AttackProgress > 0)
+                //{
+                //    float luminance = dot(col.rgb, float3(0.299, 0.587, 0.114));
+                //    float mask = (1.0 - luminance) * _AttackColor.a;
+                //
+                //    col.rgb = lerp(col.rgb, _AttackColor.rgb, mask);
+                //}
+
+
 
                 // 閃白（最後套）
                 col.rgb = lerp(col.rgb, 1.0.xxx, _FlashStrength);

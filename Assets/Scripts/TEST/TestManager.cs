@@ -18,9 +18,6 @@ public class TestManager : MonoBehaviour {
 
         // 3 Presentation
         var host = player.GetComponent<PresentationHost>();
-        if (host == null)
-            host = player.gameObject.AddComponent<PresentationHost>();
-
-        host.Play(new SkillPresentationController(skillSlot, interval));
+        host.SetController(player, new SkillPresentationController(skillSlot, interval));
     }
 }

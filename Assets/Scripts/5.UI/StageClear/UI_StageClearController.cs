@@ -8,4 +8,5 @@ public class UI_StageClearController : MonoBehaviour {
     [Header("勝利/失敗字體物件")]
     public TextMeshProUGUI Text_StageClear;
     public TextMeshProUGUI Text_StageDefeat;
+    public TextMeshProUGUI Text_Continue;
 }

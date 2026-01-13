@@ -16,7 +16,9 @@ MonoBehaviour:
   StageName: "\u68EE\u67974"
   SpawnInterval: 1
   Waves:
-  - EnemyId: 2001
+  - EnemyId: 2004
     SpawnCount: 2
   - EnemyId: 2003
     SpawnCount: 1
+  PlayerAppearType: 0
+  EnemyAppearType: 0

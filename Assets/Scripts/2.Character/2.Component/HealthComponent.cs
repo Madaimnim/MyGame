@@ -45,6 +45,9 @@ public class HealthComponent
         //µo¨Æ¥ó
         OnHpChanged?.Invoke(_healthData.CurrentHp, _healthData.MaxHp);
     }
-    //HealthComponent
+
+    public void ForceNotify() {
+        OnHpChanged?.Invoke(_healthData.CurrentHp, _healthData.MaxHp);
+    }
 
 }

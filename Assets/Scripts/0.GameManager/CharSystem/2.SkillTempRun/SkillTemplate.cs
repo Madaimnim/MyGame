@@ -48,7 +48,8 @@ public enum SkillDetectorType {
 
 [System.Serializable]
 public class SkillTemplate {
-
+    public int Id;
+    public string Name;
     public StatsData StatsData;
     public VisualData VisualData;
     [Header("發動方式")]

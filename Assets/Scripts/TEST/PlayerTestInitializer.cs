@@ -111,8 +111,8 @@ public class PlayerTestInitializer : MonoBehaviour
         sb.AppendLine("<b>=== Player Runtime ===</b>");
 
         var s = Rt.StatsData;
-        sb.AppendLine($"ID: {s.Id}");
-        sb.AppendLine($"Name: {s.Name}");
+        //sb.AppendLine($"ID: {s.Id}");
+        //sb.AppendLine($"Name: {s.Name}");
         //sb.AppendLine($"Level: {s.Level}");
         //sb.AppendLine($"Power: {s.Power}");
         //sb.AppendLine($"MoveSpeed: {s.MoveSpeed}");
@@ -139,7 +139,7 @@ public class PlayerTestInitializer : MonoBehaviour
             if (skill != null)
             {
                 var stat = skill.StatsData;
-                sb.AppendLine($"[Skill ID {kv.Key}] {stat.Name}");
+                sb.AppendLine($"[Skill ID {kv.Key}] {skill.Name}");
                 sb.AppendLine($"  Lv: {skill.SkillLevel}  Used: {skill.SkillUsageCount}/{skill.NextLevelCount}");
                 sb.AppendLine($"  Cooldown: {skill.Cooldown}");
                 sb.AppendLine($"  ¢| Power: {stat.Power}, MoveSpeed: {stat.MoveSpeed}, KnockbackPower: {stat.KnockbackPower}, FloatPower: {stat.FloatPower}, Weight: {stat.Weight}");

@@ -56,8 +56,6 @@ public class HeightComponent
     private IEnumerator HurtCoroutine(float duration) {
         int steps = Mathf.CeilToInt(duration / Time.fixedDeltaTime);
 
-
-        _stateComponent.SetIsPlayingAttackAnimation(false);
         _stateComponent.SetIsGrounded(false);
         _stateComponent.SetIsInitialHeight(false);
         _stateComponent.SetIsInGravityFall(true);

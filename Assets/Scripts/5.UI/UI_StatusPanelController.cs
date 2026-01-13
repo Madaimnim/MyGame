@@ -56,9 +56,9 @@ public class UI_StatusPanelController : UI_PanelBase
             _currentPlayerRuntime = PlayerUtility.AllRts[currentPlayerId];
         }
 
-        statusTextsArray[0].text = $"等級: {_currentPlayerRuntime.StatsData.Level}";
+        statusTextsArray[0].text = $"等級: {_currentPlayerRuntime.Level}";
         statusTextsArray[1].text = $"HP: {_currentPlayerRuntime.MaxHp}/{_currentPlayerRuntime.MaxHp}";
-        statusTextsArray[2].text = $"名稱: {_currentPlayerRuntime.StatsData.Name}";
+        statusTextsArray[2].text = $"名稱: {_currentPlayerRuntime.Name}";
         statusTextsArray[3].text = $"攻擊力: {_currentPlayerRuntime.StatsData.Power}";
         statusTextsArray[4].text = $"經驗值: {_currentPlayerRuntime.Exp}/{_currentPlayerRuntime.Exp}";
         statusTextsArray[5].text = $"速度: {_currentPlayerRuntime.StatsData.MoveSpeed}";

@@ -6,6 +6,8 @@ using UnityEngine;
 public class EnemyStatsRuntime:IHealthData
 {
     // Template Data-----------------------------------------
+    public int Id;
+    public string Name;
     public StatsData StatsData;
     public VisualData VisualData;
     public int MaxHp { get; }
@@ -22,6 +24,8 @@ public class EnemyStatsRuntime:IHealthData
 
     //«Øºc¤l---------------------------------------------------------------------------------------------------------
     public EnemyStatsRuntime(EnemyStatsTemplate template) {
+        Id = template.Id;
+        Name = template.Name;
         StatsData = new StatsData(template.StatsData);
         VisualData = new VisualData(template.VisualData);
         MaxHp = template.MaxHp;
@@ -29,7 +33,7 @@ public class EnemyStatsRuntime:IHealthData
         CanRespawn = template.CanRespawn;
         Exp = template.Exp;
         foreach (var skill in template.SkillTemplateList)
-            SkillPool[skill.StatsData.Id] = new EnemySkillRuntime(skill);
+            SkillPool[skill.Id] = new EnemySkillRuntime(skill);
         EnemyBehaviourTreeType = template.EnemyBehaviourTreeType;
         MoveStrategy = template.MoveStrategyType switch {
             MoveStrategyType.Follow => new FollowMoveStrategy(),

@@ -13,6 +13,8 @@ public enum EnemyBehaviourTreeType {
 [CreateAssetMenu(fileName ="EnemyStatsTemplate",menuName= "GameData/EnemyStatsTemplate")]
 public class EnemyStatsTemplate:ScriptableObject
 {
+    public int Id;
+    public string Name;
     public StatsData StatsData;
     public VisualData VisualData;
     public EnemyBehaviourTreeType EnemyBehaviourTreeType;

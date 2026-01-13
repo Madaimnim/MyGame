@@ -43,10 +43,8 @@ public class Enemy :MonoBehaviour,IInteractable,IVisualFacing
     private Vector3 _lastInteractPosition;
     private float _initialHeightY ;
     private HitShakeVisual _hitShakeVisual;
-    //Test Rarity
-    private SpriteInnerEdgeController _innerEdgeController;
-    [SerializeField]private Rarity _rarity;
-
+    //防二次破壞
+    private bool _isDestroyed = false;
 
     //識別ID--------------------------------------------------------------------------------------------------------------------------------------------------------------------------
     [Header("手動ID初始化")]public int id; //在Inspector設定敵人ID以載入數據
@@ -61,8 +59,8 @@ public class Enemy :MonoBehaviour,IInteractable,IVisualFacing
         _hitShakeVisual = GetComponentInChildren<HitShakeVisual>();
 
         //Test Rarity
-        var sr = GetComponentInChildren<SpriteRenderer>();
-        _innerEdgeController = new SpriteInnerEdgeController(sr);
+        //var sr = GetComponentInChildren<SpriteRenderer>();
+        //_innerEdgeController = new SpriteInnerEdgeController(sr);
     }
     private void OnEnable()
     {
@@ -71,36 +69,24 @@ public class Enemy :MonoBehaviour,IInteractable,IVisualFacing
         if (EnemyListManager.Instance != null)EnemyListManager.Instance.Register(this);
 
         UI_HpSliderCanvas.SetActive(false);
-        //Test 方法
-        //ApplyRarityVisual(); 
+
     }
-    //Test 方法
-    private void ApplyRarityVisual() {
-        Color color = RarityColor.Get(_rarity);
-        float size = _rarity switch {
-            Rarity.Normal => 0f,
-            Rarity.Uncommon => 1f,
-            Rarity.Rare => 1.2f,
-            Rarity.Epic => 1.5f,
-            Rarity.Legendary => 2f,
-            Rarity.Mythic => 2.5f,
-            _ => 0f
-        };
-        _innerEdgeController.SetInnerEdge(color, 1f);
-    }
+
 
     private void OnDisable() {
         if (GameManager.Instance != null) GameManager.Instance.EnemyStateSystem.UnregisterEnemy(this);
         if (EnemyListManager.Instance != null) EnemyListManager.Instance.Unregister(this);
-    }
-    private void Start()
-    {
+        GameEventSystem.Instance.Event_OnWallBroken -= OnWallBroken;
+        GameEventSystem.Instance.Event_OnWallBroken -= AIComponent.DisableAI;
+        GameEventSystem.Instance.Event_OnWallBroken -= RespawnComponent.DisableRespawn;
 
+        StopAllCoroutines();
     }
+
     private void Update() {
         if (SkillComponent != null) SkillComponent.Tick();
         if (ActionLockComponent != null ) ActionLockComponent.Tick();
-        if (AIComponent != null) AIComponent.Tick();
+        if (AIComponent != null && AIComponent.CanRunAI) AIComponent.Tick();
 
     }
     private void LateUpdate() {
@@ -118,13 +104,13 @@ public class Enemy :MonoBehaviour,IInteractable,IVisualFacing
         Rt = stats;
 
         //注意依賴順序
-        StateComponent = new StateComponent(DebugContext.Enemy, Rt.StatsData.Id);
+        StateComponent = new StateComponent(DebugContext.Enemy, Rt.Id);
         ActionLockComponent = new ActionLockComponent(this, StateComponent);
         HealthComponent = new HealthComponent(Rt, StateComponent);
         AnimationComponent = new AnimationComponent(Ani, transform, Rb,StateComponent);
 
         HeightComponent = new HeightComponent(_sprCol.transform, StateComponent ,AnimationComponent, this,Rt.StatsData);
-        EffectComponent = new EffectComponent(Rt.VisualData, transform, this, Spr, StateComponent);
+        EffectComponent = new EffectComponent(transform, this, Spr, StateComponent);
 
         RespawnComponent = new RespawnComponent(this, Rt.CanRespawn);
         MoveComponent = new MoveComponent(Rb,Rt.StatsData, this, MoveDetector, AnimationComponent, HeightComponent,StateComponent);
@@ -145,22 +131,20 @@ public class Enemy :MonoBehaviour,IInteractable,IVisualFacing
         HealthComponent.OnDie += OnDie;
         HealthComponent.OnHpChanged += OnHpChanged;
         RespawnComponent.OnRespawn += OnRespawn;
-        if (GameEventSystem.Instance != null)
-        {
-            GameEventSystem.Instance.Event_BattleStart += AIComponent.EnableAI;
-            GameEventSystem.Instance.Event_OnWallBroken += AIComponent.DisableAI;
-            GameEventSystem.Instance.Event_OnWallBroken += RespawnComponent.DisableRespawn;
-        }
+        GameEventSystem.Instance.Event_OnWallBroken += OnWallBroken;
+        GameEventSystem.Instance.Event_OnWallBroken += AIComponent.DisableAI;
+        GameEventSystem.Instance.Event_OnWallBroken += RespawnComponent.DisableRespawn;
+
         SkillComponent.OnSkillAnimationPlayed += SetFacingLeft;
         SkillComponent.OnSkillAnimationPlayed += MoveComponent.SetSkillDashDirection;
         MoveComponent.OnMoveDirectionChanged += SetFacingLeft;
 
         //初始化狀態--------------------------------------------------------------------------------------------------------------------------------------------------------------------
-        transform.name = $"EnemyID_{Rt.StatsData.Id}:({Rt.StatsData.Name})";
+        transform.name = $"EnemyID_{Rt.Id}:({Rt.Name})";
         ResetState();
         SkillComponent.EquipSkill(0, 1);
-
-
+        GameEventSystem.Instance.Event_BattleStart+= AIComponent.EnableAI;
+        if (GameManager.Instance.GameStageSystem.IsBattleStarted)AIComponent.EnableAI();
     }
 
 
@@ -237,6 +221,12 @@ public class Enemy :MonoBehaviour,IInteractable,IVisualFacing
         MoveComponent.ResetVelocity();
         HealthComponent.ResetCurrentHp();
     }
+    private void OnWallBroken() {
+        if (_isDestroyed) return;
+        _isDestroyed = true;
+
+        Destroy(gameObject);
+    }
 
     private void SetFacingLeft(Vector2 direction)
     {
@@ -252,4 +242,5 @@ public class Enemy :MonoBehaviour,IInteractable,IVisualFacing
             //if (IsDead) Debug.Log($"更新敵人死亡面相:{transform.localScale}，");
         }
     }
+
 }

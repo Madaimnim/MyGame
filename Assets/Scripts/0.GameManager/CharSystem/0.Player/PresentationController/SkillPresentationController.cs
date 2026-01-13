@@ -11,7 +11,7 @@ public class SkillPresentationController : IPresentationController {
         _interval = interval;
     }
 
-    public void Enter(Player player) {
+    public void Set(Player player) {
         _player = player;
         // 顯示技能範圍
         _player.SkillComponent.SetDetectRangeVisible(_skillSlot, true);
@@ -23,7 +23,6 @@ public class SkillPresentationController : IPresentationController {
         _timer += Time.deltaTime;
         if (_timer >= _interval) {
             _timer = 0f;
-
             // Todo只播放技能動畫，不走戰鬥邏輯
             //_player.SkillComponent.PlaySkillPreview(_skillSlot);
         }

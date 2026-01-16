@@ -12,21 +12,24 @@ public enum DebugContext {
     Enemy
 }
 public class StateComponent {
-    public bool CanMove => !IsDead && !IsControlLocked && !IsKnocked && !IsPlayingAttackAnimation && !IsSkillDashing;
-    public bool CanAttack => !IsDead && !IsControlLocked && !IsKnocked && !IsPlayingAttackAnimation && IsInitialHeight;
-    public bool CanRecoverHeight => !IsDead  && !IsControlLocked && !IsKnocked && !IsSkillDashing && !IsPlayingAttackAnimation && IsInitialHeight ;
+    public bool CanMove => !IsDead && !IsControlLocked && !IsKnocked && !IsCastingSkill && !IsSkillDashing;
+    public bool CanBaseAttack => !IsDead && !IsControlLocked && !IsKnocked  && IsInitialHeight;
+    public bool CanCastSkill => !IsDead && !IsControlLocked && !IsKnocked  && IsInitialHeight;
+    public bool CanRecoverHeight => !IsDead  && !IsControlLocked && !IsKnocked && !IsSkillDashing && !IsCastingSkill && IsInitialHeight ;
 
     public bool IsDead { get; private set; } = false;
+    public bool IsMoving { get; private set; } = false;
+    public bool IsBaseAttacking { get; private set; } = false;        // 普通攻擊模式中
+    public bool IsCastingSkill { get; private set; } = false;        // 技能施放中
+
     public bool IsKnocked { get; private set; }=false;
     public bool IsGrounded { get; private set; } = false;
     public bool IsInitialHeight { get; private set; } = true;
-    public bool IsAttackingIntent { get; private set; } = false;
-    public bool IsMoving { get; private set; } = false;
-    public bool IsPlayingAttackAnimation { get; private set; } = false;
+    public bool IsSkillRecoveryActionLock { get; private set; } = false;
+
     public bool IsControlLocked { get; private set; } = false;
     public bool IsMoveAnimationOpen { get; private set; } = false;
     public bool IsInGravityFall { get; private set; } = false;
-    //技能狀態
     public bool IsSkillDashing { get;private set; } = false;
 
     // 身份（建構時注入）
@@ -40,28 +43,34 @@ public class StateComponent {
 
     public void ResetState() {
         IsDead = false;
+        IsMoving = false;
+        IsBaseAttacking = false;
+        IsCastingSkill = false;
+
         IsKnocked = false;
         IsGrounded = false;
         IsInitialHeight = true;
-        IsAttackingIntent = false;
-        IsMoving = false;
-        IsPlayingAttackAnimation = false;
+        IsSkillRecoveryActionLock = false;
+
         IsControlLocked = false;
         IsMoveAnimationOpen = false;
         IsInGravityFall = false;
         IsSkillDashing = false;
     }
-    public void SetIsDead(bool value) => IsDead = value;
+
+    public void SetIsDead(bool value) => IsDead = value; 
+    public void SetIsMoving(bool value) => IsMoving = value;
+    public void SetIsBaseAttacking(bool value) => IsBaseAttacking = value;
+    public void SetIsCastingSkill(bool value) => IsCastingSkill = value;
+
     public void SetIsKnocked(bool value) => IsKnocked = value;
     public void SetIsGrounded(bool value) => IsGrounded = value;
     public void SetIsInitialHeight(bool value) => IsInitialHeight = value;
-    public void SetIsAttackingIntent(bool value) => IsAttackingIntent = value;
-    public void SetIsMoving(bool value) => IsMoving = value;
-    public void SetIsPlayingAttackAnimation(bool value) => IsPlayingAttackAnimation = value;
+    public void SetIsSkillRecoveryActionLock(bool value) => IsSkillRecoveryActionLock = value;
+
     public void SetIsControlLocked(bool value) => IsControlLocked = value;
     public void SetIsMoveAnimationOpen(bool value) => IsMoveAnimationOpen = value;
     public void SetIsInGravityFall(bool value) => IsInGravityFall = value;
-    //技能狀態
     public void SetIsSkillDashing(bool value) => IsSkillDashing = value;
 
     //Debug搭配EnemyScreenDebug用、EnemyScreenDebug用
@@ -96,21 +105,23 @@ public class StateComponent {
         return new Dictionary<string, bool>
         {
             { "IsDead", IsDead },
+            { "IsMoving", IsMoving },
+            { "IsBaseAttacking", IsBaseAttacking },
+            { "IsCastingSkill", IsCastingSkill },
+
             { "IsKnocked", IsKnocked },
             { "IsGrounded", IsGrounded },
             { "IsInitialHeight", IsInitialHeight },
+            {"IsSkillRecoveryActionLock", IsSkillRecoveryActionLock },
+
             { "IsInGravityFall", IsInGravityFall },
-
-            { "IsMoving", IsMoving },
-            { "IsAttackingIntent", IsAttackingIntent },
-            { "IsPlayingAttackAnimation", IsPlayingAttackAnimation },
             { "IsMoveAnimationOpen", IsMoveAnimationOpen },
-
             { "IsControlLocked", IsControlLocked },
             { "IsSkillDashing", IsSkillDashing },
 
             { "CanMove", CanMove },
-            { "CanAttack", CanAttack },
+            { "CanBaseAttack", CanBaseAttack },
+            { "CanCastSkill", CanCastSkill },
             { "CanRecoverHeight", CanRecoverHeight },
         };
     }

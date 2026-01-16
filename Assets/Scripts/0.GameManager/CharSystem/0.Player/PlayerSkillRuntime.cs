@@ -18,6 +18,9 @@ public class PlayerSkillRuntime: ISkillRuntime
     public StatsData StatsData { get; private set; }
     public VisualData VisualData { get; private set; }
     public bool canRotate { get; set; }
+    public SkillCostType SkillCostType { get; set; }
+    public float EnergyCost { get; set; }                 // 玩家用
+    public float EnergyGain { get; set; }                 // 玩家用
     public float Cooldown { get; set; }
     public float DestroyDelay { get; set; }
     public float OnHitDestroyDelay { get; set; }
@@ -49,6 +52,9 @@ public class PlayerSkillRuntime: ISkillRuntime
         StatsData = new StatsData(template.StatsData);
         VisualData = new VisualData(template.VisualData);
         canRotate = template.canRotate;
+        SkillCostType=SkillCostType.Energy;
+        EnergyCost = template.EnergyCost;
+        EnergyGain = template.EnergyGain;
         Cooldown = template.Cooldown;
         DestroyDelay = template.DestroyDelay;
         OnHitDestroyDelay = template.OnHitDestroyDelay;

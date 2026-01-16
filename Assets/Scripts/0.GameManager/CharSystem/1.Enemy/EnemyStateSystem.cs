@@ -11,7 +11,6 @@ public class EnemyStateSystem :GameSubSystem
     public IReadOnlyCollection<Enemy> BattleEnemyList => _battleEnemyList;
     public IReadOnlyCollection<int> UnlockedIdList => _unlockedIdList;
     //public List<EnemyStatsRuntime> EnemyStatsRuntimeList { get; private set; } = new List<EnemyStatsRuntime>();
-    public EnemySkillSystem SkillSystem { get; private set; }
 
     // 事件
     public event Action<int> OnEnemyUnlocked;
@@ -25,7 +24,6 @@ public class EnemyStateSystem :GameSubSystem
 
     public override void Initialize() {
         var appearEffector = AppearEffectorFactory.CreateEffector(AppearType.Instant);
-        SkillSystem = new EnemySkillSystem();
     }
 
 

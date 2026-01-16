@@ -163,7 +163,7 @@ public class MoveComponent
         }
 
         _stateComponent.SetIsSkillDashing(false);
-        _stateComponent.SetIsPlayingAttackAnimation(false);
+        _stateComponent.SetIsCastingSkill(false);
 
         _skillDashMoveCoroutine = null;
     }

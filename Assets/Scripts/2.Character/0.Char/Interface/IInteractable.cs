@@ -5,7 +5,7 @@ using UnityEngine;
 public interface IInteractable
 {
     Transform BottomTransform { get; }
-    Collider2D SprCol { get; }
+    Collider2D RootSpriteCollider { get; }
     Vector2 MoveVelocity { get; }
 
     void Interact(InteractInfo info);

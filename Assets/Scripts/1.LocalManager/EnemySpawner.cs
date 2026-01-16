@@ -6,7 +6,6 @@ using UnityEngine;
 public class EnemySpawner : MonoBehaviour {
     
     [Header("敵人生成位置")]
-    [SerializeField] private MonoBehaviour _enemyPositionProvider;
     private DefaultEnemyFactory _enemyFactory;
     private EnemyCounter _enemyCounter;
 

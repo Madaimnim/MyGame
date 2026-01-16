@@ -14,7 +14,7 @@ public class EnemyStatsRuntime:IHealthData
     public int SkillSlotCount;
     public int Exp;
     public bool CanRespawn;
-    public Dictionary<int, ISkillRuntime> SkillPool = new Dictionary<int, ISkillRuntime>();
+    public Dictionary<int, ISkillRuntime> SkillPool = new Dictionary<int, ISkillRuntime>();     //SkillID對應SkillRuntime
     public EnemyBehaviourTreeType EnemyBehaviourTreeType;
     public MoveStrategyBase MoveStrategy;   //直接持有策略實例
     //Runtime-------------------------------------------------------------------------------------------------------

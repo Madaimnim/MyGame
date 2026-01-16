@@ -31,12 +31,12 @@ MonoBehaviour:
     FlashMaterial: {fileID: 2100000, guid: 343628f4e759ecf46b917b0ca0685d23, type: 2}
   PlayerBehaviourTreeType: 0
   MoveStrategyType: 3
-  SkillSlotCount: 5
-  SkillTemplateList:
-  - Id: 1
+  SkillSlotCount: 4
+  BaseAttackTemplate:
+    Id: 0
     Name: "\u666E\u901A\u653B\u64CA"
     StatsData:
-      Power: 1
+      Power: 0
       MoveSpeed: 0
       VerticalMoveSpeed: 0
       KnockbackPower: 0
@@ -51,7 +51,7 @@ MonoBehaviour:
       FlashMaterial: {fileID: 0}
     SkillReleaseType: 1
     SkillLifetimeType: 1
-    SkillVisualFromType: 0
+    SkillVisualFromType: 1
     SkillMoveType: 5
     OnHitType: 0
     HitEffectPositionType: 0
@@ -61,20 +61,23 @@ MonoBehaviour:
       m_Bits: 256
     canRotate: 1
     Cooldown: 0
-    DestroyDelay: 3
+    EnergyCost: 0
+    EnergyGain: 0.03
+    DestroyDelay: 0
     OnHitDestroyDelay: 0
     SkillDashMultiplier: 1
-    SkillDashDuration: 0.5
+    SkillDashDuration: 0
     SkillDashPrepareDuration: 0
     SkillDashVerticalVelocity: 0
     DetectorType: 0
     DetectRadius: 1.5
     RangeX: 0
     RangeY: 0
-  - Id: 2
+  SkillTemplateList:
+  - Id: 1
     Name: "\u528D\u6C23"
     StatsData:
-      Power: 1
+      Power: 2
       MoveSpeed: 10
       VerticalMoveSpeed: 0
       KnockbackPower: 3
@@ -98,7 +101,9 @@ MonoBehaviour:
       serializedVersion: 2
       m_Bits: 256
     canRotate: 1
-    Cooldown: 1
+    Cooldown: 0
+    EnergyCost: 1
+    EnergyGain: 0
     DestroyDelay: 4
     OnHitDestroyDelay: 0
     SkillDashMultiplier: 1
@@ -109,10 +114,10 @@ MonoBehaviour:
     DetectRadius: 3
     RangeX: 0
     RangeY: 0
-  - Id: 3
+  - Id: 2
     Name: "\u9B54\u528D"
     StatsData:
-      Power: 1
+      Power: 2
       MoveSpeed: 7
       VerticalMoveSpeed: 0
       KnockbackPower: 0
@@ -136,7 +141,9 @@ MonoBehaviour:
       serializedVersion: 2
       m_Bits: 256
     canRotate: 0
-    Cooldown: 3
+    Cooldown: 0
+    EnergyCost: 1
+    EnergyGain: 0
     DestroyDelay: 4
     OnHitDestroyDelay: 0
     SkillDashMultiplier: 1
@@ -147,10 +154,10 @@ MonoBehaviour:
     DetectRadius: 3
     RangeX: 0
     RangeY: 0
-  - Id: 4
+  - Id: 3
     Name: "\u91CD\u64CA"
     StatsData:
-      Power: 1
+      Power: 3
       MoveSpeed: 0
       VerticalMoveSpeed: 0
       KnockbackPower: 0
@@ -174,7 +181,9 @@ MonoBehaviour:
       serializedVersion: 2
       m_Bits: 256
     canRotate: 0
-    Cooldown: 0.5
+    Cooldown: 0
+    EnergyCost: 1
+    EnergyGain: 0
     DestroyDelay: 1
     OnHitDestroyDelay: 0
     SkillDashMultiplier: 1
@@ -185,10 +194,10 @@ MonoBehaviour:
     DetectRadius: 3
     RangeX: 0
     RangeY: 0
-  - Id: 5
+  - Id: 4
     Name: "\u5967\u7FA9"
     StatsData:
-      Power: 1
+      Power: 2
       MoveSpeed: 8
       VerticalMoveSpeed: 0
       KnockbackPower: 8
@@ -212,7 +221,9 @@ MonoBehaviour:
       serializedVersion: 2
       m_Bits: 256
     canRotate: 0
-    Cooldown: 3
+    Cooldown: 0
+    EnergyCost: 1
+    EnergyGain: 0
     DestroyDelay: 8
     OnHitDestroyDelay: 0
     SkillDashMultiplier: 1
@@ -223,7 +234,6 @@ MonoBehaviour:
     DetectRadius: 10
     RangeX: 0
     RangeY: 0
-  UnlockedSkillIdList: 
   CanRespawn: 1
   MaxHp: 6
   ExpTable: 000000000400000006000000090000000d0000001200000019000000220000002d0000003a000000490000005a0000006d0000008200000099000000b2000000cd000000ea000000090100002a0100004d0100007201000099010000c2010000ed0100001a020000490200007a020000ad020000e202000019030000

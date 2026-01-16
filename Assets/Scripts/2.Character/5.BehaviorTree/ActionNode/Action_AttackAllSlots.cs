@@ -3,26 +3,27 @@ using UnityEngine;
 public class Action_AttackAllSlots : Node
 {
     private AIComponent _ai;
-    private SkillComponent _skillComponent;
+    private CombatComponent _combatComponent;
 
     public Action_AttackAllSlots(AIComponent ai) {
         _ai = ai;
-        _skillComponent= _ai.SkillComponent;
+        _combatComponent= _ai.CombatComponent;
 
     }
 
     public override NodeState Evaluate(float updateInterval) {
-        for (int i = 0; i < _skillComponent.SkillSlotCount; i++)
+        for (int i = 0; i < _combatComponent.SkillSlotCount; i++)
         {
-            var slot = _skillComponent.SkillSlots[i];
-            if (slot == null || slot.SkillId ==-1) continue;
-            if (!slot.IsReady || slot.Detector == null || !slot.Detector.HasTarget) continue;
-            //Debug.Log($"{_ai.Transform.name}: 設定技能槽 {i} 的技能 {slot.SkillId} 攻擊意圖");
-            _skillComponent.SetIntentSkill(i, slot.Detector.TargetTransform.position, slot.Detector.TargetTransform);
-            return NodeState.SUCCESS;
+            var slot = _combatComponent.SkillSlots[i];
+            if(slot == null || !slot.IsReady) continue;
+            if (slot.Detector == null || !slot.Detector.HasTarget) continue;
+
+            if(_combatComponent.SetIntentSkill(i, slot.Detector.TargetTransform.position, slot.Detector.TargetTransform))
+                return NodeState.SUCCESS;
+            else
+                continue;
         }
 
-        _skillComponent.ClearAllSkillIntent();
         return NodeState.FAILURE; // 沒有任何技能能用
     }
 }

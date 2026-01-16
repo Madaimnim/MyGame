@@ -230,8 +230,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   enableDebug: 0
-  _sprCol: {fileID: 6635113257592043771}
-  VisulaRootTransform: {fileID: 6723880853684312057}
+  _rootSpriteCollider: {fileID: 6635113257592043771}
+  _visualRootTransform: {fileID: 6723880853684312057}
   BackSpriteTransform: {fileID: 3759630329182387135}
   MoveDetector: {fileID: 0}
   SelectIndicator: {fileID: 4167029791549883717, guid: f83ade4c18471fb429dc1ccc80f42329, type: 3}

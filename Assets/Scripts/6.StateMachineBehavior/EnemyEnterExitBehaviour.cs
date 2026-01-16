@@ -12,7 +12,7 @@ public class EnemyEnterExitBehaviour : StateMachineBehaviour {
 
         if (enemy == null) return;
 
-        enemy.StateComponent.SetIsPlayingAttackAnimation(true);
+        enemy.StateComponent.SetIsCastingSkill(true);
 
         //攻擊變紅（只給敵人）
         if (effect != null) {
@@ -24,7 +24,7 @@ public class EnemyEnterExitBehaviour : StateMachineBehaviour {
     public override void OnStateExit(Animator animator, AnimatorStateInfo stateInfo, int layerIndex) {
         if (enemy == null) return;
 
-        enemy.StateComponent.SetIsPlayingAttackAnimation(false);
+        enemy.StateComponent.SetIsCastingSkill(false);
 
         //確保中斷也會清掉
         effect?.StopAttackTint();

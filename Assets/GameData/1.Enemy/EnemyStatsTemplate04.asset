@@ -60,6 +60,8 @@ MonoBehaviour:
       m_Bits: 576
     canRotate: 0
     Cooldown: 1
+    EnergyCost: 0
+    EnergyGain: 0
     DestroyDelay: 0.5
     OnHitDestroyDelay: 0
     SkillDashMultiplier: 3
@@ -71,5 +73,5 @@ MonoBehaviour:
     RangeX: 0
     RangeY: 0
   CanRespawn: 0
-  MaxHp: 10
+  MaxHp: 4
   Exp: 1

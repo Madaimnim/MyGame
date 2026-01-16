@@ -328,8 +328,8 @@ GameObject:
   - component: {fileID: 214014861}
   - component: {fileID: 214014863}
   - component: {fileID: 214014864}
-  - component: {fileID: 214014865}
   - component: {fileID: 214014866}
+  - component: {fileID: 214014865}
   m_Layer: 0
   m_Name: "Stage\u5834\u666FManager"
   m_TagString: Untagged
@@ -382,7 +382,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 49c6026acdfeb33468cef7485692f47a, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _enemyPositionProvider: {fileID: 1552200437}
 --- !u!114 &214014864
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -409,6 +408,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 1ea37ad7426ab2747b71db77cb4ebf6a, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  _timerText: {fileID: 0}
 --- !u!114 &214014866
 MonoBehaviour:
   m_ObjectHideFlags: 0

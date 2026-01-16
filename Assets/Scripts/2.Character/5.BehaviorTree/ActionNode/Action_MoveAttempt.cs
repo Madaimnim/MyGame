@@ -6,7 +6,7 @@ public class Action_MoveAttempt : Node
 {
     private AIComponent _ai;
     private MoveComponent _moveComponent;
-    private SkillComponent _skillComponent;
+    private CombatComponent _combatComponent;
     private MoveStrategyBase _moveStrategy;
 
     //攻擊目標檢測
@@ -34,7 +34,7 @@ public class Action_MoveAttempt : Node
     public Action_MoveAttempt(AIComponent ai, float moveTime) {
         _ai= ai;
         _moveComponent = _ai.MoveComponent;
-        _skillComponent = _ai.SkillComponent;
+        _combatComponent = _ai.CombatComponent;
         _moveStrategy = _ai.MoveStrategy;
 
         _moveTime = moveTime;
@@ -44,7 +44,7 @@ public class Action_MoveAttempt : Node
 
     public override NodeState Evaluate(float updateInterval) {
         //有目標且冷卻完成，SUCCESS
-        if (_timer >= ATK_INTERVAL && _skillComponent.HasAnyTarget)
+        if (_timer >= ATK_INTERVAL && _combatComponent.HasAnyTarget)
         {
             ResetTimerAndIntent();
             return NodeState.SUCCESS;

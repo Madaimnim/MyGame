@@ -26,8 +26,9 @@ public class PlayerStatsTemplate:ScriptableObject
     public MoveStrategyType MoveStrategyType;
     public int SkillSlotCount;
     [FormerlySerializedAs("SkillTemplateList")]
+    public SkillTemplate BaseAttackTemplate;
     public List<SkillTemplate> SkillTemplateList = new List<SkillTemplate>();
-    public List<int> UnlockedSkillIdList = new List<int>();
+    public HashSet<int> UnlockedSkillIdHashSet = new();
 
     public bool CanRespawn = true;
     public int MaxHp;

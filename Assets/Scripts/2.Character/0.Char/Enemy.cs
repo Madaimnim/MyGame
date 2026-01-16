@@ -7,14 +7,14 @@ using UnityEngine.UIElements;
 //SkillDetectorBase 下轄Circle_Detector、Box_Detector等偵測策略，可生成範圍Sprite物件，無實際技能槽，開關僅關閉可視化範圍
 
 //腳色技能安裝流程:
-//PlayerStateSystem.UnlockPlayer()-> PlayerSkillSystem.EquipPlayerSkil()->SkillComponent.EquipSkill->();
-//Enemy.Initialized()->EnemySkillSystem.EquipEnemySkill()->EnemySkillComponent.EquipSkill->();
+//PlayerStateSystem.UnlockPlayer()-> PlayerSkillSystem.EquipPlayerSkil()->CombatComponent.EquipSkill->();
+//Enemy.Initialized()->EnemySkillSystem.EquipEnemySkill()->EnemyCombatComponent.EquipSkill->();
 
 public class Enemy :MonoBehaviour,IInteractable,IVisualFacing
 {
     //公開--------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-    [SerializeField] private Collider2D _sprCol;
-    public Collider2D SprCol => _sprCol;
+    [SerializeField] private Collider2D _rootSpriteCollider;
+    public Collider2D RootSpriteCollider => _rootSpriteCollider;
     public Transform BottomTransform => transform;
     [SerializeField] private Transform _visualRootTransform;
     public Transform VisulaRootTransform=> _visualRootTransform;
@@ -35,7 +35,7 @@ public class Enemy :MonoBehaviour,IInteractable,IVisualFacing
     public EffectComponent EffectComponent { get; private set; }
     public AIComponent AIComponent { get; private set; }
     public MoveComponent MoveComponent { get; private set; }
-    public SkillComponent SkillComponent { get; private set; }
+    public CombatComponent CombatComponent { get; private set; }
     public SpawnerComponent SpawnerComponent { get; private set; }
     public HeightComponent HeightComponent { get; private set; }
     public Vector2 MoveVelocity => MoveComponent.IntentDirection * MoveComponent.MoveSpeed;
@@ -84,7 +84,7 @@ public class Enemy :MonoBehaviour,IInteractable,IVisualFacing
     }
 
     private void Update() {
-        if (SkillComponent != null) SkillComponent.Tick();
+        if (CombatComponent != null) CombatComponent.Tick(PlayerListManager.Instance.TargetList);
         if (ActionLockComponent != null ) ActionLockComponent.Tick();
         if (AIComponent != null && AIComponent.CanRunAI) AIComponent.Tick();
 
@@ -109,23 +109,25 @@ public class Enemy :MonoBehaviour,IInteractable,IVisualFacing
         HealthComponent = new HealthComponent(Rt, StateComponent);
         AnimationComponent = new AnimationComponent(Ani, transform, Rb,StateComponent);
 
-        HeightComponent = new HeightComponent(_sprCol.transform, StateComponent ,AnimationComponent, this,Rt.StatsData);
+        HeightComponent = new HeightComponent(_rootSpriteCollider.transform, StateComponent ,AnimationComponent, this,Rt.StatsData);
         EffectComponent = new EffectComponent(transform, this, Spr, StateComponent);
 
         RespawnComponent = new RespawnComponent(this, Rt.CanRespawn);
         MoveComponent = new MoveComponent(Rb,Rt.StatsData, this, MoveDetector, AnimationComponent, HeightComponent,StateComponent);
         SpawnerComponent = new SpawnerComponent();
-        SkillComponent = new SkillComponent(Rt.StatsData, Rt.SkillSlotCount,Rt.SkillPool, AnimationComponent,StateComponent, transform, _sprCol.transform,
+        CombatComponent = new CombatComponent(Rt.StatsData, Rt.SkillSlotCount,Rt.SkillPool, AnimationComponent,StateComponent, transform, _rootSpriteCollider.transform,
             PlayerListManager.Instance.TargetList,MoveComponent,HeightComponent);
-        AIComponent = new AIComponent( MoveComponent, SkillComponent, transform,Rt.MoveStrategy);
+        AIComponent = new AIComponent( MoveComponent, CombatComponent, transform,Rt.MoveStrategy);
 
 
         //額外初始化設定
         BehaviorTree behaviourTree =EnemyBehaviourTreeFactory.Create(Rt.EnemyBehaviourTreeType, this);
         AIComponent.SetBehaviorTree(behaviourTree);
-
         HpSlider hpSlider = GetComponentInChildren<HpSlider>();
         hpSlider.Bind(HealthComponent);
+
+        var enemySkillUseGate = new EnemySkillUseGate();
+        CombatComponent.SetSkillUseGate(enemySkillUseGate);
 
         //事件訂閱
         HealthComponent.OnDie += OnDie;
@@ -135,14 +137,16 @@ public class Enemy :MonoBehaviour,IInteractable,IVisualFacing
         GameEventSystem.Instance.Event_OnWallBroken += AIComponent.DisableAI;
         GameEventSystem.Instance.Event_OnWallBroken += RespawnComponent.DisableRespawn;
 
-        SkillComponent.OnSkillAnimationPlayed += SetFacingLeft;
-        SkillComponent.OnSkillAnimationPlayed += MoveComponent.SetSkillDashDirection;
+        CombatComponent.OnSkillAnimationPlayed += SetFacingLeft;
+        CombatComponent.OnSkillAnimationPlayed += MoveComponent.SetSkillDashDirection;
         MoveComponent.OnMoveDirectionChanged += SetFacingLeft;
 
         //初始化狀態--------------------------------------------------------------------------------------------------------------------------------------------------------------------
         transform.name = $"EnemyID_{Rt.Id}:({Rt.Name})";
         ResetState();
-        SkillComponent.EquipSkill(0, 1);
+
+        Rt.SkillPool.TryGetValue(1, out var skillRt);
+        CombatComponent.EquipSkill(1, skillRt);
         GameEventSystem.Instance.Event_BattleStart+= AIComponent.EnableAI;
         if (GameManager.Instance.GameStageSystem.IsBattleStarted)AIComponent.EnableAI();
     }
@@ -151,7 +155,7 @@ public class Enemy :MonoBehaviour,IInteractable,IVisualFacing
     public void Interact(InteractInfo info)
     {
         _lastInteractPosition = info.SourcePosition;
-        var directX = info.SourcePosition.x - SprCol.transform.localPosition.x;
+        var directX = info.SourcePosition.x - RootSpriteCollider.transform.localPosition.x;
 
         EffectComponent.TakeDamageEffect(info.Damage);
 
@@ -192,7 +196,7 @@ public class Enemy :MonoBehaviour,IInteractable,IVisualFacing
         AIComponent.DisableAI();
 
 
-        Vector2 dir = _lastInteractPosition - SprCol.transform.position;
+        Vector2 dir = _lastInteractPosition - RootSpriteCollider.transform.position;
         SetFacingLeft(dir); // 重用你現有的方向翻轉方法
                           
 
@@ -217,7 +221,7 @@ public class Enemy :MonoBehaviour,IInteractable,IVisualFacing
         AIComponent.EnableAI();
     }
     public void ResetState() {
-        StateComponent.SetIsPlayingAttackAnimation (false);
+        StateComponent.ResetState();
         MoveComponent.ResetVelocity();
         HealthComponent.ResetCurrentHp();
     }

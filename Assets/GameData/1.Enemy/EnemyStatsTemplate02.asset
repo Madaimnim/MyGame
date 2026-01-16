@@ -35,7 +35,7 @@ MonoBehaviour:
   - Id: 1
     Name: "\u666E\u901A\u653B\u64CA"
     StatsData:
-      Power: 1
+      Power: 0
       MoveSpeed: 5
       VerticalMoveSpeed: 0
       KnockbackPower: 0
@@ -60,6 +60,8 @@ MonoBehaviour:
       m_Bits: 576
     canRotate: 1
     Cooldown: 3
+    EnergyCost: 0
+    EnergyGain: 0
     DestroyDelay: 3
     OnHitDestroyDelay: 0
     SkillDashMultiplier: 1
@@ -71,5 +73,5 @@ MonoBehaviour:
     RangeX: 0
     RangeY: 0
   CanRespawn: 0
-  MaxHp: 10
+  MaxHp: 4
   Exp: 1

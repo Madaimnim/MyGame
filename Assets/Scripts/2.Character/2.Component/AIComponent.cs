@@ -10,7 +10,7 @@ public class AIComponent
     public TargetDetector GetMoveDetector() => MoveComponent.MoveDetector;
 
     public MoveComponent MoveComponent { get; private set; }
-    public SkillComponent SkillComponent { get; private set; }
+    public CombatComponent CombatComponent { get; private set; }
     public Transform Transform { get; private set; }
     public MoveStrategyBase MoveStrategy { get; private set; }
 
@@ -19,9 +19,9 @@ public class AIComponent
     private float _updateInterval = 0.1f;           // AI ¨Mµ¦¶¡¹j¡]¬í¡^
     private float _updateTimer = 0f;
 
-    public AIComponent(MoveComponent moveComponent,SkillComponent skillComponent, Transform transform, MoveStrategyBase moveStrategy) {
+    public AIComponent(MoveComponent moveComponent,CombatComponent combatComponentonent, Transform transform, MoveStrategyBase moveStrategy) {
         MoveComponent = moveComponent;
-        SkillComponent = skillComponent;
+        CombatComponent = combatComponentonent;
         Transform = transform;
         MoveStrategy = moveStrategy;
     }

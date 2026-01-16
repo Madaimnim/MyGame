@@ -448,7 +448,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: 0, y: 0.67}
+  m_AnchoredPosition: {x: 0, y: 0}
   m_SizeDelta: {x: 1, y: 1}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!223 &5097688413946083693
@@ -623,11 +623,11 @@ RectTransform:
   m_Father: {fileID: 5097688413946083694}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
-  m_AnchorMin: {x: 0.5, y: 0.5}
-  m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: 0, y: 11}
+  m_AnchorMin: {x: 0.5, y: 1}
+  m_AnchorMax: {x: 0.5, y: 1}
+  m_AnchoredPosition: {x: 0, y: -3}
   m_SizeDelta: {x: 240, y: 15}
-  m_Pivot: {x: 0.5, y: 0.5}
+  m_Pivot: {x: 0.5, y: 1}
 --- !u!114 &5097688415315766495
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -989,7 +989,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 0c0d73ebd28277448a0b50dedb6d8486, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _sprCol: {fileID: 1390189828756800086}
+  _rootSpriteCollider: {fileID: 1390189828756800086}
   _visualRootTransform: {fileID: 7963196913532301585}
   BackSpriteTransform: {fileID: 5922981820995659324}
   MoveDetector: {fileID: 0}

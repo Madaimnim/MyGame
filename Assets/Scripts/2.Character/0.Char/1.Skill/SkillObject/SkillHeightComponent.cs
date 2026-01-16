@@ -4,7 +4,7 @@ using UnityEngine;
 using System.Collections;
 
 public class SkillHeightComponent {
-    private Transform _sprTransform;
+    private Transform _rootSpriteTransform;
 
 
     private bool _canGravityFall = false;
@@ -14,8 +14,8 @@ public class SkillHeightComponent {
     //地面微小偏差容許值
     const float GROUND_EPSILON = 0.001f;
 
-    public SkillHeightComponent(Transform sprTransform,bool canGravityFall) {
-        _sprTransform= sprTransform;
+    public SkillHeightComponent(Transform rootSpriteTransform,bool canGravityFall) {
+        _rootSpriteTransform = rootSpriteTransform;
         _canGravityFall= canGravityFall;
 
         _gravity = GameSettingManager.Instance.PhysicConfig.GravityScale;
@@ -25,7 +25,7 @@ public class SkillHeightComponent {
         if (_canGravityFall) {
             GravityFall();
 
-            if (_sprTransform.localPosition.y <= GROUND_EPSILON) {
+            if (_rootSpriteTransform.localPosition.y <= GROUND_EPSILON) {
                 UpdateHeight(0f);
                 _verticalVelocity = 0f;
             }
@@ -40,7 +40,7 @@ public class SkillHeightComponent {
     //重力控制
     public void GravityFall() {
         float dt = Time.fixedDeltaTime;
-        float currentHeight = _sprTransform.localPosition.y + _verticalVelocity * dt;
+        float currentHeight = _rootSpriteTransform.localPosition.y + _verticalVelocity * dt;
         if (currentHeight <= 0f) currentHeight = 0f;
         UpdateHeight(currentHeight);
         _verticalVelocity -= _gravity * dt;
@@ -48,6 +48,6 @@ public class SkillHeightComponent {
 
     //更新高度
     public void UpdateHeight(float y) {
-        _sprTransform.localPosition = new Vector3(_sprTransform.localPosition.x, y, _sprTransform.localPosition.z);
+        _rootSpriteTransform.localPosition = new Vector3(_rootSpriteTransform.localPosition.x, y, _rootSpriteTransform.localPosition.z);
     }
 }

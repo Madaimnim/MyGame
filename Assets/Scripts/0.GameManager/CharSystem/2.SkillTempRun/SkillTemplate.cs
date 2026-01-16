@@ -2,7 +2,11 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-
+public enum SkillCostType {
+    Cooldown,   // 敵人 / 特殊技能
+    Energy,     // 玩家主流技能
+    CooldownAndEnergy
+}
 public enum SkillReleaseType
 {
     [InspectorName("指向技")] Towerd,   // 例如：地裂斬、放火球到地板
@@ -64,9 +68,10 @@ public class SkillTemplate {
     public FacingDirection FacingDirection = FacingDirection.Right;
     public LayerMask TargetLayers;
 
-
     public bool canRotate;
-    public float Cooldown;
+    public float Cooldown;          //玩家、敵人通用
+    public float EnergyCost = 0;        // 玩家用
+    public float EnergyGain = 0;        // 玩家用
     public float DestroyDelay = 0f;
     public float OnHitDestroyDelay = 0f;
     public float SkillDashMultiplier = 1f;

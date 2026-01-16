@@ -17,6 +17,9 @@ public interface ISkillRuntime
     StatsData StatsData { get; }
     VisualData VisualData { get; }
     bool canRotate { get; }
+    SkillCostType SkillCostType { get; }
+    float EnergyCost { get; }         // 玩家用
+    float EnergyGain { get; }         // 玩家用
     float Cooldown { get; }
     float DestroyDelay { get; }
     float OnHitDestroyDelay { get; }

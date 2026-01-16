@@ -10,6 +10,7 @@ GameObject:
   m_Component:
   - component: {fileID: 167583822}
   - component: {fileID: 167583823}
+  - component: {fileID: 5095246478428020105}
   m_Layer: 9
   m_Name: WallHpSlider
   m_TagString: Untagged
@@ -104,6 +105,21 @@ MonoBehaviour:
           m_StringArgument: 
           m_BoolArgument: 0
         m_CallState: 2
+--- !u!114 &5095246478428020105
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 167583821}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 19628b37e1505ee4aac382ae9b5921f4, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  slider: {fileID: 167583823}
+  text: {fileID: 1043574231}
+  title: HP
 --- !u!1 &1043574230
 GameObject:
   m_ObjectHideFlags: 0
@@ -912,7 +928,6 @@ GameObject:
   m_Component:
   - component: {fileID: 7433608722376553061}
   - component: {fileID: 2983219179938031864}
-  - component: {fileID: 9196775725751048132}
   m_Layer: 9
   m_Name: "\u6C34\u6676"
   m_TagString: Untagged
@@ -952,21 +967,6 @@ MonoBehaviour:
   sprCol: {fileID: 1498067115388496396}
   _maxHp: 10
   _visualRootTransform: {fileID: 5959984825702131296}
---- !u!114 &9196775725751048132
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 7433608722376553058}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 19628b37e1505ee4aac382ae9b5921f4, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  slider: {fileID: 167583823}
-  text: {fileID: 1043574231}
-  title: HP
 --- !u!1 &7736013521244612527
 GameObject:
   m_ObjectHideFlags: 0

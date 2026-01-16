@@ -19,6 +19,9 @@ public class EnemySkillRuntime: ISkillRuntime
     public StatsData StatsData { get; private set; }
     public VisualData VisualData { get; private set; }
     public bool canRotate { get; set; }
+    public SkillCostType SkillCostType { get; set; }
+    public float EnergyCost { get; set; }
+    public float EnergyGain { get; set; }
     public float Cooldown { get; set; }
     public float DestroyDelay { get; set; }
     public float OnHitDestroyDelay { get; set; }
@@ -45,6 +48,8 @@ public class EnemySkillRuntime: ISkillRuntime
         StatsData = template.StatsData;
         VisualData = template.VisualData;
         canRotate = template.canRotate;
+        SkillCostType = SkillCostType.Cooldown;
+        EnergyCost = template.EnergyCost;
         Cooldown = template.Cooldown;
         DestroyDelay= template.DestroyDelay;
         OnHitDestroyDelay= template.OnHitDestroyDelay;

@@ -18,7 +18,7 @@ public class PlayerInputManager : MonoBehaviour {
     KeyCode.W,
     KeyCode.E,
     KeyCode.R
-};
+    };
 
     private readonly List<Player> _selectedPlayerList = new List<Player>();
     public bool CanControl { get; private set; } = false;
@@ -155,7 +155,7 @@ public class PlayerInputManager : MonoBehaviour {
 
         ResetAllBattlePlayerIntent();
 
-        selectedPlayer.SelectIndicator.SetActive(true);
+        //selectedPlayer.SelectIndicator.SetActive(true);       //先不用
         CameraManager.Instance.Follow(selectedPlayer.transform);
 
         CurrentControlPlayer = selectedPlayer;
@@ -174,39 +174,33 @@ public class PlayerInputManager : MonoBehaviour {
     private void HandleRightClick(Player player) {
         Vector2 mouseWorldPos = Camera.main.ScreenToWorldPoint(Input.mousePosition);
 
-        var skillComp = player.SkillComponent;
+        var combatComponent = player.CombatComponent;
         var moveComp = player.MoveComponent;
+        var stateComp = player.StateComponent;
 
-        if (skillComp.SkillSlots.Length == 0) return;
-        if (skillComp.IntentSlotIndex > 0) return;
+        if (stateComp.IsCastingSkill) combatComponent.UseSkill();
+        if(stateComp.IsBaseAttacking) combatComponent.UseBaseAttack();
 
-        var slot = skillComp.SkillSlots[0]; // 普攻擊能槽 = Slot0
-
-        // 沒技能→移動
-        if (!slot.HasSkill || slot.Detector == null) {
-            moveComp.SetIntentMove( targetPosition: mouseWorldPos);
-            VFXManager.Instance.Play("ClickGround01", mouseWorldPos);
-            return;
-        }
+        var slot = combatComponent.SkillSlots[0]; // 普攻擊能槽 = Slot0
 
         // 有點到敵人->判斷距離
         Collider2D hit = Physics2D.OverlapPoint(mouseWorldPos, LayerMask.GetMask("Enemy"));
         Enemy enemy = hit ? hit.GetComponentInParent<Enemy>() : null;
         if (enemy != null) {
-
             // 清舊的 Danger
             if (_dangerEnemy != null && _dangerEnemy != enemy)_dangerEnemy.EffectComponent.HideOutline(); 
             _dangerEnemy = enemy;
             _dangerEnemy.EffectComponent.ShowTargetOutline();
 
-
             Vector2 enemyGroundPos = enemy.transform.position;
-            skillComp.SetBaseAttackIntent(enemy.transform);
+            combatComponent.SetIntentBaseAttack(enemy.transform);
             return;
         }
 
         // 其他情況→移動
-        skillComp.ClearAllSkillIntent();
+        combatComponent.ClearBaseAttackTargetTransform();
+        combatComponent.ClearSkillIntent();
+
         ClearTargetOutline();
         moveComp.SetIntentMove( targetPosition: mouseWorldPos);
         VFXManager.Instance.Play("ClickGround01", mouseWorldPos);
@@ -218,13 +212,11 @@ public class PlayerInputManager : MonoBehaviour {
         if (_selectedPlayerList.Count == 0) return;
 
         foreach (var player in _selectedPlayerList) {
-            if (player.StateComponent.IsPlayingAttackAnimation && player.SkillComponent.IntentSlotIndex > 0) continue;//技能施放中，不得更改技能意圖(普供例外)
-
             foreach (KeyCode key in _skillKeys) {
                 if (!TryGetSkillSlotFromKey(key, out int slotIndex)) continue;
-                if (slotIndex >= player.SkillComponent.SkillSlots.Length) continue;
+                if (slotIndex >= player.CombatComponent.SkillSlots.Length) continue;
 
-                var slot = player.SkillComponent.SkillSlots[slotIndex];
+                var slot = player.CombatComponent.SkillSlots[slotIndex];
                 if (!slot.HasSkill || slot.Detector == null) continue;
 
                 switch (_skillCastMode) {
@@ -242,11 +234,10 @@ public class PlayerInputManager : MonoBehaviour {
     private void HandleInstantCast(KeyCode key,Player player,int slotIndex) {
         if (!Input.GetKeyDown(key)) return;
         ClearTargetOutline();
-        player.SkillComponent.ClearAllSkillIntent();//任何按鍵攻擊，關閉連續普通攻擊(清空所有意圖)
         ResolveAndCastSkill(player, slotIndex);
     }
     private void HandleHoldReleaseCast(KeyCode key, Player player, int slotIndex) {
-        var skillComp = player.SkillComponent;
+        var combatComponent = player.CombatComponent;
 
         //KeyDown：開始 Hold ----------
         if (Input.GetKeyDown(key)) {
@@ -260,7 +251,7 @@ public class PlayerInputManager : MonoBehaviour {
             _holdingPlayer = player;
             _holdingSlotIndex = slotIndex;
 
-            skillComp.SetDetectRangeVisible(slotIndex, true);
+            combatComponent.SetDetectRangeVisible(slotIndex, true);
             return;
         }
 
@@ -269,8 +260,7 @@ public class PlayerInputManager : MonoBehaviour {
             if (_holdingPlayer != player || _holdingSlotIndex != slotIndex)
                 return;
 
-            skillComp.SetDetectRangeVisible(slotIndex, false);
-            player.SkillComponent.ClearAllSkillIntent();//任何按鍵攻擊，關閉連續普通攻擊(清空所有意圖)
+            combatComponent.SetDetectRangeVisible(slotIndex, false);
             ResolveAndCastSkill(player, slotIndex);
 
             _holdingPlayer = null;
@@ -280,7 +270,7 @@ public class PlayerInputManager : MonoBehaviour {
 
 
     private void ResolveAndCastSkill(Player player, int slotIndex) {
-        var slot = player.SkillComponent.SkillSlots[slotIndex];
+        var slot = player.CombatComponent.SkillSlots[slotIndex];
         var detector = slot.Detector;
 
         Vector2 mouseWorldPos = Camera.main.ScreenToWorldPoint(Input.mousePosition);
@@ -304,21 +294,21 @@ public class PlayerInputManager : MonoBehaviour {
                 targetPosition = detector.GetClosestPoint(mouseWorldPos);
             }
 
-            player.SkillComponent.SetIntentSkill( slotIndex, targetPosition, targetTransform);
+            player.CombatComponent.SetIntentSkill( slotIndex, targetPosition, targetTransform);
         }
         else {
             // 沒點到敵人，用滑鼠位置(在範圍內用畫鼠位置、範圍外取最近點)
             if (detector.IsInRange(mouseWorldPos)) targetPosition = mouseWorldPos;
             else targetPosition = detector.GetClosestPoint(mouseWorldPos);
-            player.SkillComponent.SetIntentSkill( slotIndex, targetPosition, targetTransform);
+            player.CombatComponent.SetIntentSkill( slotIndex, targetPosition, targetTransform);
         }
     }    //鍵盤施放
 
     private void CancelCurrentHold() {
         if (_holdingPlayer == null) return;
 
-        var skillComp = _holdingPlayer.SkillComponent;
-        skillComp.SetDetectRangeVisible(_holdingSlotIndex, false);
+        var combatComponent = _holdingPlayer.CombatComponent;
+        combatComponent.SetDetectRangeVisible(_holdingSlotIndex, false);
 
         _holdingPlayer = null;
         _holdingSlotIndex = -1;
@@ -338,7 +328,8 @@ public class PlayerInputManager : MonoBehaviour {
             p.SelectIndicator.SetActive(false);
 
             p.MoveComponent.ClearAllMoveIntent();
-            p.SkillComponent.ClearAllSkillIntent();
+            p.CombatComponent.ClearSkillIntent();
+            p.CombatComponent.ClearBaseAttackTargetTransform();
         }
         ClearTargetOutline();
     }

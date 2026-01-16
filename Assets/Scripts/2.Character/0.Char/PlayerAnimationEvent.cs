@@ -11,15 +11,19 @@ public class PlayerAnimationEvent : MonoBehaviour
         if (_player == null) Debug.LogWarning("Player is Null!");
     }
 
+    public void AnimationEvent_SpanwBaseAttack() {
+        _player.CombatComponent.UseBaseAttack();
+    }
+
     public void AnimationEvent_SpawnerSkill() {
-        _player.SkillComponent.UseSkill();
+        _player.CombatComponent.UseSkill();
     }
 
     public void AnimationEvent_SkillDashStart(int skillId) {
         if (!_player.Rt.SkillPool.TryGetValue(skillId, out var skillRt)) return;
 
-        _player.SkillComponent.UseSkill();
+        _player.CombatComponent.UseSkill();
 
-        _player.SkillComponent.SkillDashMove(skillRt);
+        _player.CombatComponent.SkillDashMove(skillRt);
     }
 }

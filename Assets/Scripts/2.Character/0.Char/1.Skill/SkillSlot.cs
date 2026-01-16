@@ -8,46 +8,46 @@ public class SkillSlot
     public float CooldownTimer { get; private set; }
     public SkillDetectorBase Detector { get; private set; }
     public GameObject DetectRangeObject;
+    public ISkillRuntime Rt;
 
     public bool HasSkill => SkillId  != -1;   //-1 代表無技能;
-    public bool IsReady => SkillId != -1 && CooldownTimer <= 0f;
+    public bool IsReady => HasSkill && CooldownTimer <= 0f;
     
     private Transform _backSpriteTransform;
-    private IReadOnlyList<IInteractable> _targetList;
 
-    public SkillSlot(Transform backSpriteTransform, IReadOnlyList<IInteractable> targetList) {
+    public SkillSlot(Transform backSpriteTransform ) {
         SkillId = -1;
         CooldownTimer = 0f;
         Detector = null;
 
         _backSpriteTransform = backSpriteTransform;
-        _targetList= targetList;
     }
 
-    public void Tick() {
-        if(Detector != null) Detector.DetectTargetsTick(_targetList);
-        TickCooldown();
+    public void DetectorTick(IReadOnlyList<IInteractable> targetList) {
+        if(Detector != null) Detector.DetectTargetsTick(targetList);
     }
+    public void CooldownTick() => CooldownTimer = Mathf.Max(0, CooldownTimer - Time.deltaTime);
 
-    public void SetSlot(int skillId,SkillDetectorBase detectStrategy = null) {
-        SkillId = skillId;
-        Detector = detectStrategy;
+    public void SetSlot(ISkillRuntime rt) {
+        Rt = rt;
+        SkillId = Rt.Id;
+        Detector = Rt.Detector;
         CooldownTimer = 0f;
         Detector.Initialize(_backSpriteTransform);
 
-        if (DetectRangeObject != null) GameObject.Destroy(DetectRangeObject);
         DetectRangeObject = Detector.SpawnRangeObject(_backSpriteTransform);
         DetectRangeObject.transform.SetParent(_backSpriteTransform);
         DetectRangeObject.transform.localPosition = Vector3.zero;
+        DetectRangeObject.SetActive(false);
     }
     public void TriggerCooldown(float cd) {
         if (SkillId == -1) return;
         CooldownTimer = cd;
     }
 
-    private void TickCooldown()=>CooldownTimer = Mathf.Max(0, CooldownTimer - Time.deltaTime);  
 
     public void Uninstall() {
+        GameObject.Destroy(DetectRangeObject);
         SkillId = -1;
         CooldownTimer = 0f;
         Detector = null;

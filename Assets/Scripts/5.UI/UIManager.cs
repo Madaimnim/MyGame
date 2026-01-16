@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Linq;
 using UnityEngine.UI;
 using System;
+using TMPro;
 
 [DefaultExecutionOrder(-50)]
 public class UIManager : MonoBehaviour
@@ -18,7 +19,7 @@ public class UIManager : MonoBehaviour
     public GameObject UI_Loading;
     public GameObject UI_SkillCooldownPanel;
     public UI_SkillSliderController UI_SkillSliderController;
-
+    public TMP_Text Text_TimeCounter;
 
     public Stack<UI_PanelBase> UiPanelsStack = new Stack<UI_PanelBase>(); // 儲存開啟中的 UI 面板
     private UI_InputController _uiInputController;

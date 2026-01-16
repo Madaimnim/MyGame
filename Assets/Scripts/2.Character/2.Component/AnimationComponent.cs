@@ -18,8 +18,11 @@ public class AnimationComponent
     }
 
 
-    public void PlayAttack(int skillId) {
-        if(TryPlay($"Skill{skillId}")) _stateComponent.SetIsPlayingAttackAnimation(true);
+    public void PlayBaseAttack() {
+        if(TryPlay("BaseAttack")) _stateComponent.SetIsBaseAttacking(true) ;
+    }
+    public void PlaySkill(int skillId) {
+        if(TryPlay($"Skill{skillId}"))_stateComponent.SetIsCastingSkill(true);
     }
 
     public void PlayIdle() => TryPlay("Idle");

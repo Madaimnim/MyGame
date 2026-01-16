@@ -12,6 +12,10 @@ public class SkillHitComponent {
 
     private List<(IInteractable target, Collider2D col)> _targetList = new();
 
+    //事件，命中目標
+    public event Action<ISkillRuntime> OnHitTarget;
+
+
     public SkillHitComponent(SkillObject skillObject) {
         _skillObject = skillObject;
     }
@@ -31,7 +35,7 @@ public class SkillHitComponent {
                 continue;
             }
             //Todo
-            float bottomYDiff = Mathf.Abs(_skillObject.transform.position.y - target.BottomTransform.position.y);
+            float bottomYDiff = Mathf.Abs(_skillObject.VisualRootTransform.position.y - target.BottomTransform.position.y);
             if (bottomYDiff > GameSettingManager.Instance.PhysicConfig.BottomYThreshold) continue;
 
             Hit(target, col);
@@ -56,7 +60,7 @@ public class SkillHitComponent {
         if (_skillRt.SkillVisualFromType == SkillVisualFromType.FromChar)
             sourcePosition = _skillObject.CharSprTransform.localPosition;
         else
-            sourcePosition = _skillObject.SprCol.transform.localPosition;
+            sourcePosition = _skillObject.RootSpriteCollider.transform.localPosition;
         
         target.Interact(new InteractInfo {
             SourcePosition = sourcePosition,
@@ -64,7 +68,11 @@ public class SkillHitComponent {
             KnockbackPower = _knockbackPower,
             FloatPower = _floatPower
         });
-        //Debug.Log($"技能命中目標 {target}，造成傷害 {_pStatsData.Power} + {_skillRt.StatsData.Power}");
+
+        //命中觸發通知        
+        Debug.Log($"技能命中目標 {target}，造成傷害 {_pStatsData.Power} + {_skillRt.StatsData.Power}");
+        OnHitTarget?.Invoke(_skillRt);
+
 
         switch (_skillRt.OnHitType) {
             case OnHitType.Disappear:
@@ -89,7 +97,7 @@ public class SkillHitComponent {
         switch (_skillRt.HitEffectPositionType) {
             case HitEffectPositionType.ClosestPoint:
                 Vector2 hitA = targetCol.ClosestPoint(_skillObject.transform.position);
-                Vector2 hitB = _skillObject.SprCol.ClosestPoint(targetCol.transform.position);
+                Vector2 hitB = _skillObject.RootSpriteCollider.ClosestPoint(targetCol.transform.position);
                 return (hitA + hitB) / 2f;
 
             case HitEffectPositionType.TargetCenter:

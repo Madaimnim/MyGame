@@ -2,6 +2,9 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using TMPro;
+using System.IO;
+using System.Text;
 
 public class StageFlowManager : MonoBehaviour {
     private EnemyCounter _enemyCounter;
@@ -10,6 +13,10 @@ public class StageFlowManager : MonoBehaviour {
     private EnemyEntrySystem _enemyEntrySystem;
     private GameStageSystem _gameStageSystem;
     private StageData _stageData;
+
+    [SerializeField] private TMP_Text _timerText;
+    private float _battleTimer;
+    private bool _isTiming;
 
     private void Awake() {
         _enemyCounter = GetComponent<EnemyCounter>();
@@ -22,6 +29,8 @@ public class StageFlowManager : MonoBehaviour {
     public void OnEnable() {
         _gameStageSystem.ResetBattleState();
         _enemyCounter.OnEnemyClear += OnEnemyClear;
+
+        _timerText= UIManager.Instance.Text_TimeCounter;
     }
     public void OnDisable() {
         _enemyCounter.OnEnemyClear -= OnEnemyClear;
@@ -29,6 +38,9 @@ public class StageFlowManager : MonoBehaviour {
 
     private void Start() {
         StartCoroutine(StageFlow());
+    }
+    private void Update() {
+        TimingCounter();
     }
 
     private IEnumerator StageFlow() {
@@ -66,9 +78,15 @@ public class StageFlowManager : MonoBehaviour {
         yield return new WaitForSeconds(0.5f);
         // 所有人都到位，才開始戰鬥
         GameEventSystem.Instance.Event_BattleStart.Invoke();
+        //計時開始
+        _battleTimer = 0f;
+        _isTiming = true;
     }
     private IEnumerator WaitForBattleEnd() {
         while (!_gameStageSystem.IsBattleEnded) yield return null;
+        //停止計時
+        _isTiming = false;
+        RecordStageTime(_enemyCounter.IsCleared); //  關鍵
         PlayerInputManager.Instance.SetCanControl(false);
     }
     private IEnumerator ShowStageResult(bool isCleared) {
@@ -123,4 +141,31 @@ public class StageFlowManager : MonoBehaviour {
     private void OnEnemyClear() {
         _gameStageSystem.SetIsBattleEneded(true);
     }
+
+    private void TimingCounter() { 
+        if (!_isTiming) return;
+        _battleTimer += Time.deltaTime;
+
+        TimeSpan timeSpan = TimeSpan.FromSeconds(_battleTimer);
+        _timerText.text = string.Format("{0:D2}:{1:D2}:{2:D2}", timeSpan.Minutes, timeSpan.Seconds, timeSpan.Milliseconds / 10);
+    }
+    private void RecordStageTime(bool isCleared) {
+        string folderPath = Path.Combine(Application.dataPath, "../Logs");
+        Directory.CreateDirectory(folderPath);
+
+        string fileName = isCleared
+            ? "StageTime_Clear.csv"
+            : "StageTime_Failed.csv";
+
+        string path = Path.Combine(folderPath, fileName);
+
+        if (!File.Exists(path)) {
+            File.WriteAllText(path, "StageId,Time\n");
+        }
+
+        string line = $"{_stageData.StageId},{_battleTimer:F2}\n";
+        File.AppendAllText(path, line);
+    }
+
+
 }

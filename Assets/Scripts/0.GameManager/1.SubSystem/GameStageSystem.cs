@@ -16,6 +16,10 @@ public class GameStageSystem : GameSubSystem {
         GameEventSystem.Instance.Event_BattleStart += () => SetIsBattleStarted(true);
         GameEventSystem.Instance.Event_OnWallBroken += () => SetIsBattleEneded(true);
         UnlockStage(101); //預設解鎖第一關
+        UnlockStage(102);//測試使用
+        UnlockStage(103);
+        UnlockStage(104);
+        UnlockStage(105);
     }
 
     public void RequestEnterStage(int stageId) {

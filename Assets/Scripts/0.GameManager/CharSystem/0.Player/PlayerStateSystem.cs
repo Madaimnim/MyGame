@@ -10,8 +10,6 @@ public sealed class PlayerStateSystem : GameSubSystem
     public IReadOnlyDictionary<int, PlayerStatsRuntime> PlayerStatsRuntimeDtny => _playerStatsRuntimeDtny;
     public IReadOnlyDictionary<int, Player> PlayerInstanceDtny => _playerInstanceDtny;
     public List<int> UnlockedIdList => _unlockedIdList;
-
-    public PlayerSkillSystem SkillSystem { get; private set; }
     public PlayerSpawnSystem SpawnSystem { get; private set; }
 
     private Dictionary<int, PlayerStatsRuntime> _playerStatsRuntimeDtny = new();
@@ -22,7 +20,6 @@ public sealed class PlayerStateSystem : GameSubSystem
     public PlayerStateSystem(GameManager gm) : base(gm) { }
     public override void Initialize() {
         SpawnSystem = new PlayerSpawnSystem();
-        SkillSystem = new PlayerSkillSystem();
     }
 
 
@@ -34,16 +31,18 @@ public sealed class PlayerStateSystem : GameSubSystem
         _playerInstanceDtny.Add(id, player);
 
         //初始化解鎖、安裝技能
-        _playerStatsRuntimeDtny[id].UnlockedSkillIdList.Add(1);
-        SkillSystem.EquipPlayerSkill(id, 0, 1);
-        SkillSystem.EquipPlayerSkill(id, 1, 2);
-        SkillSystem.EquipPlayerSkill(id, 2, 3);
-        SkillSystem.EquipPlayerSkill(id, 3, 4);
-        SkillSystem.EquipPlayerSkill(id, 4, 5);
+        _playerStatsRuntimeDtny[id].UnlockedSkillIdHashSet.Add(1);
+        //SkillSystem.EquipPlayerSkill(id, 0, 1);
+
+        EquipPlayerBaseAttack(id);
+        EquipPlayerSkill(id, 1, 1);
+        EquipPlayerSkill(id, 2, 2);
+        EquipPlayerSkill(id, 3, 3);
+        EquipPlayerSkill(id, 4, 4);
     }
     public void PrepareInitialPlayers() {
         UnlockPlayer(1001);
-        _playerStatsRuntimeDtny[1001].UnlockedSkillIdList.Add(2);
+        _playerStatsRuntimeDtny[1001].UnlockedSkillIdHashSet.Add(2);
         //SkillSystem.EquipPlayerSkill(1001, 0, 2);
 
         //UnlockPlayer(1002);
@@ -82,6 +81,36 @@ public sealed class PlayerStateSystem : GameSubSystem
             player.gameObject.SetActive(false);
             player.transform.position = Vector2.zero;
         }
+    }
+
+
+    public void EquipPlayerBaseAttack(int playerId) {
+        var player = PlayerUtility.GetPlayer(playerId);
+        var rt = PlayerUtility.Get(playerId);
+        player.CombatComponent.EquipBaseAttack(rt.BaseAttackRuntime);
+    }
+    public void EquipPlayerSkill(int playerId, int slotNumber, int skillId) {
+        var player = PlayerUtility.GetPlayer(playerId);
+        var rt = PlayerUtility.Get(playerId);
+        if (rt.SkillPool.TryGetValue(skillId, out var skillRt))
+            player.CombatComponent.EquipSkill(slotNumber, skillRt);
+        
+    }
+
+    public void UnlockSkill(int playerId, int skillId) {
+        var rtDtny = PlayerUtility.AllRts;
+        if (!rtDtny.TryGetValue(playerId, out var rt)) return;
+        if (!rt.SkillPool.ContainsKey(skillId)) {
+            Debug.LogWarning($"_playerSkillDtny不包含 ID:{skillId}");
+            return;
+        }
+        if (rt.UnlockedSkillIdHashSet.Contains(skillId)) {
+            Debug.LogWarning($"_unlockedSkillIdList已解鎖 ID:{skillId} {rt.SkillPool[skillId].Name}");
+            return;
+        }
+        rt.UnlockedSkillIdHashSet.Add(skillId);
+        //發事件
+        GameEventSystem.Instance.Event_SkillUnlocked?.Invoke(playerId, skillId);
     }
 
 }

@@ -20,7 +20,6 @@ public class UIController_Skill : MonoBehaviour
     private int currentPlayerId=-1;
 
     //生命週期
-    #region 生命週期
     private void OnEnable() {
         GameEventSystem.Instance.Event_SkillUnlocked += OnSkillUnlockedUI;
 
@@ -38,7 +37,7 @@ public class UIController_Skill : MonoBehaviour
             SlotSkillButtons[i].onClick.RemoveAllListeners();
         }
     }
-    #endregion
+
 
 
     private IEnumerator WaitAndInit() {
@@ -50,10 +49,9 @@ public class UIController_Skill : MonoBehaviour
         var _currentRt=PlayerUtility.Get(currentPlayerId);
         originSkillSelectionPanelPosition = SkillSelectionPanel.transform.position;
         SkillSelectionPanel.SetActive(false);
-        for (int i = 0; i < SlotSkillButtons.Length; i++)
+        for (int slotNumber = 1; slotNumber <= SlotSkillButtons.Length; slotNumber++)
         {
-            int slotIndex = i;
-            SlotSkillButtons[i].onClick.AddListener(() => ShowAvailableSkills(slotIndex));
+            SlotSkillButtons[slotNumber-1].onClick.AddListener(() => ShowAvailableSkills(slotNumber));
         }
         RefreshSkillSlotButtonText();
     }
@@ -77,7 +75,7 @@ public class UIController_Skill : MonoBehaviour
         for (int slotIndex = 0; slotIndex < SlotSkillButtons.Length; slotIndex++)
         {
             if (slotIndex >= SlotSkillNames.Length) continue;
-            var skillId = _currentRt.BattleObject.GetComponent<Player>().SkillComponent.SkillSlots[slotIndex].SkillId;
+            var skillId = _currentRt.BattleObject.GetComponent<Player>().CombatComponent.SkillSlots[slotIndex].SkillId;
             if(_currentRt.SkillPool.TryGetValue(skillId,out var skill))
                 SlotSkillNames[slotIndex].text = skill != null ? skill.Name : "空";
 
@@ -85,7 +83,7 @@ public class UIController_Skill : MonoBehaviour
     }
 
 
-    private void ShowAvailableSkills(int slotIndex) {
+    private void ShowAvailableSkills(int slotNumber) {
         List<ISkillRuntime> availableSkills = new List<ISkillRuntime>();
 
         SkillSelectionPanel.transform.position = originSkillSelectionPanelPosition;
@@ -98,8 +96,8 @@ public class UIController_Skill : MonoBehaviour
             Destroy(child.gameObject);
         }
 
-        foreach (var unlockedSkillID in _currentRt.UnlockedSkillIdList)
-            if(!_currentRt.BattleObject.GetComponent<Player>().SkillComponent.SkillSlots.Any(s => s.SkillId == unlockedSkillID))
+        foreach (var unlockedSkillID in _currentRt.UnlockedSkillIdHashSet)
+            if(!_currentRt.BattleObject.GetComponent<Player>().CombatComponent.SkillSlots.Any(s => s.SkillId == unlockedSkillID))
                 if(_currentRt.SkillPool.TryGetValue(unlockedSkillID,out var skill))
                     availableSkills.Add(skill);
 
@@ -118,14 +116,14 @@ public class UIController_Skill : MonoBehaviour
                 skillText.text = skill.Name;
             }
 
-            skillButton.onClick.AddListener(() => EquipSkill(slotIndex, skill.Id));
+            skillButton.onClick.AddListener(() => EquipSkill(slotNumber, skill.Id));
         }
 
         // 顯示技能選擇面板
         SkillSelectionPanel.SetActive(availableSkills.Count > 0);
     }
-    private void EquipSkill(int slotIndex, int skillID) {
-        GameManager.Instance.PlayerStateSystem.SkillSystem.EquipPlayerSkill(_currentRt.Id, slotIndex, skillID);
+    private void EquipSkill(int slotNumber, int skillID) {
+        GameManager.Instance.PlayerStateSystem.EquipPlayerSkill(_currentRt.Id, slotNumber, skillID);
 
         RefreshSkillSlotButtonText();
         SkillSelectionPanel.SetActive(false);

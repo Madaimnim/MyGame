@@ -15,8 +15,9 @@ public class PlayerStatsRuntime : IHealthData
     public int MaxHp { get; }
     public int SkillSlotCount;
     public bool CanRespawn ;
+    public ISkillRuntime BaseAttackRuntime;
     public Dictionary<int, ISkillRuntime> SkillPool = new Dictionary<int, ISkillRuntime>();
-    public List<int> UnlockedSkillIdList= new List<int>();
+    public HashSet<int> UnlockedSkillIdHashSet = new();
     public int[] ExpTable;
     public PlayerBehaviourTreeType PlayerBehaviourTreeType;
     public MoveStrategyBase MoveStrategy;   //直接持有策略實例
@@ -37,11 +38,12 @@ public class PlayerStatsRuntime : IHealthData
         MaxHp = template.MaxHp;
         SkillSlotCount = template.SkillSlotCount;
         CanRespawn = template.CanRespawn;
-        foreach (var skill in template.SkillTemplateList) { 
+        BaseAttackRuntime = new PlayerSkillRuntime(template.BaseAttackTemplate);
+        foreach (var skill in template.SkillTemplateList) {
             SkillPool[skill.Id] = new PlayerSkillRuntime(skill);
         }
 
-        UnlockedSkillIdList = new List<int>(template.UnlockedSkillIdList);
+        UnlockedSkillIdHashSet = new HashSet<int>(template.UnlockedSkillIdHashSet);
         ExpTable = template.ExpTable;
         PlayerBehaviourTreeType= template.PlayerBehaviourTreeType;
         MoveStrategy = template.MoveStrategyType switch {

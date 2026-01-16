@@ -16,7 +16,10 @@ public class PlayerEntrySystem : MonoBehaviour
 
         var targetPos = TargetPositionProvider.GetPosition();
         var player = PlayerInputManager.Instance.CurrentControlPlayer;
+        HideUI(player);
+
         var move = player.MoveComponent;
+        player.EnergyComponent.Set(1);
         move.SetIgnoreMoveBounds(true);
         move.SetIntentMove(targetPosition: targetPos);
 
@@ -26,8 +29,16 @@ public class PlayerEntrySystem : MonoBehaviour
 
         move.SetIgnoreMoveBounds(false);
         move.ClearAllMoveIntent();
-
+        ShowUI(player);
     }
 
+    private void ShowUI(Player player) {
+        player.HpSlider.gameObject.SetActive(true);
+        player.EnergyUIController.gameObject.SetActive(true);
+    }
 
+    private void HideUI(Player player) {
+        player.HpSlider.gameObject.SetActive(false);
+        player.EnergyUIController.gameObject.SetActive(false);
+    }
 }

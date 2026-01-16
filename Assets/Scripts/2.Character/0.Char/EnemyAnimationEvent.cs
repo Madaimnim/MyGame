@@ -12,7 +12,7 @@ public class EnemyAnimationEvent : MonoBehaviour
     }
 
     public void AnimationEvent_SpawnerSkill() {
-        _enemy.SkillComponent.UseSkill();
+        _enemy.CombatComponent.UseSkill();
     }
     public void AnimationEvent_MoveStart(float duration)//duration = frame¼Æ/sample²v
     {
@@ -21,13 +21,13 @@ public class EnemyAnimationEvent : MonoBehaviour
 
     public void AnimationEvent_SkillDashPrepareStart(int skillId) {
         if (!_enemy.Rt.SkillPool.TryGetValue(skillId, out var skillRt)) return;
-        _enemy.SkillComponent.SkillPrepareMove(skillRt);
+        _enemy.CombatComponent.SkillPrepareMove(skillRt);
     }
     public void AnimationEvent_SkillDashStart(int skillId) {
         if (!_enemy.Rt.SkillPool.TryGetValue(skillId, out var skillRt)) return;
 
-        _enemy.SkillComponent.UseSkill();
+        _enemy.CombatComponent.UseSkill();
 
-        _enemy.SkillComponent.SkillDashMove(skillRt);
+        _enemy.CombatComponent.SkillDashMove(skillRt);
     }
 }

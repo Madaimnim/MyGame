@@ -118,7 +118,7 @@ public class EffectComponent
 
         while (t < duration) {
             // 如果攻擊動畫已經不是播放中 → 中斷
-            if (!_stateComponent.IsPlayingAttackAnimation) {
+            if (!_stateComponent.IsCastingSkill) {
                 _spriteAttackTintController.Clear();
                 yield break;
             }

@@ -52,7 +52,7 @@ public class HpSlider : MonoBehaviour {
         }
 
         if (text != null) {
-            text.text = $"HP:{current}/{max}";
+            text.text = $"{title}{current}/{max}";
         }
     }
 }

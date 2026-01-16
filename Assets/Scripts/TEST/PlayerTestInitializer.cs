@@ -62,7 +62,7 @@ public class PlayerTestInitializer : MonoBehaviour
 
         //裝配測試技能
         if (Rt.SkillPool.TryGetValue(SkillId, out var skill)) {
-            CurrentPlayer.SkillComponent.EquipSkill(0, SkillId);
+            CurrentPlayer.CombatComponent.EquipSkill(1, skill);
         }
     }
 
@@ -122,12 +122,12 @@ public class PlayerTestInitializer : MonoBehaviour
         //sb.AppendLine($"HP: {Rt.CurrentHp}/{Rt.MaxHp}");
         //sb.AppendLine($"Exp: {Rt.Exp}");
         sb.AppendLine($"SkillSlotCount: {Rt.SkillSlotCount}");
-        sb.AppendLine($"技能槽1 ID:{CurrentPlayer.SkillComponent.SkillSlots[0].SkillId}");
-        sb.AppendLine($"技能槽1 HasSkill:{CurrentPlayer.SkillComponent.SkillSlots[0].HasSkill}");
-        sb.AppendLine($"技能槽1 DetectStrategy:{CurrentPlayer.SkillComponent.SkillSlots[0].Detector!=null}");
+        sb.AppendLine($"技能槽1 ID:{CurrentPlayer.CombatComponent.SkillSlots[0].SkillId}");
+        sb.AppendLine($"技能槽1 HasSkill:{CurrentPlayer.CombatComponent.SkillSlots[0].HasSkill}");
+        sb.AppendLine($"技能槽1 DetectStrategy:{CurrentPlayer.CombatComponent.SkillSlots[0].Detector!=null}");
         //sb.AppendLine($"CanRespawn: {Rt.CanRespawn}");
         //sb.AppendLine($"MoveStrategy: {Rt.MoveStrategy}");
-        //sb.AppendLine($"Unlocked Skills: {string.Join(" , ", Rt.UnlockedSkillIdList)}");
+        //sb.AppendLine($"Unlocked Skills: {string.Join(" , ", Rt.UnlockedSkillIdHashSet)}");
     }
 
     private void DisplaySkillData(StringBuilder sb)

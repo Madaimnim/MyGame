@@ -47,11 +47,9 @@ public class PlayerStatsRuntime : IHealthData
         ExpTable = template.ExpTable;
         PlayerBehaviourTreeType= template.PlayerBehaviourTreeType;
         MoveStrategy = template.MoveStrategyType switch {
-            MoveStrategyType.Follow => new FollowMoveStrategy(),
             MoveStrategyType.Random => new RandomMoveStrategy(),
             MoveStrategyType.Straight => new StraightMoveStrategy(),
             MoveStrategyType.Stay => new StayMoveStrategy(),
-            MoveStrategyType.Flee => new FleeMoveStrategy(),
             _ => new StayMoveStrategy()
         };
     }

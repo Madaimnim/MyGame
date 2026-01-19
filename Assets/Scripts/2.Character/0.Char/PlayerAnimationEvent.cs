@@ -15,9 +15,12 @@ public class PlayerAnimationEvent : MonoBehaviour
         _player.CombatComponent.UseBaseAttack();
     }
 
+
     public void AnimationEvent_SpawnerSkill() {
         _player.CombatComponent.UseSkill();
     }
+
+
 
     public void AnimationEvent_SkillDashStart(int skillId) {
         if (!_player.Rt.SkillPool.TryGetValue(skillId, out var skillRt)) return;

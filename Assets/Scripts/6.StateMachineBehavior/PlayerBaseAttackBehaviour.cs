@@ -7,10 +7,10 @@ public class PlayerBaseAttackBehaviour : StateMachineBehaviour
 
     // 進入攻擊動畫
     public override void OnStateEnter(Animator animator, AnimatorStateInfo stateInfo, int layerIndex) {
-        if(_player == null) _player = animator.GetComponentInParent<Player>();
+        if (_player == null) _player = animator.GetComponentInParent<Player>();
         if (_stateComponent == null) _stateComponent = _player.StateComponent;
 
-        _stateComponent.SetIsBaseAttacking (true);
+        _stateComponent.SetIsBaseAttacking(true);
     }
 
     // 動畫進行過程（0~1 normalizedTime）

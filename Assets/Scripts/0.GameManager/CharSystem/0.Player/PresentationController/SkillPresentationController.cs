@@ -14,7 +14,7 @@ public class SkillPresentationController : IPresentationController {
     public void Set(Player player) {
         _player = player;
         // 顯示技能範圍
-        _player.CombatComponent.SetDetectRangeVisible(_skillSlot, true);
+        _player.CombatComponent.SetSkillDetectRangeVisible(_skillSlot, true);
 
         _timer = 0f;
     }
@@ -29,6 +29,6 @@ public class SkillPresentationController : IPresentationController {
     }
 
     public void Exit() {
-        _player.CombatComponent.SetDetectRangeVisible(_skillSlot, false);
+        _player.CombatComponent.SetSkillDetectRangeVisible(_skillSlot, false);
     }
 }

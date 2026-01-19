@@ -44,27 +44,43 @@ public class PlayerScreenDebug : MonoBehaviour {
     // =========================
     private static readonly string[] DefaultDebugKeys =
     {
-        // 基本狀態
-        "IsDead",
-        "IsKnocked",
-        "IsGrounded",
-        "IsInitialHeight",
-        "IsInGravityFall",
+    // ===== 基本狀態 =====
+    "IsDead",
+    "IsKnocked",
+    "IsGrounded",
+    "IsInitialHeight",
+    "IsInGravityFall",
 
-        // 行為狀態
-        "IsMoving",
-        "IsAttackingIntent",
-        "IsPlayingAttackAnimation",
-        "IsMoveAnimationOpen",
+    // ===== 行為狀態 =====
+    "IsMoving",
+    "IsBaseAttacking",
+    "IsCastingSkill",
+    "IsMoveAnimationOpen",
 
-        // 控制 / 鎖定
-        "IsControlLocked",
-        "IsSkillDashing",
+    // ===== 控制 / 鎖定 =====
+    "IsControlLocked",
+    "IsSkillDashing",
+    "IsSkillRecoveryActionLock",
 
-        // 派生狀態
-        "CanMove",
-        "CanAttack",
-        "CanRecoverHeight",
+    // ===== 派生狀態 =====
+    "CanMove",
+    "CanBaseAttack",
+    "CanCastSkill",
+    "CanRecoverHeight",
+
+    // ===== Intent =====
+    "HasBaseAttackTarget",
+    "BaseAttackTarget",
+    "BaseAttackReady",
+    "BaseAttackInRange",
+    
+    "HasIntentSkill",
+    "IntentSkillSlot",
+    "IntentSkillId",
+    "SkillSlotReady",
+    "SkillGateCanUse",
+    "IntentTargetPos",
+    "IntentTargetTransform",
     };
 
     private void Awake() {
@@ -84,14 +100,23 @@ public class PlayerScreenDebug : MonoBehaviour {
         if (DebugItems == null)
             DebugItems = new List<DebugItem>();
 
-        HashSet<string> exist = new();
-        foreach (var item in DebugItems) {
-            if (!string.IsNullOrEmpty(item.KeyContains))
-                exist.Add(item.KeyContains);
-        }
+        // 1️目前合法的 Key 集合（唯一真源）
+        HashSet<string> validKeys = new HashSet<string>(DefaultDebugKeys);
 
+        // 2️移除「已不存在」或「被改名」的舊 Key
+        DebugItems.RemoveAll(item =>
+            string.IsNullOrEmpty(item.KeyContains) ||
+            !validKeys.Contains(item.KeyContains)
+        );
+
+        // 3️已存在 Key（避免重複新增）
+        HashSet<string> existKeys = new HashSet<string>();
+        foreach (var item in DebugItems)
+            existKeys.Add(item.KeyContains);
+
+        // 4️補齊新的 Debug Key
         foreach (var key in DefaultDebugKeys) {
-            if (exist.Contains(key)) continue;
+            if (existKeys.Contains(key)) continue;
 
             DebugItems.Add(new DebugItem {
                 KeyContains = key,

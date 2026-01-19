@@ -1,13 +1,16 @@
 using System;
 using System.Collections;
 using UnityEngine;
+using UnityEngine.Assertions.Must;
 
-
+//只用Position移動
 public class MoveComponent
 {
-    public Transform IntentTargetTransform;
-    public Vector2? IntentTargetPosition;
-    public Vector2 IntentDirection;
+    public Vector2? IntentMovePosition { get; private set; }
+
+    public Vector2 GetCurrentMoveVelocity()=> _currentMoveDirection* CurrentMoveSpeed;
+    private Vector2 _currentMoveDirection;
+
     public TargetDetector MoveDetector { get; private set; }
     public float MoveSpeed { get; private set; }
     private float _pendingMoveSpeed;
@@ -63,58 +66,25 @@ public class MoveComponent
         _stateComponent = stateComponent;
     }
     public void FixedTick() {
-        if(TryMove()) _stateComponent.SetIsMoving(true);
-        else _stateComponent.SetIsMoving(false);
+        bool isMoving = TryMove();
+        _stateComponent.SetIsMoving(isMoving);
     }
+
     private bool TryMove() {
         if (!_stateComponent.CanMove) return false;
+        if (IntentMovePosition == null) return false;
+
+        _currentMoveDirection = (IntentMovePosition.Value - _rb.position).normalized;
+        
+        //到達位置，停止移動
+        float dist = Vector2.Distance(_rb.position, IntentMovePosition.Value);
+        if (dist <= ARRIVAL_THRESHOLD) ClearAllMoveIntent();
 
 
-        // 若指定追蹤 Transform（AI 用）
-        if (IntentTargetTransform != null) {
-            Vector2 targetPos = IntentTargetTransform.position;
-            Vector2 current = _rb.position;
-            Vector2 dir = (targetPos - current).normalized;
-            IntentDirection = dir;
+        Vector2 newPosition = _rb.position + _currentMoveDirection * CurrentMoveSpeed * Time.fixedDeltaTime;
 
-            float dist = Vector2.Distance(current, targetPos);
-            if (dist <= ARRIVAL_THRESHOLD) {
-                IntentTargetTransform = null;  // 若你希望AI靠近就停，保留此行
-                IntentTargetPosition = null;
-                IntentDirection = Vector2.zero;
-                return false;
-            }
-        }
-        // 若有固定目標位置（玩家點擊地板）
-        else if (IntentTargetPosition.HasValue) {
-            Vector2 target = IntentTargetPosition.Value;
-            Vector2 current = _rb.position;
-            Vector2 dir = (target - current).normalized;
-            IntentDirection = dir;
-
-            float dist = Vector2.Distance(current, target);
-            if (dist <= ARRIVAL_THRESHOLD) {
-                IntentTargetPosition = null;
-                IntentDirection = Vector2.zero;
-                return false;
-            }
-        }
-        // 若只有方向輸入（玩家 WASD）
-        else if (IntentDirection == Vector2.zero)
-            return false;// 沒有方向時不移動
-
-        // 執行移動
-        Vector2 newPosition = _rb.position + IntentDirection * CurrentMoveSpeed * Time.fixedDeltaTime;
-
-        //if (_stateComponent.IsPlayingAttackAnimation)
-        //    newPosition = _rb.position + IntentDirection * CurrentMoveSpeed*MOVEATTACK_SPEED * Time.fixedDeltaTime;
-
-        //如果沒在攻擊，則播放移動動畫，否則交由攻擊動畫控制
-        //if (!_stateComponent.IsPlayingAttackAnimation) {
         _animationComponent.PlayMove();
-         OnMoveDirectionChanged?.Invoke(IntentDirection);
-        //}
-
+         OnMoveDirectionChanged?.Invoke(_currentMoveDirection);
 
         if (_useMoveWindow && _moveWindowRemainTime <= 0f) return false;
         if (_useMoveWindow) _moveWindowRemainTime -= Time.fixedDeltaTime;
@@ -127,6 +97,8 @@ public class MoveComponent
 
         return true;
     }
+
+
 
     //技能衝刺
     public void SkillDashMove(ISkillRuntime skillRt) {
@@ -229,7 +201,7 @@ public class MoveComponent
 
     //重置速度
     public void ResetVelocity() {
-        IntentDirection = Vector2.zero;
+        _currentMoveDirection = Vector2.zero;
         _rb.velocity = Vector2.zero;
     }
 
@@ -250,15 +222,16 @@ public class MoveComponent
     }
 
 
-    public void SetIntentMove( Vector2? direction = null, Vector2? targetPosition = null, Transform targetTransform = null) {
-        IntentTargetTransform = targetTransform;
-        IntentTargetPosition = targetPosition;
-        IntentDirection = direction ?? Vector2.zero;
+    public void SetIntentMovePosition(Vector2? inputPosition = null, Transform inputTargetTransform = null) {
+        if (inputTargetTransform != null)
+            IntentMovePosition = inputTargetTransform.position;
+        else if (inputPosition.HasValue)
+            IntentMovePosition = inputPosition;
     }
+
     public void ClearAllMoveIntent() {
-        IntentTargetTransform = null;
-        IntentTargetPosition = null;
-        IntentDirection = Vector2.zero;
+        IntentMovePosition = null;
+        _currentMoveDirection = Vector2.zero;
     }
 
     public void MultiCurrentMoveSpeed(float multiple) {

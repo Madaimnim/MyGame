@@ -4,7 +4,7 @@ using UnityEngine;
 
 public class StraightMoveStrategy : MoveStrategyBase
 {
-    public override Vector2? GetMoveDirection(AIComponent ai) {
-        return new Vector2(-1, 0);
+    public override Vector2? GetMovePosition(AIComponent ai) {
+        return new Vector2(ai.Transform.position.x-1, ai.Transform.position.y);
     }
 }

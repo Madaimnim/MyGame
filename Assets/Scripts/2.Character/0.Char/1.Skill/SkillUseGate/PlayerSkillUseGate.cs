@@ -9,12 +9,12 @@ public class PlayerSkillUseGate : ISkillUseGate {
         _energyComponent = energyComponent;
     }
 
-    public bool CanUse(ISkillRuntime skillRt, int slotIndex) {
+    public bool CanUse(ISkillRuntime skillRt, int inputSlotNumber) {
         //Debug.Log($"Skill {skillRt.Id} with cost {skillRt.EnergyCost}¡A Current energy: {_energyComponent.CurrentEnergy}");
         return _energyComponent.HasEnoughEnergy(skillRt.EnergyCost);
     }
 
-    public void Consume(ISkillRuntime skillRt, int slotIndex) {
+    public void Consume(ISkillRuntime skillRt, int inputSlotNumber) {
         //Debug.Log($"Consume skill {skillRt.Id} energy cost {skillRt.EnergyCost}");
         _energyComponent.Consume(skillRt.EnergyCost);
 

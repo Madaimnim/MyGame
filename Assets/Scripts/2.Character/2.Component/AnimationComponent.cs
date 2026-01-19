@@ -1,4 +1,5 @@
 using System;
+using System.Security.Cryptography.X509Certificates;
 using UnityEngine;
 
 
@@ -18,13 +19,9 @@ public class AnimationComponent
     }
 
 
-    public void PlayBaseAttack() {
-        if(TryPlay("BaseAttack")) _stateComponent.SetIsBaseAttacking(true) ;
-    }
-    public void PlaySkill(int skillId) {
-        if(TryPlay($"Skill{skillId}"))_stateComponent.SetIsCastingSkill(true);
-    }
+    public void PlaySkill(int skillId)=> TryPlay($"Skill{skillId}");
 
+    public void PlayBaseAttack() => TryPlay("BaseAttack");
     public void PlayIdle() => TryPlay("Idle");
     public void PlayMove() => TryPlay("Move");
     public void PlayDie() => TryPlay("Die");
@@ -39,7 +36,7 @@ public class AnimationComponent
         int stateNameHash = Animator.StringToHash(stateName);
         if (!_ani.HasState(layer, stateNameHash)) return false;
         _ani.Play(stateNameHash, layer);
-        //Debug.Log($"¼·©ñ°Êµe: {stateName}");
+
         return true;
     }
 

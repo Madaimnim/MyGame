@@ -16,7 +16,7 @@ public static class EnemyBehaviourTreeFactory {
         var behaviourTree = new BehaviorTree();
 
         //todo
-        var moveSequence = new Sequence(new List<Node> { new Action_MoveAttempt(enemy.AIComponent, 2f) });
+        var moveSequence = new Sequence(new List<Node> { new Action_MoveToPoint(enemy.AIComponent) });
         var root = new Selector(new List<Node> { new Action_AttackAllSlots(enemy.AIComponent), moveSequence });
 
         behaviourTree.SetRoot(root);
@@ -27,7 +27,7 @@ public static class EnemyBehaviourTreeFactory {
     private static BehaviorTree CreateRushWallTree(Enemy enemy) {
         var behaviourTree = new BehaviorTree();
         
-        var moveNode = new Action_MoveAttempt(enemy.AIComponent, moveTime: 999f); // 幾乎一直走
+        var moveNode = new Action_MoveAttempt(enemy.AIComponent); // 幾乎一直走
 
         behaviourTree.SetRoot(moveNode);
         return behaviourTree;
@@ -38,7 +38,7 @@ public static class EnemyBehaviourTreeFactory {
     private static BehaviorTree CreateBackAwayAttackTree(Enemy enemy) {
         var behaviourTree = new BehaviorTree();
 
-        var backAwayMove = new Action_MoveAttempt(enemy.AIComponent, 1.5f);
+        var backAwayMove = new Action_MoveAttempt(enemy.AIComponent);
         var root = new Selector(new List<Node> {new Action_AttackAllSlots(enemy.AIComponent),backAwayMove});
 
         behaviourTree.SetRoot(root);
@@ -50,7 +50,7 @@ public static class EnemyBehaviourTreeFactory {
         var behaviourTree = new BehaviorTree();
 
         // 先用最基本版本，之後一定會拆 Phase
-        var root = new Selector(new List<Node> {new Action_AttackAllSlots(enemy.AIComponent),new Action_MoveAttempt(enemy.AIComponent, 2f)});
+        var root = new Selector(new List<Node> {new Action_AttackAllSlots(enemy.AIComponent),new Action_MoveAttempt(enemy.AIComponent)});
 
         behaviourTree.SetRoot(root);
         return behaviourTree;

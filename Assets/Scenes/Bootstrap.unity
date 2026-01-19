@@ -1062,22 +1062,48 @@ MonoBehaviour:
     Enable: 0
   - KeyContains: IsMoving
     Enable: 0
-  - KeyContains: IsAttackingIntent
-    Enable: 0
-  - KeyContains: IsPlayingAttackAnimation
-    Enable: 0
+  - KeyContains: IsBaseAttacking
+    Enable: 1
+  - KeyContains: IsCastingSkill
+    Enable: 1
   - KeyContains: IsMoveAnimationOpen
     Enable: 0
   - KeyContains: IsControlLocked
     Enable: 0
   - KeyContains: IsSkillDashing
     Enable: 0
+  - KeyContains: IsSkillRecoveryActionLock
+    Enable: 0
   - KeyContains: CanMove
     Enable: 1
-  - KeyContains: CanAttack
+  - KeyContains: CanBaseAttack
+    Enable: 1
+  - KeyContains: CanCastSkill
     Enable: 1
   - KeyContains: CanRecoverHeight
     Enable: 0
+  - KeyContains: HasBaseAttackTarget
+    Enable: 1
+  - KeyContains: BaseAttackTarget
+    Enable: 1
+  - KeyContains: BaseAttackReady
+    Enable: 1
+  - KeyContains: BaseAttackInRange
+    Enable: 1
+  - KeyContains: HasIntentSkill
+    Enable: 1
+  - KeyContains: IntentSkillSlot
+    Enable: 1
+  - KeyContains: IntentSkillId
+    Enable: 1
+  - KeyContains: SkillSlotReady
+    Enable: 0
+  - KeyContains: SkillGateCanUse
+    Enable: 0
+  - KeyContains: IntentTargetPos
+    Enable: 1
+  - KeyContains: IntentTargetTransform
+    Enable: 1
   FontSize: 30
   StartPos: {x: 1000, y: 10}
   TrueColor: {r: 0, g: 0, b: 1, a: 1}

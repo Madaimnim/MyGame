@@ -6,8 +6,6 @@ public class BaseAttackSlot {
     public float CooldownTimer { get; private set; }
     public SkillDetectorBase Detector { get; private set; }
     public GameObject DetectRangeObject;
-    public ISkillRuntime Rt;
-
     public bool IsReady => CooldownTimer <= 0f;
     private Transform _backSpriteTransform;
 
@@ -25,8 +23,7 @@ public class BaseAttackSlot {
 
     public void SetSlot(ISkillRuntime rt) {
         CooldownTimer = 0f;
-        Rt = rt;
-        Detector = Rt.Detector;
+        Detector = rt.Detector;
         Detector.Initialize(_backSpriteTransform);
 
         DetectRangeObject = Detector.SpawnRangeObject(_backSpriteTransform);

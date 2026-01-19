@@ -78,6 +78,12 @@ public class StageFlowManager : MonoBehaviour {
         yield return new WaitForSeconds(0.5f);
         // 所有人都到位，才開始戰鬥
         GameEventSystem.Instance.Event_BattleStart.Invoke();
+
+        //Todo 在遊戲開始時，設定敵人移動目標
+        //foreach (var enemy in EnemyListManager.Instance.TargetList) {
+        //    enemy as Enemy .MoveComponent.SetIgnoreMoveBounds(false);
+        //}
+
         //計時開始
         _battleTimer = 0f;
         _isTiming = true;

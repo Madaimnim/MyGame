@@ -12,7 +12,7 @@ public enum DebugContext {
     Enemy
 }
 public class StateComponent {
-    public bool CanMove => !IsDead && !IsControlLocked && !IsKnocked && !IsCastingSkill && !IsSkillDashing;
+    public bool CanMove => !IsDead && !IsControlLocked && !IsKnocked && !IsCastingSkill &&! IsCastingSkill && !IsBaseAttacking&&!IsSkillDashing;
     public bool CanBaseAttack => !IsDead && !IsControlLocked && !IsKnocked  && IsInitialHeight;
     public bool CanCastSkill => !IsDead && !IsControlLocked && !IsKnocked  && IsInitialHeight;
     public bool CanRecoverHeight => !IsDead  && !IsControlLocked && !IsKnocked && !IsSkillDashing && !IsCastingSkill && IsInitialHeight ;
@@ -61,6 +61,7 @@ public class StateComponent {
     public void SetIsDead(bool value) => IsDead = value; 
     public void SetIsMoving(bool value) => IsMoving = value;
     public void SetIsBaseAttacking(bool value) => IsBaseAttacking = value;
+    
     public void SetIsCastingSkill(bool value) => IsCastingSkill = value;
 
     public void SetIsKnocked(bool value) => IsKnocked = value;

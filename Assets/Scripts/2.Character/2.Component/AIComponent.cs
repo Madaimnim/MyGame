@@ -14,6 +14,10 @@ public class AIComponent
     public Transform Transform { get; private set; }
     public MoveStrategyBase MoveStrategy { get; private set; }
 
+    public ISkillRuntime BaseAttackSkillRt;
+    public Vector2 AutoMoveLastIntentPosition { get; private set; }
+    public IReadOnlyList<IInteractable> TargetList { get; private set; }
+
     private BehaviorTree _behaviorTree;
 
     private float _updateInterval = 0.1f;           // AI ¨Mµ¦¶¡¹j¡]¬í¡^
@@ -41,6 +45,24 @@ public class AIComponent
     public void SetBehaviorTree(BehaviorTree behaviourTree) {
         _behaviorTree = behaviourTree;
     }
+
+    public void StartAutoMoveAttack(IReadOnlyList<IInteractable> targetList,Vector2 autoMoveIntentPosition, ISkillRuntime baseAttackRt) {
+        Debug.Log($"StartAutoMoveAttack to {autoMoveIntentPosition}");
+
+        AutoMoveLastIntentPosition = autoMoveIntentPosition;
+        MoveComponent.SetIntentMovePosition(inputPosition: AutoMoveLastIntentPosition);
+
+        BaseAttackSkillRt = baseAttackRt;
+        TargetList = targetList;
+        CanRunAI= true;
+    }
+
+    public void StopAutoMoveAttack() { 
+        Debug.Log($"StopAutoMoveAttack");
+        MoveComponent.ClearAllMoveIntent();
+        CanRunAI = false;
+    }
+
 
     public void EnableAI() => CanRunAI = true;
     public void DisableAI() => CanRunAI = false;

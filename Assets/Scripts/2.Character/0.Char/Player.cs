@@ -50,7 +50,7 @@ public class Player : MonoBehaviour, IInteractable, IVisualFacing {
     public EnergyComponent EnergyComponent { get; private set; }
     public EnergyUIController EnergyUIController { get; private set; }
     public HpSlider HpSlider { get; private set; }
-    public Vector2 MoveVelocity=>MoveComponent.IntentDirection * MoveComponent.MoveSpeed;
+    public Vector2 MoveVelocity=>MoveComponent.GetCurrentMoveVelocity();
 
     private Vector3 _lastInteractPosition;
     private float _initialHeightY;
@@ -90,9 +90,10 @@ public class Player : MonoBehaviour, IInteractable, IVisualFacing {
         if (ActionLockComponent != null) ActionLockComponent.Tick();
         if(!StateComponent.IsMoving && !StateComponent.IsDead && !StateComponent.IsCastingSkill && !StateComponent.IsBaseAttacking)
             AnimationComponent.PlayIdle();
-        //if (InputProvider != PlayerInputManager.Instance && AIComponent != null) AIComponent.Tick();
+        
+        if (AIComponent != null && AIComponent.CanRunAI) AIComponent.Tick();
 
-
+        CombatComponent.DebugIntent(DebugContext.Player, Rt.Id);
     }
     private void LateUpdate() {
         if(StateComponent!=null)StateComponent.DebugState();
@@ -125,7 +126,7 @@ public class Player : MonoBehaviour, IInteractable, IVisualFacing {
         SpawnerComponent = new SpawnerComponent();
         if (EnemyListManager.Instance.TargetList == null) Debug.Log("EnemyListManager未初始化");
         CombatComponent = new CombatComponent(StatsComponent.FinalStats, Rt.SkillSlotCount, Rt.SkillPool, AnimationComponent, StateComponent, transform, _rootSpriteCollider.transform,
-            EnemyListManager.Instance.TargetList,MoveComponent,HeightComponent);
+            EnemyListManager.Instance.TargetList,MoveComponent,HeightComponent,Rt.BaseAttackRuntime);
         AIComponent = new AIComponent( MoveComponent, CombatComponent, transform, Rt.MoveStrategy);
         GrowthComponent = new GrowthComponent(Rt,StatsComponent);
         //額外初始化設定
@@ -153,7 +154,7 @@ public class Player : MonoBehaviour, IInteractable, IVisualFacing {
             GameEventSystem.Instance.Event_BattleStart += RespawnComponent.EnableRespawn;
             GameEventSystem.Instance.Event_OnWallBroken += RespawnComponent.DisableRespawn;
         }
-        CombatComponent.OnSkillAnimationPlayed += TurnFacingByIntent;
+        CombatComponent.OnAttackTurn += TurnFacingByIntent;
         MoveComponent.OnMoveDirectionChanged += TurnFacingByIntent;
 
 
@@ -187,7 +188,6 @@ public class Player : MonoBehaviour, IInteractable, IVisualFacing {
     //事件方法
     public void OnDie()
     {
-
         AnimationComponent.PlayDie();
         StartCoroutine(Die());
     }
@@ -201,8 +201,8 @@ public class Player : MonoBehaviour, IInteractable, IVisualFacing {
         EffectComponent.PlayerDeathEffect();
 
         Vector2 dir = _lastInteractPosition-transform.position ;
-        //SetFacingRight(dir); // 
 
+        EnemyOutlineManager.Instance.ClearTarget();
 
         foreach (var col in GetComponentsInChildren<Collider2D>())
             col.enabled = false;
@@ -233,7 +233,6 @@ public class Player : MonoBehaviour, IInteractable, IVisualFacing {
     public void ResetState()
     {
         StateComponent.ResetState();
-        MoveComponent.ResetVelocity();
         HealthComponent.ResetCurrentHp();
     }
 

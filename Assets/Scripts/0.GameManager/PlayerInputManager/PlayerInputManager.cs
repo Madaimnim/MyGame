@@ -26,24 +26,25 @@ public class PlayerInputManager : MonoBehaviour {
 
     private SkillCastMode _skillCastMode;
     private Player _holdingPlayer;
-    private int _holdingSlotIndex;
+    private int _holdingSlotNumber;
 
     // 拖曳框選
     public LineRenderer LineRenderer;
     private Vector2 _dragStartPos;
     private bool _isDragging;
 
-    //顯示outline狀態的對象
-    private Enemy _hoverEnemy;
-    private Enemy _dangerEnemy;
 
-    private bool TryGetSkillSlotFromKey(KeyCode key, out int slotIndex) {
-        slotIndex = -1;
+    //自動攻擊子狀態
+
+    private bool _isPreparingAutoAttackMoveInput = false;
+
+    private bool TryGetSkillSlotFromKey(KeyCode key, out int slotNumber) {
+        slotNumber = -1;
         switch (key) {
-            case KeyCode.Q: slotIndex = 1; return true;
-            case KeyCode.W: slotIndex = 2; return true;
-            case KeyCode.E: slotIndex = 3; return true;
-            case KeyCode.R: slotIndex = 4; return true;
+            case KeyCode.Q: slotNumber = 1; return true;
+            case KeyCode.W: slotNumber = 2; return true;
+            case KeyCode.E: slotNumber = 3; return true;
+            case KeyCode.R: slotNumber = 4; return true;
             default: return false;
         }
     }
@@ -58,6 +59,8 @@ public class PlayerInputManager : MonoBehaviour {
         LineRenderer.enabled = false;
         if (GameSettingManager.Instance != null) _skillCastMode=GameSettingManager.Instance.SkillCastMode;
         GameEventSystem.Instance.Event_BattleStart += () => SetCanControl(true);
+
+
     }
 
     public void Update() {
@@ -66,8 +69,14 @@ public class PlayerInputManager : MonoBehaviour {
         //HandleSelectionBox();
         UpdateHoverEnemy();   // 新增
 
-        HandleMoveInput();
-        HandleSkillInput();
+        HandleRightClick();
+        if (_isPreparingAutoAttackMoveInput) {
+            HandleAutoAttackMoveConfirm();
+            return; // 準備狀態下，不吃其他輸入
+        }
+
+        HandleAutoAttackMoveKey();
+        HandleKeyBoardInput();
     }
 
     //=================================玩家點擊選取======================================
@@ -161,116 +170,156 @@ public class PlayerInputManager : MonoBehaviour {
         CurrentControlPlayer = selectedPlayer;
         OnBattlePlayerSelected?.Invoke(selectedPlayer.transform);
     }
-    //===============================Input 輸入處理========================================
-    private void HandleMoveInput() {
+
+    //右鍵
+    //
+    //
+    private void HandleRightClick() {
         if (_selectedPlayerList.Count == 0) return;
+        if (!Input.GetMouseButtonDown(1)) return;
+        var ai = CurrentControlPlayer.AIComponent;
+        ai.StopAutoMoveAttack();
 
-        if (Input.GetMouseButtonDown(1)) {
-            foreach (var player in _selectedPlayerList) {
-                HandleRightClick(player);
-            }
-        }
-    }
-    private void HandleRightClick(Player player) {
         Vector2 mouseWorldPos = Camera.main.ScreenToWorldPoint(Input.mousePosition);
+        var combatComp = CurrentControlPlayer.CombatComponent;
+        var moveComp = CurrentControlPlayer.MoveComponent;
+        var stateComp = CurrentControlPlayer.StateComponent;
+        var aniComp= CurrentControlPlayer.AnimationComponent;
+        var slot = combatComp.SkillSlots[0]; // 普攻擊能槽 = Slot0
 
-        var combatComponent = player.CombatComponent;
-        var moveComp = player.MoveComponent;
-        var stateComp = player.StateComponent;
 
-        if (stateComp.IsCastingSkill) combatComponent.UseSkill();
-        if(stateComp.IsBaseAttacking) combatComponent.UseBaseAttack();
-
-        var slot = combatComponent.SkillSlots[0]; // 普攻擊能槽 = Slot0
-
-        // 有點到敵人->判斷距離
+        // 有點到敵人
         Collider2D hit = Physics2D.OverlapPoint(mouseWorldPos, LayerMask.GetMask("Enemy"));
         Enemy enemy = hit ? hit.GetComponentInParent<Enemy>() : null;
         if (enemy != null) {
-            // 清舊的 Danger
-            if (_dangerEnemy != null && _dangerEnemy != enemy)_dangerEnemy.EffectComponent.HideOutline(); 
-            _dangerEnemy = enemy;
-            _dangerEnemy.EffectComponent.ShowTargetOutline();
-
-            Vector2 enemyGroundPos = enemy.transform.position;
-            combatComponent.SetIntentBaseAttack(enemy.transform);
+            combatComp.SetIntentBaseAttack(enemy.transform);
+            EnemyOutlineManager.Instance.SetTarget(enemy);
             return;
         }
 
         // 其他情況→移動
-        combatComponent.ClearBaseAttackTargetTransform();
-        combatComponent.ClearSkillIntent();
+        aniComp.PlayIdle();
+        //if (stateComp.IsCastingSkill) combatComp.UseSkill();
+        //if (stateComp.IsBaseAttacking) combatComp.UseBaseAttack();
 
-        ClearTargetOutline();
-        moveComp.SetIntentMove( targetPosition: mouseWorldPos);
+        EnemyOutlineManager.Instance.ClearTarget();
+        combatComp.ClearBaseAttackTargetTransform();
+        combatComp.ClearSkillIntent();
+
+        moveComp.SetIntentMovePosition( inputPosition: mouseWorldPos);
         VFXManager.Instance.Play("ClickGround01", mouseWorldPos);
     }
 
+    //鍵盤A
+    private void HandleAutoAttackMoveKey() {
+        if (!Input.GetKeyDown(KeyCode.A)) return;
+        if (CurrentControlPlayer == null) return;
+
+
+        var combat = CurrentControlPlayer.CombatComponent;
+
+        // 進入準備狀態
+        _isPreparingAutoAttackMoveInput = true;
+        combat.SetBaseAttackDetectRangeVisible(true);
+    }
+    //左鍵確定 右鍵取消
+    private void HandleAutoAttackMoveConfirm() {
+        var player = CurrentControlPlayer;
+        var combat = player.CombatComponent;
+        var ai = player.AIComponent;
+
+        // 左鍵 → 確認執行自動移動攻擊
+        if (Input.GetMouseButtonDown(0)) {
+            Vector2 mouseWorldPos = Camera.main.ScreenToWorldPoint(Input.mousePosition);
+
+            // 關閉普攻顯示
+            combat.SetBaseAttackDetectRangeVisible(false);
+
+            // 啟動 AI 行為
+            ai.StartAutoMoveAttack(
+                EnemyListManager.Instance.TargetList,
+                mouseWorldPos,
+                player.Rt.BaseAttackRuntime
+            );
+
+            VFXManager.Instance.Play("ClickGround01", mouseWorldPos);
+            _isPreparingAutoAttackMoveInput = false;
+            return;
+        }
+
+        // 右鍵 → 取消
+        if (Input.GetMouseButtonDown(1)) {
+            combat.SetBaseAttackDetectRangeVisible(false);
+            _isPreparingAutoAttackMoveInput = false;
+        }
+    }
+
+    //鍵盤QWER
     #region 鍵盤施放技能
     //========================對每顆_skillKeys裡的按鍵=================================
-    private void HandleSkillInput() {
+    private void HandleKeyBoardInput() {
         if (_selectedPlayerList.Count == 0) return;
 
         foreach (var player in _selectedPlayerList) {
             foreach (KeyCode key in _skillKeys) {
-                if (!TryGetSkillSlotFromKey(key, out int slotIndex)) continue;
-                if (slotIndex >= player.CombatComponent.SkillSlots.Length) continue;
+                if (!TryGetSkillSlotFromKey(key, out int slotNumber)) continue;
+                if (slotNumber < 1 || slotNumber > player.CombatComponent.SkillSlots.Length) continue;
 
-                var slot = player.CombatComponent.SkillSlots[slotIndex];
+                var slot = player.CombatComponent.SkillSlots[slotNumber-1];
                 if (!slot.HasSkill || slot.Detector == null) continue;
 
                 switch (_skillCastMode) {
                     case SkillCastMode.Instant:
-                        HandleInstantCast(key, player, slotIndex);
+                        HandleInstantCast(key, player, slotNumber);
                         break;
 
                     case SkillCastMode.HoldRelease:
-                        HandleHoldReleaseCast(key, player, slotIndex);
+                        HandleHoldReleaseCast(key, player, slotNumber);
                         break;
                 }
             }
         }
     }
-    private void HandleInstantCast(KeyCode key,Player player,int slotIndex) {
+    private void HandleInstantCast(KeyCode key,Player player,int slotNumber) {
         if (!Input.GetKeyDown(key)) return;
-        ClearTargetOutline();
-        ResolveAndCastSkill(player, slotIndex);
+
+        ResolveAndCastSkill(player, slotNumber);
     }
-    private void HandleHoldReleaseCast(KeyCode key, Player player, int slotIndex) {
+    private void HandleHoldReleaseCast(KeyCode key, Player player, int slotNumber) {
         var combatComponent = player.CombatComponent;
 
         //KeyDown：開始 Hold ----------
         if (Input.GetKeyDown(key)) {
-            ClearTargetOutline();
+
             // 若已有其他技能在 Hold → 強制取消
             if (_holdingPlayer != null &&
-                (_holdingPlayer != player || _holdingSlotIndex != slotIndex)) {
+                (_holdingPlayer != player || _holdingSlotNumber != slotNumber)) {
                 CancelCurrentHold();
             }
 
             _holdingPlayer = player;
-            _holdingSlotIndex = slotIndex;
+            _holdingSlotNumber = slotNumber;
 
-            combatComponent.SetDetectRangeVisible(slotIndex, true);
+            combatComponent.SetSkillDetectRangeVisible(slotNumber, true);
             return;
         }
 
         // KeyUp：只有持有者才能施放 ----------
         if (Input.GetKeyUp(key)) {
-            if (_holdingPlayer != player || _holdingSlotIndex != slotIndex)
+            if (_holdingPlayer != player || _holdingSlotNumber != slotNumber)
                 return;
 
-            combatComponent.SetDetectRangeVisible(slotIndex, false);
-            ResolveAndCastSkill(player, slotIndex);
+            combatComponent.SetSkillDetectRangeVisible(slotNumber, false);
+            ResolveAndCastSkill(player, slotNumber);
 
             _holdingPlayer = null;
-            _holdingSlotIndex = -1;
+            _holdingSlotNumber = -1;
         }
     }
 
 
-    private void ResolveAndCastSkill(Player player, int slotIndex) {
-        var slot = player.CombatComponent.SkillSlots[slotIndex];
+    private void ResolveAndCastSkill(Player player, int slotNumber) {
+        var slot = player.CombatComponent.SkillSlots[slotNumber-1];
         var detector = slot.Detector;
 
         Vector2 mouseWorldPos = Camera.main.ScreenToWorldPoint(Input.mousePosition);
@@ -294,13 +343,13 @@ public class PlayerInputManager : MonoBehaviour {
                 targetPosition = detector.GetClosestPoint(mouseWorldPos);
             }
 
-            player.CombatComponent.SetIntentSkill( slotIndex, targetPosition, targetTransform);
+            player.CombatComponent.SetIntentSkill(slotNumber, targetPosition, targetTransform);
         }
         else {
             // 沒點到敵人，用滑鼠位置(在範圍內用畫鼠位置、範圍外取最近點)
             if (detector.IsInRange(mouseWorldPos)) targetPosition = mouseWorldPos;
             else targetPosition = detector.GetClosestPoint(mouseWorldPos);
-            player.CombatComponent.SetIntentSkill( slotIndex, targetPosition, targetTransform);
+            player.CombatComponent.SetIntentSkill(slotNumber, targetPosition, targetTransform);
         }
     }    //鍵盤施放
 
@@ -308,10 +357,10 @@ public class PlayerInputManager : MonoBehaviour {
         if (_holdingPlayer == null) return;
 
         var combatComponent = _holdingPlayer.CombatComponent;
-        combatComponent.SetDetectRangeVisible(_holdingSlotIndex, false);
+        combatComponent.SetSkillDetectRangeVisible(_holdingSlotNumber, false);
 
         _holdingPlayer = null;
-        _holdingSlotIndex = -1;
+        _holdingSlotNumber = -1;
     }                                   //取消上一個Hold住的按鍵
     #endregion
 
@@ -331,7 +380,7 @@ public class PlayerInputManager : MonoBehaviour {
             p.CombatComponent.ClearSkillIntent();
             p.CombatComponent.ClearBaseAttackTargetTransform();
         }
-        ClearTargetOutline();
+        EnemyOutlineManager.Instance.ClearAll();
     }
     //===============================Outline處理==============================
     private void UpdateHoverEnemy() {
@@ -339,25 +388,7 @@ public class PlayerInputManager : MonoBehaviour {
         Collider2D hit = Physics2D.OverlapPoint(mouseWorldPos, LayerMask.GetMask("Enemy"));
         Enemy newHover = hit ? hit.GetComponentInParent<Enemy>() : null;
 
-        // 如果 Hover 對象沒變 → 不做事
-        if (_hoverEnemy == newHover) return;
-
-        // 舊 Hover 要關掉（但 Danger 不動）
-        if (_hoverEnemy != null && _hoverEnemy != _dangerEnemy) {
-            _hoverEnemy.EffectComponent.HideOutline();
-        }
-
-        _hoverEnemy = newHover;
-
-        // 新 Hover 顯示（但 Danger 優先）
-        if (_hoverEnemy != null && _hoverEnemy != _dangerEnemy) {
-            _hoverEnemy.EffectComponent.ShowHoverOutline();
-        }
+        EnemyOutlineManager.Instance.SetHover(newHover);
     }
-    private void ClearTargetOutline() {
-        if (_dangerEnemy != null) {
-            _dangerEnemy.EffectComponent.HideOutline();
-            _dangerEnemy = null;
-        }
-    }
+
 }

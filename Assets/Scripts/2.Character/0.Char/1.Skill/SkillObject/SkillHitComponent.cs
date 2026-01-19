@@ -43,6 +43,8 @@ public class SkillHitComponent {
         }
     }
     public void TriggerEnter(Collider2D collision) {
+        if (collision == null) return;
+
         if (((1 << collision.gameObject.layer) & _skillRt.TargetLayers) == 0) return;
 
         IInteractable target = collision.GetComponentInParent<IInteractable>();

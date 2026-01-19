@@ -36,11 +36,9 @@ public class EnemyStatsRuntime:IHealthData
             SkillPool[skill.Id] = new EnemySkillRuntime(skill);
         EnemyBehaviourTreeType = template.EnemyBehaviourTreeType;
         MoveStrategy = template.MoveStrategyType switch {
-            MoveStrategyType.Follow => new FollowMoveStrategy(),
             MoveStrategyType.Random => new RandomMoveStrategy(),
             MoveStrategyType.Straight => new StraightMoveStrategy(),
             MoveStrategyType.Stay => new StayMoveStrategy(),
-            MoveStrategyType.Flee => new FleeMoveStrategy(),
             _ => new StayMoveStrategy()
         };
     }

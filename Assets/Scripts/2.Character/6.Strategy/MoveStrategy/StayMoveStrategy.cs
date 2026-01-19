@@ -4,7 +4,5 @@ using UnityEngine;
 
 public class StayMoveStrategy : MoveStrategyBase
 {
-    public override Vector2? GetMoveDirection(AIComponent ai) {
-        return null;
-    }
+
 }

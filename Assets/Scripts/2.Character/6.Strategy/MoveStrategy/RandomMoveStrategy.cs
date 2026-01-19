@@ -7,7 +7,7 @@ public class RandomMoveStrategy : MoveStrategyBase
     private float _minDistance = 3f;
     private float _maxDistance = 3f;
 
-    public override Vector2? GetTargetPosition(AIComponent ai) {
+    public override Vector2? GetMovePosition(AIComponent ai) {
         Vector2 origin = ai.Transform.position;
 
         // 隨機方向（單位向量）
@@ -21,9 +21,4 @@ public class RandomMoveStrategy : MoveStrategyBase
 
         return target;
     }
-
-    public override Vector2? GetMoveDirection(AIComponent ai) {
-        return null;
-    }
-
 }

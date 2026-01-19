@@ -21,7 +21,7 @@ public class EnemyEntrySystem : MonoBehaviour {
 
 
         Vector2 targetPos = TargetProvider.GetPosition();
-        move.SetIntentMove(targetPosition: targetPos);
+        move.SetIntentMovePosition(inputPosition: targetPos);
 
         while (Vector2.Distance(enemy.transform.position, targetPos) > 0.05f)
             yield return null;

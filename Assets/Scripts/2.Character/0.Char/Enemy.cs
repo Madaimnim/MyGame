@@ -38,7 +38,7 @@ public class Enemy :MonoBehaviour,IInteractable,IVisualFacing
     public CombatComponent CombatComponent { get; private set; }
     public SpawnerComponent SpawnerComponent { get; private set; }
     public HeightComponent HeightComponent { get; private set; }
-    public Vector2 MoveVelocity => MoveComponent.IntentDirection * MoveComponent.MoveSpeed;
+    public Vector2 MoveVelocity => MoveComponent.GetCurrentMoveVelocity();
 
     private Vector3 _lastInteractPosition;
     private float _initialHeightY ;
@@ -88,6 +88,7 @@ public class Enemy :MonoBehaviour,IInteractable,IVisualFacing
         if (ActionLockComponent != null ) ActionLockComponent.Tick();
         if (AIComponent != null && AIComponent.CanRunAI) AIComponent.Tick();
 
+        CombatComponent.DebugIntent(DebugContext.Enemy, Rt.Id);
     }
     private void LateUpdate() {
         if(StateComponent!=null) StateComponent.DebugState();
@@ -137,8 +138,8 @@ public class Enemy :MonoBehaviour,IInteractable,IVisualFacing
         GameEventSystem.Instance.Event_OnWallBroken += AIComponent.DisableAI;
         GameEventSystem.Instance.Event_OnWallBroken += RespawnComponent.DisableRespawn;
 
-        CombatComponent.OnSkillAnimationPlayed += SetFacingLeft;
-        CombatComponent.OnSkillAnimationPlayed += MoveComponent.SetSkillDashDirection;
+        CombatComponent.OnAttackTurn += SetFacingLeft;
+        CombatComponent.OnAttackTurn += MoveComponent.SetSkillDashDirection;
         MoveComponent.OnMoveDirectionChanged += SetFacingLeft;
 
         //初始化狀態--------------------------------------------------------------------------------------------------------------------------------------------------------------------
@@ -222,7 +223,10 @@ public class Enemy :MonoBehaviour,IInteractable,IVisualFacing
     }
     public void ResetState() {
         StateComponent.ResetState();
-        MoveComponent.ResetVelocity();
+        MoveComponent.ClearAllMoveIntent();
+        CombatComponent.ClearSkillIntent();
+        //CombatComponent.ClearBaseAttackTargetTransform(); //敵人沒有譜攻
+
         HealthComponent.ResetCurrentHp();
     }
     private void OnWallBroken() {

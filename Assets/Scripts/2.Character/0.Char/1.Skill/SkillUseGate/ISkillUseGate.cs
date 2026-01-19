@@ -1,4 +1,4 @@
 public interface ISkillUseGate {
-    bool CanUse(ISkillRuntime skill, int slotIndex);
-    void Consume(ISkillRuntime skill, int slotIndex);//基戈方Ι埃
+    bool CanUse(ISkillRuntime skill, int inputSlotNumber);
+    void Consume(ISkillRuntime skill, int inputSlotNumber);//基戈方Ι埃
 }

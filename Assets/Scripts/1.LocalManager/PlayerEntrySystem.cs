@@ -21,7 +21,7 @@ public class PlayerEntrySystem : MonoBehaviour
         var move = player.MoveComponent;
         player.EnergyComponent.Set(1);
         move.SetIgnoreMoveBounds(true);
-        move.SetIntentMove(targetPosition: targetPos);
+        move.SetIntentMovePosition(inputPosition: targetPos);
 
         // 等玩家真的走到
         while (Vector2.Distance(player.transform.position, targetPos) > 0.05f)

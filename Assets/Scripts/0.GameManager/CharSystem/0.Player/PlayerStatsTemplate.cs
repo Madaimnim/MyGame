@@ -5,13 +5,11 @@ using UnityEngine.Serialization;
 public enum MoveStrategyType {
     [InspectorName("直線")] Straight,
     [InspectorName("隨機")] Random,
-    [InspectorName("追蹤")] Follow,
     [InspectorName("站立")] Stay,
-    [InspectorName("逃跑")] Flee//todo:未實裝
 }
 public enum PlayerBehaviourTreeType {
-    [InspectorName("最近敵人優先")] NearTargetAttackFirst,
-    [InspectorName("防禦優先")] DefensiveAttack //todo:未實裝
+    [InspectorName("移動攻擊模式")] MoveAttackType,
+    [InspectorName("防禦優先Todo")] DefensiveType //todo:未實裝
 }
 
 [CreateAssetMenu(fileName ="PlayerStatsTemplate",menuName="GameData/PlayerStatsTemplate")]

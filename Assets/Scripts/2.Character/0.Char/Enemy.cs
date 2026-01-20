@@ -116,7 +116,7 @@ public class Enemy :MonoBehaviour,IInteractable,IVisualFacing
         RespawnComponent = new RespawnComponent(this, Rt.CanRespawn);
         MoveComponent = new MoveComponent(Rb,Rt.StatsData, this, MoveDetector, AnimationComponent, HeightComponent,StateComponent);
         SpawnerComponent = new SpawnerComponent();
-        CombatComponent = new CombatComponent(Rt.StatsData, Rt.SkillSlotCount,Rt.SkillPool, AnimationComponent,StateComponent, transform, _rootSpriteCollider.transform,
+        CombatComponent = new CombatComponent(this,Rt.StatsData, Rt.SkillSlotCount,Rt.SkillPool, AnimationComponent,StateComponent, transform, _rootSpriteCollider.transform,
             PlayerListManager.Instance.TargetList,MoveComponent,HeightComponent);
         AIComponent = new AIComponent( MoveComponent, CombatComponent, transform,Rt.MoveStrategy);
 

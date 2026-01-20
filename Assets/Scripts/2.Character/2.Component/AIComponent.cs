@@ -15,7 +15,7 @@ public class AIComponent
     public MoveStrategyBase MoveStrategy { get; private set; }
 
     public ISkillRuntime BaseAttackSkillRt;
-    public Vector2 AutoMoveLastIntentPosition { get; private set; }
+    public Vector2? AutoMoveTargetPosition { get; private set; } = null;
     public IReadOnlyList<IInteractable> TargetList { get; private set; }
 
     private BehaviorTree _behaviorTree;
@@ -46,23 +46,25 @@ public class AIComponent
         _behaviorTree = behaviourTree;
     }
 
-    public void StartAutoMoveAttack(IReadOnlyList<IInteractable> targetList,Vector2 autoMoveIntentPosition, ISkillRuntime baseAttackRt) {
-        Debug.Log($"StartAutoMoveAttack to {autoMoveIntentPosition}");
 
-        AutoMoveLastIntentPosition = autoMoveIntentPosition;
-        MoveComponent.SetIntentMovePosition(inputPosition: AutoMoveLastIntentPosition);
+    public void StartAutoMoveAttack(IReadOnlyList<IInteractable> targetList,Vector2 autoMoveTargetPosition, ISkillRuntime baseAttackRt) {  
+        AutoMoveTargetPosition = autoMoveTargetPosition;
 
         BaseAttackSkillRt = baseAttackRt;
         TargetList = targetList;
         CanRunAI= true;
+        //Debug.Log($"StartAutoMoveAttack to {autoMoveIntentPosition}");
     }
 
     public void StopAutoMoveAttack() { 
-        Debug.Log($"StopAutoMoveAttack");
         MoveComponent.ClearAllMoveIntent();
         CanRunAI = false;
+        //Debug.Log($"StopAutoMoveAttack");
     }
 
+    public void SetAutoMoveTargetPosition(Vector2? pos) {
+        AutoMoveTargetPosition = pos;
+    }
 
     public void EnableAI() => CanRunAI = true;
     public void DisableAI() => CanRunAI = false;

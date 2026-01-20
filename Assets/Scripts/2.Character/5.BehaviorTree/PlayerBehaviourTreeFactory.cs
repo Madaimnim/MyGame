@@ -16,8 +16,8 @@ public static class PlayerBehaviourTreeFactory {
 
         var root = new Selector(new List<Node> {
             new Action_BaseAttackDetect(player.AIComponent),
-            new Action_MoveToPoint(player.AIComponent)});
-
+            new Action_StopAutoMoveAttack(player.AIComponent)});
+        
         behaviourTree.SetRoot(root);
         return behaviourTree;
     }

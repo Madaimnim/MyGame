@@ -3,8 +3,8 @@ using System.Collections.Generic;
 public static class EnemyBehaviourTreeFactory {
     public static BehaviorTree Create(EnemyBehaviourTreeType type, Enemy enemy) {
         return type switch {
-            EnemyBehaviourTreeType.RushWall=>CreateRushWallTree(enemy),
             EnemyBehaviourTreeType.AdvanceAttack =>CreateAdvanceAttackTree(enemy),
+            EnemyBehaviourTreeType.RushWall => CreateRushWallTree(enemy),
             EnemyBehaviourTreeType.BackAwayAttack =>CreateBackAwayAttackTree(enemy),
             EnemyBehaviourTreeType.Boss =>CreateBossTree(enemy),
             _ => throw new System.Exception("Unknown EnemyBehaviourTreeType")
@@ -15,9 +15,9 @@ public static class EnemyBehaviourTreeFactory {
     private static BehaviorTree CreateAdvanceAttackTree(Enemy enemy) {
         var behaviourTree = new BehaviorTree();
 
-        //todo
-        var moveSequence = new Sequence(new List<Node> { new Action_MoveToPoint(enemy.AIComponent) });
-        var root = new Selector(new List<Node> { new Action_AttackAllSlots(enemy.AIComponent), moveSequence });
+        var root = new Selector(new List<Node> {
+            new Action_AttackAllSlots(enemy.AIComponent),
+            new Action_MoveToPoint(enemy.AIComponent)});
 
         behaviourTree.SetRoot(root);
         return behaviourTree;

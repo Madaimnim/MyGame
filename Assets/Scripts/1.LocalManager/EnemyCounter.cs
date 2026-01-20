@@ -8,10 +8,11 @@ public class EnemyCounter : MonoBehaviour {
     private int _totalEnemy;
     public bool IsCleared => _remainEnemy <= 0;
 
-    private void Start() {
+    public void OnEnable() {
         _totalEnemy = CalculateTotalEnemyCount();
         _remainEnemy = _totalEnemy;
     }
+
 
     private int CalculateTotalEnemyCount() {
         int total = 0;

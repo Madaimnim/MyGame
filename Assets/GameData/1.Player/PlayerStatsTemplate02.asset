@@ -24,14 +24,47 @@ MonoBehaviour:
     Weight: 0
   VisualData:
     Prefab: {fileID: 1901394458928384591, guid: 0d87d99a51500fd418339ea0f269bb01, type: 3}
-    DetectPrefab: {fileID: 0}
     SpriteIcon: {fileID: 0}
-    DeathSFX: {fileID: 0}
-    NormalMaterial: {fileID: 2100000, guid: ce71ba01014fe3043971f56059a6c29d, type: 2}
-    FlashMaterial: {fileID: 2100000, guid: 343628f4e759ecf46b917b0ca0685d23, type: 2}
   PlayerBehaviourTreeType: 0
-  MoveStrategyType: 3
+  MoveStrategyType: 2
   SkillSlotCount: 4
+  BaseAttackTemplate:
+    Id: 0
+    Name: "\u666E\u901A\u653B\u64CA"
+    StatsData:
+      Power: 0
+      MoveSpeed: 0
+      VerticalMoveSpeed: 0
+      KnockbackPower: 0
+      FloatPower: 0
+      Weight: 0
+    VisualData:
+      Prefab: {fileID: 0}
+      SpriteIcon: {fileID: 0}
+    SkillReleaseType: 0
+    SkillLifetimeType: 0
+    SkillVisualFromType: 0
+    SkillMoveType: 0
+    OnHitType: 0
+    HitEffectPositionType: 0
+    FacingDirection: 1
+    TargetLayers:
+      serializedVersion: 2
+      m_Bits: 0
+    canRotate: 0
+    Cooldown: 0
+    EnergyCost: 0
+    EnergyGain: 0
+    DestroyDelay: 0
+    OnHitDestroyDelay: 0
+    SkillDashMultiplier: 1
+    SkillDashDuration: 0
+    SkillDashPrepareDuration: 0
+    SkillDashVerticalVelocity: 0
+    DetectorType: 0
+    DetectRadius: 0
+    RangeX: 0
+    RangeY: 0
   SkillTemplateList:
   - Id: 1
     Name: "\u666E\u901A\u653B\u64CA"
@@ -44,11 +77,7 @@ MonoBehaviour:
       Weight: 0
     VisualData:
       Prefab: {fileID: 1868301516382297822, guid: e9482e1a632b9db42abfad2b78ec208a, type: 3}
-      DetectPrefab: {fileID: 2003774139042550798, guid: 95167d54ba66b37429c084cc1d1c6065, type: 3}
       SpriteIcon: {fileID: 0}
-      DeathSFX: {fileID: 0}
-      NormalMaterial: {fileID: 0}
-      FlashMaterial: {fileID: 0}
     SkillReleaseType: 0
     SkillLifetimeType: 0
     SkillVisualFromType: 0
@@ -61,6 +90,8 @@ MonoBehaviour:
       m_Bits: 256
     canRotate: 1
     Cooldown: 0.1
+    EnergyCost: 0
+    EnergyGain: 0
     DestroyDelay: 5
     OnHitDestroyDelay: 0
     SkillDashMultiplier: 1
@@ -71,7 +102,7 @@ MonoBehaviour:
     DetectRadius: 0
     RangeX: 20
     RangeY: 1
-  UnlockedSkillIdList: 
+  EnhancedSkillTemplateList: []
   CanRespawn: 1
   MaxHp: 5
   ExpTable: 0400000006000000090000000d0000001200000019000000220000002d0000003a000000490000005a0000006d0000008200000099000000b2000000cd000000ea000000090100002a0100004d0100007201000099010000c2010000ed0100001a020000490200007a020000ad020000e202000019030000

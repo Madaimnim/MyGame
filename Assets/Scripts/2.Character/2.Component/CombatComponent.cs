@@ -23,6 +23,7 @@ public class CombatComponent
     private ISkillRuntime _baseAttackRuntime;
     private Dictionary<int, ISkillRuntime> _skillPool;
 
+    private MonoBehaviour _monoBehaviour;
     private AnimationComponent _animationComponent;
     private MoveComponent _moveComponent;
     private HeightComponent _heightComponent;
@@ -36,19 +37,25 @@ public class CombatComponent
 
     //技能判斷大門
     private ISkillUseGate _skillUseGate;
+    //技能鍊
+    private PlayerSkillChain _playerSkillChain;
 
+    //普攻、技能槽
     public BaseAttackSlot BaseAttackSlot;
     public SkillSlot[] SkillSlots;
     public bool HasAnySkillTarget => SkillSlots.Any(slot => slot.HasSkill && slot.Detector != null && slot.Detector.HasTarget);
     //事件
     public event Action OnSkillsChanged; // (slot, skillId, runtime)
     public event Action<Vector2> OnAttackTurn;
-    public event Action<int, ISkillRuntime> OnSkillUsed;         // (slot, runtime)
-    public event Action<ISkillRuntime> OnSkillHitTarget;        //技能命中事件傳遞
 
-    public CombatComponent(StatsData statsData,int skillSlotCount,Dictionary<int, ISkillRuntime> skillPool,AnimationComponent animationComponent,
+    public event Action<int, ISkillRuntime> OnSkillUsed;         // (slot, runtime)
+    public event Action<ISkillRuntime> OnAttackHitTarget;        //技能命中事件傳遞
+
+    public CombatComponent(MonoBehaviour monoBehaviour, StatsData statsData,int skillSlotCount,Dictionary<int, ISkillRuntime> skillPool,AnimationComponent animationComponent,
         StateComponent stateComponent,Transform transform, Transform sprTransform, IReadOnlyList<IInteractable> targetList,MoveComponent moveComponent,
         HeightComponent heightComponent,ISkillRuntime baseAttackRuntime=null) {
+        _monoBehaviour= monoBehaviour;
+
         _statsData = statsData;
         SkillSlotCount = skillSlotCount;
         _baseAttackRuntime= baseAttackRuntime;
@@ -107,16 +114,17 @@ public class CombatComponent
 
         OnAttackTurn.Invoke(IntentBaseAttackInitialDirection);
     }
-    public void UseBaseAttack() {
+    public void SpawnBaseAttack() {
         if (!HasBaseAttackTarget) return;
      
         GameObject obj = _spawner.Spawn(_baseAttackRuntime.VisualData.Prefab, _transform.position, Quaternion.identity);
         var skillObj = obj.GetComponent<SkillObject>();
         skillObj.Initial(_transform, _sprTransform, _statsData, _baseAttackRuntime, IntentBaseAttackInitialDirection, IntentBaseAttackTargetTransform.position, IntentBaseAttackTargetTransform);
-        skillObj.OnHitTarget += skillRt => { OnSkillHitTarget?.Invoke(skillRt); };
+        skillObj.OnHitTarget += baseAttackRt => { OnAttackHitTarget?.Invoke(baseAttackRt); };
 
         BaseAttackSlot.TriggerCooldown(_baseAttackRuntime.Cooldown);          //觸發冷卻
     }
+    //檢查普通攻擊中，目標若離開或消失，則取消普攻動畫
     private void CheckBaseAttackAnimationIsValid() {
         if (!_stateComponent.IsBaseAttacking) return;
 
@@ -143,19 +151,19 @@ public class CombatComponent
 
         OnAttackTurn.Invoke(IntentSkillInitialDirection);
     }
-    public void UseSkill() {
+    public void SpawnSkill() {
         GameObject obj = _spawner.Spawn(IntentSkillRt.VisualData.Prefab, _transform.position, Quaternion.identity);
         var skillObj = obj.GetComponent<SkillObject>();
         skillObj.Initial(_transform, _sprTransform, _statsData, IntentSkillRt, IntentSkillInitialDirection, IntentTargetPosition, IntentTargetTransform);
-        skillObj.OnHitTarget += skillRt => { OnSkillHitTarget?.Invoke(skillRt); };
+        skillObj.OnHitTarget += skillRt => { OnAttackHitTarget?.Invoke(skillRt); };
 
         var skillSlot = SkillSlots[IntentSkillSlotNumber-1];
 
         skillSlot.TriggerCooldown(IntentSkillRt.Cooldown);          //觸發冷卻
-        _skillUseGate.Consume(IntentSkillRt, IntentSkillSlotNumber); //消耗能量
+   
         ClearSkillIntent();                                         //清除意圖
         _stateComponent.SetIsCastingSkill(false);             //技能施放完成
-        OnSkillUsed?.Invoke(IntentSkillSlotNumber, IntentSkillRt);   //發事件
+        OnSkillUsed?.Invoke(IntentSkillSlotNumber, IntentSkillRt);  //發事件
     }
     //衝刺攻擊
     public void SkillPrepareMove(ISkillRuntime skillRt) {
@@ -180,12 +188,14 @@ public class CombatComponent
         SkillSlots[slotNumber-1].Uninstall();
         SkillSlots[slotNumber-1].SetSlot(skillIRt);
 
-        Debug.Log($"{_transform.name}裝備技能ID{skillIRt.Id} {skillIRt.Name} 到技能槽{slotNumber}");
+        //Debug.Log($"{_transform.name}裝備技能ID{skillIRt.Id} {skillIRt.Name} 到技能槽{slotNumber}");
 
         //發事件
         OnSkillsChanged?.Invoke();
     }
-
+    public void EquipSkillChain(PlayerSkillChain playerSkillChain) {
+        _playerSkillChain = playerSkillChain;
+    }
     //顯示/隱藏偵測範圍
     public void SetBaseAttackDetectRangeVisible(bool visible) {
         if (BaseAttackSlot == null) return;
@@ -224,29 +234,54 @@ public class CombatComponent
         return true;
     }
 
-    //觸發一次型技能意圖設定
+    //觸發一次型技能意圖
+    //若有上個技能，先釋放上個技能
     public bool SetIntentSkill(int inputSlotNumber, Vector2 inputTargetPosition, Transform inputTargetTransform = null) {
-        if(inputSlotNumber < 1 || inputSlotNumber > SkillSlots.Length) return false;
+        // ===== 檢查區域 =====
+        if (inputSlotNumber < 1 || inputSlotNumber > SkillSlots.Length) return false;
         var skillSlot = SkillSlots[inputSlotNumber-1];
         if (!skillSlot.IsReady || skillSlot.Detector == null) return false;
         if (!_skillPool.TryGetValue(skillSlot.SkillId, out var inputSkillRt)) return false;
-
         if (!_stateComponent.CanCastSkill) return false;
-        if(inputSkillRt.SkillReleaseType==SkillReleaseType.Target && inputTargetTransform == null) return false;
+        if(inputSkillRt.SkillReleaseType==SkillReleaseType.Target && inputTargetTransform == null) return false;      
         if (!_skillUseGate.CanUse(inputSkillRt, inputSlotNumber)) return false;
 
-        var targetPos = GetTargetPosByReleaseType(inputSkillRt,inputTargetPosition, inputTargetTransform);
+        // ===== 先結算上一招 ===== 
+        if (IntentSkillSlotNumber >= 1) {
+            SpawnSkill();                                       //釋放上個技能
+            _animationComponent.PlayIdle();
+        }
+        // ===== Commit 區域 =====
+        var targetPos = GetTargetPosByReleaseType(inputSkillRt, inputTargetPosition, inputTargetTransform);
+        var finalRt = inputSkillRt;
+
+        //技能鍊處理
+        if (_playerSkillChain != null) {
+            _playerSkillChain.AddChain(_monoBehaviour);
+            Debug.Log($"技能鍊++,CurrentChain={_playerSkillChain.CurrentChain}");                                     //技能鍊+1
+            if (_playerSkillChain.CurrentChain >= 3) {
+                var playerRt = inputSkillRt as PlayerSkillRuntime;
+                finalRt = playerRt.EnhancedSkillRuntime;
+                Debug.Log($"{inputSkillRt.Name} enhanced to {finalRt.Name}");
+                _playerSkillChain.ResetChain();                                        //重置技能鍊
+            }
+        }
+
+        _skillUseGate.Consume(finalRt, inputSlotNumber);
 
         IntentSkillSlotNumber = inputSlotNumber;
-        IntentSkillRt = inputSkillRt;
+        IntentSkillRt = finalRt;
         IntentTargetTransform = inputTargetTransform;       //只給追蹤技能使用
         IntentTargetPosition = targetPos;                   //給一般技能使用
 
         return true;
     }
-
+    //清除意圖
     public void ClearSkillIntent() {
         IntentSkillSlotNumber = -1;
+    }
+    public void ResetSkillChain() {
+        _playerSkillChain?.ResetChain();
     }
     public void ClearBaseAttackTargetTransform() {
         IntentBaseAttackTargetTransform = null;
@@ -269,8 +304,6 @@ public class CombatComponent
         }
         return targetPos;
     }
-
-
     public void DebugIntent(DebugContext context, int id) {
         if (context == DebugContext.None) return;
 

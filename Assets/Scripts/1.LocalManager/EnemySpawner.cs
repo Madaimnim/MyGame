@@ -11,10 +11,9 @@ public class EnemySpawner : MonoBehaviour {
 
     private void Awake() {
         _enemyCounter = GetComponent<EnemyCounter>();
-    }
-    private void OnEnable() {
         _enemyFactory = new DefaultEnemyFactory();
     }
+    private void OnEnable() { }
     private void Start() {}
 
     public Enemy Spawn(int enemyId) {

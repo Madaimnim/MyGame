@@ -172,8 +172,6 @@ public class PlayerInputManager : MonoBehaviour {
     }
 
     //右鍵
-    //
-    //
     private void HandleRightClick() {
         if (_selectedPlayerList.Count == 0) return;
         if (!Input.GetMouseButtonDown(1)) return;
@@ -198,10 +196,10 @@ public class PlayerInputManager : MonoBehaviour {
         }
 
         // 其他情況→移動
-        aniComp.PlayIdle();
-        //if (stateComp.IsCastingSkill) combatComp.UseSkill();
-        //if (stateComp.IsBaseAttacking) combatComp.UseBaseAttack();
+        if (stateComp.IsCastingSkill) combatComp.SpawnSkill();
+        //if (stateComp.IsBaseAttacking) combatComp.SpawnBaseAttack();
 
+        aniComp.PlayIdle();
         EnemyOutlineManager.Instance.ClearTarget();
         combatComp.ClearBaseAttackTargetTransform();
         combatComp.ClearSkillIntent();
@@ -209,7 +207,6 @@ public class PlayerInputManager : MonoBehaviour {
         moveComp.SetIntentMovePosition( inputPosition: mouseWorldPos);
         VFXManager.Instance.Play("ClickGround01", mouseWorldPos);
     }
-
     //鍵盤A
     private void HandleAutoAttackMoveKey() {
         if (!Input.GetKeyDown(KeyCode.A)) return;
@@ -343,12 +340,15 @@ public class PlayerInputManager : MonoBehaviour {
                 targetPosition = detector.GetClosestPoint(mouseWorldPos);
             }
 
+            //if(player.StateComponent.IsCastingSkill)player.CombatComponent.SpawnSkill();              //即時釋放技能
             player.CombatComponent.SetIntentSkill(slotNumber, targetPosition, targetTransform);
         }
         else {
             // 沒點到敵人，用滑鼠位置(在範圍內用畫鼠位置、範圍外取最近點)
             if (detector.IsInRange(mouseWorldPos)) targetPosition = mouseWorldPos;
             else targetPosition = detector.GetClosestPoint(mouseWorldPos);
+
+            //if (player.StateComponent.IsCastingSkill) player.CombatComponent.SpawnSkill();              //即時釋放技能
             player.CombatComponent.SetIntentSkill(slotNumber, targetPosition, targetTransform);
         }
     }    //鍵盤施放

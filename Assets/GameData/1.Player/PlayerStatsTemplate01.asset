@@ -24,13 +24,9 @@ MonoBehaviour:
     Weight: 0
   VisualData:
     Prefab: {fileID: 1901394458928384591, guid: c1a9c12d802fc0446a22a42d0c13403e, type: 3}
-    DetectPrefab: {fileID: 0}
     SpriteIcon: {fileID: 0}
-    DeathSFX: {fileID: 0}
-    NormalMaterial: {fileID: 2100000, guid: ce71ba01014fe3043971f56059a6c29d, type: 2}
-    FlashMaterial: {fileID: 2100000, guid: 343628f4e759ecf46b917b0ca0685d23, type: 2}
   PlayerBehaviourTreeType: 0
-  MoveStrategyType: 3
+  MoveStrategyType: 2
   SkillSlotCount: 4
   BaseAttackTemplate:
     Id: 0
@@ -44,11 +40,7 @@ MonoBehaviour:
       Weight: 0
     VisualData:
       Prefab: {fileID: 8199362471887348744, guid: 95bd66950499aab4badc8e9ca2aef0f5, type: 3}
-      DetectPrefab: {fileID: 0}
       SpriteIcon: {fileID: 0}
-      DeathSFX: {fileID: 0}
-      NormalMaterial: {fileID: 0}
-      FlashMaterial: {fileID: 0}
     SkillReleaseType: 1
     SkillLifetimeType: 1
     SkillVisualFromType: 1
@@ -62,7 +54,7 @@ MonoBehaviour:
     canRotate: 1
     Cooldown: 0
     EnergyCost: 0
-    EnergyGain: 0.03
+    EnergyGain: 0.3
     DestroyDelay: 0
     OnHitDestroyDelay: 0
     SkillDashMultiplier: 1
@@ -85,11 +77,7 @@ MonoBehaviour:
       Weight: 0
     VisualData:
       Prefab: {fileID: 1868301516382297822, guid: bee82ac91c521d24b938786f51b7c88d, type: 3}
-      DetectPrefab: {fileID: 0}
       SpriteIcon: {fileID: 0}
-      DeathSFX: {fileID: 0}
-      NormalMaterial: {fileID: 0}
-      FlashMaterial: {fileID: 0}
     SkillReleaseType: 0
     SkillLifetimeType: 0
     SkillVisualFromType: 0
@@ -125,11 +113,7 @@ MonoBehaviour:
       Weight: 0
     VisualData:
       Prefab: {fileID: 6644035455482526802, guid: a158b2d525771b946b249c808818d1df, type: 3}
-      DetectPrefab: {fileID: 1240820100763929428, guid: 97300d7895f13084783945f8167006d2, type: 3}
       SpriteIcon: {fileID: 0}
-      DeathSFX: {fileID: 0}
-      NormalMaterial: {fileID: 0}
-      FlashMaterial: {fileID: 0}
     SkillReleaseType: 0
     SkillLifetimeType: 0
     SkillVisualFromType: 0
@@ -161,15 +145,11 @@ MonoBehaviour:
       MoveSpeed: 0
       VerticalMoveSpeed: 0
       KnockbackPower: 0
-      FloatPower: 8
+      FloatPower: 3
       Weight: 0
     VisualData:
       Prefab: {fileID: 7327708947082931564, guid: ebc3332d416aec74cb1e857b78e74da3, type: 3}
-      DetectPrefab: {fileID: 1240820100763929428, guid: 97300d7895f13084783945f8167006d2, type: 3}
       SpriteIcon: {fileID: 0}
-      DeathSFX: {fileID: 0}
-      NormalMaterial: {fileID: 0}
-      FlashMaterial: {fileID: 0}
     SkillReleaseType: 0
     SkillLifetimeType: 1
     SkillVisualFromType: 0
@@ -184,9 +164,9 @@ MonoBehaviour:
     Cooldown: 0
     EnergyCost: 1
     EnergyGain: 0
-    DestroyDelay: 1
+    DestroyDelay: 0
     OnHitDestroyDelay: 0
-    SkillDashMultiplier: 1
+    SkillDashMultiplier: 0
     SkillDashDuration: 0
     SkillDashPrepareDuration: 0
     SkillDashVerticalVelocity: 0
@@ -205,11 +185,7 @@ MonoBehaviour:
       Weight: 0
     VisualData:
       Prefab: {fileID: 6644035455482526802, guid: a158b2d525771b946b249c808818d1df, type: 3}
-      DetectPrefab: {fileID: 1240820100763929428, guid: 97300d7895f13084783945f8167006d2, type: 3}
       SpriteIcon: {fileID: 0}
-      DeathSFX: {fileID: 0}
-      NormalMaterial: {fileID: 0}
-      FlashMaterial: {fileID: 0}
     SkillReleaseType: 1
     SkillLifetimeType: 0
     SkillVisualFromType: 0
@@ -232,6 +208,151 @@ MonoBehaviour:
     SkillDashVerticalVelocity: 0
     DetectorType: 0
     DetectRadius: 10
+    RangeX: 0
+    RangeY: 0
+  EnhancedSkillTemplateList:
+  - Id: 1
+    Name: "\u5DE8\u528D\u6C23"
+    StatsData:
+      Power: 4
+      MoveSpeed: 10
+      VerticalMoveSpeed: 0
+      KnockbackPower: 6
+      FloatPower: 0
+      Weight: 0
+    VisualData:
+      Prefab: {fileID: 1115684852050053604, guid: bfdd4bf945b50374cba320ed9cb0e91a, type: 3}
+      SpriteIcon: {fileID: 0}
+    SkillReleaseType: 0
+    SkillLifetimeType: 0
+    SkillVisualFromType: 0
+    SkillMoveType: 2
+    OnHitType: 1
+    HitEffectPositionType: 0
+    FacingDirection: 1
+    TargetLayers:
+      serializedVersion: 2
+      m_Bits: 256
+    canRotate: 1
+    Cooldown: 0
+    EnergyCost: 1
+    EnergyGain: 0
+    DestroyDelay: 4
+    OnHitDestroyDelay: 0
+    SkillDashMultiplier: 1
+    SkillDashDuration: 0
+    SkillDashPrepareDuration: 0
+    SkillDashVerticalVelocity: 0
+    DetectorType: 0
+    DetectRadius: 3
+    RangeX: 0
+    RangeY: 0
+  - Id: 2
+    Name: "\u5DE8\u9B54\u528D"
+    StatsData:
+      Power: 4
+      MoveSpeed: 7
+      VerticalMoveSpeed: 0
+      KnockbackPower: 5
+      FloatPower: 0
+      Weight: 0
+    VisualData:
+      Prefab: {fileID: 5516188749188944098, guid: 7c3cda0a165898f47a77ffc182dcf2a3, type: 3}
+      SpriteIcon: {fileID: 0}
+    SkillReleaseType: 0
+    SkillLifetimeType: 0
+    SkillVisualFromType: 0
+    SkillMoveType: 2
+    OnHitType: 0
+    HitEffectPositionType: 0
+    FacingDirection: 1
+    TargetLayers:
+      serializedVersion: 2
+      m_Bits: 256
+    canRotate: 0
+    Cooldown: 0
+    EnergyCost: 1
+    EnergyGain: 0
+    DestroyDelay: 4
+    OnHitDestroyDelay: 0
+    SkillDashMultiplier: 0
+    SkillDashDuration: 0
+    SkillDashPrepareDuration: 0
+    SkillDashVerticalVelocity: 0
+    DetectorType: 0
+    DetectRadius: 3
+    RangeX: 0
+    RangeY: 0
+  - Id: 3
+    Name: "\u5DE8\u91CD\u64CA"
+    StatsData:
+      Power: 6
+      MoveSpeed: 0
+      VerticalMoveSpeed: 0
+      KnockbackPower: 0
+      FloatPower: 6
+      Weight: 0
+    VisualData:
+      Prefab: {fileID: 6899941417416835117, guid: fb4cbae90d93ef349b62e167590f1be0, type: 3}
+      SpriteIcon: {fileID: 0}
+    SkillReleaseType: 0
+    SkillLifetimeType: 1
+    SkillVisualFromType: 0
+    SkillMoveType: 0
+    OnHitType: 0
+    HitEffectPositionType: 0
+    FacingDirection: 1
+    TargetLayers:
+      serializedVersion: 2
+      m_Bits: 256
+    canRotate: 0
+    Cooldown: 0
+    EnergyCost: 1
+    EnergyGain: 0
+    DestroyDelay: 0
+    OnHitDestroyDelay: 0
+    SkillDashMultiplier: 0
+    SkillDashDuration: 0
+    SkillDashPrepareDuration: 0
+    SkillDashVerticalVelocity: 0
+    DetectorType: 0
+    DetectRadius: 3
+    RangeX: 0
+    RangeY: 0
+  - Id: 4
+    Name: "\u5DE8\u528D\u6C23"
+    StatsData:
+      Power: 4
+      MoveSpeed: 10
+      VerticalMoveSpeed: 0
+      KnockbackPower: 6
+      FloatPower: 0
+      Weight: 0
+    VisualData:
+      Prefab: {fileID: 1115684852050053604, guid: bfdd4bf945b50374cba320ed9cb0e91a, type: 3}
+      SpriteIcon: {fileID: 0}
+    SkillReleaseType: 0
+    SkillLifetimeType: 0
+    SkillVisualFromType: 0
+    SkillMoveType: 0
+    OnHitType: 0
+    HitEffectPositionType: 0
+    FacingDirection: 0
+    TargetLayers:
+      serializedVersion: 2
+      m_Bits: 0
+    canRotate: 0
+    Cooldown: 0
+    EnergyCost: 0
+    EnergyGain: 0
+    DestroyDelay: 0
+    OnHitDestroyDelay: 0
+    SkillDashMultiplier: 0
+    SkillDashDuration: 0
+    SkillDashPrepareDuration: 0
+    SkillDashVerticalVelocity: 0
+    DetectorType: 0
+    DetectRadius: 0
     RangeX: 0
     RangeY: 0
   CanRespawn: 1

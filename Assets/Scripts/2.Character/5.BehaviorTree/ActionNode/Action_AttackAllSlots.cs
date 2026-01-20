@@ -14,15 +14,15 @@ public class Action_AttackAllSlots : Node
     public override NodeState Evaluate(float updateInterval) {
         for (int skillSlotNumber = 1; skillSlotNumber <= _combatComponent.SkillSlotCount; skillSlotNumber++)
         {
-            Debug.Log($"嘗試使用技能槽 {skillSlotNumber} 的技能");
+            //Debug.Log($"嘗試使用技能槽 {skillSlotNumber} 的技能");
 
             var slot = _combatComponent.SkillSlots[skillSlotNumber-1];
             if(slot == null || !slot.IsReady) continue;
             if (slot.Detector == null || !slot.Detector.HasTarget) continue;
 
-            Debug.Log($"技能槽 {skillSlotNumber} 有目標，嘗試設定意圖");
+            //Debug.Log($"技能槽 {skillSlotNumber} 有目標，嘗試設定意圖");
             if (_combatComponent.SetIntentSkill(skillSlotNumber, slot.Detector.TargetTransform.position, slot.Detector.TargetTransform)) {
-                Debug.Log($"成功設定技能槽 {skillSlotNumber} 的攻擊意圖");
+                //Debug.Log($"成功設定技能槽 {skillSlotNumber} 的攻擊意圖");
                 return NodeState.SUCCESS;
             }
 

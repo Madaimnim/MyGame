@@ -43,6 +43,15 @@ public class PlayerStatsRuntime : IHealthData
             SkillPool[skill.Id] = new PlayerSkillRuntime(skill);
         }
 
+        foreach (var enhancedTemplate in template.EnhancedSkillTemplateList) {
+            if (!SkillPool.TryGetValue(enhancedTemplate.Id, out var skillRt))            // 找對應的普通技能
+                continue; // 沒有普通技能就跳過（安全）
+
+            var enhancedRt = new PlayerSkillRuntime(enhancedTemplate);
+            // 掛回去（只玩家有）
+            ((PlayerSkillRuntime)skillRt).EnhancedSkillRuntime = enhancedRt;
+        }
+
         UnlockedSkillIdHashSet = new HashSet<int>(template.UnlockedSkillIdHashSet);
         ExpTable = template.ExpTable;
         PlayerBehaviourTreeType= template.PlayerBehaviourTreeType;

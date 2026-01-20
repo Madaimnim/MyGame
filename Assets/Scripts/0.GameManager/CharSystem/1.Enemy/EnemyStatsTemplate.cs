@@ -3,8 +3,8 @@ using UnityEngine;
 using UnityEngine.Serialization;
 
 public enum EnemyBehaviourTreeType {
-    [InspectorName("½ÄÀð")] RushWall,
     [InspectorName("«e¶i§ðÀ»")] AdvanceAttack,
+    [InspectorName("½ÄÀð")] RushWall,
     [InspectorName("«á°h§ðÀ»")] BackAwayAttack,
     [InspectorName("Boss")] Boss
 }

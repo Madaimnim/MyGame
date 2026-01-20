@@ -35,6 +35,7 @@ public class PlayerSkillRuntime: ISkillRuntime
     public int SkillLevel;
     public int SkillUsageCount;
     public int NextLevelCount;
+    public PlayerSkillRuntime EnhancedSkillRuntime;
 
     public PlayerSkillRuntime(SkillTemplate template) {
         //▓`л■ий

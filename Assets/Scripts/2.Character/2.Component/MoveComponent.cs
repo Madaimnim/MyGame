@@ -3,7 +3,8 @@ using System.Collections;
 using UnityEngine;
 using UnityEngine.Assertions.Must;
 
-//只用Position移動
+//只用IntentMovePosition移動
+//低階持續行為元件，透過IntentMovePosition持續移動到目標
 public class MoveComponent
 {
     public Vector2? IntentMovePosition { get; private set; }

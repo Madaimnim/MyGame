@@ -12,12 +12,12 @@ public class PlayerAnimationEvent : MonoBehaviour
     }
 
     public void AnimationEvent_SpanwBaseAttack() {
-        _player.CombatComponent.UseBaseAttack();
+        _player.CombatComponent.SpawnBaseAttack();
     }
 
 
     public void AnimationEvent_SpawnerSkill() {
-        _player.CombatComponent.UseSkill();
+        _player.CombatComponent.SpawnSkill();
     }
 
 
@@ -25,7 +25,7 @@ public class PlayerAnimationEvent : MonoBehaviour
     public void AnimationEvent_SkillDashStart(int skillId) {
         if (!_player.Rt.SkillPool.TryGetValue(skillId, out var skillRt)) return;
 
-        _player.CombatComponent.UseSkill();
+        _player.CombatComponent.SpawnSkill();
 
         _player.CombatComponent.SkillDashMove(skillRt);
     }

@@ -4,8 +4,6 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Serialization;
 using UnityEngine.UIElements;
-using static Cinemachine.DocumentationSortingAttribute;
-using static UnityEditor.Experimental.GraphView.GraphView;
 
 //BottomTransform:角色底部位置(水平移動用)
 //VisulaRootTransform:轉向Scale
@@ -70,7 +68,8 @@ public class Player : MonoBehaviour, IInteractable, IVisualFacing {
     }
     private void OnEnable()
     {
-        if(PlayerListManager.Instance != null) PlayerListManager.Instance.Register(this);
+        if(EnergyComponent!=null) EnergyComponent.Set(3);
+        if (PlayerListManager.Instance != null) PlayerListManager.Instance.Register(this);
         if(PlayerInputManager.Instance != null) PlayerInputManager.Instance.SelectPlayer(this);
         TryBindSkillSliderUI();
         if(_isInitialized) StateComponent.ResetState();
@@ -78,6 +77,9 @@ public class Player : MonoBehaviour, IInteractable, IVisualFacing {
     private void OnDisable()
     {
         if (PlayerListManager.Instance != null) PlayerListManager.Instance.Unregister(this);
+        ClearAllIntent();
+    
+        StopAllCoroutines();
     }
     private void Start()
     {
@@ -125,7 +127,7 @@ public class Player : MonoBehaviour, IInteractable, IVisualFacing {
         MoveComponent = new MoveComponent(Rb, StatsComponent.FinalStats, this, MoveDetector, AnimationComponent,HeightComponent, StateComponent);
         SpawnerComponent = new SpawnerComponent();
         if (EnemyListManager.Instance.TargetList == null) Debug.Log("EnemyListManager未初始化");
-        CombatComponent = new CombatComponent(StatsComponent.FinalStats, Rt.SkillSlotCount, Rt.SkillPool, AnimationComponent, StateComponent, transform, _rootSpriteCollider.transform,
+        CombatComponent = new CombatComponent(this,StatsComponent.FinalStats, Rt.SkillSlotCount, Rt.SkillPool, AnimationComponent, StateComponent, transform, _rootSpriteCollider.transform,
             EnemyListManager.Instance.TargetList,MoveComponent,HeightComponent,Rt.BaseAttackRuntime);
         AIComponent = new AIComponent( MoveComponent, CombatComponent, transform, Rt.MoveStrategy);
         GrowthComponent = new GrowthComponent(Rt,StatsComponent);
@@ -139,8 +141,7 @@ public class Player : MonoBehaviour, IInteractable, IVisualFacing {
 
         var playerSkillUseGate = new PlayerSkillUseGate(EnergyComponent);
         CombatComponent.SetSkillUseGate(playerSkillUseGate);
-        SetEnergyGainRule();                //目前只有普攻回能規則
-
+        CombatComponent.EquipSkillChain(new PlayerSkillChain());
         //事件訂閱
         HealthComponent.OnDie += OnDie;
         HealthComponent.OnHpChanged += OnHpChanged;
@@ -149,13 +150,14 @@ public class Player : MonoBehaviour, IInteractable, IVisualFacing {
         GrowthComponent.OnExpGained += EffectComponent.GainedExpEffect;
         if (GameEventSystem.Instance != null)
         {
-            GameEventSystem.Instance.Event_BattleStart += AIComponent.EnableAI;
+            //GameEventSystem.Instance.Event_BattleStart += AIComponent.EnableAI;
             GameEventSystem.Instance.Event_OnWallBroken += AIComponent.DisableAI;
             GameEventSystem.Instance.Event_BattleStart += RespawnComponent.EnableRespawn;
             GameEventSystem.Instance.Event_OnWallBroken += RespawnComponent.DisableRespawn;
         }
         CombatComponent.OnAttackTurn += TurnFacingByIntent;
         MoveComponent.OnMoveDirectionChanged += TurnFacingByIntent;
+        CombatComponent.OnAttackHitTarget += EnergyComponent.GainEnergyFromAttack;
 
 
         //初始化狀態--------------------------------------------------------------------------------------------------------------------------------------------------------------------
@@ -235,6 +237,16 @@ public class Player : MonoBehaviour, IInteractable, IVisualFacing {
         StateComponent.ResetState();
         HealthComponent.ResetCurrentHp();
     }
+    public void ClearAllIntent() {
+        MoveComponent.ClearAllMoveIntent();
+        CombatComponent.ClearSkillIntent();
+        CombatComponent.ClearBaseAttackTargetTransform();
+        CombatComponent.ResetSkillChain();
+
+        AIComponent.DisableAI();
+        AIComponent.SetAutoMoveTargetPosition (null);
+        CombatComponent.SetAllDetectRangesVisible(false);
+    }
 
     private void TurnFacingByIntent(Vector2 direction)
     {
@@ -262,11 +274,5 @@ public class Player : MonoBehaviour, IInteractable, IVisualFacing {
         if (UIManager.Instance.UI_SkillSliderController == null) return;
 
         UIManager.Instance.UI_SkillSliderController.BindCombatComponent(CombatComponent, Rt.SkillPool);
-    }
-    private void SetEnergyGainRule() {
-        var energyGainSystem = new EnergyGainSystem();
-
-        energyGainSystem.AddRule(new BaseAttackEnergyGainRule(EnergyComponent));
-        CombatComponent.OnSkillHitTarget += energyGainSystem.HandleSkillUsed;
     }
 }

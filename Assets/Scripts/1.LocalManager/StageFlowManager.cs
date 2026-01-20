@@ -17,6 +17,7 @@ public class StageFlowManager : MonoBehaviour {
     [SerializeField] private TMP_Text _timerText;
     private float _battleTimer;
     private bool _isTiming;
+    private Coroutine _stageFlowRoutine;
 
     private void Awake() {
         _enemyCounter = GetComponent<EnemyCounter>();
@@ -24,21 +25,25 @@ public class StageFlowManager : MonoBehaviour {
         _playerEntrySystem= GetComponent<PlayerEntrySystem>();
         _enemyEntrySystem =GetComponent<EnemyEntrySystem>();
         _gameStageSystem = GameManager.Instance.GameStageSystem;
-        _stageData = _gameStageSystem.CurrentStageData;
+
     }
     public void OnEnable() {
+        _stageData = _gameStageSystem.CurrentStageData;
+
         _gameStageSystem.ResetBattleState();
         _enemyCounter.OnEnemyClear += OnEnemyClear;
-
         _timerText= UIManager.Instance.Text_TimeCounter;
+
+        if (_stageFlowRoutine != null) { 
+            StopCoroutine( _stageFlowRoutine );
+        }
+        _stageFlowRoutine=StartCoroutine(StageFlow());
     }
     public void OnDisable() {
         _enemyCounter.OnEnemyClear -= OnEnemyClear;
     }
 
-    private void Start() {
-        StartCoroutine(StageFlow());
-    }
+    private void Start() {}
     private void Update() {
         TimingCounter();
     }
@@ -79,10 +84,6 @@ public class StageFlowManager : MonoBehaviour {
         // 所有人都到位，才開始戰鬥
         GameEventSystem.Instance.Event_BattleStart.Invoke();
 
-        //Todo 在遊戲開始時，設定敵人移動目標
-        //foreach (var enemy in EnemyListManager.Instance.TargetList) {
-        //    enemy as Enemy .MoveComponent.SetIgnoreMoveBounds(false);
-        //}
 
         //計時開始
         _battleTimer = 0f;

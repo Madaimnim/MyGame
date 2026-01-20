@@ -19,7 +19,6 @@ public class PlayerEntrySystem : MonoBehaviour
         HideUI(player);
 
         var move = player.MoveComponent;
-        player.EnergyComponent.Set(1);
         move.SetIgnoreMoveBounds(true);
         move.SetIntentMovePosition(inputPosition: targetPos);
 

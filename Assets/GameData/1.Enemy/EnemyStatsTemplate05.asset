@@ -23,12 +23,8 @@ MonoBehaviour:
     Weight: 0
   VisualData:
     Prefab: {fileID: 6483244831074600195, guid: 2c5ddd8415107ec438e8c22aaab61d13, type: 3}
-    DetectPrefab: {fileID: 0}
     SpriteIcon: {fileID: 0}
-    DeathSFX: {fileID: 0}
-    NormalMaterial: {fileID: 2100000, guid: ce71ba01014fe3043971f56059a6c29d, type: 2}
-    FlashMaterial: {fileID: 2100000, guid: 343628f4e759ecf46b917b0ca0685d23, type: 2}
-  EnemyBehaviourTreeType: 1
+  EnemyBehaviourTreeType: 0
   MoveStrategyType: 0
   SkillSlotCount: 1
   SkillTemplateList:
@@ -43,11 +39,7 @@ MonoBehaviour:
       Weight: 0
     VisualData:
       Prefab: {fileID: 5281362192602328335, guid: c2027b93b47c38c49ac8df1d23725a03, type: 3}
-      DetectPrefab: {fileID: 0}
       SpriteIcon: {fileID: 0}
-      DeathSFX: {fileID: 0}
-      NormalMaterial: {fileID: 0}
-      FlashMaterial: {fileID: 0}
     SkillReleaseType: 0
     SkillLifetimeType: 0
     SkillVisualFromType: 0

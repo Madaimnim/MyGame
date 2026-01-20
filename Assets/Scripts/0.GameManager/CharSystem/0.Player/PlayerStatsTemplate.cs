@@ -26,6 +26,7 @@ public class PlayerStatsTemplate:ScriptableObject
     [FormerlySerializedAs("SkillTemplateList")]
     public SkillTemplate BaseAttackTemplate;
     public List<SkillTemplate> SkillTemplateList = new List<SkillTemplate>();
+    public List<SkillTemplate> EnhancedSkillTemplateList = new List<SkillTemplate>();
     public HashSet<int> UnlockedSkillIdHashSet = new();
 
     public bool CanRespawn = true;

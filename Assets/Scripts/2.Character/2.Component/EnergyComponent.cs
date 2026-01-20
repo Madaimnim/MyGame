@@ -1,9 +1,11 @@
 using System;
+using System.Collections.Generic;
 using UnityEngine;
 
 public class EnergyComponent {
     public float CurrentEnergy { get; private set; }
     public float MaxEnergy { get; private set; }
+
 
     //UI 每次刷新用
     public event Action<float, float> OnEnergyChanged;
@@ -30,10 +32,14 @@ public class EnergyComponent {
         OnEnergyChanged?.Invoke(CurrentEnergy, MaxEnergy);
     }
 
+    public void GainEnergyFromAttack(ISkillRuntime rt) {
+        //Debug.Log($"攻擊恢復能量{rt.EnergyGain}");
+        Gain(rt.EnergyGain);
+    }
+
     // ===== Debug / Reset =====
     public void Set(float value) {
         CurrentEnergy = Mathf.Clamp(value, 0, MaxEnergy);
-
         OnEnergyChanged?.Invoke(CurrentEnergy, MaxEnergy);
     }
 }

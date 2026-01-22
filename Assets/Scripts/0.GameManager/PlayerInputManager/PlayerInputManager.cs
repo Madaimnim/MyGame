@@ -199,7 +199,8 @@ public class PlayerInputManager : MonoBehaviour {
         if (stateComp.IsCastingSkill) combatComp.SpawnSkill();
         //if (stateComp.IsBaseAttacking) combatComp.SpawnBaseAttack();
 
-        aniComp.PlayIdle();
+        if(!CurrentControlPlayer.StateComponent.IsDead)
+            aniComp.PlayIdle();
         EnemyOutlineManager.Instance.ClearTarget();
         combatComp.ClearBaseAttackTargetTransform();
         combatComp.ClearSkillIntent();
@@ -341,7 +342,8 @@ public class PlayerInputManager : MonoBehaviour {
             }
 
             //if(player.StateComponent.IsCastingSkill)player.CombatComponent.SpawnSkill();              //即時釋放技能
-            player.CombatComponent.SetIntentSkill(slotNumber, targetPosition, targetTransform);
+            if(!player.CombatComponent.SetIntentSkill(slotNumber, targetPosition, targetTransform))
+                player.HitShakeVisual.Play(HitShakeType.SkillFailure, targetPosition.x- player.transform.position.x);
         }
         else {
             // 沒點到敵人，用滑鼠位置(在範圍內用畫鼠位置、範圍外取最近點)
@@ -349,7 +351,8 @@ public class PlayerInputManager : MonoBehaviour {
             else targetPosition = detector.GetClosestPoint(mouseWorldPos);
 
             //if (player.StateComponent.IsCastingSkill) player.CombatComponent.SpawnSkill();              //即時釋放技能
-            player.CombatComponent.SetIntentSkill(slotNumber, targetPosition, targetTransform);
+            if(!player.CombatComponent.SetIntentSkill(slotNumber, targetPosition, targetTransform))
+                player.HitShakeVisual.Play(HitShakeType.SkillFailure, targetPosition.x - player.transform.position.x); ;
         }
     }    //鍵盤施放
 

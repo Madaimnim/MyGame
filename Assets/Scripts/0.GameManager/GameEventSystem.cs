@@ -8,7 +8,6 @@ public class GameEventSystem : MonoBehaviour
     public static GameEventSystem Instance { get; private set; }
     //¾Ô°«
     public Action<int, int, IInteractable> Event_HpChanged;
-    public Action<Player> Event_OnPlayerDie;
 
     public Action Event_OnWallBroken;
     //playerStatsRuntime

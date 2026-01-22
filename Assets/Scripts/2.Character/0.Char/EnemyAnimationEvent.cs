@@ -19,6 +19,15 @@ public class EnemyAnimationEvent : MonoBehaviour
         _enemy.MoveComponent.MoveDuration(duration);
     }
 
+    public void AnimationEvent_RecoverHeight() {
+        var _stateComponent = _enemy.StateComponent;
+        if (_stateComponent.IsGrounded) {
+            _stateComponent.SetIsRecoveringHeight(true);
+            _stateComponent.SetIsAntiGravity(true);
+        }
+    }
+
+
     public void AnimationEvent_SkillDashPrepareStart(int skillId) {
         if (!_enemy.Rt.SkillPool.TryGetValue(skillId, out var skillRt)) return;
         _enemy.CombatComponent.SkillPrepareMove(skillRt);

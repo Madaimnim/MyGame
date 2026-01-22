@@ -12,7 +12,6 @@ public class MoveComponent
     public Vector2 GetCurrentMoveVelocity()=> _currentMoveDirection* CurrentMoveSpeed;
     private Vector2 _currentMoveDirection;
 
-    public TargetDetector MoveDetector { get; private set; }
     public float MoveSpeed { get; private set; }
     private float _pendingMoveSpeed;
     public float VerticalMoveSpeed { get; private set; }
@@ -54,13 +53,12 @@ public class MoveComponent
     private Vector2 _skillDashDirection;
     public void SetSkillDashDirection(Vector2 dir) => _skillDashDirection = dir.normalized;
 
-    public MoveComponent(Rigidbody2D rb,StatsData statsData ,MonoBehaviour runner,TargetDetector moveDetector,AnimationComponent animationComponent,HeightComponent heightComponent,StateComponent stateComponent) {
+    public MoveComponent(Rigidbody2D rb,StatsData statsData ,MonoBehaviour runner,AnimationComponent animationComponent,HeightComponent heightComponent,StateComponent stateComponent) {
         _rb = rb ;
         MoveSpeed = statsData.MoveSpeed;
         VerticalMoveSpeed= statsData.VerticalMoveSpeed;
         CurrentMoveSpeed = MoveSpeed;
         _runner = runner;
-        MoveDetector = moveDetector;
         _animationComponent = animationComponent;
         _heightComponent = heightComponent;
 
@@ -169,15 +167,16 @@ public class MoveComponent
     }
 
     //被擊退
-    public void Knockbacked(float knockbackPower, Vector3 sourcePosition) {
+    public void Knockbacked(InteractInfo info) {
+        if (info.KnockbackPower == 0f) return;
+        StopKnockbackedCoroutine();
 
-        if (_knockbackCoroutine != null)
-        {
-            _runner.StopCoroutine(_knockbackCoroutine);
-            _knockbackCoroutine = null;
-        }
-        var baseDirection = ((Vector2)sourcePosition-_rb.position).normalized;
-        var knockbackVector = knockbackPower * baseDirection;
+        var knockbackDirection = Vector2.zero;
+        if(info.MoveVelocity!=Vector2.zero)
+            knockbackDirection = info.MoveVelocity.normalized;
+        else knockbackDirection = ((Vector2)info.SourcePosition - _rb.position).normalized;
+
+        var knockbackVector = info.KnockbackPower * knockbackDirection;
         //Debug.Log($"{_rb.gameObject.name}被擊退，方向力道{knockbackVector}");
         _knockbackCoroutine = _runner.StartCoroutine(KnockbackCoroutine(knockbackVector));
     }
@@ -199,6 +198,13 @@ public class MoveComponent
         }
         _stateComponent.SetIsKnocked(false);
     }
+    public void StopKnockbackedCoroutine() {
+        if (_knockbackCoroutine != null) {
+            _runner.StopCoroutine(_knockbackCoroutine);
+            _knockbackCoroutine = null;
+        }
+    }
+
 
     //重置速度
     public void ResetVelocity() {

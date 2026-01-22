@@ -51,7 +51,7 @@ MonoBehaviour:
     TargetLayers:
       serializedVersion: 2
       m_Bits: 256
-    canRotate: 1
+    canRotate: 0
     Cooldown: 0
     EnergyCost: 0
     EnergyGain: 0.3
@@ -293,7 +293,7 @@ MonoBehaviour:
       FloatPower: 6
       Weight: 0
     VisualData:
-      Prefab: {fileID: 6899941417416835117, guid: fb4cbae90d93ef349b62e167590f1be0, type: 3}
+      Prefab: {fileID: 1115684852050053604, guid: bfdd4bf945b50374cba320ed9cb0e91a, type: 3}
       SpriteIcon: {fileID: 0}
     SkillReleaseType: 0
     SkillLifetimeType: 1
@@ -356,5 +356,5 @@ MonoBehaviour:
     RangeX: 0
     RangeY: 0
   CanRespawn: 1
-  MaxHp: 6
+  MaxHp: 30
   ExpTable: 000000000400000006000000090000000d0000001200000019000000220000002d0000003a000000490000005a0000006d0000008200000099000000b2000000cd000000ea000000090100002a0100004d0100007201000099010000c2010000ed0100001a020000490200007a020000ad020000e202000019030000

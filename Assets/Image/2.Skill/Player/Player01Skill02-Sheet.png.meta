@@ -1,5 +1,5 @@
 fileFormatVersion: 2
-guid: 81a6f28d442b8d74d975e23b10e4636a
+guid: d5e96b3e23a9a1047a817672bdc56e6d
 TextureImporter:
   internalIDToNameTable: []
   externalObjects: {}
@@ -122,17 +122,17 @@ TextureImporter:
         serializedVersion: 2
         x: 0
         y: 0
-        width: 64
-        height: 68
-      alignment: 7
-      pivot: {x: 0.5, y: 0}
+        width: 32
+        height: 32
+      alignment: 9
+      pivot: {x: 0.59, y: 0.1}
       border: {x: 0, y: 0, z: 0, w: 0}
       outline: []
       physicsShape: []
       tessellationDetail: 0
       bones: []
-      spriteID: 2240c31bea0f3274eb612c89596ac5f5
-      internalID: 605211623
+      spriteID: f68d4e2ae69bed548a878d5bd749e0be
+      internalID: 1738344240
       vertices: []
       indices: 
       edges: []
@@ -141,61 +141,19 @@ TextureImporter:
       name: Player01Skill02-Sheet_1
       rect:
         serializedVersion: 2
-        x: 64
+        x: 32
         y: 0
-        width: 64
-        height: 68
-      alignment: 7
-      pivot: {x: 0.5, y: 0}
+        width: 32
+        height: 32
+      alignment: 9
+      pivot: {x: 0.59, y: 0.1}
       border: {x: 0, y: 0, z: 0, w: 0}
       outline: []
       physicsShape: []
       tessellationDetail: 0
       bones: []
-      spriteID: 07c16a75daa34c942adc0861ab776058
-      internalID: 1349862565
-      vertices: []
-      indices: 
-      edges: []
-      weights: []
-    - serializedVersion: 2
-      name: Player01Skill02-Sheet_2
-      rect:
-        serializedVersion: 2
-        x: 128
-        y: 0
-        width: 64
-        height: 68
-      alignment: 7
-      pivot: {x: 0.5, y: 0}
-      border: {x: 0, y: 0, z: 0, w: 0}
-      outline: []
-      physicsShape: []
-      tessellationDetail: 0
-      bones: []
-      spriteID: 9d741022af52da045821290c73d78227
-      internalID: -728677431
-      vertices: []
-      indices: 
-      edges: []
-      weights: []
-    - serializedVersion: 2
-      name: Player01Skill02-Sheet_3
-      rect:
-        serializedVersion: 2
-        x: 192
-        y: 0
-        width: 64
-        height: 68
-      alignment: 7
-      pivot: {x: 0.5, y: 0}
-      border: {x: 0, y: 0, z: 0, w: 0}
-      outline: []
-      physicsShape: []
-      tessellationDetail: 0
-      bones: []
-      spriteID: 5e1bf0682563e2041b852499a66028cf
-      internalID: -794326332
+      spriteID: 9af18063dcbd1a94fa6701a278e4e6f4
+      internalID: -1126301076
       vertices: []
       indices: 
       edges: []
@@ -211,10 +169,8 @@ TextureImporter:
     weights: []
     secondaryTextures: []
     nameFileIdTable:
-      Player01Skill02-Sheet_0: 605211623
-      Player01Skill02-Sheet_1: 1349862565
-      Player01Skill02-Sheet_2: -728677431
-      Player01Skill02-Sheet_3: -794326332
+      Player01Skill02-Sheet_0: 1738344240
+      Player01Skill02-Sheet_1: -1126301076
   spritePackingTag: 
   pSDRemoveMatte: 0
   pSDShowRemoveMatteOption: 0

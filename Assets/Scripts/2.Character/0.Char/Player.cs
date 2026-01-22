@@ -6,33 +6,38 @@ using UnityEngine.Serialization;
 using UnityEngine.UIElements;
 
 //BottomTransform:角色底部位置(水平移動用)
-//VisulaRootTransform:轉向Scale
-//RootSpriteCollider:RootSprite，Collider、Sprite的高度移動用、旋轉
+//ScaleTransform:轉向Scale，與UIAnchor分離，避免UI轉向
 //SpriteRender:Sprite，純視覺抖動用
+//變形、旋轉必須同時針對Collider、Sprite、Shadow，否則回歪斜
 
 
 public class Player : MonoBehaviour, IInteractable, IVisualFacing {
     //公開--------------------------------------------------------------------------------------------------------------------------------------------------------------------------
     [Header("Debug")]
     [SerializeField] private bool enableDebug = true;
-    [SerializeField] private Collider2D _rootSpriteCollider;
-    public Collider2D RootSpriteCollider => _rootSpriteCollider;
-    public Transform BottomTransform => transform;
-    [SerializeField] private Transform _visualRootTransform;
-    public Transform VisulaRootTransform=> _visualRootTransform;
-    public Transform BackSpriteTransform;
 
-    public TargetDetector MoveDetector;
+    [SerializeField] private Transform _scaleTransform;
+    private Collider2D _groundCollider;
+
+    [SerializeField] private float _heightRange;
+    public Transform BackSpriteTransform;
+    public Transform BottomTransform => transform;
+    public Transform ScaleTransform => _scaleTransform;
+    public Collider2D GroundCollider => _groundCollider;
+    private Transform _heightTransform => _spr.transform;
+    public Transform SpriteTransform => _spr.transform;
+    public HeightInfo HeightInfo => new HeightInfo(_heightTransform.localPosition.y, _heightTransform.localPosition.y + _heightRange);
+
+
     public GameObject SelectIndicator;
     public Transform SelectIndicatorParent;
     //組件--------------------------------------------------------------------------------------------------------------------------------------------------------------------------
     [HideInInspector] public Rigidbody2D Rb;
     [HideInInspector] public Animator Ani;
-    [HideInInspector] public SpriteRenderer Spr;
+    private SpriteRenderer _spr;
     //模組化 --------------------------------------------------------------------------------------------------------------------------------------------------------------------------
     public PlayerStatsRuntime Rt { get; private set; }
     public StateComponent StateComponent { get; private set; }
-    public ActionLockComponent ActionLockComponent { get; private set; }
     public HealthComponent HealthComponent { get; private set; }
     public RespawnComponent RespawnComponent { get; private set; }
     public AnimationComponent AnimationComponent { get; private set; }
@@ -51,17 +56,16 @@ public class Player : MonoBehaviour, IInteractable, IVisualFacing {
     public Vector2 MoveVelocity=>MoveComponent.GetCurrentMoveVelocity();
 
     private Vector3 _lastInteractPosition;
-    private float _initialHeightY;
     private bool _isInitialized = false;
-    private HitShakeVisual _hitShakeVisual;
+    public HitShakeVisual HitShakeVisual;
 
     private void Awake()
     {
         Rb = GetComponent<Rigidbody2D>();
-        Spr = GetComponentInChildren<SpriteRenderer>();
+        _spr = GetComponentInChildren<SpriteRenderer>();
+        _groundCollider = GetComponentInChildren<Collider2D>();
         Ani = GetComponentInChildren<Animator>();
-        _initialHeightY = Spr.transform.localPosition.y;
-        _hitShakeVisual = GetComponentInChildren<HitShakeVisual>();
+        HitShakeVisual = GetComponentInChildren<HitShakeVisual>();
 
         EnergyUIController = GetComponentInChildren<EnergyUIController>();
         HpSlider = GetComponentInChildren<HpSlider>();
@@ -80,6 +84,7 @@ public class Player : MonoBehaviour, IInteractable, IVisualFacing {
         ClearAllIntent();
     
         StopAllCoroutines();
+
     }
     private void Start()
     {
@@ -89,23 +94,24 @@ public class Player : MonoBehaviour, IInteractable, IVisualFacing {
     private void Update()
     {
         if (CombatComponent != null) CombatComponent.Tick(EnemyListManager.Instance.TargetList);
-        if (ActionLockComponent != null) ActionLockComponent.Tick();
-        if(!StateComponent.IsMoving && !StateComponent.IsDead && !StateComponent.IsCastingSkill && !StateComponent.IsBaseAttacking)
-            AnimationComponent.PlayIdle();
+        //if(!StateComponent.IsMoving && !StateComponent.IsDead &&!StateComponent.IsHurt&& 
+        //    !StateComponent.IsCastingSkill && !StateComponent.IsBaseAttacking && StateComponent.IsGrounded)
+        //    AnimationComponent.PlayIdle();
         
         if (AIComponent != null && AIComponent.CanRunAI) AIComponent.Tick();
 
         CombatComponent.DebugIntent(DebugContext.Player, Rt.Id);
+
+        if (HeightComponent != null) HeightComponent.Tick();
     }
     private void LateUpdate() {
         if(StateComponent!=null)StateComponent.DebugState();
     }
 
-
     private void FixedUpdate()
     {
         if (MoveComponent != null) MoveComponent.FixedTick();
-        if (HeightComponent != null) HeightComponent.FixedTick();
+
     }
     public void Initialize(PlayerStatsRuntime stats)
     {
@@ -114,21 +120,21 @@ public class Player : MonoBehaviour, IInteractable, IVisualFacing {
         //注意依賴順序
         EnergyComponent= new EnergyComponent();
         StatsComponent = new StatsComponent(Rt.StatsData);
-        StateComponent = new StateComponent(DebugContext.Player,Rt.Id);
+        StateComponent = new StateComponent(this,DebugContext.Player,Rt.Id);
         EquipmentComponent = new EquipmentComponent(StatsComponent);
 
-        ActionLockComponent = new ActionLockComponent(this,StateComponent);
         HealthComponent = new HealthComponent(Rt, StateComponent);
         AnimationComponent = new AnimationComponent(Ani, transform, Rb, StateComponent);
 
-        HeightComponent = new HeightComponent(_rootSpriteCollider.transform,StateComponent, AnimationComponent,this, StatsComponent.FinalStats);
-        EffectComponent = new EffectComponent(transform, this, Spr, StateComponent);
+        HeightComponent = new HeightComponent(_heightTransform, StateComponent, AnimationComponent,this, StatsComponent.FinalStats,
+            ()=>GameSettingManager.Instance.PhysicConfig.GravityScale);
+        EffectComponent = new EffectComponent(transform, this, _spr, StateComponent);
         RespawnComponent = new RespawnComponent(this, Rt.CanRespawn);
-        MoveComponent = new MoveComponent(Rb, StatsComponent.FinalStats, this, MoveDetector, AnimationComponent,HeightComponent, StateComponent);
+        MoveComponent = new MoveComponent(Rb, StatsComponent.FinalStats, this, AnimationComponent,HeightComponent, StateComponent);
         SpawnerComponent = new SpawnerComponent();
         if (EnemyListManager.Instance.TargetList == null) Debug.Log("EnemyListManager未初始化");
-        CombatComponent = new CombatComponent(this,StatsComponent.FinalStats, Rt.SkillSlotCount, Rt.SkillPool, AnimationComponent, StateComponent, transform, _rootSpriteCollider.transform,
-            EnemyListManager.Instance.TargetList,MoveComponent,HeightComponent,Rt.BaseAttackRuntime);
+        CombatComponent = new CombatComponent(this,StatsComponent.FinalStats, Rt.SkillSlotCount, Rt.SkillPool, AnimationComponent, StateComponent,
+            transform, _heightTransform,EnemyListManager.Instance.TargetList,MoveComponent,HeightComponent,Rt.BaseAttackRuntime);
         AIComponent = new AIComponent( MoveComponent, CombatComponent, transform, Rt.MoveStrategy);
         GrowthComponent = new GrowthComponent(Rt,StatsComponent);
         //額外初始化設定
@@ -168,99 +174,12 @@ public class Player : MonoBehaviour, IInteractable, IVisualFacing {
     }
     public void Interact(InteractInfo info)
     {
-        _lastInteractPosition = info.SourcePosition;
-        var directX = info.SourcePosition.x - RootSpriteCollider.transform.localPosition.x;
-
-        EffectComponent.TakeDamageEffect(info.Damage);
+        _lastInteractPosition = info.SourcePosition;            
+        EffectComponent.TakeDamageEffect(info.Damage);               //先顯示傷害，儘管為0也顯示
 
         if (info.Damage<=0f) return;
-
-
-        HealthComponent.TakeDamage(info.Damage);
-        _hitShakeVisual.Play(HitShakeType.PushBack, directX);
-        if (info.KnockbackPower != 0f) MoveComponent.Knockbacked(info.KnockbackPower, info.SourcePosition);
-        MoveComponent.StopSkillDashMoveCoroutine();
-        HeightComponent.StopSkillDashMoveCoroutine();
-        HeightComponent.StopRecoverHeightCoroutine();
-
-        HeightComponent.AddUpVelocity(info.FloatPower);
+        EnterHurt(0.1f,info);
     }
-
-
-    //事件方法
-    public void OnDie()
-    {
-        AnimationComponent.PlayDie();
-        StartCoroutine(Die());
-    }
-    private IEnumerator Die()
-    {
-        CombatComponent.ClearSkillIntent();
-        CombatComponent.ClearBaseAttackTargetTransform();
-        MoveComponent.ClearAllMoveIntent();
-
-        AIComponent.DisableAI();
-        EffectComponent.PlayerDeathEffect();
-
-        Vector2 dir = _lastInteractPosition-transform.position ;
-
-        EnemyOutlineManager.Instance.ClearTarget();
-
-        foreach (var col in GetComponentsInChildren<Collider2D>())
-            col.enabled = false;
-
-        yield return null; //等一幀，讓Animator確實切到Die動畫
-        AnimatorStateInfo state = Ani.GetCurrentAnimatorStateInfo(0);
-        yield return new WaitForSeconds(state.length / Ani.speed);
-
-        RespawnComponent.RespawnAfter(3f);
-
-        //發事件
-        GameEventSystem.Instance.Event_OnPlayerDie?.Invoke(this);
-        if (PlayerListManager.Instance != null) PlayerListManager.Instance.Unregister(this);
-    }
-
-    public void OnHpChanged(int currentHp, int maxHp) { }    //Todo SliderChange
-    public void OnRespawn()
-    {
-        foreach (var col in GetComponentsInChildren<Collider2D>())
-            col.enabled = true;
-
-
-        ResetState();
-
-        AIComponent.EnableAI();
-        if (PlayerListManager.Instance != null) PlayerListManager.Instance.Register(this);
-    }
-    public void ResetState()
-    {
-        StateComponent.ResetState();
-        HealthComponent.ResetCurrentHp();
-    }
-    public void ClearAllIntent() {
-        MoveComponent.ClearAllMoveIntent();
-        CombatComponent.ClearSkillIntent();
-        CombatComponent.ClearBaseAttackTargetTransform();
-        CombatComponent.ResetSkillChain();
-
-        AIComponent.DisableAI();
-        AIComponent.SetAutoMoveTargetPosition (null);
-        CombatComponent.SetAllDetectRangesVisible(false);
-    }
-
-    private void TurnFacingByIntent(Vector2 direction)
-    {
-        if (direction.sqrMagnitude < 0.01f) return;     //避免靜止時頻繁執行
-
-        if (Mathf.Abs(direction.x) > 0.01f)
-        {
-            var scale = VisulaRootTransform.localScale;
-            float mag = Mathf.Abs(scale.x);
-            scale.x = (direction.x < 0f) ? -mag : mag;          //假設朝向即向右，向左即向左
-            VisulaRootTransform.localScale = scale;
-        }
-    }
-
     private void TryBindEnergyUI() {
         var energyUI = GetComponentInChildren<EnergyUIController>();
         if (energyUI != null) {
@@ -275,4 +194,78 @@ public class Player : MonoBehaviour, IInteractable, IVisualFacing {
 
         UIManager.Instance.UI_SkillSliderController.BindCombatComponent(CombatComponent, Rt.SkillPool);
     }
+    private void EnterHurt(float duration, InteractInfo info) {  
+        MoveComponent.StopSkillDashMoveCoroutine();
+
+        var directX = info.SourcePosition.x - BottomTransform.localPosition.x;
+        HitShakeVisual.Play(HitShakeType.PushBack, directX);
+
+        MoveComponent.Knockbacked(info);
+        HeightComponent.Hurt(duration, info.FloatPower,HurtType.Hard);
+        AnimationComponent.PlayHurt();
+
+        HealthComponent.TakeDamage(info.Damage);
+    }
+
+
+
+    private void OnDie()                        //事件方法
+    {
+        if (PlayerListManager.Instance != null) PlayerListManager.Instance.Unregister(this);
+
+        ClearAllIntent();
+        SetAllColliderEnable(false);
+
+        AnimationComponent.PlayDie();
+        EffectComponent.PlayerDeathEffect();
+        RespawnComponent.RespawnAfter(3f);
+    }
+
+
+    public void OnHpChanged(int currentHp, int maxHp) { }    //Todo SliderChange
+    public void OnRespawn()
+    {
+        if (PlayerListManager.Instance != null) PlayerListManager.Instance.Register(this);
+
+        ResetState();
+    }
+
+
+    public void ResetState()
+    {
+
+        StateComponent.ResetState();
+        HealthComponent.ResetCurrentHp();
+        HeightComponent.ResetInitialHeight();
+        SetAllColliderEnable(true);
+    }
+    public void ClearAllIntent() {
+        MoveComponent.ClearAllMoveIntent();
+        CombatComponent.ClearSkillIntent();
+        CombatComponent.ClearBaseAttackTargetTransform();
+        CombatComponent.ResetSkillChain();
+        EnemyOutlineManager.Instance.ClearTarget();
+
+        AIComponent.DisableAI();
+        AIComponent.SetAutoMoveTargetPosition (null);
+        CombatComponent.SetAllDetectRangesVisible(false);
+    }
+    private void SetAllColliderEnable(bool value) {
+        foreach (var col in GetComponentsInChildren<Collider2D>())
+            col.enabled = value;
+    }
+
+    private void TurnFacingByIntent(Vector2 direction)
+    {
+        if (direction.sqrMagnitude < 0.01f) return;     //避免靜止時頻繁執行
+
+        if (Mathf.Abs(direction.x) > 0.01f)
+        {
+            var scale = ScaleTransform.localScale;
+            float mag = Mathf.Abs(scale.x);
+            scale.x = (direction.x < 0f) ? -mag : mag;          //假設朝向即向右，向左即向左
+            ScaleTransform.localScale = scale;
+        }
+    }
+
 }

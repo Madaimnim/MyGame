@@ -1,52 +1,65 @@
 using System.Collections;
 using UnityEngine;
+
 public enum HitShakeType {
     Shake,      // 目前敵人用
-    PushBack    // 目前玩家用
+    PushBack,    // 目前玩家用
+    SkillFailure
 }
+
 public class HitShakeVisual : MonoBehaviour {
-    [Header("Config檔")]
-    private HitShakeConfig _hitShakConfig;
+
+    private HitShakeConfig _hitShakeConfig;
 
     private Coroutine _shakeCoroutine;
-    private Vector3 _initialLocalPos;
-    private Transform _visualRootTransform;
+
+    // ★ 只記 X，不記 Y
+    private float _initialLocalX;
 
     private void Awake() {
-        _initialLocalPos = transform.localPosition;
-        _hitShakConfig = GameSettingManager.Instance.HitShakeConfig;
-        _visualRootTransform = GetComponentInParent<IVisualFacing>().VisulaRootTransform;
+        _initialLocalX = transform.localPosition.x;
+        _hitShakeConfig = GameSettingManager.Instance.HitShakeConfig;
 
-        if (_hitShakConfig == null) {
+        if (_hitShakeConfig == null) {
             Debug.LogError($"{name} 的 HitShakeVisual 沒有指定 HitShakeConfig！");
         }
     }
 
-    /// <summary>
-    /// 播放受擊抖動
-    /// </summary>
-    /// <param name="hitDirectionX">-1 or +1，代表攻擊來向</param>
     public void Play(HitShakeType hitShakeType, float hitDirectionX) {
-        if (_hitShakConfig == null) return;
+        if (_hitShakeConfig == null) return;
 
         if (_shakeCoroutine != null) {
             StopCoroutine(_shakeCoroutine);
-            transform.localPosition = _initialLocalPos;
+            ResetX();   //  只回 X
         }
 
         switch (hitShakeType) {
             case HitShakeType.Shake:
-                _shakeCoroutine = StartCoroutine(
-                    ShakeRoutine(hitDirectionX,Mathf.Min(_hitShakConfig.Amplitude, _hitShakConfig.maxAmplitude),_hitShakConfig.Duration,_hitShakConfig.Frequency));
+                _shakeCoroutine = StartCoroutine(ShakeRoutine(
+                        hitDirectionX,
+                        Mathf.Min(_hitShakeConfig.Amplitude, _hitShakeConfig.maxAmplitude),
+                        _hitShakeConfig.Duration,
+                        _hitShakeConfig.Frequency)
+                );
                 break;
 
             case HitShakeType.PushBack:
-                _shakeCoroutine = StartCoroutine(
-                    PushBackRoutine(hitDirectionX,_hitShakConfig.PushBackDistance,_hitShakConfig.PushBackDuration));
+                _shakeCoroutine = StartCoroutine(PushBackRoutine(
+                        hitDirectionX,
+                        _hitShakeConfig.PushBackDistance,
+                        _hitShakeConfig.PushBackDuration)
+                );
+                break;
+            case HitShakeType.SkillFailure:
+                _shakeCoroutine = StartCoroutine(ShakeRoutine(
+                        hitDirectionX,
+                        Mathf.Min(_hitShakeConfig.Amplitude/2, _hitShakeConfig.maxAmplitude/2),
+                        _hitShakeConfig.Duration,
+                        _hitShakeConfig.Frequency)
+                );
                 break;
         }
     }
-
 
     private IEnumerator ShakeRoutine(float hitDirX, float amplitude, float duration, int frequency) {
         float elapsed = 0f;
@@ -60,18 +73,17 @@ public class HitShakeVisual : MonoBehaviour {
 
             float offsetX =Mathf.Sin(progress * Mathf.PI * frequency)* amplitude* damping* sign;
 
-            transform.localPosition = _initialLocalPos + new Vector3(offsetX, 0f, 0f);
+            ApplyOffsetX(offsetX);
             yield return null;
         }
 
-        transform.localPosition = _initialLocalPos;
+        ResetX();
         _shakeCoroutine = null;
     }
 
     private IEnumerator PushBackRoutine(float hitDirX, float distance, float duration) {
         float elapsed = 0f;
         float sign = -Mathf.Sign(hitDirX);
-        float startX = _initialLocalPos.x;
 
         while (elapsed < duration) {
             elapsed += Time.deltaTime;
@@ -80,11 +92,23 @@ public class HitShakeVisual : MonoBehaviour {
             float eased = 1f - Mathf.Pow(1f - t, 2f);
             float offsetX = eased * distance * sign;
 
-            transform.localPosition = new Vector3(startX + offsetX, _initialLocalPos.y, _initialLocalPos.z);
+            ApplyOffsetX(offsetX);
             yield return null;
         }
 
-        transform.localPosition = _initialLocalPos;
+        ResetX();
         _shakeCoroutine = null;
+    }
+
+    // ===== 小工具 =====
+
+    private void ApplyOffsetX(float offsetX) {
+        var pos = transform.localPosition;
+        transform.localPosition = new Vector3(_initialLocalX + offsetX,pos.y,pos.z);   // 永遠保留即時高度
+    }
+
+    private void ResetX() {
+        var pos = transform.localPosition;
+        transform.localPosition = new Vector3(_initialLocalX,pos.y,pos.z);
     }
 }

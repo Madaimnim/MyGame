@@ -10,6 +10,6 @@ public class HeightFix_HpSlider : MonoBehaviour
     private void Awake() {}
 
     private void LateUpdate() {
-        transform.localPosition = new Vector3(transform.localPosition.x,_spriteTransform.localPosition.y , transform.localPosition.z);
+        //transform.localPosition = new Vector3(transform.localPosition.x,_spriteTransform.localPosition.y , transform.localPosition.z);
     }
 }

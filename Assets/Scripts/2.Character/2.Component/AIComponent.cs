@@ -6,9 +6,6 @@ using System.Collections.Generic;
 public class AIComponent
 {
     public bool CanRunAI { get; private set; } = false;
-
-    public TargetDetector GetMoveDetector() => MoveComponent.MoveDetector;
-
     public MoveComponent MoveComponent { get; private set; }
     public CombatComponent CombatComponent { get; private set; }
     public Transform Transform { get; private set; }

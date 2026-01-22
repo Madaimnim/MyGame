@@ -62,7 +62,7 @@ Transform:
   m_Children:
   - {fileID: 696804140542230062}
   m_Father: {fileID: 759332654290746892}
-  m_RootOrder: 1
+  m_RootOrder: 2
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!210 &7380006408966806654
 SortingGroup:
@@ -159,6 +159,54 @@ SpriteRenderer:
   m_WasSpriteAssigned: 1
   m_MaskInteraction: 0
   m_SpriteSortPoint: 1
+--- !u!1 &4170743779223694790
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 7196939971800167728}
+  - component: {fileID: 6760327912203294880}
+  m_Layer: 11
+  m_Name: GroundCollider
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &7196939971800167728
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4170743779223694790}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 759332654290746892}
+  m_RootOrder: 0
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!58 &6760327912203294880
+CircleCollider2D:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4170743779223694790}
+  m_Enabled: 1
+  m_Density: 1
+  m_Material: {fileID: 0}
+  m_IsTrigger: 1
+  m_UsedByEffector: 0
+  m_UsedByComposite: 0
+  m_Offset: {x: 0, y: 0.22056434}
+  serializedVersion: 2
+  m_Radius: 0.32574436
 --- !u!1 &4214940176122660070
 GameObject:
   m_ObjectHideFlags: 0
@@ -259,8 +307,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a4dfaaf66ef49214aae722a3f87c09a6, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _rootSpriteCollider: {fileID: 7891914129392936886}
-  _visualRootTransform: {fileID: 759332654290746892}
+  _scaleTransform: {fileID: 759332654290746892}
+  _heightRange: 0.6
   CanGravityFall: 0
 --- !u!1 &6410165869709100198
 GameObject:
@@ -356,7 +404,6 @@ GameObject:
   m_Component:
   - component: {fileID: 8837957424954979240}
   - component: {fileID: 5952126228716930839}
-  - component: {fileID: 7891914129392936886}
   m_Layer: 11
   m_Name: RootSprite
   m_TagString: Untagged
@@ -378,7 +425,7 @@ Transform:
   m_Children:
   - {fileID: 8318755522948334561}
   m_Father: {fileID: 759332654290746892}
-  m_RootOrder: 0
+  m_RootOrder: 1
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!210 &5952126228716930839
 SortingGroup:
@@ -391,22 +438,6 @@ SortingGroup:
   m_SortingLayerID: 0
   m_SortingLayer: 0
   m_SortingOrder: 0
---- !u!58 &7891914129392936886
-CircleCollider2D:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 8274139043178496728}
-  m_Enabled: 1
-  m_Density: 1
-  m_Material: {fileID: 0}
-  m_IsTrigger: 1
-  m_UsedByEffector: 0
-  m_UsedByComposite: 0
-  m_Offset: {x: 0, y: 0.23179471}
-  serializedVersion: 2
-  m_Radius: 0.3482052
 --- !u!1 &8780939329091566774
 GameObject:
   m_ObjectHideFlags: 0
@@ -419,7 +450,7 @@ GameObject:
   - component: {fileID: 1116580915638476758}
   - component: {fileID: 3135818373756793515}
   m_Layer: 11
-  m_Name: VisualRoot
+  m_Name: ScaleRoot
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -437,6 +468,7 @@ Transform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
+  - {fileID: 7196939971800167728}
   - {fileID: 8837957424954979240}
   - {fileID: 7324791510477559766}
   m_Father: {fileID: 4690764757931481766}

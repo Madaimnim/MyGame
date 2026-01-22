@@ -27,6 +27,15 @@ AnimationClip:
     path: RootSprite/Sprite
     classID: 212
     script: {fileID: 0}
+  - curve:
+    - time: 0
+      value: {fileID: -1988100034, guid: f298a9b55a6f9114caec43f72511816a, type: 3}
+    - time: 0.125
+      value: {fileID: 914163363, guid: f298a9b55a6f9114caec43f72511816a, type: 3}
+    attribute: m_Sprite
+    path: BackSprite/Shadow/Sprite
+    classID: 212
+    script: {fileID: 0}
   m_SampleRate: 8
   m_WrapMode: 0
   m_Bounds:
@@ -41,7 +50,16 @@ AnimationClip:
       typeID: 212
       customType: 23
       isPPtrCurve: 1
+    - serializedVersion: 2
+      path: 4148160296
+      attribute: 0
+      script: {fileID: 0}
+      typeID: 212
+      customType: 23
+      isPPtrCurve: 1
     pptrCurveMapping:
+    - {fileID: -1988100034, guid: f298a9b55a6f9114caec43f72511816a, type: 3}
+    - {fileID: 914163363, guid: f298a9b55a6f9114caec43f72511816a, type: 3}
     - {fileID: -1988100034, guid: f298a9b55a6f9114caec43f72511816a, type: 3}
     - {fileID: 914163363, guid: f298a9b55a6f9114caec43f72511816a, type: 3}
   m_AnimationClipSettings:

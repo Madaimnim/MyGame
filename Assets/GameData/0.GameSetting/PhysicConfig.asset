@@ -12,5 +12,5 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b982e3052e418ad4fa4d9389866d2c83, type: 3}
   m_Name: PhysicConfig
   m_EditorClassIdentifier: 
-  GravityScale: 15
+  GravityScale: 20
   BottomYThreshold: 0.5

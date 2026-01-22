@@ -4,31 +4,34 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UIElements;
 
-//SkillDetectorBase 下轄Circle_Detector、Box_Detector等偵測策略，可生成範圍Sprite物件，無實際技能槽，開關僅關閉可視化範圍
-
-//腳色技能安裝流程:
-//PlayerStateSystem.UnlockPlayer()-> PlayerSkillSystem.EquipPlayerSkil()->CombatComponent.EquipSkill->();
-//Enemy.Initialized()->EnemySkillSystem.EquipEnemySkill()->EnemyCombatComponent.EquipSkill->();
+//BottomTransform:角色底部位置(水平移動用)
+//ScaleTransform:轉向Scale，與UIAnchor分離，避免UI轉向
+//SpriteRender:Sprite，純視覺抖動用
+//變形、旋轉必須同時針對Collider、Sprite、Shadow，否則回歪斜
 
 public class Enemy :MonoBehaviour,IInteractable,IVisualFacing
 {
     //公開--------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-    [SerializeField] private Collider2D _rootSpriteCollider;
-    public Collider2D RootSpriteCollider => _rootSpriteCollider;
-    public Transform BottomTransform => transform;
-    [SerializeField] private Transform _visualRootTransform;
-    public Transform VisulaRootTransform=> _visualRootTransform;
+    [SerializeField] private Transform _scaleTransform;
+    [SerializeField] private float _heightRange;
     public Transform BackSpriteTransform;
-    public TargetDetector MoveDetector;
+
+    public Transform BottomTransform => transform;
+    public Transform ScaleTransform => _scaleTransform;
+    public Collider2D GroundCollider => _groundCollider;
+    private Transform _heightTransform => _spr.transform;
+    public Transform SpriteTransform => _spr.transform;
+    public HeightInfo HeightInfo => new HeightInfo(_heightTransform.localPosition.y,_heightTransform.localPosition.y + _heightRange);
+
     public GameObject UI_HpSliderCanvas;
     //組件--------------------------------------------------------------------------------------------------------------------------------------------------------------------------
     [HideInInspector] public Rigidbody2D Rb;
     [HideInInspector] public Animator Ani;
-    [HideInInspector] public SpriteRenderer Spr;
+    private SpriteRenderer _spr;
+    private Collider2D _groundCollider;
     //模組化 --------------------------------------------------------------------------------------------------------------------------------------------------------------------------
     public EnemyStatsRuntime Rt { get; private set; }
     public StateComponent StateComponent { get; private set; } 
-    public ActionLockComponent ActionLockComponent { get; private set; }
     public HealthComponent HealthComponent { get; private set; }
     public RespawnComponent RespawnComponent { get; private set; }
     public AnimationComponent AnimationComponent { get; private set; }
@@ -41,8 +44,7 @@ public class Enemy :MonoBehaviour,IInteractable,IVisualFacing
     public Vector2 MoveVelocity => MoveComponent.GetCurrentMoveVelocity();
 
     private Vector3 _lastInteractPosition;
-    private float _initialHeightY ;
-    private HitShakeVisual _hitShakeVisual;
+    private HitShakeVisual HitShakeVisual;
     //防二次破壞
     private bool _isDestroyed = false;
 
@@ -53,11 +55,10 @@ public class Enemy :MonoBehaviour,IInteractable,IVisualFacing
     private void Awake()
     {
         Rb = GetComponent<Rigidbody2D>();
-        Spr = GetComponentInChildren<SpriteRenderer>();
+        _spr = GetComponentInChildren<SpriteRenderer>();
         Ani = GetComponentInChildren<Animator>();
-        _initialHeightY = Spr.transform.localPosition.y;
-        _hitShakeVisual = GetComponentInChildren<HitShakeVisual>();
-
+        HitShakeVisual = GetComponentInChildren<HitShakeVisual>();
+        _groundCollider = GetComponentInChildren<Collider2D>();
         //Test Rarity
         //var sr = GetComponentInChildren<SpriteRenderer>();
         //_innerEdgeController = new SpriteInnerEdgeController(sr);
@@ -68,7 +69,7 @@ public class Enemy :MonoBehaviour,IInteractable,IVisualFacing
         if (GameManager.Instance != null)GameManager.Instance.EnemyStateSystem.RegisterEnemy(this);
         if (EnemyListManager.Instance != null)EnemyListManager.Instance.Register(this);
 
-        UI_HpSliderCanvas.SetActive(false);
+        //UI_HpSliderCanvas.SetActive(false);
 
     }
 
@@ -85,8 +86,8 @@ public class Enemy :MonoBehaviour,IInteractable,IVisualFacing
 
     private void Update() {
         if (CombatComponent != null) CombatComponent.Tick(PlayerListManager.Instance.TargetList);
-        if (ActionLockComponent != null ) ActionLockComponent.Tick();
         if (AIComponent != null && AIComponent.CanRunAI) AIComponent.Tick();
+        if (HeightComponent != null) HeightComponent.Tick();
 
         CombatComponent.DebugIntent(DebugContext.Enemy, Rt.Id);
     }
@@ -96,7 +97,6 @@ public class Enemy :MonoBehaviour,IInteractable,IVisualFacing
     private void FixedUpdate()
     {
         if (MoveComponent != null) MoveComponent.FixedTick();
-        if (HeightComponent != null) HeightComponent.FixedTick();
     }
     public void Initialize(EnemyStatsRuntime stats) {
         if (_initialized) return;
@@ -105,18 +105,18 @@ public class Enemy :MonoBehaviour,IInteractable,IVisualFacing
         Rt = stats;
 
         //注意依賴順序
-        StateComponent = new StateComponent(DebugContext.Enemy, Rt.Id);
-        ActionLockComponent = new ActionLockComponent(this, StateComponent);
+        StateComponent = new StateComponent(this,DebugContext.Enemy, Rt.Id);
         HealthComponent = new HealthComponent(Rt, StateComponent);
         AnimationComponent = new AnimationComponent(Ani, transform, Rb,StateComponent);
 
-        HeightComponent = new HeightComponent(_rootSpriteCollider.transform, StateComponent ,AnimationComponent, this,Rt.StatsData);
-        EffectComponent = new EffectComponent(transform, this, Spr, StateComponent);
+        HeightComponent = new HeightComponent(_heightTransform, StateComponent ,AnimationComponent, this,Rt.StatsData,
+             () => GameSettingManager.Instance.PhysicConfig.GravityScale);
+        EffectComponent = new EffectComponent(transform, this, _spr, StateComponent);
 
         RespawnComponent = new RespawnComponent(this, Rt.CanRespawn);
-        MoveComponent = new MoveComponent(Rb,Rt.StatsData, this, MoveDetector, AnimationComponent, HeightComponent,StateComponent);
+        MoveComponent = new MoveComponent(Rb,Rt.StatsData, this, AnimationComponent, HeightComponent,StateComponent);
         SpawnerComponent = new SpawnerComponent();
-        CombatComponent = new CombatComponent(this,Rt.StatsData, Rt.SkillSlotCount,Rt.SkillPool, AnimationComponent,StateComponent, transform, _rootSpriteCollider.transform,
+        CombatComponent = new CombatComponent(this,Rt.StatsData, Rt.SkillSlotCount,Rt.SkillPool, AnimationComponent,StateComponent, transform, _groundCollider.transform,
             PlayerListManager.Instance.TargetList,MoveComponent,HeightComponent);
         AIComponent = new AIComponent( MoveComponent, CombatComponent, transform,Rt.MoveStrategy);
 
@@ -155,37 +155,40 @@ public class Enemy :MonoBehaviour,IInteractable,IVisualFacing
 
     public void Interact(InteractInfo info)
     {
-        _lastInteractPosition = info.SourcePosition;
-        var directX = info.SourcePosition.x - RootSpriteCollider.transform.localPosition.x;
-
-        EffectComponent.TakeDamageEffect(info.Damage);
+        _lastInteractPosition = info.SourcePosition;  
+        EffectComponent.TakeDamageEffect(info.Damage);              //先顯示傷害，儘管為0也顯示
 
         if (info.Damage <= 0f) return;
+        //
+        //var directX = info.SourcePosition.x - BottomTransform.localPosition.x;
+        //
+        //HealthComponent.TakeDamage(info.Damage);
+        //MoveComponent.Knockbacked(info);     
+        //MoveComponent.StopSkillDashMoveCoroutine();
 
-        _hitShakeVisual.Play(HitShakeType.Shake,directX);
-        HealthComponent.TakeDamage(info.Damage);
-        if (info.KnockbackPower != 0f) MoveComponent.Knockbacked(info.KnockbackPower, info.SourcePosition);
-        
-        MoveComponent.StopSkillDashMoveCoroutine();
-        HeightComponent.StopSkillDashMoveCoroutine();
-        HeightComponent.StopRecoverHeightCoroutine();
-
-        HeightComponent.Hurt(0.5f);
-        HeightComponent.AddUpVelocity(info.FloatPower);
-
-        ActionLockComponent.HurtLock(0.5f);
-        //AnimationComponent.Play("Hurt");
+        EnterHurt(0.5f, info);
     }
 
+    private void EnterHurt(float duration, InteractInfo info) {
+        MoveComponent.StopSkillDashMoveCoroutine();
 
-    //事件方法
-    public void OnHpChanged(int currentHp, int maxHp) {
-        // 第一次被打（血量不滿）才顯示
-        if (currentHp < maxHp) {
-            if (!UI_HpSliderCanvas.activeSelf)
-                UI_HpSliderCanvas.SetActive(true);
-        }
-    }   
+        var directX = info.SourcePosition.x - BottomTransform.localPosition.x;
+        HitShakeVisual.Play(HitShakeType.Shake, directX);
+
+        MoveComponent.Knockbacked(info);
+        HeightComponent.Hurt(duration, info.FloatPower, HurtType.Hard);
+        AnimationComponent.PlayHurt();
+
+        HealthComponent.TakeDamage(info.Damage);
+    }
+
+    public void OnHpChanged(int currentHp, int maxHp) {                     //事件方法
+        //// 第一次被打（血量不滿）才顯示
+        //if (currentHp < maxHp) {
+        //    if (!UI_HpSliderCanvas.activeSelf)
+        //        UI_HpSliderCanvas.SetActive(true);
+        //}
+    }      
     public void OnDie() {
         EffectComponent.HideOutline();
 
@@ -197,7 +200,7 @@ public class Enemy :MonoBehaviour,IInteractable,IVisualFacing
         AIComponent.DisableAI();
 
 
-        Vector2 dir = _lastInteractPosition - RootSpriteCollider.transform.position;
+        Vector2 dir = _lastInteractPosition - BottomTransform.transform.position;
         SetFacingLeft(dir); // 重用你現有的方向翻轉方法
                           
 
@@ -241,10 +244,10 @@ public class Enemy :MonoBehaviour,IInteractable,IVisualFacing
         if (direction.sqrMagnitude < 0.01f) return;     //避免靜止時頻繁執行
         if (Mathf.Abs(direction.x) > 0.01f)
         {
-            var scale = VisulaRootTransform.localScale;
+            var scale = ScaleTransform.localScale;
             float mag = Mathf.Abs(scale.x);
             scale.x = (direction.x < 0f) ? mag : -mag;
-            VisulaRootTransform.localScale = scale;
+            ScaleTransform.localScale = scale;
 
 
             //if (IsDead) Debug.Log($"更新敵人死亡面相:{transform.localScale}，");

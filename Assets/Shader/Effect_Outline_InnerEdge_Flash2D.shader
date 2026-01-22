@@ -121,7 +121,7 @@ Shader "Custom/Sprite/Effect_Outline_InnerEdge_Flash2D"
                 //if (_AttackProgress > 0)
                 //    col.rgb *= lerp(1.0.xxx, _AttackColor.rgb, _AttackColor.a);           
                 if (_AttackProgress > 0)
-                    col.rgb = lerp(col.rgb, _AttackColor.rgb, _AttackColor.a * 0.2);
+                    col.rgb = lerp(col.rgb, _AttackColor.rgb, _AttackColor.a * 0.4);
 
                 //if (_AttackProgress > 0)
                 //{

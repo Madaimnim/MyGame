@@ -28,7 +28,7 @@ public enum SkillMoveType {
     [InspectorName("拋物線朝目標發射")] ParabolaToward,
     [InspectorName("直線飛行")] Straight,
     [InspectorName("生成於目標位置")] SpawnAtTarget,
-    [InspectorName("附在角色")] AttackToOwner
+    [InspectorName("附在角色")] AttachToOwner
 }
 public enum OnHitType {
     [InspectorName("沒反應")] Nothing,                      //沒反應

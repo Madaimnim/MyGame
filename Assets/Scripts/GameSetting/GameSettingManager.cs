@@ -8,6 +8,7 @@ public class GameSettingManager : MonoBehaviour {
     public PhysicConfig PhysicConfig;
     public SceneConfig SceneConfig;
     public HitShakeConfig HitShakeConfig;
+    public ShadowConfig ShadowConfig;
 
     public SkillCastMode SkillCastMode { get; private set; }
 

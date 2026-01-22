@@ -34,8 +34,8 @@ MonoBehaviour:
       Power: 0
       MoveSpeed: 5
       VerticalMoveSpeed: 0
-      KnockbackPower: 0
-      FloatPower: 0
+      KnockbackPower: 1
+      FloatPower: 5
       Weight: 0
     VisualData:
       Prefab: {fileID: 3372780662201843477, guid: 2dd7717d106aeed4182c61195d94e8a5, type: 3}
@@ -51,7 +51,7 @@ MonoBehaviour:
       serializedVersion: 2
       m_Bits: 576
     canRotate: 1
-    Cooldown: 3
+    Cooldown: 0.2
     EnergyCost: 0
     EnergyGain: 0
     DestroyDelay: 3

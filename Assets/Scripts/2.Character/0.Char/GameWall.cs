@@ -4,20 +4,29 @@ using System.Collections.Generic;
 using UnityEngine;
 
 public class GameWall : MonoBehaviour, IInteractable, IHealthData, IVisualFacing {
-    [SerializeField] private Collider2D sprCol;
-    public Collider2D RootSpriteCollider => sprCol;
+
+    [SerializeField] private Transform _scaleTransform; 
+    [SerializeField] private Collider2D _groundCollider;
+
+    [SerializeField] private float _heightRange;
+    [SerializeField] private int _maxHp = 10;
+
+
     public Transform BottomTransform => transform;
-    [SerializeField]private int _maxHp = 10;
+    public Transform ScaleTransform => _scaleTransform;
+    public Collider2D GroundCollider => _groundCollider;
+    private Transform _heightTransform => _spriteRenderer.transform;
+    public Transform SpriteTransform => _spriteRenderer.transform;
+    public HeightInfo HeightInfo => new HeightInfo(_heightTransform.localPosition.y, _heightTransform.localPosition.y + _heightRange);
+
+
     public int MaxHp =>_maxHp;
     public int CurrentHp { get; set; }
     public HpSlider HpSlider { get; set; }
-
     public Vector2 MoveVelocity => Vector2.zero;
-    [SerializeField] private Transform _visualRootTransform;
-    public Transform VisulaRootTransform => _visualRootTransform;
+
 
     private SpriteRenderer _spriteRenderer;
-
     private HitShakeVisual _hitShakeVisual ;
     private HealthComponent _healthComponent;
     private EffectComponent _effectComponent;
@@ -29,7 +38,7 @@ public class GameWall : MonoBehaviour, IInteractable, IHealthData, IVisualFacing
         _spriteRenderer = GetComponentInChildren<SpriteRenderer>();
 
         _hitShakeVisual = GetComponentInChildren<HitShakeVisual>();
-        _stateComponent = new StateComponent(DebugContext.None, -1);
+        _stateComponent = new StateComponent(this,DebugContext.None, -1);
         _healthComponent = new HealthComponent(this, _stateComponent);
         _effectComponent = new EffectComponent(transform, this, _spriteRenderer, _stateComponent);
 

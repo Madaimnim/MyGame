@@ -67,7 +67,7 @@ public class EffectComponent
     private IEnumerator FlashWhite(float duration) {
         if (_spriteFlashController == null) yield break;
 
-        _spriteFlashController.SetFlash(0.5f);
+        _spriteFlashController.SetFlash(0.7f);
         yield return new WaitForSeconds(duration);
         _spriteFlashController.SetFlash(0f);
 

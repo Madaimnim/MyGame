@@ -24,7 +24,16 @@ AnimationClip:
     - time: 0.125
       value: {fileID: 824895483, guid: 87503ce8b5c6e74419acc0354dc2ed88, type: 3}
     attribute: m_Sprite
-    path: RootSprite/Sprite
+    path: HeightRoot/Sprite
+    classID: 212
+    script: {fileID: 0}
+  - curve:
+    - time: 0
+      value: {fileID: -165236485, guid: 87503ce8b5c6e74419acc0354dc2ed88, type: 3}
+    - time: 0.125
+      value: {fileID: 824895483, guid: 87503ce8b5c6e74419acc0354dc2ed88, type: 3}
+    attribute: m_Sprite
+    path: BackSprite/Shadow/Sprite
     classID: 212
     script: {fileID: 0}
   m_SampleRate: 8
@@ -35,13 +44,22 @@ AnimationClip:
   m_ClipBindingConstant:
     genericBindings:
     - serializedVersion: 2
-      path: 2439941589
+      path: 2386151394
+      attribute: 0
+      script: {fileID: 0}
+      typeID: 212
+      customType: 23
+      isPPtrCurve: 1
+    - serializedVersion: 2
+      path: 4148160296
       attribute: 0
       script: {fileID: 0}
       typeID: 212
       customType: 23
       isPPtrCurve: 1
     pptrCurveMapping:
+    - {fileID: -165236485, guid: 87503ce8b5c6e74419acc0354dc2ed88, type: 3}
+    - {fileID: 824895483, guid: 87503ce8b5c6e74419acc0354dc2ed88, type: 3}
     - {fileID: -165236485, guid: 87503ce8b5c6e74419acc0354dc2ed88, type: 3}
     - {fileID: 824895483, guid: 87503ce8b5c6e74419acc0354dc2ed88, type: 3}
   m_AnimationClipSettings:

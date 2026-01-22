@@ -4,6 +4,7 @@ using UnityEngine;
 
 public class SkillMoveComponent {
     private SkillObject _skillObject;
+    private SkillHeightComponent _skillheightComponent;
 
     private ISkillRuntime _skillRt;
     private SkillMoveType _skillMoveType;
@@ -19,8 +20,10 @@ public class SkillMoveComponent {
         _skillObject = skillObject;
     }
 
-    public void Initialize(ISkillRuntime skillRt,Transform charTransform,Transform charSprTransform,
-                            Vector3 initialHorizontalDirection, Vector3 targetPos, Transform targetTransform = null) {
+    public void Initialize(SkillHeightComponent skillheightComponent,ISkillRuntime skillRt,Transform sourceCharTransform,
+        Transform sourceCharHeightTransform, Vector3 initialHorizontalDirection, Vector3 targetPos, Transform targetTransform = null) {
+        _skillheightComponent = skillheightComponent;
+
         _skillRt = skillRt;
         _skillMoveType = _skillRt.SkillMoveType;
         MoveSpeed = _skillRt.StatsData.MoveSpeed;
@@ -30,16 +33,16 @@ public class SkillMoveComponent {
         _initialHorizontalDirection = initialHorizontalDirection;
         HorizontalMoveDirection = initialHorizontalDirection;
 
-        InitailPosition(charTransform, charSprTransform);
+        InitailPosition(sourceCharTransform, sourceCharHeightTransform);
 
         var target = targetTransform ? targetTransform.GetComponentInParent<IInteractable>():null;
-        float targetHeight = target!=null ? target.RootSpriteCollider.transform.localPosition.y : 0f;
+        float targetHeight = target!=null ? target.HeightInfo.Min : 0f;
         Vector2 targetVelocity= target != null ? target.MoveVelocity: Vector2.zero;
 
         ParabolaHelper.TryGetVerticalSpeed(
             GameSettingManager.Instance.PhysicConfig.GravityScale,
             _skillObject.transform.position,
-            _skillObject.RootSpriteCollider.transform.localPosition.y,
+            _skillObject.HeightInfo.Min,
              MoveSpeed,
             _targetPosition,
             targetHeight,
@@ -51,7 +54,8 @@ public class SkillMoveComponent {
 
     public void Tick() {
         switch (_skillMoveType) {
-            case SkillMoveType.AttackToOwner:
+            case SkillMoveType.AttachToOwner:
+                AttachToOwnerTick();
                 break;
             case SkillMoveType.Station:
                 break;
@@ -72,15 +76,15 @@ public class SkillMoveComponent {
         }
     }
 
-    private void InitailPosition(Transform charTransform,Transform charSprTransform) {
+    private void InitailPosition(Transform charTransform,Transform charHeightTransform) {
         _skillObject.transform.position= charTransform.position;
-        _skillObject.VisualRootTransform.localPosition = Vector3.zero;
+        _skillObject.ScaleTransform.localPosition = Vector3.zero;
 
         switch (_skillMoveType) {
-            case SkillMoveType.AttackToOwner:
+            case SkillMoveType.AttachToOwner:
                 _skillObject.transform.SetParent(charTransform);
                 _skillObject.transform.position = charTransform.position;
-                _skillObject.VisualRootTransform.localPosition = Vector3.zero;
+                _skillObject.ScaleTransform.localPosition = Vector3.zero;
                 break;
             case SkillMoveType.SpawnAtTarget:
                 _skillObject.transform.position = _targetPosition;
@@ -91,6 +95,14 @@ public class SkillMoveComponent {
         SetFacingRight(_initialHorizontalDirection);
     }
     //移動方法
+    private void AttachToOwnerTick() {
+        if (_skillObject.SourceCharHeightTransform == null)
+            return;
+
+        //高度：直接同步角色高度（不是加、不是 lerp）
+        float ownerHeight = _skillObject.SourceCharHeightTransform.localPosition.y;
+        _skillheightComponent.UpdateHeight(ownerHeight);
+    }
     private void TowardTick() => _skillObject.transform.position += (Vector3)(_initialHorizontalDirection * MoveSpeed * Time.deltaTime);
     //Todo Fix
     private void StraightTick() => _skillObject.transform.position += (Vector3)(_initialHorizontalDirection * MoveSpeed * Time.deltaTime);
@@ -106,27 +118,24 @@ public class SkillMoveComponent {
     private void ParabolaTowardTick() {
         _skillObject.transform.position += (Vector3)(HorizontalMoveDirection * MoveSpeed * Time.deltaTime);
 
-        if (_skillObject.RootSpriteCollider.transform.localPosition.y < 0) {
-            _skillObject.RootSpriteCollider.transform.localPosition = new Vector3(0, 0);
+        if (_skillObject.HeightInfo.Min < 0) {
+            _skillheightComponent.UpdateHeight( 0);
             _skillObject.StartDestroyTimer(_skillRt.OnHitDestroyDelay);
             return;
         }
 
-        UpdateArrowRotation();
-        _skillObject.RootSpriteCollider.transform.localPosition += new Vector3(0f, VerticalSpeed * Time.deltaTime, 0f);
+        _skillObject.UpdateArrowRotation(VerticalSpeed, MoveSpeed);
+        _skillheightComponent.AddHeight(VerticalSpeed * Time.deltaTime);
 
         VerticalSpeed -= GameSettingManager.Instance.PhysicConfig.GravityScale * Time.deltaTime;
     }
-    private void UpdateArrowRotation() {
-        float angle = Mathf.Atan2(VerticalSpeed,MoveSpeed) * Mathf.Rad2Deg;
-        _skillObject.RootSpriteCollider.transform.localRotation = Quaternion.Euler(0f, 0f, angle);
-    }
+
 
     public void SetFacingRight(Vector2 direction) {
         if (direction.sqrMagnitude < 0.01f) return;     //避免靜止時頻繁執行
 
         if (Mathf.Abs(direction.x) > 0.01f) {
-            var scale = _skillObject.VisualRootTransform.localScale;
+            var scale = _skillObject.ScaleTransform.localScale;
             float mag = Mathf.Abs(scale.x);
 
             switch (_skillRt.FacingDirection) {
@@ -139,7 +148,7 @@ public class SkillMoveComponent {
             }
 
 
-            _skillObject.VisualRootTransform.localScale = scale;
+            _skillObject.ScaleTransform.localScale = scale;
         }
     }
 }
